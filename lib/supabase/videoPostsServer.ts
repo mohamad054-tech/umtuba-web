@@ -18,6 +18,11 @@ import {
   applyFollowingToDiscoverVideos,
   loadViewerFollowingSet,
 } from "./follows";
+import {
+  applyViewerVisibility,
+  isPostVisibleToViewer,
+  postsSelectVisible,
+} from "./postVisibility";
 import { createClient, getServerUser } from "./server";
 import { loadViewerInteractionState } from "./socialInteractions";
 import { listArticleTitlesByIds } from "../articles/articlesFoundation";
@@ -94,7 +99,7 @@ export async function loadCanonicalVideoFeedPage(input?: {
     const buildFeedQuery = (columns: string) => {
       let query = supabase
         .from("posts")
-        .select(columns)
+        .select(postsSelectVisible(columns))
         .eq("post_type", "video")
         .eq("media_status", "ready")
         .not("video_path", "is", null)
@@ -106,7 +111,7 @@ export async function loadCanonicalVideoFeedPage(input?: {
           `and(created_at.eq.${cursor.createdAt},id.lt.${cursor.id}),created_at.lt.${cursor.createdAt}`
         );
       }
-      return query;
+      return applyViewerVisibility(query, user?.id);
     };
 
     let { data, error } = await buildFeedQuery(postColumns);
@@ -134,15 +139,20 @@ export async function loadCanonicalVideoFeedPage(input?: {
         const focusSelect = useArticleColumn
           ? postColumns
           : postColumnsWithoutArticle;
-        const { data: focused } = await supabase
-          .from("posts")
-          .select(focusSelect)
-          .eq("id", input.focusPostId)
-          .eq("post_type", "video")
-          .eq("media_status", "ready")
-          .not("video_path", "is", null)
-          .maybeSingle();
-        if (focused) {
+        const { data: focused } = await applyViewerVisibility(
+          supabase
+            .from("posts")
+            .select(postsSelectVisible(focusSelect))
+            .eq("id", input.focusPostId)
+            .eq("post_type", "video")
+            .eq("media_status", "ready")
+            .not("video_path", "is", null),
+          user?.id
+        ).maybeSingle();
+        if (
+          focused &&
+          isPostVisibleToViewer(focused as unknown as VideoPostRow, user?.id)
+        ) {
           rows = [focused as unknown as VideoPostRow, ...rows];
         }
       }
@@ -292,17 +302,24 @@ export async function refreshWatchPlaybackUrlServer(
 ): Promise<WatchPlaybackUrlResult> {
   try {
     const supabase = await createClient();
-    const { data, error } = await supabase
-      .from("posts")
-      .select("id, video_path, video_url, post_type, media_status")
-      .eq("id", postId)
-      .maybeSingle();
+    const user = await getServerUser();
+    const { data, error } = await applyViewerVisibility(
+      supabase
+        .from("posts")
+        .select(
+          postsSelectVisible(
+            "id, user_id, video_path, video_url, post_type, media_status, deleted_at"
+          )
+        )
+        .eq("id", postId),
+      user?.id
+    ).maybeSingle();
 
     if (error) {
       return { ok: false, message: "Unable to refresh playback." };
     }
 
-    if (!data) {
+    if (!data || !isPostVisibleToViewer(data, user?.id)) {
       return { ok: false, message: "This video was deleted.", deleted: true };
     }
 
@@ -349,10 +366,13 @@ export async function getFeedPostsServer(): Promise<FeedPostsResult> {
     const supabase = await createClient();
     const user = await getServerUser();
 
-    const { data, error } = await supabase
-      .from("posts")
-      .select(postColumns)
-      .order("created_at", { ascending: false });
+    const { data, error } = await applyViewerVisibility(
+      supabase
+        .from("posts")
+        .select(postsSelectVisible(postColumns))
+        .order("created_at", { ascending: false }),
+      user?.id
+    );
 
     if (error) {
       console.error("Unable to load feed posts:", error);
@@ -441,17 +461,23 @@ async function hydrateLifePosts(
  * UM Life chronological feed — existing `posts` rows only (text / image / video).
  * Does not insert rows or copy media.
  */
-export async function getLifePostsServer(): Promise<FeedPostsResult> {
+export async function getLifePostsServer(options?: {
+  /** Anonymous visibility for sitemap / public index. */
+  indexableOnly?: boolean;
+}): Promise<FeedPostsResult> {
   try {
     const supabase = await createClient();
-    const user = await getServerUser();
+    const user = options?.indexableOnly ? null : await getServerUser();
 
-    const { data, error } = await supabase
-      .from("posts")
-      .select(postColumns)
-      .in("post_type", [...LIFE_CANONICAL_POST_TYPES])
-      .order("created_at", { ascending: false })
-      .limit(LIFE_FEED_LIMIT);
+    const { data, error } = await applyViewerVisibility(
+      supabase
+        .from("posts")
+        .select(postsSelectVisible(postColumns))
+        .in("post_type", [...LIFE_CANONICAL_POST_TYPES])
+        .order("created_at", { ascending: false })
+        .limit(LIFE_FEED_LIMIT),
+      user?.id ?? null
+    );
 
     if (error) {
       console.error("Unable to load UM Life posts:", error);
@@ -484,11 +510,13 @@ export async function getLifePostByIdServer(
     const supabase = await createClient();
     const user = await getServerUser();
 
-    const { data, error } = await supabase
-      .from("posts")
-      .select(postColumns)
-      .eq("id", postId)
-      .maybeSingle();
+    const { data, error } = await applyViewerVisibility(
+      supabase
+        .from("posts")
+        .select(postsSelectVisible(postColumns))
+        .eq("id", postId),
+      user?.id
+    ).maybeSingle();
 
     if (error) {
       console.error("Unable to load UM Life post:", error);
@@ -498,7 +526,10 @@ export async function getLifePostByIdServer(
       };
     }
 
-    if (!data) {
+    if (
+      !data ||
+      !isPostVisibleToViewer(data as unknown as VideoPostRow, user?.id)
+    ) {
       return {
         ok: false,
         message: "This post is unavailable.",

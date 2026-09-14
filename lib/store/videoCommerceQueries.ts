@@ -1,4 +1,8 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import {
+  applyViewerVisibility,
+  postsSelectVisible,
+} from "../supabase/postVisibility";
 import { isPubliclyVisibleProduct } from "./permissions";
 import {
   buildProductHref,
@@ -227,13 +231,20 @@ export async function listPublicVideosForProduct(
     return { items: [], error: null };
   }
 
-  const { data: posts, error: postsError } = await supabase
-    .from("posts")
-    .select("id, content, author_name, author_username, thumbnail_path, video_path, media_status")
-    .in("id", postIds)
-    .eq("post_type", "video")
-    .eq("media_status", "ready")
-    .not("video_path", "is", null);
+  const { data: posts, error: postsError } = await applyViewerVisibility(
+    supabase
+      .from("posts")
+      .select(
+        postsSelectVisible(
+          "id, content, author_name, author_username, thumbnail_path, video_path, media_status"
+        )
+      )
+      .in("id", postIds)
+      .eq("post_type", "video")
+      .eq("media_status", "ready")
+      .not("video_path", "is", null),
+    null
+  );
 
   if (postsError) {
     console.error("listPublicVideosForProduct posts", postsError);

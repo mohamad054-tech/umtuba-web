@@ -32,6 +32,7 @@ const USER_MENU_ITEM_KEYS: Record<string, TranslationKey> = {
   seller: "menu.seller",
   wishlist: "menu.wishlist",
   advertise: "menu.advertise",
+  admin: "menu.admin",
   "admin-ads": "menu.admin",
 };
 

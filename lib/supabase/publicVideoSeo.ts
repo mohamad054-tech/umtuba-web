@@ -1,12 +1,14 @@
+import { applyViewerVisibility, isPostVisibleToViewer, postsSelectVisible } from "./postVisibility";
 import { createClient } from "./server";
 import type { PublicVideoSeoInput } from "../site/videoSeo";
 import { VIDEO_SITEMAP_LIMIT } from "../site/videoSeo";
 
 const SEO_POST_COLUMNS =
-  "id, content, created_at, media_duration_ms, author_name, author_username, article_id, post_type, media_status, video_path";
+  "id, user_id, content, created_at, media_duration_ms, author_name, author_username, article_id, post_type, media_status, video_path, deleted_at";
 
 type SeoPostRow = {
   id: number;
+  user_id?: string | null;
   content: string | null;
   created_at: string;
   media_duration_ms: number | null;
@@ -16,6 +18,8 @@ type SeoPostRow = {
   post_type: string | null;
   media_status: string | null;
   video_path: string | null;
+  deleted_at?: string | null;
+  visibility_author?: unknown;
 };
 
 function isPublicEligibleVideo(row: SeoPostRow): boolean {
@@ -51,18 +55,22 @@ export async function loadPublicVideoSeoById(
 
   try {
     const supabase = await createClient();
-    const { data, error } = await supabase
-      .from("posts")
-      .select(SEO_POST_COLUMNS)
-      .eq("id", postId)
-      .eq("post_type", "video")
-      .eq("media_status", "ready")
-      .not("video_path", "is", null)
-      .maybeSingle();
+    const { data, error } = await applyViewerVisibility(
+      supabase
+        .from("posts")
+        .select(postsSelectVisible(SEO_POST_COLUMNS))
+        .eq("id", postId)
+        .eq("post_type", "video")
+        .eq("media_status", "ready")
+        .not("video_path", "is", null),
+      null
+    ).maybeSingle();
 
     if (error || !data) return null;
     const row = data as unknown as SeoPostRow;
-    if (!isPublicEligibleVideo(row)) return null;
+    if (!isPublicEligibleVideo(row) || !isPostVisibleToViewer(data, null)) {
+      return null;
+    }
     return mapRow(row);
   } catch (error) {
     console.error("loadPublicVideoSeoById failed:", error);
@@ -77,15 +85,18 @@ export async function listPublicVideosForSitemap(
   const capped = Math.min(Math.max(limit, 1), VIDEO_SITEMAP_LIMIT);
   try {
     const supabase = await createClient();
-    const { data, error } = await supabase
-      .from("posts")
-      .select(SEO_POST_COLUMNS)
-      .eq("post_type", "video")
-      .eq("media_status", "ready")
-      .not("video_path", "is", null)
-      .order("created_at", { ascending: false })
-      .order("id", { ascending: false })
-      .limit(capped);
+    const { data, error } = await applyViewerVisibility(
+      supabase
+        .from("posts")
+        .select(postsSelectVisible(SEO_POST_COLUMNS))
+        .eq("post_type", "video")
+        .eq("media_status", "ready")
+        .not("video_path", "is", null)
+        .order("created_at", { ascending: false })
+        .order("id", { ascending: false })
+        .limit(capped),
+      null
+    );
 
     if (error) {
       console.error("listPublicVideosForSitemap failed:", error);
@@ -93,7 +104,9 @@ export async function listPublicVideosForSitemap(
     }
 
     return ((data ?? []) as unknown as SeoPostRow[])
-      .filter(isPublicEligibleVideo)
+      .filter(
+        (row) => isPublicEligibleVideo(row) && isPostVisibleToViewer(row, null)
+      )
       .map(mapRow);
   } catch (error) {
     console.error("listPublicVideosForSitemap failed:", error);

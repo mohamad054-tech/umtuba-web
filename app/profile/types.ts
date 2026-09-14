@@ -16,6 +16,7 @@ export type ProfileVideo = {
   thumbnailUrl?: string | null;
   gradient: string;
   accent: string;
+  removed?: boolean;
 };
 
 /** Live tab bucket (Creator Space §13) — structure readiness only. */

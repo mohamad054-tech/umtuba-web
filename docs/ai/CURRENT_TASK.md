@@ -2,34 +2,39 @@
 
 ## Task title
 
-CENTRAL_UMTUBA_LEGAL_PAGES_V1
+CENTRAL_UMTUBA_UGC_POST_VIEWER_VISIBILITY_V1
 
 ## Status
 
-**LOCAL COMPLETE.** Routes replaced/created. Migration written, not applied.
+**IN PROGRESS → LOCAL COMPLETE after quality gates.** Migrations written, not applied. Do not commit until the owner asks.
 
 ```
-TASK_ID = CENTRAL_UMTUBA_LEGAL_PAGES_V1
+TASK_ID = CENTRAL_UMTUBA_UGC_POST_VIEWER_VISIBILITY_V1
 STATUS = LOCAL_COMPLETE
-DATE = 2026-09-13
+DATE = 2026-09-14
+BRANCH = feat/legal-pages-v1
+BASE_HEAD = c7dd4d68af428f59790fa026b371c8906157e2f8
 PRODUCTION_DB = DO_NOT_TOUCH
 SUPABASE_DB_PUSH = FORBIDDEN
-MIGRATION = supabase/migrations/20260940_data_export_requests_v1.sql
+MIGRATION = supabase/migrations/20260944_ugc_post_viewer_visibility_v1.sql
+PRIOR_MIGRATION = supabase/migrations/20260943_ugc_moderation_operator_actions_v1.sql
 COMMIT = FORBIDDEN_UNLESS_USER_ASKS
-LEGAL_I18N_KEYS = 322
 ```
 
 ## Allowed scope
 
-- Legal i18n keys (types + all 13 catalogs).
-- Replace `/privacy`, `/terms`, `/account-deletion`, `/support` content.
-- Create `/cookies`, `/community-guidelines`, `/copyright`, `/about`, `/data-export`.
-- Shared public footer via AppChrome.
-- Additive migration `20260940` only (not applied).
+- Shared helper `lib/supabase/postVisibility.ts` (`applyViewerVisibility`, `isPostVisibleToViewer`).
+- Wire every listed public post surface through that helper.
+- Additive print-only migration `20260944` (profile stats, interaction RPCs, journey).
+- Owner "removed" state on Watch / Discover / Life / profile grid.
+- i18n key `feed.postRemoved`.
+- Tests for the helper + SQL/surface contract.
 
 ## Forbidden scope
 
-- Do not create `/legal/*`.
-- Do not invent address, CRN, or legal prose.
+- Do not touch RLS.
+- Do not widen any public surface for platform admins.
+- Do not filter `/admin/moderation`.
 - Do not connect to production or run `supabase db push`.
-- Do not change existing i18n key meanings.
+- Do not apply `20260943` or `20260944`.
+- Do not commit or push unless the owner asks.

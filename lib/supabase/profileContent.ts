@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { formatFollowCountLabel } from "./follows";
+import { applyViewerVisibility, hasDeletedAt, postsSelectVisible } from "./postVisibility";
 import {
   attachPlaybackUrls,
   createVideoSignedUrl,
@@ -28,6 +29,7 @@ export type ProfileContentVideo = {
   createdAt: string;
   /** Null until authoritative media duration is available. */
   durationLabel?: string | null;
+  removed?: boolean;
 };
 
 export function formatMediaDurationLabel(
@@ -102,26 +104,33 @@ function liveGradientForRoomId(roomId: string): string {
 
 async function loadProfileContentStatsFromTable(
   supabase: SupabaseClient,
-  userId: string
+  userId: string,
+  viewerId: string | null
 ): Promise<ProfileContentStats | null> {
-  let query = supabase
-    .from("posts")
-    .select("likes, views")
-    .eq("user_id", userId)
-    .eq("post_type", "video")
-    .eq("media_status", "ready")
-    .not("video_path", "is", null);
+  const query = applyViewerVisibility(
+    supabase
+      .from("posts")
+      .select(postsSelectVisible("likes, views"))
+      .eq("user_id", userId)
+      .eq("post_type", "video")
+      .eq("media_status", "ready")
+      .not("video_path", "is", null),
+    viewerId
+  );
 
   let { data, error } = await query;
 
   // Pre-migration fallback: column may not exist yet.
   if (error && (error.message || "").toLowerCase().includes("media_status")) {
-    const legacy = await supabase
-      .from("posts")
-      .select("likes, views")
-      .eq("user_id", userId)
-      .eq("post_type", "video")
-      .not("video_path", "is", null);
+    const legacy = await applyViewerVisibility(
+      supabase
+        .from("posts")
+        .select(postsSelectVisible("likes, views"))
+        .eq("user_id", userId)
+        .eq("post_type", "video")
+        .not("video_path", "is", null),
+      viewerId
+    );
     data = legacy.data;
     error = legacy.error;
   }
@@ -160,7 +169,8 @@ function isMissingRpcError(error: { message?: string; code?: string }): boolean 
  */
 export async function getProfileContentStats(
   supabase: SupabaseClient,
-  userId: string
+  userId: string,
+  viewerId: string | null = null
 ): Promise<ProfileContentStats | null> {
   const { data, error } = await supabase.rpc("get_profile_content_stats", {
     p_user_id: userId,
@@ -168,10 +178,10 @@ export async function getProfileContentStats(
 
   if (error) {
     if (isMissingRpcError(error)) {
-      return loadProfileContentStatsFromTable(supabase, userId);
+      return loadProfileContentStatsFromTable(supabase, userId, viewerId);
     }
     console.error("get_profile_content_stats failed:", error);
-    return loadProfileContentStatsFromTable(supabase, userId);
+    return loadProfileContentStatsFromTable(supabase, userId, viewerId);
   }
 
   const row = asRecord(data);
@@ -189,7 +199,7 @@ export async function getProfileContentStats(
 export async function listProfileVideos(
   supabase: SupabaseClient,
   userId: string,
-  options?: { limit?: number }
+  options?: { limit?: number; viewerId?: string | null }
 ): Promise<{
   videos: ProfileContentVideo[];
   hasMore: boolean;
@@ -200,16 +210,19 @@ export async function listProfileVideos(
     48
   );
 
-  const { data, error } = await supabase
-    .from("posts")
-    .select(postColumns)
-    .eq("user_id", userId)
-    .eq("post_type", "video")
-    .eq("media_status", "ready")
-    .not("video_path", "is", null)
-    .order("created_at", { ascending: false })
-    .order("id", { ascending: false })
-    .limit(limit + 1);
+  const { data, error } = await applyViewerVisibility(
+    supabase
+      .from("posts")
+      .select(postsSelectVisible(postColumns))
+      .eq("user_id", userId)
+      .eq("post_type", "video")
+      .eq("media_status", "ready")
+      .not("video_path", "is", null)
+      .order("created_at", { ascending: false })
+      .order("id", { ascending: false })
+      .limit(limit + 1),
+    options?.viewerId ?? null
+  );
 
   if (error) {
     console.error("listProfileVideos failed:", error);
@@ -238,6 +251,7 @@ export async function listProfileVideos(
         href: `/watch?post=${post.id}`,
         createdAt: post.created_at,
         durationLabel: formatMediaDurationLabel(row?.media_duration_ms),
+        removed: hasDeletedAt(row ?? {}),
       };
     })
   );
@@ -252,16 +266,19 @@ export async function listProfileVideos(
 export async function listProfilePosts(
   supabase: SupabaseClient,
   userId: string,
-  options?: { limit?: number }
+  options?: { limit?: number; viewerId?: string | null }
 ): Promise<{ posts: ProfileContentPost[]; failed?: boolean }> {
   const limit = Math.min(Math.max(options?.limit ?? 24, 1), 48);
-  const { data, error } = await supabase
-    .from("posts")
-    .select("id, post_type, content, image_url, created_at")
-    .eq("user_id", userId)
-    .in("post_type", ["text", "image"])
-    .order("created_at", { ascending: false })
-    .limit(limit);
+  const { data, error } = await applyViewerVisibility(
+    supabase
+      .from("posts")
+      .select(postsSelectVisible("id, post_type, content, image_url, created_at"))
+      .eq("user_id", userId)
+      .in("post_type", ["text", "image"])
+      .order("created_at", { ascending: false })
+      .limit(limit),
+    options?.viewerId ?? null
+  );
 
   if (error) {
     console.error("listProfilePosts failed:", error);
@@ -335,6 +352,7 @@ export function mapContentVideosToProfileVideos(
       thumbnailUrl: video.thumbnailUrl,
       gradient: palette.gradient,
       accent: palette.accent,
+      removed: Boolean(video.removed),
     };
   });
 }

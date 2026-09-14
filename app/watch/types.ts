@@ -36,6 +36,8 @@ export type WatchVideo = {
   articleId?: string | null;
   articleTitle?: string | null;
   articleHref?: string | null;
+  /** Owner-only: taken-down post still shown with a removed state. */
+  removed?: boolean;
 };
 
 export type WatchFeedCursor = {

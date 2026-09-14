@@ -10,6 +10,7 @@ import {
 import { createClient } from "../../../lib/supabase/client";
 import ShareMenu from "../../components/social/ShareMenu";
 import OwnerContentDeleteControl from "../../components/social/OwnerContentDeleteControl";
+import UgcReportControl from "../../components/social/UgcReportControl";
 import { APP_ROUTES } from "../../lib/nav";
 import {
   formatInteractionCount,
@@ -396,6 +397,13 @@ export default function DiscoverActionRail({
           onSelect={(target) => void handleShareTarget(target)}
         />
       </div>
+
+      <UgcReportControl
+        target={{ kind: "content", postId, ownerUserId }}
+        viewerId={viewerId}
+        returnPath={returnPath}
+        variant="rail"
+      />
 
       <OwnerContentDeleteControl
         postId={postId}

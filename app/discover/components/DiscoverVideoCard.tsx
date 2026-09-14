@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useTranslation } from "../../components/i18n";
 import type { WatchProgressEvent } from "../../components/video/VideoPlayer";
 import { APP_ROUTES } from "../../lib/nav";
 import { recordFeedViewOnce } from "../../lib/video/recordFeedView";
@@ -48,6 +49,7 @@ export default function DiscoverVideoCard({
   slideRef,
   onDeleted,
 }: DiscoverVideoCardProps) {
+  const { t } = useTranslation();
   const router = useRouter();
   const [localViews] = useState(() => new Set<number>());
   const viewsSet = sessionViews ?? localViews;
@@ -228,6 +230,11 @@ export default function DiscoverVideoCard({
                 onFollowChange={onFollowChange}
               />
             </div>
+            {video.removed ? (
+              <p className="pointer-events-none inline-flex rounded-full border border-amber-300/40 bg-amber-500/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.14em] text-amber-100">
+                {t("feed.postRemoved")}
+              </p>
+            ) : null}
             <DiscoverCaption
               title={video.title || video.caption}
               caption={video.caption}

@@ -3,6 +3,11 @@ import type {
   PostCommentRow,
   ProfileRow,
 } from "./database.types";
+import {
+  isPostInteractable,
+  postsSelectVisible,
+  readAuthorModerationStatus,
+} from "./postVisibility";
 
 export const COMMENT_MAX_LENGTH = 500;
 export const COMMENT_MIN_LENGTH = 1;
@@ -186,6 +191,10 @@ export async function togglePostLike(
       };
     }
 
+    if (message.includes("post not found")) {
+      return { ok: false, message: "Post not found." };
+    }
+
     return { ok: false, message: "Unable to update like. Please try again." };
   }
 
@@ -220,6 +229,10 @@ export async function togglePostSave(
         message: "Please sign in to save posts.",
         requiresAuth: true,
       };
+    }
+
+    if (message.includes("post not found")) {
+      return { ok: false, message: "Post not found." };
     }
 
     return { ok: false, message: "Unable to update save. Please try again." };
@@ -425,11 +438,27 @@ export async function createPostComment(
 
   const { data: post, error: postError } = await supabase
     .from("posts")
-    .select("id")
+    .select(postsSelectVisible("id, user_id, deleted_at"))
     .eq("id", postId)
     .maybeSingle();
 
-  if (postError || !post) {
+  const visiblePost = post as {
+    id?: number;
+    user_id?: string | null;
+    deleted_at?: string | null;
+    visibility_author?: unknown;
+  } | null;
+
+  if (
+    postError ||
+    !visiblePost ||
+    !isPostInteractable({
+      user_id: visiblePost.user_id,
+      deleted_at: visiblePost.deleted_at,
+      visibility_author: visiblePost.visibility_author,
+      author_moderation_status: readAuthorModerationStatus(visiblePost),
+    })
+  ) {
     return { ok: false, message: "Post not found." };
   }
 

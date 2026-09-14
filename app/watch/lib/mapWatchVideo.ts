@@ -63,6 +63,7 @@ export function discoverVideoToWatchVideo(video: DiscoverVideo): WatchVideo {
     articleId: video.articleId ?? null,
     articleTitle: video.articleTitle ?? null,
     articleHref: video.articleHref ?? null,
+    removed: Boolean(video.removed),
   };
 }
 

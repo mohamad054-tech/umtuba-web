@@ -24,6 +24,7 @@ export type LifePost = {
   likedByMe: boolean;
   savedByMe: boolean;
   createdAt: string;
+  removed?: boolean;
 };
 
 export function isLifePostType(value: string): value is LifePostType {
@@ -55,6 +56,7 @@ export function mapPublicPostToLifePost(post: PublicPostDTO): LifePost | null {
     likedByMe: post.likedByMe,
     savedByMe: post.savedByMe,
     createdAt: post.created_at,
+    removed: Boolean(post.removed),
   };
 }
 

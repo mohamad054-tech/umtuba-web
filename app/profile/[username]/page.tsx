@@ -103,11 +103,12 @@ async function resolveProfile(username: string): Promise<{
       ] = await Promise.all([
         loadProfileActivityTier(row.id),
         getProfileFollowSnapshot(supabase, row.id),
-        getProfileContentStats(supabase, row.id),
+        getProfileContentStats(supabase, row.id, viewerId),
         listProfileVideos(supabase, row.id, {
           limit: PROFILE_VIDEO_PAGE_SIZE,
+          viewerId,
         }),
-        listProfilePosts(supabase, row.id),
+        listProfilePosts(supabase, row.id, { viewerId }),
         listPublishedArticlesForUser(supabase, row.id),
         listProfileActiveLiveRooms(supabase, row.id),
         listProfileProjections(supabase, row.id, { viewerId }),

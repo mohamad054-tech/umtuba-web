@@ -21,6 +21,10 @@ import {
   type ViewResult,
 } from "../../lib/supabase/socialInteractions";
 import {
+  applyViewerVisibility,
+  postsSelectVisible,
+} from "../../lib/supabase/postVisibility";
+import {
   applyViewerStateToPosts,
   attachPlaybackUrls,
   postColumns,
@@ -319,10 +323,13 @@ export async function loadSavedPostsAction(): Promise<SavedPostsResult> {
       return { ok: true, posts: [] };
     }
 
-    const { data, error } = await supabase
-      .from("posts")
-      .select(postColumns)
-      .in("id", postIds);
+    const { data, error } = await applyViewerVisibility(
+      supabase
+        .from("posts")
+        .select(postsSelectVisible(postColumns))
+        .in("id", postIds),
+      user.id
+    );
 
     if (error) {
       console.error("Unable to load saved posts:", error);

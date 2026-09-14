@@ -12,6 +12,7 @@ import {
   applyFollowingToDiscoverVideos,
   loadViewerFollowingSet,
 } from "./follows";
+import { applyViewerVisibility, postsSelectVisible } from "./postVisibility";
 import { createClient, getServerUser } from "./server";
 import { loadViewerInteractionState } from "./socialInteractions";
 import {
@@ -104,7 +105,7 @@ export async function loadFollowingVideoFeedPage(input?: {
     const buildFeedQuery = (columns: string) => {
       let query = supabase
         .from("posts")
-        .select(columns)
+        .select(postsSelectVisible(columns))
         .eq("post_type", "video")
         .eq("media_status", "ready")
         .not("video_path", "is", null)
@@ -117,7 +118,7 @@ export async function loadFollowingVideoFeedPage(input?: {
           `and(created_at.eq.${cursor.createdAt},id.lt.${cursor.id}),created_at.lt.${cursor.createdAt}`
         );
       }
-      return query;
+      return applyViewerVisibility(query, user.id);
     };
 
     let { data, error } = await buildFeedQuery(postColumns);

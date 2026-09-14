@@ -41,4 +41,6 @@ export type DiscoverVideo = {
   stats: DiscoverStats;
   likedByMe: boolean;
   savedByMe: boolean;
+  /** Owner-only: taken-down post still shown with a removed state. */
+  removed?: boolean;
 };

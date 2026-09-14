@@ -57,7 +57,7 @@ async function collectDynamicPaths(): Promise<string[]> {
   }
 
   try {
-    const life = await getLifePostsServer();
+    const life = await getLifePostsServer({ indexableOnly: true });
     if (life.ok) {
       for (const post of life.posts.slice(0, SITEMAP_DYNAMIC_LIMIT)) {
         const path = publicLifePostSitemapPath(post.id);

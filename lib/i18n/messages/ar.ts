@@ -1,4 +1,5 @@
 import { legalArMessages } from "./legalCatalogs";
+import { moderationArMessages } from "./moderationCatalogs";
 import { storeArMessages } from "./storeCatalogs";
 import { teacherArMessages } from "./teacherCatalogs";
 import type { FoundationMessages } from "./types";
@@ -7,6 +8,7 @@ export const arMessages: FoundationMessages = {
   ...storeArMessages,
   ...teacherArMessages,
   ...legalArMessages,
+  ...moderationArMessages,
   "languages.ar": "العربية",
   "languages.en": "الإنجليزية",
   "languages.fr": "الفرنسية",

@@ -16,6 +16,7 @@ import {
 import { createClient } from "../../../lib/supabase/client";
 import ShareMenu from "../social/ShareMenu";
 import OwnerContentDeleteControl from "../social/OwnerContentDeleteControl";
+import UgcReportControl from "../social/UgcReportControl";
 import { APP_ROUTES } from "../../lib/nav";
 import {
   formatInteractionCount,
@@ -373,6 +374,15 @@ export default function VideoActionRail({
               />
             </svg>
           }
+        />
+      ) : null}
+
+      {persist && postId ? (
+        <UgcReportControl
+          target={{ kind: "content", postId, ownerUserId }}
+          viewerId={viewerId}
+          returnPath={returnPath}
+          variant="rail"
         />
       ) : null}
 

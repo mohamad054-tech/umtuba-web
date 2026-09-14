@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useTranslation } from "../../components/i18n";
 import StartDirectMessageButton from "../../components/messaging/StartDirectMessageButton";
 import FollowButton from "../../components/social/FollowButton";
+import UgcReportControl from "../../components/social/UgcReportControl";
 import {
   APP_ROUTES,
   buildCreatorProfileHref,
@@ -145,6 +146,14 @@ export default function ProfileActions({
 
       {umLifeButton}
       {shareButton}
+      {profile.source === "supabase" && isUuid(profile.id) ? (
+        <UgcReportControl
+          target={{ kind: "user", userId: profile.id }}
+          viewerId={viewerId}
+          returnPath={`${APP_ROUTES.profile}/${profile.username}`}
+          variant="button"
+        />
+      ) : null}
       {shareFeedback}
     </div>
   );

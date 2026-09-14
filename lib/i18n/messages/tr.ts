@@ -1,4 +1,5 @@
 import { legalEnMessages } from "./legalCatalogs";
+import { moderationEnMessages } from "./moderationCatalogs";
 import { storeTrMessages } from "./storeCatalogs";
 import { teacherEnMessages } from "./teacherCatalogs";
 import type { FoundationMessages } from "./types";
@@ -8,6 +9,7 @@ export const trMessages: FoundationMessages = {
   ...storeTrMessages,
   ...teacherEnMessages,
   ...legalEnMessages,
+  ...moderationEnMessages,
   "languages.ar": "Arapça",
   "languages.en": "İngilizce",
   "languages.fr": "Fransızca",

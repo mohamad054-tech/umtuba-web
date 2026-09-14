@@ -112,6 +112,11 @@ export default function VideoOverlay({
           </div>
 
           <div>
+            {video.removed ? (
+              <p className="mb-1 inline-flex rounded-full border border-amber-300/40 bg-amber-500/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.14em] text-amber-100">
+                {t("feed.postRemoved")}
+              </p>
+            ) : null}
             <p className="text-sm font-black text-white md:text-[15px]">
               {displayTitle}
             </p>

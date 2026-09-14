@@ -22,6 +22,7 @@ import {
   validateVideoFile,
   VIDEO_SIGNED_URL_TTL_SECONDS,
 } from "./videoPostsShared";
+import { hasDeletedAt } from "./postVisibility";
 import { normalizeUsername } from "./validation";
 
 /**
@@ -81,7 +82,8 @@ const postColumns = `
   shares,
   saves,
   views,
-  created_at
+  created_at,
+  deleted_at
 `;
 
 /** Pre-migration select when `posts.article_id` is not applied yet. */
@@ -129,6 +131,9 @@ export type VideoPostRow = DatabasePost & {
   media_aspect_ratio?: string | null;
   thumbnail_path?: string | null;
   media_pipeline?: Record<string, unknown> | null;
+  deleted_at?: string | null;
+  visibility_author?: unknown;
+  author_moderation_status?: string | null;
 };
 
 /** Client-safe post: playback URL only — never includes storage paths. */
@@ -155,6 +160,8 @@ export type PublicPostDTO = {
   likedByMe: boolean;
   savedByMe: boolean;
   created_at: string;
+  /** Owner-only: the post is taken down but still shown with a removed state. */
+  removed?: boolean;
 };
 
 export type CreateVideoPostInput = {
@@ -328,6 +335,7 @@ export async function attachPlaybackUrls(
         likedByMe: false,
         savedByMe: false,
         created_at: post.created_at,
+        removed: hasDeletedAt(post),
       };
     })
   );
@@ -529,6 +537,7 @@ export function mapVideoPostToDiscover(post: PublicPostDTO): DiscoverVideo | nul
     },
     likedByMe: post.likedByMe,
     savedByMe: post.savedByMe,
+    removed: Boolean(post.removed),
   };
 }
 

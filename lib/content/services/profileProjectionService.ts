@@ -11,6 +11,11 @@ import {
 import { canViewerAccessContent } from "./visibilityService";
 import { getRegisteredAdapter } from "../runtime/adapterRuntime";
 import { ensureBuiltinContentAdaptersRegistered } from "../runtime/registerBuiltinAdapters";
+import {
+  applyViewerVisibility,
+  isPostVisibleToViewer,
+  postsSelectVisible,
+} from "../../supabase/postVisibility";
 
 // Ensure allowlisted adapters exist before projection.
 ensureBuiltinContentAdaptersRegistered();
@@ -175,6 +180,29 @@ export async function listProfileProjections(
   }
 
   const pageRows = filtered.slice(0, limit);
+  const discoveryIds = [
+    ...new Set(
+      pageRows
+        .map((row) => row.discovery_post_id)
+        .filter((id): id is number => typeof id === "number" && id > 0)
+    ),
+  ];
+  const visibleDiscoveryIds = new Set<number>();
+  if (discoveryIds.length > 0) {
+    const { data: visiblePosts } = await applyViewerVisibility(
+      supabase
+        .from("posts")
+        .select(postsSelectVisible("id, user_id, deleted_at"))
+        .in("id", discoveryIds),
+      options?.viewerId ?? null
+    );
+    for (const post of visiblePosts ?? []) {
+      if (isPostVisibleToViewer(post, options?.viewerId ?? null)) {
+        visibleDiscoveryIds.add(Number(post.id));
+      }
+    }
+  }
+
   const items: ProfileProjectionCard[] = [];
 
   for (const row of pageRows) {
@@ -185,6 +213,12 @@ export async function listProfileProjections(
         ownerUserId: row.owner_user_id,
         viewerId: options?.viewerId ?? null,
       })
+    ) {
+      continue;
+    }
+    if (
+      row.discovery_post_id != null &&
+      !visibleDiscoveryIds.has(row.discovery_post_id)
     ) {
       continue;
     }

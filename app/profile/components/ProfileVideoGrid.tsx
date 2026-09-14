@@ -102,6 +102,11 @@ export default function ProfileVideoGrid({
                     {video.durationLabel}
                   </span>
                 ) : null}
+                {video.removed ? (
+                  <span className="absolute start-2 bottom-14 rounded-full border border-amber-300/40 bg-amber-500/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.14em] text-amber-100">
+                    {t("feed.postRemoved")}
+                  </span>
+                ) : null}
                 <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent p-3 pt-10">
                   <p className="line-clamp-2 text-xs font-bold leading-4 text-white sm:text-sm">
                     {video.title}

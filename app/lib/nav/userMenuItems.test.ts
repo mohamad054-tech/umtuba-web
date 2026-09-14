@@ -42,6 +42,7 @@ describe("userMenuItems — Capability Links V1", () => {
     expect(hrefs).toContain(APP_ROUTES.advertise);
     expect(hrefs).not.toContain(APP_ROUTES.seller);
     expect(hrefs).not.toContain(LEARNING_INSTRUCTOR_ROUTES.hub);
+    expect(hrefs).not.toContain(APP_ROUTES.admin);
     expect(hrefs).not.toContain(APP_ROUTES.adminAds);
     expect(hrefs).not.toContain("/feed");
     expect(hrefs).not.toContain("/ai");
@@ -77,7 +78,8 @@ describe("userMenuItems — Capability Links V1", () => {
     const hrefs = listUserMenuHrefs("/profile/demo_user", full);
     expect(hrefs).toContain(LEARNING_INSTRUCTOR_ROUTES.hub);
     expect(hrefs).toContain(APP_ROUTES.seller);
-    expect(hrefs).toContain(APP_ROUTES.adminAds);
+    expect(hrefs).toContain(APP_ROUTES.admin);
+    expect(hrefs).not.toContain(APP_ROUTES.adminAds);
     expect(hrefs).not.toContain(APP_ROUTES.adminStore);
   });
 

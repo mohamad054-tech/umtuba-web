@@ -27,6 +27,10 @@ import {
   quotedIlikePattern,
   validateSearchQuery,
 } from "./validation";
+import {
+  applyViewerVisibility,
+  postsSelectVisible,
+} from "../supabase/postVisibility";
 
 type AnyClient = SupabaseClient;
 
@@ -81,22 +85,28 @@ async function searchPeople(
 async function searchVideos(
   supabase: AnyClient,
   term: string,
-  limit: number
+  limit: number,
+  viewerId: string | null
 ): Promise<RankableCandidate[]> {
   const pattern = quotedIlikePattern(term);
-  const { data, error } = await supabase
-    .from("posts")
-    .select(
-      "id, content, author_username, author_name, post_type, media_status, likes, created_at"
-    )
-    .eq("post_type", "video")
-    .eq("media_status", "ready")
-    .not("video_path", "is", null)
-    .or(
-      `content.ilike.${pattern},author_username.ilike.${pattern},author_name.ilike.${pattern}`
-    )
-    .order("created_at", { ascending: false })
-    .limit(limit);
+  const { data, error } = await applyViewerVisibility(
+    supabase
+      .from("posts")
+      .select(
+        postsSelectVisible(
+          "id, content, author_username, author_name, post_type, media_status, likes, created_at"
+        )
+      )
+      .eq("post_type", "video")
+      .eq("media_status", "ready")
+      .not("video_path", "is", null)
+      .or(
+        `content.ilike.${pattern},author_username.ilike.${pattern},author_name.ilike.${pattern}`
+      )
+      .order("created_at", { ascending: false })
+      .limit(limit),
+    viewerId
+  );
 
   if (error) {
     console.error("searchVideos", error);
@@ -358,7 +368,7 @@ export async function runGlobalSearch(
       tasks.push(Promise.resolve([]));
     }
     if (tab === "all" || tab === "videos") {
-      tasks.push(searchVideos(supabase, term, perTypeLimit));
+      tasks.push(searchVideos(supabase, term, perTypeLimit, viewerId));
     } else {
       tasks.push(Promise.resolve([]));
     }

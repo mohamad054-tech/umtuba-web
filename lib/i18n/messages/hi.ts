@@ -1,4 +1,5 @@
 import { legalEnMessages } from "./legalCatalogs";
+import { moderationEnMessages } from "./moderationCatalogs";
 import { storeHiMessages } from "./storeCatalogs";
 import { teacherEnMessages } from "./teacherCatalogs";
 import type { FoundationMessages } from "./types";
@@ -8,6 +9,7 @@ export const hiMessages: FoundationMessages = {
   ...storeHiMessages,
   ...teacherEnMessages,
   ...legalEnMessages,
+  ...moderationEnMessages,
   "languages.ar": "अरबी",
   "languages.en": "अंग्रेज़ी",
   "languages.fr": "फ़्रेंच",

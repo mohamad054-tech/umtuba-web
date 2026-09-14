@@ -95,9 +95,9 @@ export function buildUserMenuGroups(
 
   if (capabilities.showAdmin) {
     accountItems.push({
-      id: "admin-ads",
+      id: "admin",
       label: "Admin",
-      href: APP_ROUTES.adminAds,
+      href: APP_ROUTES.admin,
     });
   }
 

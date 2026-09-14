@@ -64,6 +64,11 @@ export default function LifePostCard({
               <time dateTime={post.createdAt}>
                 {formatLifeTimestamp(post.createdAt)}
               </time>
+              {post.removed ? (
+                <span className="ms-2 inline-flex rounded-full border border-amber-300/40 bg-amber-500/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.14em] text-amber-100">
+                  {t("feed.postRemoved")}
+                </span>
+              ) : null}
             </p>
           </div>
         </div>

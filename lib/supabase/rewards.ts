@@ -1,4 +1,9 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import {
+  applyViewerVisibility,
+  isPostVisibleToViewer,
+  postsSelectVisible,
+} from "./postVisibility";
 
 export type JourneyCountry = {
   countryCode: string;
@@ -51,6 +56,20 @@ export async function getPostJourney(
   supabase: SupabaseClient,
   postId: number
 ): Promise<PostJourneySummary | null> {
+  const { data: auth } = await supabase.auth.getUser();
+  const viewerId = auth.user?.id ?? null;
+  const { data: visiblePost } = await applyViewerVisibility(
+    supabase
+      .from("posts")
+      .select(postsSelectVisible("id, user_id, deleted_at"))
+      .eq("id", postId),
+    viewerId
+  ).maybeSingle();
+
+  if (!visiblePost || !isPostVisibleToViewer(visiblePost, viewerId)) {
+    return null;
+  }
+
   const { data, error } = await supabase.rpc("get_post_journey", {
     p_post_id: postId,
   });
