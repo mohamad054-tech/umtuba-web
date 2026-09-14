@@ -124,7 +124,11 @@ export async function loadCanonicalVideoFeedPage(input?: {
     }
 
     if (error) {
-      console.error("Unable to load video feed:", error);
+      console.error(
+        "Unable to load video feed:",
+        `code=${error.code ?? "unknown"}`,
+        `message=${error.message ?? ""}`
+      );
       return {
         ok: false,
         message: "Unable to load videos. Please try again.",

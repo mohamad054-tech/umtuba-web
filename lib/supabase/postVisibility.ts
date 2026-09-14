@@ -20,10 +20,17 @@ const VIEWER_UUID_RE =
 export const VISIBILITY_AUTHOR_EMBED =
   "visibility_author:profiles!user_id!inner(moderation_status)";
 
+export type ViewerVisibilityOrOptions = {
+  referencedTable?: string;
+};
+
 export type ViewerVisibilityQuery = {
   is: (column: string, value: null) => ViewerVisibilityQuery;
   eq: (column: string, value: string) => ViewerVisibilityQuery;
-  or: (filters: string) => ViewerVisibilityQuery;
+  or: (
+    filters: string,
+    options?: ViewerVisibilityOrOptions
+  ) => ViewerVisibilityQuery;
 };
 
 export type ViewerVisibilityPost = {
@@ -94,9 +101,16 @@ export function applyViewerVisibility<Q>(
       .eq("visibility_author.moderation_status", "active") as Q;
   }
 
+  // Same boolean as post_is_visible_to_viewer:
+  //   (active AND (not deleted OR owner)) OR (shadowbanned AND owner)
+  // CNF: (active OR (shadowbanned AND owner)) AND (not deleted OR owner).
+  // PostgREST cannot parse embed columns inside a parent or=(...) tree, so the
+  // first conjunct is scoped to the profiles embed. visibility_author.id is
+  // posts.user_id (profiles!user_id!inner).
   return builder
     .or(
-      `visibility_author.moderation_status.eq.active,and(visibility_author.moderation_status.eq.shadowbanned,user_id.eq.${viewer})`
+      `moderation_status.eq.active,and(moderation_status.eq.shadowbanned,id.eq.${viewer})`,
+      { referencedTable: "visibility_author" }
     )
     .or(`deleted_at.is.null,user_id.eq.${viewer}`) as Q;
 }

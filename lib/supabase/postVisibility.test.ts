@@ -1,3 +1,4 @@
+import { createClient } from "@supabase/supabase-js";
 import { describe, expect, it } from "vitest";
 import {
   applyViewerVisibility,
@@ -120,8 +121,8 @@ describe("postVisibility helper", () => {
         calls.push({ method: "eq", args: [column, value] });
         return this;
       },
-      or(filters: string) {
-        calls.push({ method: "or", args: [filters] });
+      or(filters: string, options?: { referencedTable?: string }) {
+        calls.push({ method: "or", args: options ? [filters, options] : [filters] });
         return this;
       },
     };
@@ -134,11 +135,51 @@ describe("postVisibility helper", () => {
 
     calls.length = 0;
     applyViewerVisibility(query, AUTHOR);
-    expect(calls[0]?.method).toBe("or");
-    expect(String(calls[0]?.args[0])).toContain("shadowbanned");
-    expect(String(calls[0]?.args[0])).toContain(AUTHOR);
-    expect(calls[1]?.method).toBe("or");
-    expect(String(calls[1]?.args[0])).toContain("deleted_at.is.null");
+    expect(calls).toEqual([
+      {
+        method: "or",
+        args: [
+          `moderation_status.eq.active,and(moderation_status.eq.shadowbanned,id.eq.${AUTHOR})`,
+          { referencedTable: "visibility_author" },
+        ],
+      },
+      {
+        method: "or",
+        args: [`deleted_at.is.null,user_id.eq.${AUTHOR}`],
+      },
+    ]);
+  });
+
+  it("keeps the signed-in SQL filters equivalent to isPostVisibleToViewer", () => {
+    const cases = [
+      post({ status: "active" }),
+      post({ deleted: true, status: "active" }),
+      post({ status: "shadowbanned" }),
+      post({ deleted: true, status: "shadowbanned" }),
+      post({ status: "banned" }),
+      post({ status: "suspended" }),
+      post({ status: "active", authorId: OTHER }),
+      post({ deleted: true, status: "active", authorId: OTHER }),
+      post({ status: "shadowbanned", authorId: OTHER }),
+    ];
+
+    for (const row of cases) {
+      const status = (row.author_moderation_status ?? "").toLowerCase();
+      const authorId = row.user_id;
+      const embedOk =
+        status === "active" ||
+        (status === "shadowbanned" && authorId === AUTHOR);
+      const baseOk = !row.deleted_at || authorId === AUTHOR;
+      expect(embedOk && baseOk).toBe(isPostVisibleToViewer(row, AUTHOR));
+    }
+  });
+
+  it("builds PostgREST-valid anonymous and signed-in query strings", async () => {
+    const anonymousUrl = await captureVisibilityQueryUrl(null);
+    const signedInUrl = await captureVisibilityQueryUrl(AUTHOR);
+
+    expectValidAnonymousVisibilityQuery(anonymousUrl);
+    expectValidSignedInVisibilityQuery(signedInUrl, AUTHOR);
   });
 
   it("keeps the author embed in one select helper", () => {
@@ -147,3 +188,117 @@ describe("postVisibility helper", () => {
     );
   });
 });
+
+const POSTGREST_LEAF =
+  /^[A-Za-z_][A-Za-z0-9_]*\.(eq|neq|gt|gte|lt|lte|like|ilike|is|in|cs|cd)\./;
+
+function splitTopLevel(args: string): string[] {
+  const parts: string[] = [];
+  let depth = 0;
+  let start = 0;
+  for (let i = 0; i < args.length; i += 1) {
+    const ch = args[i];
+    if (ch === "(") depth += 1;
+    else if (ch === ")") depth -= 1;
+    else if (ch === "," && depth === 0) {
+      parts.push(args.slice(start, i));
+      start = i + 1;
+    }
+  }
+  parts.push(args.slice(start));
+  return parts.map((part) => part.trim()).filter(Boolean);
+}
+
+function walkLogicTree(tree: string, visitLeaf: (leaf: string) => void) {
+  const trimmed = tree.trim();
+  const wrap = /^(and|or|not)\(([\s\S]*)\)$/.exec(trimmed);
+  if (wrap?.[2] !== undefined) {
+    for (const part of splitTopLevel(wrap[2])) {
+      walkLogicTree(part, visitLeaf);
+    }
+    return;
+  }
+  const parts = splitTopLevel(trimmed);
+  if (parts.length > 1) {
+    for (const part of parts) {
+      walkLogicTree(part, visitLeaf);
+    }
+    return;
+  }
+  visitLeaf(trimmed);
+}
+
+function unwrapPostgrestGroup(tree: string): string {
+  const trimmed = tree.trim();
+  if (trimmed.startsWith("(") && trimmed.endsWith(")")) {
+    return trimmed.slice(1, -1);
+  }
+  return trimmed;
+}
+
+function expectValidPostgrestLogicTree(tree: string) {
+  walkLogicTree(unwrapPostgrestGroup(tree), (leaf) => {
+    expect(leaf, `invalid PostgREST leaf: ${leaf}`).toMatch(POSTGREST_LEAF);
+    expect(leaf.startsWith("visibility_author.")).toBe(false);
+    expect(leaf.split(".")[0]).not.toBe("visibility_author");
+  });
+}
+
+async function captureVisibilityQueryUrl(
+  viewerId: string | null
+): Promise<string> {
+  let captured = "";
+  const supabase = createClient("http://127.0.0.1", "test-anon-key", {
+    auth: { persistSession: false, autoRefreshToken: false },
+    global: {
+      fetch: async (input: RequestInfo | URL) => {
+        if (typeof input === "string") captured = input;
+        else if (input instanceof URL) captured = input.toString();
+        else captured = input.url;
+        return new Response("[]", {
+          status: 200,
+          headers: { "Content-Type": "application/json", "content-range": "0-0/0" },
+        });
+      },
+    },
+  });
+
+  const { error } = await applyViewerVisibility(
+    supabase
+      .from("posts")
+      .select(postsSelectVisible("id, user_id, deleted_at")),
+    viewerId
+  );
+  expect(error).toBeNull();
+  expect(captured).toContain("/posts");
+  return captured;
+}
+
+function queryParams(url: string): URLSearchParams {
+  return new URL(url).searchParams;
+}
+
+function expectValidAnonymousVisibilityQuery(url: string) {
+  const params = queryParams(url);
+  expect(params.get("or")).toBeNull();
+  expect(params.get("deleted_at")).toBe("is.null");
+  expect(params.get("visibility_author.moderation_status")).toBe("eq.active");
+}
+
+function expectValidSignedInVisibilityQuery(url: string, viewer: string) {
+  const params = queryParams(url);
+  const parentOr = params.getAll("or");
+  expect(parentOr).toHaveLength(1);
+  expect(unwrapPostgrestGroup(parentOr[0] ?? "")).toBe(
+    `deleted_at.is.null,user_id.eq.${viewer}`
+  );
+  expectValidPostgrestLogicTree(parentOr[0] ?? "");
+
+  const embedOr = params.get("visibility_author.or");
+  expect(unwrapPostgrestGroup(embedOr ?? "")).toBe(
+    `moderation_status.eq.active,and(moderation_status.eq.shadowbanned,id.eq.${viewer})`
+  );
+  expectValidPostgrestLogicTree(embedOr ?? "");
+  expect(embedOr).not.toContain("user_id");
+  expect(embedOr).not.toContain("deleted_at");
+}
