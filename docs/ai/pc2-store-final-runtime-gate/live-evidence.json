@@ -1,0 +1,34 @@
+{
+  "pages": [
+    {
+      "name": "01_store_home",
+      "url": "https://umtuba.com/store",
+      "status": 200,
+      "finalUrl": "https://umtuba.com/store",
+      "hasNightMarket": true,
+      "hasEmpty": true,
+      "hasProductHref": false,
+      "screenshot": "C:\\Users\\Giga store\\Desktop\\umtuba\\worktrees\\PC2-STORE-APPROVED-DESIGN-PRODUCTIZATION-V1\\docs\\ai\\pc2-store-final-runtime-gate\\shots\\01_store_home.png"
+    },
+    {
+      "name": "02_seller_a_storefront",
+      "url": "https://umtuba.com/store/pc2-test-seller-a-20260823",
+      "status": 200,
+      "finalUrl": "https://umtuba.com/store/pc2-test-seller-a-20260823",
+      "hasNightMarket": true,
+      "hasEmpty": false,
+      "hasProductHref": false,
+      "screenshot": "C:\\Users\\Giga store\\Desktop\\umtuba\\worktrees\\PC2-STORE-APPROVED-DESIGN-PRODUCTIZATION-V1\\docs\\ai\\pc2-store-final-runtime-gate\\shots\\02_seller_a_storefront.png"
+    },
+    {
+      "name": "03_store_search",
+      "url": "https://umtuba.com/store/search",
+      "status": 200,
+      "finalUrl": "https://umtuba.com/store/search",
+      "hasNightMarket": false,
+      "hasEmpty": false,
+      "hasProductHref": false,
+      "screenshot": "C:\\Users\\Giga store\\Desktop\\umtuba\\worktrees\\PC2-STORE-APPROVED-DESIGN-PRODUCTIZATION-V1\\docs\\ai\\pc2-store-final-runtime-gate\\shots\\03_store_search.png"
+    }
+  ]
+}

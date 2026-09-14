@@ -1,0 +1,83 @@
+{
+  "origin": "https://umtuba.com",
+  "pages": [
+    {
+      "name": "01_store_desktop_1440",
+      "url": "https://umtuba.com/store",
+      "status": 200,
+      "finalUrl": "https://umtuba.com/store",
+      "dir": "ltr",
+      "lang": "en",
+      "hasNightMarketToken": false,
+      "hasShopUmtuba": true,
+      "hasEmptyCatalog": true,
+      "hasLogin": true,
+      "screenshot": "C:\\Users\\Giga store\\Desktop\\umtuba\\worktrees\\PC2-STORE-APPROVED-DESIGN-PRODUCTIZATION-V1\\docs\\ai\\pc2-store-staged-production-deployment\\shots\\01_store_desktop_1440.png"
+    },
+    {
+      "name": "02_store_mobile_390",
+      "url": "https://umtuba.com/store",
+      "status": 200,
+      "finalUrl": "https://umtuba.com/store",
+      "dir": "ltr",
+      "lang": "en",
+      "hasNightMarketToken": false,
+      "hasShopUmtuba": true,
+      "hasEmptyCatalog": true,
+      "hasLogin": true,
+      "screenshot": "C:\\Users\\Giga store\\Desktop\\umtuba\\worktrees\\PC2-STORE-APPROVED-DESIGN-PRODUCTIZATION-V1\\docs\\ai\\pc2-store-staged-production-deployment\\shots\\02_store_mobile_390.png"
+    },
+    {
+      "name": "03_store_ar_rtl_1440",
+      "url": "https://umtuba.com/store?hl=ar",
+      "status": 200,
+      "finalUrl": "https://umtuba.com/store?hl=ar",
+      "dir": "rtl",
+      "lang": "ar",
+      "hasNightMarketToken": false,
+      "hasShopUmtuba": true,
+      "hasEmptyCatalog": true,
+      "hasLogin": true,
+      "screenshot": "C:\\Users\\Giga store\\Desktop\\umtuba\\worktrees\\PC2-STORE-APPROVED-DESIGN-PRODUCTIZATION-V1\\docs\\ai\\pc2-store-staged-production-deployment\\shots\\03_store_ar_rtl_1440.png"
+    },
+    {
+      "name": "04_store_en_ltr_1440",
+      "url": "https://umtuba.com/store?hl=en",
+      "status": 200,
+      "finalUrl": "https://umtuba.com/store?hl=en",
+      "dir": "ltr",
+      "lang": "en",
+      "hasNightMarketToken": false,
+      "hasShopUmtuba": true,
+      "hasEmptyCatalog": true,
+      "hasLogin": true,
+      "screenshot": "C:\\Users\\Giga store\\Desktop\\umtuba\\worktrees\\PC2-STORE-APPROVED-DESIGN-PRODUCTIZATION-V1\\docs\\ai\\pc2-store-staged-production-deployment\\shots\\04_store_en_ltr_1440.png"
+    },
+    {
+      "name": "05_store_cart_auth",
+      "url": "https://umtuba.com/store/cart",
+      "status": 200,
+      "finalUrl": "https://umtuba.com/login?next=%2Fstore%2Fcart",
+      "dir": "ltr",
+      "lang": "en",
+      "hasNightMarketToken": false,
+      "hasShopUmtuba": false,
+      "hasEmptyCatalog": false,
+      "hasLogin": true,
+      "screenshot": "C:\\Users\\Giga store\\Desktop\\umtuba\\worktrees\\PC2-STORE-APPROVED-DESIGN-PRODUCTIZATION-V1\\docs\\ai\\pc2-store-staged-production-deployment\\shots\\05_store_cart_auth.png"
+    },
+    {
+      "name": "06_store_checkout_auth",
+      "url": "https://umtuba.com/store/checkout",
+      "status": 200,
+      "finalUrl": "https://umtuba.com/login?next=%2Fstore%2Fcheckout",
+      "dir": "ltr",
+      "lang": "en",
+      "hasNightMarketToken": false,
+      "hasShopUmtuba": false,
+      "hasEmptyCatalog": false,
+      "hasLogin": true,
+      "screenshot": "C:\\Users\\Giga store\\Desktop\\umtuba\\worktrees\\PC2-STORE-APPROVED-DESIGN-PRODUCTIZATION-V1\\docs\\ai\\pc2-store-staged-production-deployment\\shots\\06_store_checkout_auth.png"
+    }
+  ]
+}
