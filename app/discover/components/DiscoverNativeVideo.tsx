@@ -14,6 +14,7 @@ import {
   shouldAutoRemintPlayback,
 } from "../../lib/video/signedPlaybackRetry";
 import { pauseInactiveVideo, playActiveVideo } from "../../../lib/video/playActiveVideo";
+import { preferredFeedMuted } from "../../../lib/video/feedAudioPreference";
 import { localizedVideoTitle } from "../../watch/lib/mapWatchVideo";
 
 type DiscoverNativeVideoProps = {
@@ -52,6 +53,7 @@ export default function DiscoverNativeVideo({
   const [playbackStatus, setPlaybackStatus] = useState<PlaybackStatus>("ok");
   const [retrying, setRetrying] = useState(false);
   const [playbackSrc, setPlaybackSrc] = useState(src);
+  const [muted, setMuted] = useState(() => preferredFeedMuted());
 
   useEffect(() => {
     autoRemintAttemptedRef.current = false;
@@ -75,7 +77,10 @@ export default function DiscoverNativeVideo({
       return;
     }
 
-    void playActiveVideo(video, true);
+    const nextMuted = preferredFeedMuted();
+    void playActiveVideo(video, nextMuted).then((result) => {
+      setMuted(result === "muted_fallback" ? true : nextMuted);
+    });
   }, [active, playbackSrc, playbackStatus]);
 
   useEffect(() => {
@@ -184,7 +189,7 @@ export default function DiscoverNativeVideo({
           poster={poster}
           controls
           playsInline
-          muted
+          muted={muted}
           preload={resolveHomeDiscoverMediaPreload(active)}
           aria-label={displayLabel}
           onError={handlePlaybackError}

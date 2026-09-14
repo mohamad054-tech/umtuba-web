@@ -2,38 +2,32 @@
 
 ## Task title
 
-CENTRAL_UMTUBA_UGC_SIGNED_IN_VISIBILITY_POSTGREST_FIX_V1
+CENTRAL_UMTUBA_FEED_AUDIO_PERSISTENCE_V1
 
 ## Status
 
-**IN PROGRESS → LOCAL COMPLETE after quality gates.** TypeScript-only hotfix. Do not commit until the owner asks.
+**IN PROGRESS → LOCAL COMPLETE after quality gates.** New branch off `4cb958c5`. Do not merge.
 
 ```
-TASK_ID = CENTRAL_UMTUBA_UGC_SIGNED_IN_VISIBILITY_POSTGREST_FIX_V1
+TASK_ID = CENTRAL_UMTUBA_FEED_AUDIO_PERSISTENCE_V1
 STATUS = LOCAL_COMPLETE
 DATE = 2026-09-14
-BRANCH = feat/legal-pages-v1
-BASE_HEAD = e3431744996750301ea9545056fd804683343ed6
+BRANCH = fix/feed-audio-persistence
+BASE_HEAD = 4cb958c5b1018f5c3ffdfc5364f19a6adf367c98
 PRODUCTION_DB = DO_NOT_TOUCH
 SUPABASE_DB_PUSH = FORBIDDEN
 MIGRATION = NONE
-COMMIT = FORBIDDEN_UNLESS_USER_ASKS
+MERGE = FORBIDDEN
 ```
 
 ## Allowed scope
 
-- Rewrite the signed-in branch of `applyViewerVisibility` so PostgREST accepts it.
-- Keep the same visibility boolean as `post_is_visible_to_viewer` / `isPostVisibleToViewer`.
-- Keep the anonymous path unchanged.
-- Keep one shared helper. Do not inline the rule.
-- Add PostgREST `code` + `message` to the Home/Discover server log in `videoPostsServer.ts`. Do not leak that to the client.
-- Tests for signed-in and anonymous built query strings.
+- Persist Watch unmute across videos and page remounts.
+- Autoplay `NotAllowedError` may mute the current element only; do not overwrite the stored preference.
+- Home/Discover should start from the same preference.
 
 ## Forbidden scope
 
-- Do not change the visibility rule.
-- Do not touch RLS.
-- Do not filter `/admin/moderation`.
-- Do not add or apply a migration.
-- Do not connect to production or run `supabase db push`.
+- Do not merge into `feat/legal-pages-v1`.
+- Do not touch RLS, migrations, or visibility helpers.
 - Do not commit or push unless the owner asks.

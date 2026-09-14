@@ -16,6 +16,10 @@ import {
   WATCH_PLAYBACK_NEIGHBOR_WINDOW,
   isPlayableHttpSrc,
 } from "../../lib/video/playbackFetchPolicy";
+import {
+  preferredFeedMuted,
+  writeFeedUnmutedPreference,
+} from "../../../lib/video/feedAudioPreference";
 import type { WatchPanelId } from "./watchTypes";
 import VideoSlide from "./VideoSlide";
 
@@ -94,12 +98,19 @@ export default function VerticalVideoFeed({
     Math.min(Math.max(initialIndex, 0), Math.max(videos.length - 1, 0))
   );
   const [muted, setMuted] = useState(true);
+  const [muteAppliedVideoId, setMuteAppliedVideoId] = useState(
+    () => videos[Math.min(Math.max(initialIndex, 0), Math.max(videos.length - 1, 0))]?.id
+  );
   const nearEndRequestedRef = useRef(false);
   const lastRestoreTokenRef = useRef<number | null>(null);
   const signingRef = useRef(new Set<number>());
   const programmaticIndexRef = useRef<number | null>(null);
 
   const activeVideo = videos[activeIndex] ?? videos[0];
+  if (activeVideo?.id !== muteAppliedVideoId) {
+    setMuteAppliedVideoId(activeVideo?.id);
+    setMuted(preferredFeedMuted());
+  }
 
   const mountedIndexes = useMemo(() => {
     const indexes = new Set<number>();
@@ -326,10 +337,16 @@ export default function VerticalVideoFeed({
   }, [activeIndex, videos]);
 
   const handleToggleMute = useCallback(() => {
-    setMuted((value) => !value);
+    setMuted((value) => {
+      const nextMuted = !value;
+      writeFeedUnmutedPreference(!nextMuted);
+      return nextMuted;
+    });
   }, []);
 
   const handleAutoplayMuted = useCallback(() => {
+    // Playback-only mute. Do not persist — the viewer still wants sound
+    // on the next clip / next gesture after a NotAllowedError.
     setMuted(true);
   }, []);
 
