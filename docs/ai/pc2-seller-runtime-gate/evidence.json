@@ -1,0 +1,111 @@
+{
+  "TASK_ID": "PC2_UMTUBA_STORE_SELLER_CENTER_COMMERCE_READINESS_V1",
+  "AUTH_METHOD": "NORMAL_USER_AUTH",
+  "FAKE_SESSION_USED": "NO",
+  "SERVICE_ROLE_USED_CLIENT_SIDE": "NO",
+  "RLS_DISABLED": "NO",
+  "startedAt": "2026-08-23T15:58:50.228Z",
+  "envPresent": {
+    "NEXT_PUBLIC_SUPABASE_URL": true,
+    "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY": true,
+    "SUPABASE_SERVICE_ROLE_KEY": false
+  },
+  "signup": {
+    "A": {
+      "email": "pc2.store.seller.a.20260823@example.com",
+      "username": "pc2sellera0823",
+      "userIdPresent": true,
+      "hasSession": true,
+      "emailConfirmPending": false,
+      "error": null
+    },
+    "B": {
+      "email": "pc2.store.seller.b.20260823@example.com",
+      "username": "pc2sellerb0823",
+      "userIdPresent": true,
+      "hasSession": true,
+      "emailConfirmPending": false,
+      "error": null
+    }
+  },
+  "applicationInsertA": {
+    "ok": true,
+    "status": "draft",
+    "slug": "pc2-test-seller-a-20260823",
+    "error": null
+  },
+  "applicationReloadA": {
+    "ok": true,
+    "status": "draft",
+    "wizardStep": 6,
+    "error": null
+  },
+  "applicationSubmitA": {
+    "ok": true,
+    "error": null
+  },
+  "applicationStatusAfterSubmit": "pending",
+  "applicationInsertB": {
+    "ok": true,
+    "status": "draft",
+    "error": null
+  },
+  "rlsBCannotReadA": {
+    "ok": true,
+    "rowCount": 0,
+    "error": null
+  },
+  "rlsBCannotUpdateA": {
+    "ok": true,
+    "rowCount": 0,
+    "error": null
+  },
+  "productListA": {
+    "ok": true,
+    "count": 0,
+    "error": null
+  },
+  "storesVisibleToA": {
+    "ok": true,
+    "count": 0,
+    "verification": [],
+    "error": null
+  },
+  "productCreateWithoutApproval": {
+    "ok": false,
+    "error": {
+      "code": "P0001",
+      "message": "Store must be verified before managing products"
+    }
+  },
+  "nonAdminCannotApprove": {
+    "denied": true,
+    "error": {
+      "code": "P0001",
+      "message": "Platform admin required"
+    }
+  },
+  "customerPrivacyProbe": {
+    "error": {
+      "code": "42703",
+      "message": "column orders.buyer_email does not exist"
+    },
+    "rowCount": 0,
+    "leakedEmail": false,
+    "leakedPhone": false
+  },
+  "cleanup": {
+    "deletedA": false,
+    "deleteAError": {
+      "code": "42501",
+      "message": "permission denied for table seller_applications"
+    },
+    "deletedB": false,
+    "deleteBError": {
+      "code": "42501",
+      "message": "permission denied for table seller_applications"
+    },
+    "pendingALeftForOperator": true
+  },
+  "STATUS": "AUTHENTICATED_RUNTIME_PARTIAL"
+}

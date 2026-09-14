@@ -18,6 +18,8 @@ import { listPublicVideosForProduct } from "../../../../../lib/store/videoCommer
 import { isProductWishlisted } from "../../../../../lib/store/wishlist";
 import type { PublicCatalogItem } from "../../../../../lib/store/types";
 import ProductDetailClient from "./ProductDetailClient";
+import ProductReviewsPanel from "../../../../components/store/ProductReviewsPanel";
+import { listPublishedProductReviews } from "../../../../../lib/store/productReviews";
 import JsonLd from "../../../../components/JsonLd";
 import {
   buildBreadcrumbListJsonLd,
@@ -92,10 +94,11 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
 
   if (!detail) notFound();
 
-  const [user, catalog, videos] = await Promise.all([
+  const [user, catalog, videos, reviews] = await Promise.all([
     getServerUser(),
     listPublicCatalog(supabase, { limit: 24 }),
     listPublicVideosForProduct(supabase, detail.product.id),
+    listPublishedProductReviews(supabase, detail.product.id),
   ]);
   const related = pickTrending(
     catalog.items.filter(
@@ -175,6 +178,18 @@ export default async function ProductDetailPage({ params }: ProductPageProps) {
         recommended={recommended}
         videos={videos.items}
         initialWishlisted={wishlisted}
+      />
+      <ProductReviewsPanel
+        productId={detail.product.id}
+        storeSlug={detail.store.slug}
+        productSlug={detail.product.slug}
+        reviews={reviews}
+        title={t("store.product.reviewsTitle")}
+        empty={t("store.product.reviewsEmpty")}
+        canWrite={false}
+        writeLabel={t("store.reviews.write")}
+        submitLabel={t("store.reviews.submit")}
+        deliveredOnly={t("store.reviews.deliveredOnly")}
       />
     </StoreShell>
     </>

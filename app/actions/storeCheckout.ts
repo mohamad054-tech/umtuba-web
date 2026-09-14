@@ -12,6 +12,7 @@ import {
 import { getCartSummary } from "../../lib/store/cart";
 import { ensureDeferredPaymentAttempts } from "../../lib/store/paymentAttempts";
 import { rejectClientMoneyFormFields } from "../../lib/store/tradingContracts";
+import { assertCommerceFinancialGates } from "../../lib/store/commerceReadiness";
 import { APP_ROUTES } from "../lib/nav";
 
 function formString(formData: FormData, key: string): string {
@@ -123,6 +124,7 @@ export async function confirmCheckoutQuoteAction(formData: FormData) {
     return { ok: false as const, message: "Missing checkout quote." };
   }
   const supabase = await createClient();
+  const financialGates = assertCommerceFinancialGates();
   const result = await confirmCheckoutQuote(supabase, quoteId);
   if (!result.ok) {
     return result;
@@ -153,6 +155,8 @@ export async function confirmCheckoutQuoteAction(formData: FormData) {
       payment_attempts: attempts,
       payment_attempt_failures: failures,
       payment_recording_incomplete: failures.length > 0,
+      real_payment_capture: financialGates.REAL_PAYMENT_CAPTURE,
+      payment_provider_connected: financialGates.PAYMENT_PROVIDER_CONNECTED,
     },
   };
 }

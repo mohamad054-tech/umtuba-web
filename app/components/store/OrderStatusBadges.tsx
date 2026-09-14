@@ -21,6 +21,8 @@ const ORDER_TONE: Record<OrderStatus, Tone> = {
   shipped: "good",
   delivered: "good",
   cancelled: "bad",
+  return_requested: "warn",
+  returned: "info",
   refunded: "bad",
 };
 

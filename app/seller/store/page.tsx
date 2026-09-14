@@ -279,12 +279,18 @@ export default async function SellerStorePage({ searchParams }: PageProps) {
           Hidden/archived listing counts stay on the seller Marketplace page.
           Enabling participation does not mark every product eligible.
         </p>
-        <div className="mt-4">
+        <div className="mt-4 flex flex-wrap gap-4">
           <Link
             href={APP_ROUTES.sellerMarketplace}
             className="text-sm font-semibold text-[var(--sf-accent-strong)] hover:underline"
           >
             Open marketplace workspace
+          </Link>
+          <Link
+            href={APP_ROUTES.sellerEarnings}
+            className="text-sm font-semibold text-[var(--sf-accent-strong)] hover:underline"
+          >
+            Earnings architecture
           </Link>
         </div>
       </section>
