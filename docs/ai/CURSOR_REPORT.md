@@ -1,60 +1,38 @@
-# Cursor Report
+# CURSOR_REPORT — Shared AI Surface Integration V1
 
 ## Summary
 
-Private AI Foundation V1 is implemented on
-`office/platform-private-ai-foundation-v1` (base `2344c1b`). Provides private
-model registry, capability registry, lifecycle metadata, hardware/deployment/
-routing contracts, permissions, file persistence, read-only admin UI under
-`/admin/private-ai`, and local-only migration `20260879`. No training,
-fine-tuning, inference, or weights. Staged for manual commit — **not
-committed, not pushed**.
+**FAIL for worktree/branch contract; functional Shared AI checks PASS on current tree.**
 
-## Exact files changed
+Current folder `umtuba-web-shared-ai-surface-integration-v1` is checked out as
+`office/platform-private-ai-workflow-lifecycle-v1` @ `db6f52a` (not Gemini tip
+`30bda6a`). Working tree mixes Private AI Workflow files + Shared AI Surface
+files. Per operator instruction: no reset/clean/backup restore was performed.
 
-- `lib/privateAi/**`
-- `app/admin/private-ai/**`
-- `supabase/migrations/20260879_private_ai_foundation_v1.sql`
-- `vitest.config.ts`
-- `docs/architecture/PRIVATE_AI_FOUNDATION_V1.md`
-- `docs/ai/CURRENT_TASK.md`
-- `docs/ai/CURSOR_REPORT.md`
-- `docs/ai/PROJECT_STATE.md`
-- `docs/ai/SESSION_HANDOFF.md`
+On this mixed tree: focused Shared AI tests **35/35 PASS**, `tsc --noEmit`
+**PASS**. Translation Studio admin AI path is wired through `aiService`.
+Architecture guards + secret sanitize present. No `.env.local` → live smoke
+not run. No commit / no push.
 
-## Migrations created
+## Verdict detail
 
-- `20260879_private_ai_foundation_v1.sql` — **not remote-applied**
-
-## Security review
-
-- Admin pages platform-admin gated
-- Migration: FORCE RLS + admin SELECT only
-- Permission contracts for model/capability/dataset/experiment/audit
-- No secrets; no weights; no inference/provider runtime changes
-
-## Tests
-
-`npx vitest run lib/privateAi/privateAiFoundation.test.ts` — **6/6 pass**
-
-## TypeScript
-
-`npx tsc --noEmit` — pass
-
-## Build
-
-`npm run build` — pass (`/admin/private-ai` routes registered)
-
-## git diff --check
-
-`git diff --cached --check` — pass
-
-## git status --short
-
-Staged intended scope only. See Final Verification Report.
+| Contract | Result |
+| --- | --- |
+| Independent Shared AI branch @ Gemini tip | **FAIL** (wrong branch/HEAD) |
+| Shared AI functional wiring + tests | **PASS** on current files |
+| Tree isolation from Private AI task | **FAIL** (mixed dirty tree) |
 
 ## Open issues
 
-- No runtime routing or hardware provisioning (by design)
-- Supabase tables unused until persistence cutover
-- No commit / push until GO
+1. Re-home Shared AI work onto `office/platform-shared-ai-surface-integration-v1`
+   @ `origin/office/platform-gemini-live-provider-v1` **without destructive
+   commands** — needs explicit operator GO on the safe procedure.
+2. Keep Private AI Workflow changes on their own branch/worktree.
+3. **Learning Tutor UI still on stub RPC** (`app/learning/.../ai-tutor` +
+   `appendAiTutorMessageAction` / `aiTutorFoundation`) — backend Shared AI
+   actions exist but learner UI does not call them. Highest remaining product
+   gap after inventory audit.
+4. Commerce product-draft seller UI / Assistant chat UI: Core ready, product UI
+   absent or Hub-entry-only (intentional / deferred unless tasked).
+5. After separation + GO: Commit (no trailers) + Push + verify `0 0`.
+6. Live smoke needs worktree `.env.local` with `GEMINI_API_KEY`.

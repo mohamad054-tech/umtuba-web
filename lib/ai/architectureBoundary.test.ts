@@ -151,4 +151,85 @@ describe("AI architecture boundary", () => {
     }
     expect(offenders).toEqual([]);
   });
+
+  it("provider vendor domains and SDKs stay inside allowed adapters", () => {
+    const allowed = new Set([
+      "lib/ai/providers/adapters.ts",
+      "lib/ai/providers/geminiAdapter.ts",
+      "lib/ai/providers/anthropicAdapter.ts",
+      "lib/ai/providers/localAdapter.ts",
+      "lib/ai/config.ts",
+    ]);
+    const forbiddenPatterns = [
+      /api\.openai\.com/i,
+      /generativelanguage\.googleapis\.com/i,
+      /api\.anthropic\.com/i,
+      /GoogleGenerativeAI/,
+      /@google\/genai/,
+      /@google\/generative-ai/,
+      /from\s+["']openai["']/,
+      /from\s+["']@anthropic-ai\//,
+    ];
+    const offenders: string[] = [];
+    const roots = [
+      join(process.cwd(), "lib"),
+      join(process.cwd(), "app"),
+    ];
+    const skipDir = (name: string) =>
+      name === "node_modules" ||
+      name === ".git" ||
+      name === "dist" ||
+      name === "coverage";
+
+    const walk = (dir: string) => {
+      if (!statSync(dir, { throwIfNoEntry: false })?.isDirectory()) return;
+      for (const name of readdirSync(dir)) {
+        if (skipDir(name)) continue;
+        const full = join(dir, name);
+        const st = statSync(full);
+        if (st.isDirectory()) {
+          walk(full);
+          continue;
+        }
+        if (!/\.(ts|tsx|js|mjs)$/.test(name)) continue;
+        if (name.includes(".test.")) continue;
+        const rel = relative(process.cwd(), full).replace(/\\/g, "/");
+        if (allowed.has(rel)) continue;
+        const src = readFileSync(full, "utf8");
+        for (const pattern of forbiddenPatterns) {
+          if (pattern.test(src)) {
+            offenders.push(`${rel} :: ${pattern}`);
+            break;
+          }
+        }
+      }
+    };
+    for (const root of roots) walk(root);
+    expect(offenders).toEqual([]);
+  });
+
+  it("server actions do not call provider adapters or vendor SDKs directly", () => {
+    const actionsDir = join(process.cwd(), "app/actions");
+    const offenders: string[] = [];
+    if (!statSync(actionsDir, { throwIfNoEntry: false })?.isDirectory()) {
+      expect(offenders).toEqual([]);
+      return;
+    }
+    for (const name of readdirSync(actionsDir)) {
+      if (!name.endsWith(".ts")) continue;
+      const full = join(actionsDir, name);
+      const src = readFileSync(full, "utf8");
+      const rel = relative(process.cwd(), full).replace(/\\/g, "/");
+      if (
+        /from\s+["'][^"']*lib\/ai\/providers\//.test(src) ||
+        /createGeminiAdapter|createOpenAiCompatibleAdapter|createAnthropicAdapter/.test(
+          src
+        ) ||
+        /api\.openai\.com|generativelanguage\.googleapis\.com/.test(src)
+      ) {
+        offenders.push(rel);
+      }
+    }
+    expect(offenders).toEqual([]);
+  });
 });
