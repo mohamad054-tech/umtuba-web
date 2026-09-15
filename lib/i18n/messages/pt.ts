@@ -675,6 +675,7 @@ export const ptMessages: FoundationMessages = {
   "watch.pauseVideo": "Pausar vídeo",
   "watch.unmute": "Ativar som",
   "watch.mute": "Silenciar",
+  "watch.tapToUnmute": "Toque para ativar o som",
   "watch.emptyFeed": "Ainda não há vídeos publicados. Cria um para começar a ver.",
   "watch.aiSummary": "Resumo de IA",
   "watch.openAiPanel": "Abrir painel de IA",

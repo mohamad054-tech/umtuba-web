@@ -22,14 +22,11 @@ import VideoPlayer, { type WatchProgressEvent } from "./VideoPlayer";
 type VideoSlideProps = {
   video: WatchVideo;
   active: boolean;
-  muted: boolean;
   viewerId?: string | null;
   forcePause?: boolean;
   transitionLocked?: boolean;
   shopProductCount?: number;
   shopShelfOpen?: boolean;
-  onToggleMute: () => void;
-  onAutoplayMuted?: () => void;
   onOpenPanel: (panel: Exclude<WatchPanelId, null>) => void;
   onPostJourney: (video: WatchVideo) => void;
   onStatsChange?: (stats: Partial<DiscoverStats>) => void;
@@ -46,14 +43,11 @@ type VideoSlideProps = {
 export default function VideoSlide({
   video,
   active,
-  muted,
   viewerId = null,
   forcePause = false,
   transitionLocked = false,
   shopProductCount = 0,
   shopShelfOpen = false,
-  onToggleMute,
-  onAutoplayMuted,
   onOpenPanel,
   onPostJourney,
   onStatsChange,
@@ -189,10 +183,7 @@ export default function VideoSlide({
         src={video.src}
         poster={video.poster}
         active={active}
-        muted={muted}
         forcePause={forcePause && active}
-        onToggleMute={onToggleMute}
-        onAutoplayMuted={onAutoplayMuted}
         playbackStatus={playbackStatus}
         onPlaybackError={handlePlaybackError}
         onRetryPlayback={

@@ -604,6 +604,7 @@ export const idMessages: FoundationMessages = {
   "watch.pauseVideo": "Jeda video",
   "watch.unmute": "Nyala suara",
   "watch.mute": "Bisukan",
+  "watch.tapToUnmute": "Ketuk untuk nyalakan suara",
   "watch.emptyFeed": "Belum ada video terbit. Buat satu untuk mulai menonton.",
   "watch.aiSummary": "Ringkasan AI",
   "watch.openAiPanel": "Buka panel AI",

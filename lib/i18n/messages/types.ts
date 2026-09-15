@@ -616,6 +616,7 @@ export type FoundationMessages = {
   "watch.pauseVideo": string;
   "watch.unmute": string;
   "watch.mute": string;
+  "watch.tapToUnmute": string;
   "watch.emptyFeed": string;
   "watch.aiSummary": string;
   "watch.openAiPanel": string;

@@ -604,6 +604,7 @@ export const ruMessages: FoundationMessages = {
   "watch.pauseVideo": "Пауза",
   "watch.unmute": "Включить звук",
   "watch.mute": "Выключить звук",
+  "watch.tapToUnmute": "Нажмите, чтобы включить звук",
   "watch.emptyFeed": "Пока нет опубликованных видео. Создайте одно, чтобы начать просмотр.",
   "watch.aiSummary": "Сводка ИИ",
   "watch.openAiPanel": "Открыть панель ИИ",

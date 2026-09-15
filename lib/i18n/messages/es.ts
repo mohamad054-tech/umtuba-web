@@ -674,6 +674,7 @@ export const esMessages: FoundationMessages = {
   "watch.pauseVideo": "Pausar vídeo",
   "watch.unmute": "Activar sonido",
   "watch.mute": "Silenciar",
+  "watch.tapToUnmute": "Toca para activar el sonido",
   "watch.emptyFeed": "Aún no hay vídeos publicados. Crea uno para empezar a ver.",
   "watch.aiSummary": "Resumen de IA",
   "watch.openAiPanel": "Abrir panel de IA",

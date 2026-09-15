@@ -678,6 +678,7 @@ export const deMessages: FoundationMessages = {
   "watch.pauseVideo": "Video pausieren",
   "watch.unmute": "Ton einschalten",
   "watch.mute": "Ton aus",
+  "watch.tapToUnmute": "Tippen, um Ton einzuschalten",
   "watch.emptyFeed": "Noch keine veröffentlichten Videos. Erstelle eines, um Watch zu starten.",
   "watch.aiSummary": "KI-Zusammenfassung",
   "watch.openAiPanel": "KI-Panel öffnen",

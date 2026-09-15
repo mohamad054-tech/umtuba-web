@@ -603,6 +603,7 @@ export const koMessages: FoundationMessages = {
   "watch.pauseVideo": "영상 일시정지",
   "watch.unmute": "소리 켜기",
   "watch.mute": "음소거",
+  "watch.tapToUnmute": "탭하여 소리 켜기",
   "watch.emptyFeed": "게시된 영상이 아직 없습니다. 하나 만들어 시청을 시작하세요.",
   "watch.aiSummary": "AI 요약",
   "watch.openAiPanel": "AI 패널 열기",

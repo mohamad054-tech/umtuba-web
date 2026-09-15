@@ -682,6 +682,7 @@ export const enMessages: FoundationMessages = {
   "watch.pauseVideo": "Pause video",
   "watch.unmute": "Unmute video",
   "watch.mute": "Mute video",
+  "watch.tapToUnmute": "Tap to unmute",
   "watch.emptyFeed": "No published videos yet. Create one to start the Watch feed.",
   "watch.aiSummary": "AI summary",
   "watch.openAiPanel": "Open AI panel",

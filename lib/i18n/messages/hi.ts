@@ -604,6 +604,7 @@ export const hiMessages: FoundationMessages = {
   "watch.pauseVideo": "वीडियो रोकें",
   "watch.unmute": "आवाज़ चालू करें",
   "watch.mute": "आवाज़ बंद करें",
+  "watch.tapToUnmute": "आवाज़ चालू करने के लिए टैप करें",
   "watch.emptyFeed": "अभी कोई प्रकाशित वीडियो नहीं। देखने के लिए एक बनाएँ।",
   "watch.aiSummary": "एआई सारांश",
   "watch.openAiPanel": "एआई पैनल खोलें",

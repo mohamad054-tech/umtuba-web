@@ -667,6 +667,7 @@ export const arMessages: FoundationMessages = {
   "watch.pauseVideo": "إيقاف الفيديو",
   "watch.unmute": "تشغيل الصوت",
   "watch.mute": "كتم الصوت",
+  "watch.tapToUnmute": "اضغط لتشغيل الصوت",
   "watch.emptyFeed": "لا توجد فيديوهات منشورة بعد. أنشئ واحداً لبدء المشاهدة.",
   "watch.aiSummary": "خلاصة الذكاء الاصطناعي",
   "watch.openAiPanel": "فتح لوحة الذكاء الاصطناعي",

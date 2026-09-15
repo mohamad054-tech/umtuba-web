@@ -604,6 +604,7 @@ export const trMessages: FoundationMessages = {
   "watch.pauseVideo": "Videoyu duraklat",
   "watch.unmute": "Sesi aç",
   "watch.mute": "Sesi kapat",
+  "watch.tapToUnmute": "Sesi açmak için dokunun",
   "watch.emptyFeed": "Henüz yayımlanmış video yok. İzlemeye başlamak için bir tane oluştur.",
   "watch.aiSummary": "YZ özeti",
   "watch.openAiPanel": "YZ panelini aç",

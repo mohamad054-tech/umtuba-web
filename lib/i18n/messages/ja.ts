@@ -603,6 +603,7 @@ export const jaMessages: FoundationMessages = {
   "watch.pauseVideo": "動画を一時停止",
   "watch.unmute": "ミュート解除",
   "watch.mute": "ミュート",
+  "watch.tapToUnmute": "タップして音声をオンにする",
   "watch.emptyFeed": "公開動画はまだありません。作成すると視聴を始められます。",
   "watch.aiSummary": "AI要約",
   "watch.openAiPanel": "AIパネルを開く",
