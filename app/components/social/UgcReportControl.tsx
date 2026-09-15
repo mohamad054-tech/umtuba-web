@@ -36,7 +36,10 @@ type Props = {
   target: ContentTarget | UserTarget;
   viewerId?: string | null;
   returnPath: string;
-  variant?: "rail" | "button";
+  variant?: "rail" | "button" | "none";
+  /** When set, the dialog is controlled by the parent (More menu). */
+  controlledOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
 };
 
 export default function UgcReportControl({
@@ -44,6 +47,8 @@ export default function UgcReportControl({
   viewerId = null,
   returnPath,
   variant = "button",
+  controlledOpen,
+  onOpenChange,
 }: Props) {
   const { t } = useTranslation();
   const router = useRouter();
@@ -71,8 +76,10 @@ export default function UgcReportControl({
   const invalidContent =
     target.kind === "content" && !isReportPostId(target.postId);
   const invalidUser = target.kind === "user" && !isReportUuid(target.userId);
+  const blocked = ownContent || ownUser || invalidContent || invalidUser;
+  const dialogOpen = controlledOpen ?? open;
 
-  if (ownContent || ownUser || invalidContent || invalidUser) {
+  if (blocked) {
     return null;
   }
 
@@ -86,6 +93,7 @@ export default function UgcReportControl({
     setErrorKey(null);
     setDone(false);
     setOpen(true);
+    onOpenChange?.(true);
   }
 
   async function submit() {
@@ -113,10 +121,17 @@ export default function UgcReportControl({
     }
     setDone(true);
     setOpen(false);
+    onOpenChange?.(false);
+  }
+
+  function closeDialog() {
+    if (pending) return;
+    setOpen(false);
+    onOpenChange?.(false);
   }
 
   const trigger =
-    variant === "rail" ? (
+    variant === "none" ? null : variant === "rail" ? (
       <button
         type="button"
         className="watch-focus-ring flex flex-col items-center gap-1"
@@ -157,7 +172,7 @@ export default function UgcReportControl({
           {t("report.success")}
         </p>
       ) : null}
-      {open && typeof document !== "undefined"
+      {dialogOpen && typeof document !== "undefined"
         ? createPortal(
             <ReportDialog
               titleId={titleId}
@@ -172,9 +187,7 @@ export default function UgcReportControl({
               error={errorKey ? t(errorKey) : null}
               onReasonChange={setReasonCode}
               onDetailChange={setDetail}
-              onClose={() => {
-                if (!pending) setOpen(false);
-              }}
+              onClose={closeDialog}
               onSubmit={() => void submit()}
             />,
             document.body

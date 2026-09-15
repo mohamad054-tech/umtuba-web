@@ -345,8 +345,20 @@ export default function WatchExperience({
   );
 
   const handleVideoDeleted = useCallback((videoId: string) => {
-    setVideos((current) => current.filter((video) => video.id !== videoId));
-    setActiveVideo((current) => (current?.id === videoId ? null : current));
+    setVideos((current) => {
+      const index = current.findIndex((video) => video.id === videoId);
+      const remaining = current.filter((video) => video.id !== videoId);
+      setActiveVideo((active) => {
+        if (active?.id !== videoId) {
+          return active;
+        }
+        if (remaining.length === 0) {
+          return null;
+        }
+        return remaining[Math.min(Math.max(index, 0), remaining.length - 1)] ?? null;
+      });
+      return remaining;
+    });
     setActivePanel(null);
   }, []);
 

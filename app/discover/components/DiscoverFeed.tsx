@@ -26,6 +26,7 @@ type DiscoverFeedProps = {
   onSrcChange?: (videoId: string, src: string) => void;
   onNearEnd?: () => void;
   onVideoDeleted?: (videoId: string, postId: number) => void;
+  onCaptionChange?: (videoId: string, caption: string) => void;
   /** Bump when a load-more attempt fails so near-end can fire again. */
   loadMoreEpoch?: number;
 };
@@ -61,6 +62,7 @@ export default function DiscoverFeed({
   onSrcChange,
   onNearEnd,
   onVideoDeleted,
+  onCaptionChange,
   loadMoreEpoch = 0,
 }: DiscoverFeedProps) {
   const scrollerRef = useRef<HTMLDivElement>(null);
@@ -72,6 +74,9 @@ export default function DiscoverFeed({
   const [activeIndex, setActiveIndex] = useState(() =>
     Math.min(Math.max(initialIndex, 0), Math.max(videos.length - 1, 0))
   );
+  const [advanceLocked, setAdvanceLocked] = useState(false);
+  const videoIdsKey = videos.map((video) => video.id).join(",");
+  const previousVideoIdsRef = useRef(videoIdsKey);
 
   const activeVideo = videos[activeIndex] ?? videos[0];
 
@@ -171,6 +176,15 @@ export default function DiscoverFeed({
   );
 
   useEffect(() => {
+    const previous = previousVideoIdsRef.current.split(",").filter(Boolean);
+    previousVideoIdsRef.current = videoIdsKey;
+    if (previous.length <= videos.length) {
+      return;
+    }
+    scrollToIndex(activeIndexRef.current);
+  }, [videoIdsKey, videos.length, scrollToIndex]);
+
+  useEffect(() => {
     const scroller = scrollerRef.current;
 
     if (!scroller || videos.length === 0) {
@@ -259,6 +273,9 @@ export default function DiscoverFeed({
       if (target && ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName)) {
         return;
       }
+      if (advanceLocked) {
+        return;
+      }
 
       const delta =
         event.key === "ArrowDown" || event.key === "j" ? 1 : -1;
@@ -279,7 +296,7 @@ export default function DiscoverFeed({
     return () => {
       window.removeEventListener("keydown", onKeyDown);
     };
-  }, [stepByDelta, videos.length]);
+  }, [advanceLocked, stepByDelta, videos.length]);
 
   if (videos.length === 0) {
     return (
@@ -301,7 +318,9 @@ export default function DiscoverFeed({
       {videos.map((video, index) => {
         const shouldMountPlayer = mountedIndexes.has(index);
         const shouldAutoAdvance =
-          index === activeIndex && index < videos.length - 1;
+          index === activeIndex &&
+          index < videos.length - 1 &&
+          !advanceLocked;
 
         return (
           <div
@@ -322,6 +341,11 @@ export default function DiscoverFeed({
                 onFollowChange={onFollowChange}
                 onSrcChange={(src) => onSrcChange?.(video.id, src)}
                 onDeleted={(postId) => onVideoDeleted?.(video.id, postId)}
+                onHideFromFeed={(postId) => onVideoDeleted?.(video.id, postId)}
+                onCaptionChange={(nextCaption) =>
+                  onCaptionChange?.(video.id, nextCaption)
+                }
+                onUiLockChange={setAdvanceLocked}
                 onEnded={
                   shouldAutoAdvance ? () => stepByDelta(1) : undefined
                 }

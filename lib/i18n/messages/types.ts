@@ -1373,6 +1373,29 @@ export type ModerationMessages = {
   "admin.moderation.error.noPost": string;
   "admin.moderation.error.noUser": string;
   "feed.postRemoved": string;
+  "video.more.button": string;
+  "video.more.aria": string;
+  "video.more.close": string;
+  "video.more.editCaption": string;
+  "video.more.copyLink": string;
+  "video.more.linkCopied": string;
+  "video.more.copyFailed": string;
+  "video.more.notInterested": string;
+  "video.more.report": string;
+  "video.more.delete": string;
+  "video.more.deleteTitle": string;
+  "video.more.deleteBody": string;
+  "video.more.deleteConfirm": string;
+  "video.more.deleteCancel": string;
+  "video.more.deleting": string;
+  "video.more.deleteSuccess": string;
+  "video.more.deleteError": string;
+  "video.more.editTitle": string;
+  "video.more.editSave": string;
+  "video.more.editSaving": string;
+  "video.more.editCancel": string;
+  "video.more.editSuccess": string;
+  "video.more.editError": string;
 };
 
 /** Learning Hub composer + 1-to-1 booking chrome. Must exist in every AppLocale. */

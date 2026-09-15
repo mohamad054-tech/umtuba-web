@@ -93,6 +93,9 @@ export default function VerticalVideoFeed({
   const [activeIndex, setActiveIndex] = useState(() =>
     Math.min(Math.max(initialIndex, 0), Math.max(videos.length - 1, 0))
   );
+  const [advanceLocked, setAdvanceLocked] = useState(false);
+  const videoIdsKey = videos.map((video) => video.id).join(",");
+  const previousVideoIdsRef = useRef(videoIdsKey);
   const nearEndRequestedRef = useRef(false);
   const lastRestoreTokenRef = useRef<number | null>(null);
   const signingRef = useRef(new Set<number>());
@@ -302,6 +305,15 @@ export default function VerticalVideoFeed({
   );
 
   useEffect(() => {
+    const previous = previousVideoIdsRef.current.split(",").filter(Boolean);
+    previousVideoIdsRef.current = videoIdsKey;
+    if (previous.length <= videos.length) {
+      return;
+    }
+    stepToIndex(activeIndex);
+  }, [activeIndex, stepToIndex, videoIdsKey, videos.length]);
+
+  useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
       if (
         event.key !== "ArrowDown" &&
@@ -314,6 +326,9 @@ export default function VerticalVideoFeed({
 
       const target = event.target as HTMLElement | null;
       if (target && ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName)) {
+        return;
+      }
+      if (advanceLocked) {
         return;
       }
 
@@ -329,7 +344,7 @@ export default function VerticalVideoFeed({
     return () => {
       window.removeEventListener("keydown", onKeyDown);
     };
-  }, [activeIndex, stepToIndex]);
+  }, [activeIndex, advanceLocked, stepToIndex]);
 
   useEffect(() => {
     const scroller = scrollerRef.current;
@@ -373,7 +388,8 @@ export default function VerticalVideoFeed({
           index < videos.length - 1 &&
           !forcePause &&
           !transitionLocked &&
-          !shopShelfOpen;
+          !shopShelfOpen &&
+          !advanceLocked;
 
         return (
           <div
@@ -404,6 +420,14 @@ export default function VerticalVideoFeed({
                 onFollowChange={onFollowChange}
                 onSrcChange={(src) => onVideoPatch?.(video.id, { src })}
                 onDeleted={(postId) => onVideoDeleted?.(video.id, postId)}
+                onHideFromFeed={(postId) => onVideoDeleted?.(video.id, postId)}
+                onCaptionChange={(nextCaption) =>
+                  onVideoPatch?.(video.id, {
+                    caption: nextCaption,
+                    title: video.articleTitle ? video.title : nextCaption || video.title,
+                  })
+                }
+                onUiLockChange={setAdvanceLocked}
                 onPlaybackTime={
                   index === activeIndex ? onPlaybackTime : undefined
                 }

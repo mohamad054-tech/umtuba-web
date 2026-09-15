@@ -206,11 +206,14 @@ describe("own content delete — contracts", () => {
     expect(control).toMatch(/min-h-\[44px\]/);
 
     const discover = read("app/discover/components/DiscoverActionRail.tsx");
-    expect(discover).toMatch(/OwnerContentDeleteControl/);
-    expect(discover).toMatch(/kind="video"/);
+    expect(discover).toMatch(/VideoMoreMenu/);
 
     const watch = read("app/components/video/VideoActionRail.tsx");
-    expect(watch).toMatch(/OwnerContentDeleteControl/);
+    expect(watch).toMatch(/VideoMoreMenu/);
+
+    const moreMenu = read("app/components/social/VideoMoreMenu.tsx");
+    expect(moreMenu).toMatch(/deletePostAction/);
+    expect(moreMenu).toMatch(/This cannot be undone|video\.more\.deleteBody/);
 
     const card = read("app/components/ContentCard.tsx");
     expect(card).toMatch(/OwnerContentDeleteControl/);

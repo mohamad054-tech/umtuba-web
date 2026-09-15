@@ -27,6 +27,7 @@ import { useTranslation } from "../components/i18n";
 import DiscoverFeed from "./components/DiscoverFeed";
 import DiscoverShell from "./components/DiscoverShell";
 import type { DiscoverStats, DiscoverVideo } from "./types";
+import { extractHashtagsFromCaption } from "../../lib/supabase/updateOwnPostCaption";
 
 type DiscoverExperienceProps = {
   videos: DiscoverVideo[];
@@ -161,9 +162,47 @@ export default function DiscoverExperience({
   );
 
   const handleVideoDeleted = useCallback((videoId: string) => {
-    setVideos((current) => current.filter((video) => video.id !== videoId));
-    setActiveVideo((current) => (current?.id === videoId ? null : current));
+    setVideos((current) => {
+      const index = current.findIndex((video) => video.id === videoId);
+      const remaining = current.filter((video) => video.id !== videoId);
+      setActiveVideo((active) => {
+        if (active?.id !== videoId) {
+          return active;
+        }
+        if (remaining.length === 0) {
+          return null;
+        }
+        return remaining[Math.min(Math.max(index, 0), remaining.length - 1)] ?? null;
+      });
+      return remaining;
+    });
     setCommentsOpen(false);
+  }, []);
+
+  const handleCaptionChange = useCallback((videoId: string, caption: string) => {
+    const hashtags = extractHashtagsFromCaption(caption);
+    setVideos((current) =>
+      current.map((video) =>
+        video.id === videoId
+          ? {
+              ...video,
+              caption,
+              hashtags,
+              title: video.articleTitle ? video.title : caption || video.title,
+            }
+          : video
+      )
+    );
+    setActiveVideo((current) =>
+      current && current.id === videoId
+        ? {
+            ...current,
+            caption,
+            hashtags,
+            title: current.articleTitle ? current.title : caption || current.title,
+          }
+        : current
+    );
   }, []);
 
   const handleSrcChange = useCallback((videoId: string, src: string) => {
@@ -293,6 +332,7 @@ export default function DiscoverExperience({
               onSrcChange={handleSrcChange}
               onNearEnd={handleNearEnd}
               onVideoDeleted={handleVideoDeleted}
+              onCaptionChange={handleCaptionChange}
               loadMoreEpoch={loadMoreEpoch}
             />
 

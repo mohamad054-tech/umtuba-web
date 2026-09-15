@@ -31,6 +31,9 @@ type VideoOverlayProps = {
   onFlagsChange?: (flags: { likedByMe?: boolean; savedByMe?: boolean }) => void;
   onFollowChange?: (authorId: string, following: boolean) => void;
   onDeleted?: (postId: number) => void;
+  onHideFromFeed?: (postId: number) => void;
+  onCaptionChange?: (caption: string) => void;
+  onUiLockChange?: (locked: boolean) => void;
 };
 
 export default function VideoOverlay({
@@ -45,6 +48,9 @@ export default function VideoOverlay({
   onFlagsChange,
   onFollowChange,
   onDeleted,
+  onHideFromFeed,
+  onCaptionChange,
+  onUiLockChange,
 }: VideoOverlayProps) {
   const { t } = useTranslation();
   const prototypePanelsAllowed = allowWatchPrototypePanels();
@@ -217,6 +223,9 @@ export default function VideoOverlay({
             onStatsChange={onStatsChange}
             onFlagsChange={onFlagsChange}
             onDeleted={onDeleted}
+            onHideFromFeed={onHideFromFeed}
+            onCaptionChange={onCaptionChange}
+            onUiLockChange={onUiLockChange}
           />
         </div>
       </div>

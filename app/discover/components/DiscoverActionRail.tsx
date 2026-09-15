@@ -9,8 +9,7 @@ import {
 } from "../../actions/socialInteractions";
 import { createClient } from "../../../lib/supabase/client";
 import ShareMenu from "../../components/social/ShareMenu";
-import OwnerContentDeleteControl from "../../components/social/OwnerContentDeleteControl";
-import UgcReportControl from "../../components/social/UgcReportControl";
+import VideoMoreMenu from "../../components/social/VideoMoreMenu";
 import { APP_ROUTES } from "../../lib/nav";
 import {
   formatInteractionCount,
@@ -38,6 +37,9 @@ type DiscoverActionRailProps = {
   onStatsChange?: (stats: Partial<DiscoverStats>) => void;
   onFlagsChange?: (flags: { likedByMe?: boolean; savedByMe?: boolean }) => void;
   onDeleted?: (postId: number) => void;
+  onHideFromFeed?: (postId: number) => void;
+  onCaptionChange?: (caption: string) => void;
+  onUiLockChange?: (locked: boolean) => void;
 };
 
 /**
@@ -57,6 +59,9 @@ export default function DiscoverActionRail({
   onStatsChange,
   onFlagsChange,
   onDeleted,
+  onHideFromFeed,
+  onCaptionChange,
+  onUiLockChange,
 }: DiscoverActionRailProps) {
   const router = useRouter();
   const [sharedPulse, setSharedPulse] = useState(false);
@@ -398,20 +403,17 @@ export default function DiscoverActionRail({
         />
       </div>
 
-      <UgcReportControl
-        target={{ kind: "content", postId, ownerUserId }}
-        viewerId={viewerId}
-        returnPath={returnPath}
-        variant="rail"
-      />
-
-      <OwnerContentDeleteControl
+      <VideoMoreMenu
         postId={postId}
-        kind="video"
+        caption={caption}
         viewerId={viewerId}
         ownerUserId={ownerUserId}
-        variant="rail"
+        returnPath={returnPath}
+        surface="discover"
         onDeleted={onDeleted}
+        onHideFromFeed={onHideFromFeed}
+        onCaptionChange={onCaptionChange}
+        onUiLockChange={onUiLockChange}
       />
     </div>
   );

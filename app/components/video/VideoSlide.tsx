@@ -35,6 +35,9 @@ type VideoSlideProps = {
   onSrcChange?: (src: string) => void;
   onPlaybackTime?: (currentTimeMs: number) => void;
   onDeleted?: (postId: number) => void;
+  onHideFromFeed?: (postId: number) => void;
+  onCaptionChange?: (caption: string) => void;
+  onUiLockChange?: (locked: boolean) => void;
   restorePlaybackTimeSeconds?: number | null;
   restorePlaybackToken?: number;
   slideRef?: (node: HTMLElement | null) => void;
@@ -58,6 +61,9 @@ export default function VideoSlide({
   onSrcChange,
   onPlaybackTime,
   onDeleted,
+  onHideFromFeed,
+  onCaptionChange,
+  onUiLockChange,
   restorePlaybackTimeSeconds,
   restorePlaybackToken,
   slideRef,
@@ -216,6 +222,9 @@ export default function VideoSlide({
         onFlagsChange={handleFlagsChange}
         onFollowChange={onFollowChange}
         onDeleted={onDeleted}
+        onHideFromFeed={onHideFromFeed}
+        onCaptionChange={onCaptionChange}
+        onUiLockChange={onUiLockChange}
       />
     </article>
   );

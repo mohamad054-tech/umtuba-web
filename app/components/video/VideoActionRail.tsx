@@ -15,8 +15,7 @@ import {
 } from "../../actions/socialInteractions";
 import { createClient } from "../../../lib/supabase/client";
 import ShareMenu from "../social/ShareMenu";
-import OwnerContentDeleteControl from "../social/OwnerContentDeleteControl";
-import UgcReportControl from "../social/UgcReportControl";
+import VideoMoreMenu from "../social/VideoMoreMenu";
 import { APP_ROUTES } from "../../lib/nav";
 import {
   formatInteractionCount,
@@ -48,6 +47,9 @@ type VideoActionRailProps = {
   onStatsChange?: (stats: Partial<DiscoverStats>) => void;
   onFlagsChange?: (flags: { likedByMe?: boolean; savedByMe?: boolean }) => void;
   onDeleted?: (postId: number) => void;
+  onHideFromFeed?: (postId: number) => void;
+  onCaptionChange?: (caption: string) => void;
+  onUiLockChange?: (locked: boolean) => void;
 };
 
 export default function VideoActionRail({
@@ -64,6 +66,9 @@ export default function VideoActionRail({
   onStatsChange,
   onFlagsChange,
   onDeleted,
+  onHideFromFeed,
+  onCaptionChange,
+  onUiLockChange,
 }: VideoActionRailProps) {
   const router = useRouter();
   const [sharedPulse, setSharedPulse] = useState(false);
@@ -378,22 +383,17 @@ export default function VideoActionRail({
       ) : null}
 
       {persist && postId ? (
-        <UgcReportControl
-          target={{ kind: "content", postId, ownerUserId }}
-          viewerId={viewerId}
-          returnPath={returnPath}
-          variant="rail"
-        />
-      ) : null}
-
-      {persist && postId ? (
-        <OwnerContentDeleteControl
+        <VideoMoreMenu
           postId={postId}
-          kind="video"
+          caption={caption}
           viewerId={viewerId}
           ownerUserId={ownerUserId}
-          variant="rail"
+          returnPath={returnPath}
+          surface="watch"
           onDeleted={onDeleted}
+          onHideFromFeed={onHideFromFeed}
+          onCaptionChange={onCaptionChange}
+          onUiLockChange={onUiLockChange}
         />
       ) : null}
     </div>

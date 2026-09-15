@@ -34,6 +34,9 @@ type DiscoverVideoCardProps = {
   onSrcChange?: (src: string) => void;
   slideRef?: (node: HTMLElement | null) => void;
   onDeleted?: (postId: number) => void;
+  onHideFromFeed?: (postId: number) => void;
+  onCaptionChange?: (caption: string) => void;
+  onUiLockChange?: (locked: boolean) => void;
   onEnded?: () => void;
 };
 
@@ -49,6 +52,9 @@ export default function DiscoverVideoCard({
   onSrcChange,
   slideRef,
   onDeleted,
+  onHideFromFeed,
+  onCaptionChange,
+  onUiLockChange,
   onEnded,
 }: DiscoverVideoCardProps) {
   const { t } = useTranslation();
@@ -274,6 +280,9 @@ export default function DiscoverVideoCard({
               onStatsChange={onStatsChange}
               onFlagsChange={handleFlagsChange}
               onDeleted={onDeleted}
+              onHideFromFeed={onHideFromFeed}
+              onCaptionChange={onCaptionChange}
+              onUiLockChange={onUiLockChange}
             />
           </div>
         </div>

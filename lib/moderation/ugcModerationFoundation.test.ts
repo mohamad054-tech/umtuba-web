@@ -79,11 +79,14 @@ describe("ugc operator moderation foundation", () => {
     const action = read("app/actions/ugcReport.ts");
     expect(action).toMatch(/report_ugc_content/);
     expect(action).toMatch(/report_ugc_user/);
-    expect(read("app/components/video/VideoActionRail.tsx")).toMatch(
+    expect(read("app/components/social/VideoMoreMenu.tsx")).toMatch(
       /UgcReportControl/
     );
+    expect(read("app/components/video/VideoActionRail.tsx")).toMatch(
+      /VideoMoreMenu/
+    );
     expect(read("app/discover/components/DiscoverActionRail.tsx")).toMatch(
-      /UgcReportControl/
+      /VideoMoreMenu/
     );
     expect(read("app/profile/components/ProfileActions.tsx")).toMatch(
       /UgcReportControl/
