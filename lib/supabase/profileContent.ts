@@ -232,7 +232,9 @@ export async function listProfileVideos(
   const rows = (data ?? []) as VideoPostRow[];
   const hasMore = rows.length > limit;
   const pageRows = hasMore ? rows.slice(0, limit) : rows;
-  const withUrls = await attachPlaybackUrls(supabase, pageRows);
+  const withUrls = await attachPlaybackUrls(supabase, pageRows, {
+    signIndexes: new Set(),
+  });
 
   const videos: ProfileContentVideo[] = await Promise.all(
     withUrls.map(async (post, index) => {

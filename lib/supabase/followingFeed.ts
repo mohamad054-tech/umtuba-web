@@ -137,7 +137,11 @@ export async function loadFollowingVideoFeedPage(input?: {
     const rows = (data ?? []) as unknown as VideoPostRow[];
     const hasMore = rows.length > limit;
     const pageRows = hasMore ? rows.slice(0, limit) : rows;
-    const withUrls = await attachPlaybackUrls(supabase, pageRows);
+    const withUrls = await attachPlaybackUrls(supabase, pageRows, {
+      signIndexes: new Set(
+        pageRows.length > 0 && !cursor ? [0] : []
+      ),
+    });
     const withAuthorIds = await enrichAuthorUserIdsFromProfiles(
       supabase,
       withUrls

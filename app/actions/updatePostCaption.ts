@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { APP_ROUTES } from "../lib/nav";
 import { createClient, getServerUser } from "../../lib/supabase/server";
+import { consumeNamedActionRateLimit } from "../../lib/security/actionRateLimit";
 import {
   OWN_CAPTION_UPDATE_ERRORS,
   updateOwnPostCaption,
@@ -38,6 +39,15 @@ export async function updatePostCaptionAction(
       ok: false,
       code: "auth_required",
       message: OWN_CAPTION_UPDATE_ERRORS.authRequired,
+    };
+  }
+
+  const limit = await consumeNamedActionRateLimit("caption", user.id);
+  if (!limit.ok) {
+    return {
+      ok: false,
+      code: "rate_limited",
+      message: OWN_CAPTION_UPDATE_ERRORS.rateLimited,
     };
   }
 

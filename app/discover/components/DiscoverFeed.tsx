@@ -7,6 +7,8 @@ import {
   useRef,
   useState,
 } from "react";
+import { refreshWatchPlaybackAction } from "../../actions/loadWatchFeed";
+import { isPlayableHttpSrc } from "../../lib/video/playbackFetchPolicy";
 import type { DiscoverStats, DiscoverVideo } from "../types";
 import DiscoverVideoCard from "./DiscoverVideoCard";
 
@@ -77,6 +79,7 @@ export default function DiscoverFeed({
   const [advanceLocked, setAdvanceLocked] = useState(false);
   const videoIdsKey = videos.map((video) => video.id).join(",");
   const previousVideoIdsRef = useRef(videoIdsKey);
+  const signingRef = useRef(new Set<number>());
 
   const activeVideo = videos[activeIndex] ?? videos[0];
 
@@ -241,6 +244,35 @@ export default function DiscoverFeed({
 
     onActiveChange?.(activeVideo, activeIndex);
   }, [activeIndex, activeVideo, onActiveChange]);
+
+  useEffect(() => {
+    const unsigned = videos.filter((video, index) => {
+      return (
+        mountedIndexes.has(index) &&
+        Number.isInteger(Number(video.id)) &&
+        Number(video.id) > 0 &&
+        !isPlayableHttpSrc(video.src)
+      );
+    });
+
+    for (const video of unsigned) {
+      const postId = Number(video.id);
+      if (!Number.isInteger(postId) || postId <= 0 || signingRef.current.has(postId)) {
+        continue;
+      }
+
+      signingRef.current.add(postId);
+      void refreshWatchPlaybackAction(postId)
+        .then((result) => {
+          if (result.ok) {
+            onSrcChange?.(video.id, result.src);
+          }
+        })
+        .finally(() => {
+          signingRef.current.delete(postId);
+        });
+    }
+  }, [mountedIndexes, onSrcChange, videos]);
 
   const stepByDelta = useCallback(
     (delta: number) => {

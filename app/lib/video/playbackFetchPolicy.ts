@@ -1,17 +1,17 @@
 /**
  * Web video byte-delivery policy.
  *
- * Watch mounts players only for the active ± neighbor window and signs
- * playback URLs for that same window (mobile 0d5680a is API-only sign-ahead;
- * this does not widen video downloads).
+ * SSR HTML may include at most one signed post-videos URL (the first/active
+ * clip) so a full feed is not dumped into the document. Neighbors remint
+ * from the client via refreshWatchPlaybackAction when they enter the mount
+ * window. Watch still mounts players for active ± 1.
  *
- * Home/Discover may keep signed URLs in memory but must not attach media
- * (src / preload) except for the active card.
+ * Home/Discover must not attach media (src / preload) except for the active card.
  */
 
 export const WATCH_PLAYBACK_NEIGHBOR_WINDOW = 1;
 
-export type WatchSignPolicy = "all" | "active-window";
+export type WatchSignPolicy = "all" | "active-window" | "first-active";
 
 export function isPlayableHttpSrc(src: string | null | undefined): boolean {
   const value = src?.trim() ?? "";
@@ -40,9 +40,8 @@ export function resolvePlaybackWindowIndexes(
 }
 
 /**
- * Watch first page signs the focused row ± neighbors.
- * Paginated pages (cursor) sign nothing — the client signs when a row
- * enters the mount window.
+ * First page signs only the focused/first row. Paginated pages sign nothing —
+ * the client remints when a row enters the mount window.
  */
 export function resolveWatchSignIndexes(input: {
   length: number;
@@ -57,7 +56,16 @@ export function resolveWatchSignIndexes(input: {
     return [];
   }
 
-  return resolvePlaybackWindowIndexes(input.focusIndex, input.length);
+  const safeFocus = Math.min(Math.max(input.focusIndex, 0), input.length - 1);
+  return [safeFocus];
+}
+
+/** Mixed feeds (Life, saved): sign at most the first video row. */
+export function firstPlayableVideoSignIndexes(
+  rows: ReadonlyArray<{ post_type?: string | null }>
+): Set<number> {
+  const index = rows.findIndex((row) => row.post_type === "video");
+  return index >= 0 ? new Set([index]) : new Set();
 }
 
 export function resolveWatchMediaPreload(active: boolean): "auto" | "metadata" {

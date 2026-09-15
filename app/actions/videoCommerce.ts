@@ -2,6 +2,7 @@
 
 import { createClient, getServerUser } from "../../lib/supabase/server";
 import { recordVideoCommerceEvent } from "../../lib/store/videoCommerceAnalytics";
+import { consumeNamedActionRateLimit } from "../../lib/security/actionRateLimit";
 import { listPublicVideoShopShelf } from "../../lib/store/videoCommerceQueries";
 import type {
   VideoCommerceEventType,
@@ -24,6 +25,10 @@ export async function recordVideoCommerceEventAction(input: {
 }): Promise<{ ok: boolean }> {
   const supabase = await createClient();
   const user = await getServerUser();
+  const limit = await consumeNamedActionRateLimit("videoCommerce", user?.id);
+  if (!limit.ok) {
+    return { ok: true };
+  }
   const result = await recordVideoCommerceEvent(supabase, {
     ...input,
     userId: user?.id ?? null,

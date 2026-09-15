@@ -15,6 +15,7 @@ import {
   UGC_REASON_I18N_KEYS,
   isReportPostId,
   isReportUuid,
+  type UgcReportErrorKey,
 } from "../../../lib/moderation/ugcReport";
 import {
   PROFILE_A11Y_FOCUS_RING_CLASS,
@@ -59,13 +60,7 @@ export default function UgcReportControl({
     "spam"
   );
   const [detail, setDetail] = useState("");
-  const [errorKey, setErrorKey] = useState<
-    | "report.error.generic"
-    | "report.error.auth"
-    | "report.error.own"
-    | "report.error.already"
-    | null
-  >(null);
+  const [errorKey, setErrorKey] = useState<UgcReportErrorKey | null>(null);
   const [done, setDone] = useState(false);
 
   const ownContent =

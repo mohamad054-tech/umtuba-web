@@ -15,6 +15,7 @@ export const OWN_CAPTION_UPDATE_ERRORS = {
   notFound: "This post is no longer available.",
   invalid: "Invalid caption.",
   failed: "Unable to update caption. Please try again.",
+  rateLimited: "Too many caption edits. Please try again shortly.",
 } as const;
 
 export type UpdateOwnPostCaptionCode =
@@ -22,7 +23,8 @@ export type UpdateOwnPostCaptionCode =
   | "not_owner"
   | "not_found"
   | "invalid"
-  | "failed";
+  | "failed"
+  | "rate_limited";
 
 export type UpdateOwnPostCaptionResult =
   | { ok: true; content: string }

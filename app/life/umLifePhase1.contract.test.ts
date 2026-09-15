@@ -209,6 +209,7 @@ describe("UM Life Phase 1 — feed, focused post, RTL, locales", () => {
     expect(card).toMatch(/whitespace-pre-wrap/);
     expect(card).toMatch(/focused/);
     expect(card).toMatch(/LifeEngagementBar/);
+    expect(card).toMatch(/OnDemandSignedVideo/);
   });
 
   it("uses logical start/end classes and a 360-1440 readable column", () => {

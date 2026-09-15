@@ -4,6 +4,7 @@ import {
   VIDEO_FEED_PAGE_SIZE,
 } from "../../app/lib/video/feedPolicy";
 import {
+  firstPlayableVideoSignIndexes,
   resolveWatchSignIndexes,
   type WatchSignPolicy,
 } from "../../app/lib/video/playbackFetchPolicy";
@@ -172,15 +173,15 @@ export async function loadCanonicalVideoFeedPage(input?: {
       return 0;
     })();
     const signIndexes =
-      input?.signPolicy === "active-window"
-        ? new Set(
+      input?.signPolicy === "all"
+        ? undefined
+        : new Set(
             resolveWatchSignIndexes({
               length: pageRows.length,
               focusIndex,
               isContinuationPage: Boolean(cursor),
             })
-          )
-        : undefined;
+          );
     const withUrls = await attachPlaybackUrls(supabase, pageRows, {
       signIndexes,
     });
@@ -252,6 +253,7 @@ export async function getDiscoverVideosServer(input?: {
   const result = await loadCanonicalVideoFeedPage({
     focusPostId: input?.focusPostId,
     limit: input?.limit ?? VIDEO_FEED_PAGE_SIZE,
+    signPolicy: "first-active",
   });
 
   if (!result.ok) {
@@ -396,7 +398,9 @@ export async function getFeedPostsServer(): Promise<FeedPostsResult> {
         videoPath: row.video_path,
       });
     });
-    const withUrls = await attachPlaybackUrls(supabase, rows);
+    const withUrls = await attachPlaybackUrls(supabase, rows, {
+      signIndexes: firstPlayableVideoSignIndexes(rows),
+    });
     const withAuthorIds = await enrichAuthorUserIdsFromProfiles(
       supabase,
       withUrls
@@ -429,7 +433,8 @@ function isLifeCanonicalPostType(postType: string): boolean {
 async function hydrateLifePosts(
   supabase: Awaited<ReturnType<typeof createClient>>,
   userId: string | undefined,
-  rows: VideoPostRow[]
+  rows: VideoPostRow[],
+  options?: { signAll?: boolean; signNone?: boolean }
 ): Promise<PublicPostDTO[]> {
   const visible = rows.filter((row) => {
     if (!isLifeCanonicalPostType(row.post_type)) {
@@ -444,7 +449,14 @@ async function hydrateLifePosts(
       videoPath: row.video_path,
     });
   });
-  const withUrls = await attachPlaybackUrls(supabase, visible);
+  const signIndexes = options?.signAll
+    ? undefined
+    : options?.signNone
+      ? new Set<number>()
+      : firstPlayableVideoSignIndexes(visible);
+  const withUrls = await attachPlaybackUrls(supabase, visible, {
+    signIndexes,
+  });
   const withAuthorIds = await enrichAuthorUserIdsFromProfiles(
     supabase,
     withUrls
@@ -494,7 +506,8 @@ export async function getLifePostsServer(options?: {
     const posts = await hydrateLifePosts(
       supabase,
       user?.id,
-      (data ?? []) as VideoPostRow[]
+      (data ?? []) as VideoPostRow[],
+      { signNone: Boolean(options?.indexableOnly) }
     );
     return { ok: true, posts };
   } catch (error) {

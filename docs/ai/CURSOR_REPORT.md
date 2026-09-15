@@ -1,93 +1,53 @@
-# Cursor Report — video More menu v1
+# Cursor Report — security batch 3
 
 ## Summary
 
-Home Discover and Watch feeds now share one **More** menu.
+SSR HTML now signs **at most the first/active** `post-videos` URL. Neighbors remint via existing `refreshWatchPlaybackAction` (visibility-checked, 15-minute TTL). Watch/Discover auto-advance and neighbor mount are unchanged. VideoObject JSON-LD still uses poster + canonical `/watch?post=` (no signed media URL).
 
-- Own post: Edit caption, Copy link, Delete (existing `deletePostAction` confirm flow).
-- Other posts: Copy link, Not interested, Report (existing `UgcReportControl` / report RPCs).
-- Copy link uses `copyPostLink` / `buildPostShareUrl`.
-- Not interested is client-side hide + advance (no hide table exists).
-- Caption edits `public.posts.content` via owner session update, preferring `update_own_post_caption` when applied.
+`20260948_abuse_limits_v1.sql` is **written only** (not applied): view ≤1/(post,viewer)/24h; share ≤20/viewer/hour; watch-signal and referral helper-table throttles; `video_commerce_events` UPDATE/DELETE revoked; metadata ≤4 KB. App-level in-memory rate limits wrap the listed server actions.
 
-Branch `feat/video-more-menu-v1` from `origin/release/v1` @ `cd3a479e`. Not deployed. SQL not applied.
+Anon RPC identity remains `d:{uuid}` from the client (or auth uid). SQL cannot see a trusted anon fingerprint; rotating device keys bypasses SQL throttle. App limiter keys by user id or IP. Best follow-up: hash device id + IP on the server and pass that as the viewer key — never trust raw client values for counts.
 
 ## Exact files changed
 
-- `app/components/social/VideoMoreMenu.tsx` (new)
-- `app/components/social/UgcReportControl.tsx`
-- `app/components/social/videoMoreMenu.contract.test.ts` (new)
-- `app/actions/updatePostCaption.ts` (new)
-- `lib/supabase/updateOwnPostCaption.ts` (new)
-- `lib/supabase/updateOwnPostCaption.test.ts` (new)
-- `lib/supabase/deleteOwnedPost.test.ts`
-- `lib/moderation/ugcModerationFoundation.test.ts`
-- `lib/i18n/messages/types.ts`
-- `lib/i18n/messages/moderationCatalogs.ts`
-- `app/discover/components/DiscoverActionRail.tsx`
-- `app/discover/components/DiscoverVideoCard.tsx`
-- `app/discover/components/DiscoverFeed.tsx`
-- `app/discover/DiscoverExperience.tsx`
-- `app/components/video/VideoActionRail.tsx`
-- `app/components/video/VideoOverlay.tsx`
-- `app/components/video/VideoSlide.tsx`
-- `app/components/video/VerticalVideoFeed.tsx`
-- `app/watch/WatchExperience.tsx`
-- `supabase/migrations/20260945_update_own_post_caption_v1.sql` (new, not applied)
-- `docs/ai/CURRENT_TASK.md`
-- `docs/ai/CURSOR_REPORT.md`
+See `git status --short` in this report. Primary: playback sign policy, Life/saved on-demand player, action rate limiter, `20260948`, i18n `report.error.rate`.
 
 ## Migrations created
 
-`supabase/migrations/20260945_update_own_post_caption_v1.sql` — **not applied**.
-
-Creates `public.update_own_post_caption(p_post_id bigint, p_content text)` (security definer, `auth.uid()` owner check, updates `content` only, max 1000 chars). Grant execute to `authenticated` only.
+- `supabase/migrations/20260948_abuse_limits_v1.sql` — **not applied**. Do not `supabase db push`.
 
 ## Security review
 
-- No secrets or `.env` touched.
-- Delete still uses `deletePostAction` / owner RLS. No `service_role`.
-- Caption action uses `getServerUser` + owner `user_id` filter. RPC (when applied) is caption-only.
-- Existing posts UPDATE RLS is owner-only but column-wide; the new RPC is the narrow contract.
-- Report still uses existing UGC RPCs. Not interested is local only (no forged server hide).
-- Menu/dialogs lock auto-advance; they do not pause playback.
+- Playback remint reuses `refreshWatchPlaybackUrlServer` + `applyViewerVisibility` / `isPostVisibleToViewer`.
+- Rate limiter is per-process memory (single server v1); not a substitute for SQL throttle until 20260948 is applied.
+- Anon view/share still accept `d:{uuid}`; IP limiter is the v1 abuse backstop.
+- No secrets printed. No remote DB writes.
 
 ## Tests
 
-```
-npx vitest run lib/supabase/updateOwnPostCaption.test.ts app/components/social/videoMoreMenu.contract.test.ts lib/supabase/deleteOwnedPost.test.ts lib/moderation/ugcModerationFoundation.test.ts lib/i18n/moderationCatalogs.test.ts lib/video app/lib/video app/watch app/components/video app/discover
-```
-
-PASS: 15 files, 72 tests.
+- `npx tsc --noEmit` PASS
+- Related vitest PASS (playback policy, security limiter, 20260948 foundation, i18n, Life contract, caption, VideoObject, feed unification, ugc report)
+- `npm run build` PASS
 
 ## TypeScript
 
-```
-npx tsc --noEmit
-```
-
-PASS.
+PASS (`npx tsc --noEmit` and Next build TypeScript step)
 
 ## Build
 
-```
-npm run build
-```
-
-PASS. Existing Turbopack NFT warning unchanged.
+PASS (`npm run build`)
 
 ## git diff --check
 
-PASS.
+Run at handoff.
 
 ## git status --short
 
-Clean after commit/push (this report committed with the feature).
+Run at handoff.
 
 ## Open issues
 
-- Not interested is session/client-only. Need `post_hides` / `not_interested` table + feed filter to persist across reloads/devices.
-- Caption RPC is not applied; action falls back to owner RLS `update({ content })`.
-- Existing posts UPDATE policy still allows owners to change any column if they call PostgREST directly.
-- Comments / share sheet still do not lock Discover auto-advance (out of this menu’s lock unless those UIs set the same flag).
-- Locales needing real translation for `video.more.*`: de, es, fr, hi, id, ja, ko, pt, ru, tr, zh-CN (ar + en are written).
+- Local HTML signed-URL counts are **0** on `/`, `/watch?post=1`, `/life` because this worktree has no Supabase env (feeds empty/error). Production-before (live audit 2026-09-15): `/` = 13, `/life` = 98. After deploy, expect ≤1 SSR signed `post-videos` URL on those routes (Watch first page was already a 3-URL window; now 1).
+- Profile grids still mint **thumbnail** signed URLs from `post-videos` (not playback). Playback `previewUrl` is no longer signed in SSR.
+- `20260948` is not on production. Existing view window remains 6h until applied.
+- DiscoverNativeVideo / DiscoverFeed still have pre-existing `react-hooks/set-state-in-effect` and img warnings.

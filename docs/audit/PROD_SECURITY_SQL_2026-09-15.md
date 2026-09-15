@@ -19,3 +19,9 @@ These files **record SQL that was already applied manually** to production. Do n
   Any other column change raises `post_column_locked` (`42501`). Service-role and SECURITY DEFINER RPCs (caption RPC, `publish_my_article`, `mark_my_article_teaser_uploaded`, admin takedown/restore) are not limited by `current_user in ('authenticated', 'anon')`.
 
 - **`articles` can only be written via `publish_my_article`** (and other SECURITY DEFINER / service-role paths). Direct table INSERT/UPDATE/DELETE from `anon`/`authenticated` is revoked.
+
+## Not applied (2026-09-15 batch 3)
+
+| File | Status |
+| --- | --- |
+| `supabase/migrations/20260948_abuse_limits_v1.sql` | **Written only.** View ≤1 / (post, viewer) / 24h; share ≤20 / viewer / hour; watch-signal and referral helper-table throttles; `video_commerce_events` UPDATE/DELETE revoked; metadata ≤4 KB. Do not `supabase db push`. |

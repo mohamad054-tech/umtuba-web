@@ -22,6 +22,7 @@ import {
 import CommentsPanel from "./social/CommentsPanel";
 import ShareMenu from "./social/ShareMenu";
 import OwnerContentDeleteControl from "./social/OwnerContentDeleteControl";
+import OnDemandSignedVideo from "./video/OnDemandSignedVideo";
 
 type ContentCardProps = {
   post: Post;
@@ -283,15 +284,14 @@ export default function ContentCard({
         />
       ) : null}
 
-      {post.video ? (
+      {post.type === "video" ? (
         <div className="bg-black">
-          <video
-            src={post.video}
-            controls
-            playsInline
+          <OnDemandSignedVideo
+            postId={post.id}
+            initialSrc={post.video}
             preload="none"
             className="max-h-96 w-full bg-black"
-            aria-label={post.content || "Video post"}
+            label={post.content || "Video post"}
           />
         </div>
       ) : null}

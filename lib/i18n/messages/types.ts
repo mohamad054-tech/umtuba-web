@@ -1294,6 +1294,7 @@ export type ModerationMessages = {
   "report.error.auth": string;
   "report.error.own": string;
   "report.error.already": string;
+  "report.error.rate": string;
   "report.reason.spam": string;
   "report.reason.harassment": string;
   "report.reason.hate": string;

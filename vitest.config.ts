@@ -42,6 +42,7 @@ export default defineConfig({
       "lib/knowledgeAcquisition/**/*.test.ts",
       "lib/i18n/**/*.test.ts",
       "lib/moderation/**/*.test.ts",
+      "lib/security/**/*.test.ts",
       "lib/video/**/*.test.ts",
       "app/learning/**/*.test.ts",
       "lib/translationStudio/**/*.test.ts",

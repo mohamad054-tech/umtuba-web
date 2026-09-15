@@ -32,6 +32,7 @@ import {
   type VideoPostRow,
 } from "../../lib/supabase/videoPosts";
 import { wireSocialEngagementToPersonalization } from "../../lib/ai/integrations/video/wiring";
+import { consumeNamedActionRateLimit } from "../../lib/security/actionRateLimit";
 
 function parsePostId(postId: number): ActionResult<{ postId: number }> {
   if (!Number.isInteger(postId) || postId <= 0) {
@@ -119,6 +120,10 @@ export async function recordShareAction(
   }
 
   const user = await getServerUser();
+  const shareLimit = await consumeNamedActionRateLimit("share", user?.id);
+  if (!shareLimit.ok) {
+    return { ok: true, counted: false, shares: 0 };
+  }
   const supabase = await createClient();
 
   // Authenticated: SQL forces u:{auth.uid()}. Anonymous: require d:{uuid}.
@@ -158,6 +163,10 @@ export async function recordViewAction(
   }
 
   const user = await getServerUser();
+  const viewLimit = await consumeNamedActionRateLimit("view", user?.id);
+  if (!viewLimit.ok) {
+    return { ok: true, counted: false, views: 0 };
+  }
   const supabase = await createClient();
 
   let resolvedKey: string | null = null;
@@ -340,7 +349,9 @@ export async function loadSavedPostsAction(): Promise<SavedPostsResult> {
     }
 
     const rows = (data ?? []) as VideoPostRow[];
-    const withUrls = await attachPlaybackUrls(supabase, rows);
+    const withUrls = await attachPlaybackUrls(supabase, rows, {
+      signIndexes: new Set(),
+    });
     const order = new Map(postIds.map((id, index) => [id, index]));
 
     withUrls.sort(

@@ -7,6 +7,7 @@ import {
   buildLifePostHref,
 } from "../lib/nav";
 import { useTranslation } from "../components/i18n";
+import OnDemandSignedVideo from "../components/video/OnDemandSignedVideo";
 import LifeEngagementBar from "./LifeEngagementBar";
 import { formatLifeTimestamp, type LifePost } from "./lib/lifePosts";
 
@@ -106,14 +107,14 @@ export default function LifePostCard({
         )
       ) : null}
 
-      {post.videoUrl ? (
+      {post.type === "video" ? (
         <div className="bg-black">
-          <video
-            src={post.videoUrl}
-            controls
-            playsInline
-            preload="metadata"
+          <OnDemandSignedVideo
+            postId={post.id}
+            initialSrc={post.videoUrl}
+            preload="none"
             className="max-h-[36rem] w-full bg-black"
+            label={post.content || undefined}
           />
           {focused ? (
             <div className="border-t border-white/10 px-5 py-3">

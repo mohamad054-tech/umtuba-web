@@ -24,6 +24,7 @@ export async function loadDiscoverFeedPageAction(input?: {
     cursor: input?.cursor,
     limit: input?.limit,
     focusPostId: input?.focusPostId,
+    signPolicy: "first-active",
   });
 
   if (!result.ok) {

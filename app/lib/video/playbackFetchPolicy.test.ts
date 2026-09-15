@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import {
   WATCH_PLAYBACK_NEIGHBOR_WINDOW,
+  firstPlayableVideoSignIndexes,
   isPlayableHttpSrc,
   resolveHomeDiscoverMediaPreload,
   resolvePlaybackWindowIndexes,
@@ -32,21 +33,21 @@ describe("playbackFetchPolicy", () => {
     );
   });
 
-  it("signs only the Watch active window on the first page", () => {
+  it("signs only the Watch first/active row on the first page", () => {
     expect(
       resolveWatchSignIndexes({
         length: 12,
         focusIndex: 0,
         isContinuationPage: false,
       })
-    ).toEqual([0, 1]);
+    ).toEqual([0]);
     expect(
       resolveWatchSignIndexes({
         length: 12,
         focusIndex: 3,
         isContinuationPage: false,
       })
-    ).toEqual([2, 3, 4]);
+    ).toEqual([3]);
     expect(
       resolveWatchSignIndexes({
         length: 12,
@@ -54,6 +55,9 @@ describe("playbackFetchPolicy", () => {
         isContinuationPage: true,
       })
     ).toEqual([]);
+    expect(
+      [...firstPlayableVideoSignIndexes([{ post_type: "text" }, { post_type: "video" }])]
+    ).toEqual([1]);
   });
 
   it("does not attach Home/Discover media except the active card", () => {
@@ -97,14 +101,18 @@ describe("video egress source contracts", () => {
     expect(discover).not.toMatch(/preload="metadata"/);
 
     const card = read("app/components/ContentCard.tsx");
-    expect(card).toMatch(/preload="none"/);
+    expect(card).toMatch(/OnDemandSignedVideo/);
     expect(card).not.toMatch(/preload="metadata"/);
+    const onDemand = read("app/components/video/OnDemandSignedVideo.tsx");
+    expect(onDemand).toMatch(/preload = "none"/);
   });
 
-  it("uses Watch sign-on-demand for the active window only", () => {
+  it("uses Watch/Discover sign-on-demand for the first/active video only", () => {
     const server = read("lib/supabase/videoPostsServer.ts");
     expect(server).toMatch(/signPolicy:\s*"active-window"/);
+    expect(server).toMatch(/signPolicy:\s*"first-active"/);
     expect(server).toMatch(/resolveWatchSignIndexes/);
+    expect(server).toMatch(/firstPlayableVideoSignIndexes/);
 
     const attach = read("lib/supabase/videoPosts.ts");
     expect(attach).toMatch(/signIndexes/);

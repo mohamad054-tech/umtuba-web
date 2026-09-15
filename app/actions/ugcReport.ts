@@ -9,6 +9,7 @@ import {
   type UgcReportErrorKey,
 } from "../../lib/moderation/ugcReport";
 import { createClient, getServerUser } from "../../lib/supabase/server";
+import { consumeNamedActionRateLimit } from "../../lib/security/actionRateLimit";
 
 export type UgcReportActionResult =
   | { ok: true }
@@ -28,6 +29,10 @@ export async function reportUgcContentAction(input: {
   const user = await getServerUser();
   if (!user) {
     return { ok: false, key: "report.error.auth" };
+  }
+  const limit = await consumeNamedActionRateLimit("report", user.id);
+  if (!limit.ok) {
+    return { ok: false, key: "report.error.rate" };
   }
 
   const supabase = await createClient();
@@ -57,6 +62,10 @@ export async function reportUgcUserAction(input: {
   const user = await getServerUser();
   if (!user) {
     return { ok: false, key: "report.error.auth" };
+  }
+  const limit = await consumeNamedActionRateLimit("report", user.id);
+  if (!limit.ok) {
+    return { ok: false, key: "report.error.rate" };
   }
 
   const supabase = await createClient();

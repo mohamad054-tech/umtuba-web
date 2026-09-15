@@ -26,6 +26,7 @@ export type UgcReportErrorKey =
   | "report.error.auth"
   | "report.error.own"
   | "report.error.already"
+  | "report.error.rate"
   | "report.error.generic";
 
 const UUID_RE =

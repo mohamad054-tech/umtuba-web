@@ -10,6 +10,7 @@ import {
 } from "../../lib/supabase/recommendations";
 import { createClient, getServerUser } from "../../lib/supabase/server";
 import { wireWatchSignalToPersonalization } from "../../lib/ai/integrations/video/wiring";
+import { consumeNamedActionRateLimit } from "../../lib/security/actionRateLimit";
 
 export type RecordWatchSignalActionInput = {
   postId: number;
@@ -53,12 +54,17 @@ export async function recordWatchSignalAction(
     viewerKey: input.viewerKey ?? null,
   };
 
+  const user = await getServerUser();
+  const limit = await consumeNamedActionRateLimit("watchSignal", user?.id);
+  if (!limit.ok) {
+    return { ok: true, signalId: null, skippedEarly: false };
+  }
+
   const supabase = await createClient();
   const result = await recordWatchSignal(supabase, payload);
 
   if (result.ok) {
     try {
-      const user = await getServerUser();
       wireWatchSignalToPersonalization({
         watchSignal: payload,
         serverUserId: user?.id ?? null,
