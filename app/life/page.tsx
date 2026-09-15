@@ -12,6 +12,7 @@ import { buildSocialMediaPostingJsonLd } from "../../lib/site/jsonLd";
 import { buildLocalizedRouteMetadata } from "../../lib/site/localizedSeo";
 import { buildPageMetadata, truncateForMeta } from "../../lib/site/metadata";
 import { parsePublicPostId } from "../../lib/site/videoSeo";
+import { getServerUser } from "../../lib/supabase/server";
 import ProductLoadingState from "../components/product/ProductLoadingState";
 import LifeExperience from "./LifeExperience";
 import { mapPublicPostToLifePost } from "./lib/lifePosts";
@@ -81,6 +82,8 @@ async function LifeFallback() {
 async function LifeLoader({ searchParams }: LifePageProps) {
   const params = await Promise.resolve(searchParams ?? {});
   const focusId = parsePublicPostId(params.post ?? null);
+  const user = await getServerUser().catch(() => null);
+  const viewerId = user?.id ?? null;
 
   if (focusId) {
     const result = await getLifePostByIdServer(focusId);
@@ -88,6 +91,7 @@ async function LifeLoader({ searchParams }: LifePageProps) {
       return (
         <LifeExperience
           initialPosts={[]}
+          viewerId={viewerId}
           focusedMissing={Boolean(result.notFound)}
           loadError={result.notFound ? null : result.message}
         />
@@ -113,6 +117,7 @@ async function LifeLoader({ searchParams }: LifePageProps) {
         <LifeExperience
           initialPosts={focused ? [focused] : []}
           focusedPost={focused}
+          viewerId={viewerId}
           focusedMissing={!focused}
         />
       </>
@@ -121,7 +126,13 @@ async function LifeLoader({ searchParams }: LifePageProps) {
 
   const result = await getLifePostsServer();
   if (!result.ok) {
-    return <LifeExperience initialPosts={[]} loadError={result.message} />;
+    return (
+      <LifeExperience
+        initialPosts={[]}
+        viewerId={viewerId}
+        loadError={result.message}
+      />
+    );
   }
 
   return (
@@ -129,6 +140,7 @@ async function LifeLoader({ searchParams }: LifePageProps) {
       initialPosts={result.posts
         .map(mapPublicPostToLifePost)
         .filter((post): post is NonNullable<typeof post> => post != null)}
+      viewerId={viewerId}
     />
   );
 }

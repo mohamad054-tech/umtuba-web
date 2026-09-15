@@ -42,6 +42,7 @@ export default function ContinueWatchingVideo({
       <video
         ref={videoRef}
         controls
+        controlsList="nodownload"
         preload="metadata"
         className="w-full rounded-2xl bg-black"
         src={src}

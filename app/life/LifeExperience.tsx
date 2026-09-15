@@ -14,6 +14,7 @@ import type { LifePost } from "./lib/lifePosts";
 type LifeExperienceProps = {
   initialPosts: LifePost[];
   focusedPost?: LifePost | null;
+  viewerId?: string | null;
   loadError?: string | null;
   focusedMissing?: boolean;
 };
@@ -21,6 +22,7 @@ type LifeExperienceProps = {
 export default function LifeExperience({
   initialPosts,
   focusedPost = null,
+  viewerId = null,
   loadError = null,
   focusedMissing = false,
 }: LifeExperienceProps) {
@@ -34,6 +36,13 @@ export default function LifeExperience({
     );
     setFocused((current) =>
       current && current.id === postId ? { ...current, ...patch } : current
+    );
+  }
+
+  function handleRemoveFromList(postId: number) {
+    setPosts((current) => current.filter((post) => post.id !== postId));
+    setFocused((current) =>
+      current && current.id === postId ? null : current
     );
   }
 
@@ -95,7 +104,10 @@ export default function LifeExperience({
             <LifePostCard
               post={focused}
               focused
+              viewerId={viewerId}
               onChange={handleChange}
+              onDeleted={handleRemoveFromList}
+              onHideFromFeed={handleRemoveFromList}
             />
           </section>
         ) : posts.length > 0 ? (
@@ -104,7 +116,10 @@ export default function LifeExperience({
               <LifePostCard
                 key={post.id}
                 post={post}
+                viewerId={viewerId}
                 onChange={handleChange}
+                onDeleted={handleRemoveFromList}
+                onHideFromFeed={handleRemoveFromList}
               />
             ))}
           </section>

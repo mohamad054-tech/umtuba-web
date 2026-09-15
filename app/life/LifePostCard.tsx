@@ -7,6 +7,7 @@ import {
   buildLifePostHref,
 } from "../lib/nav";
 import { useTranslation } from "../components/i18n";
+import VideoMoreMenu from "../components/social/VideoMoreMenu";
 import OnDemandSignedVideo from "../components/video/OnDemandSignedVideo";
 import LifeEngagementBar from "./LifeEngagementBar";
 import { formatLifeTimestamp, type LifePost } from "./lib/lifePosts";
@@ -14,13 +15,19 @@ import { formatLifeTimestamp, type LifePost } from "./lib/lifePosts";
 type LifePostCardProps = {
   post: LifePost;
   focused?: boolean;
+  viewerId?: string | null;
   onChange: (postId: number, patch: Partial<LifePost>) => void;
+  onDeleted?: (postId: number) => void;
+  onHideFromFeed?: (postId: number) => void;
 };
 
 export default function LifePostCard({
   post,
   focused = false,
+  viewerId = null,
   onChange,
+  onDeleted,
+  onHideFromFeed,
 }: LifePostCardProps) {
   const { t } = useTranslation();
   const profileHref = post.author.username
@@ -71,6 +78,19 @@ export default function LifePostCard({
                 </span>
               ) : null}
             </p>
+          </div>
+          <div className="ms-auto shrink-0 self-start">
+            <VideoMoreMenu
+              postId={post.id}
+              caption={post.content}
+              viewerId={viewerId}
+              ownerUserId={post.ownerUserId}
+              returnPath={focused ? focusedHref : APP_ROUTES.life}
+              surface="life"
+              onDeleted={onDeleted}
+              onHideFromFeed={onHideFromFeed}
+              onCaptionChange={(content) => onChange(post.id, { content })}
+            />
           </div>
         </div>
 

@@ -210,6 +210,7 @@ export default function DiscoverNativeVideo({
           src={playbackSrc}
           poster={poster}
           controls
+          controlsList="nodownload"
           playsInline
           muted={isCurrentlyMuted}
           preload={resolveHomeDiscoverMediaPreload(active)}

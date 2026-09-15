@@ -202,6 +202,7 @@ export default async function AdminAdsCreativesPage({
                     <video
                       src={previewUrl}
                       controls
+                      controlsList="nodownload"
                       className="max-h-80 w-full object-contain"
                     />
                   ) : (

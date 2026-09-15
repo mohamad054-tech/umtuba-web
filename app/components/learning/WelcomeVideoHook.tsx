@@ -41,6 +41,7 @@ export default function WelcomeVideoHook({ hook }: Props) {
         <video
           className="mt-4 w-full rounded-2xl bg-black"
           controls
+          controlsList="nodownload"
           src={hook.source_url}
         />
       ) : null}

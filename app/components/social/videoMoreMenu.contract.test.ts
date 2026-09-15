@@ -30,5 +30,13 @@ describe("video More menu v1", () => {
     expect(watch).toMatch(/VideoMoreMenu/);
     expect(watch).not.toMatch(/OwnerContentDeleteControl/);
     expect(watch).not.toMatch(/UgcReportControl/);
+
+    const life = read("app/life/LifePostCard.tsx");
+    expect(life).toMatch(/VideoMoreMenu/);
+    expect(life).toMatch(/surface="life"/);
+    expect(life).toMatch(/onHideFromFeed/);
+    const lifeExperience = read("app/life/LifeExperience.tsx");
+    expect(lifeExperience).toMatch(/handleRemoveFromList/);
+    expect(lifeExperience).toMatch(/onHideFromFeed=\{handleRemoveFromList\}/);
   });
 });

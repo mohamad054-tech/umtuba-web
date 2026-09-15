@@ -200,6 +200,7 @@ export default function VideoOverlayEditor({
           <video
             src={videoSrc}
             controls
+            controlsList="nodownload"
             playsInline
             preload="metadata"
             className="absolute inset-0 h-full w-full bg-black object-contain"

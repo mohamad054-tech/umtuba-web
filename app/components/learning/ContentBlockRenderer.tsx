@@ -122,6 +122,7 @@ export default function ContentBlockRenderer({
         <figure>
           <video
             controls
+            controlsList="nodownload"
             preload="metadata"
             className="w-full rounded-2xl bg-black"
             src={url}

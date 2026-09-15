@@ -90,6 +90,7 @@ export default function OnDemandSignedVideo({
     <video
       src={src}
       controls
+      controlsList="nodownload"
       playsInline
       preload={preload}
       className={className}

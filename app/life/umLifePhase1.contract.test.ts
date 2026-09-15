@@ -210,6 +210,17 @@ describe("UM Life Phase 1 — feed, focused post, RTL, locales", () => {
     expect(card).toMatch(/focused/);
     expect(card).toMatch(/LifeEngagementBar/);
     expect(card).toMatch(/OnDemandSignedVideo/);
+    expect(card).toMatch(/VideoMoreMenu/);
+    expect(card).toMatch(/onHideFromFeed/);
+    expect(card).toMatch(/surface="life"/);
+    expect(card).toMatch(/ms-auto/);
+    const onDemand = read("app/components/video/OnDemandSignedVideo.tsx");
+    expect(onDemand).toMatch(/controlsList="nodownload"/);
+    const experience = read("app/life/LifeExperience.tsx");
+    expect(experience).toMatch(/onHideFromFeed=\{handleRemoveFromList\}/);
+    const page = read("app/life/page.tsx");
+    expect(page).toMatch(/getServerUser/);
+    expect(page).toMatch(/viewerId/);
   });
 
   it("uses logical start/end classes and a 360-1440 readable column", () => {
