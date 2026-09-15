@@ -2,36 +2,36 @@
 
 ## Task title
 
-Private AI Foundation V1
+Private AI Workflow & Lifecycle V1
 
 ## Status
 
-`implementation-complete` — staged for manual commit (no trailers). Not pushed.
+`implementation-complete` — uncommitted; awaiting GO (no commit / no push)
 
 ## Resume here (next session / next GO)
 
-1. Worktree: `C:\Users\1\Desktop\umtuba\umtuba-web-private-ai-foundation-v1`
-2. Branch: `office/platform-private-ai-foundation-v1`
-3. Base: `2344c1b` (AI Data Platform Workflow & Dataset Approval V1)
+1. Worktree: `C:\Users\1\Desktop\umtuba\umtuba-web-private-ai-workflow-lifecycle-v1`
+2. Branch: `office/platform-private-ai-workflow-lifecycle-v1`
+3. Base: `db6f52a` (Private AI Foundation V1)
 4. Manual commit (no trailers) → push when approved
-5. Do not train/fine-tune/infer; do not download weights; do not apply migrations remotely
+5. Do not train/fine-tune/infer; do not apply migrations remotely
 
 ## Branch
 
-`office/platform-private-ai-foundation-v1`
+`office/platform-private-ai-workflow-lifecycle-v1`
 
 ## Allowed scope
 
 - `lib/privateAi/**`
 - `app/admin/private-ai/**`
-- `supabase/migrations/20260879_private_ai_foundation_v1.sql` (local only)
-- `vitest.config.ts` (include path)
-- Handoff + architecture docs + focused tests
+- `supabase/migrations/20260880_private_ai_workflow_lifecycle_v1.sql` (local only)
+- `docs/architecture/PRIVATE_AI_WORKFLOW_LIFECYCLE_V1.md`
+- Handoff docs + focused tests
 
 ## Forbidden scope
 
 - Training / fine-tuning / inference / model weights / downloads
-- Provider runtime changes
+- Gemini provider changes
 - Commit / push / remote migration apply without GO
 - Git trailers
-- Switching unrelated branches or worktrees
+- Merge into other branches

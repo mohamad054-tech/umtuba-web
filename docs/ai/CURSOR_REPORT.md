@@ -1,60 +1,80 @@
-# Cursor Report
+# CURSOR_REPORT — Private AI Workflow & Lifecycle V1
 
 ## Summary
 
-Private AI Foundation V1 is implemented on
-`office/platform-private-ai-foundation-v1` (base `2344c1b`). Provides private
-model registry, capability registry, lifecycle metadata, hardware/deployment/
-routing contracts, permissions, file persistence, read-only admin UI under
-`/admin/private-ai`, and local-only migration `20260879`. No training,
-fine-tuning, inference, or weights. Staged for manual commit — **not
-committed, not pushed**.
+**PASS.** Implemented admin workflow lifecycle on Foundation base `db6f52a`
+in worktree `umtuba-web-private-ai-workflow-lifecycle-v1` / branch
+`office/platform-private-ai-workflow-lifecycle-v1`. Legal transitions,
+Readiness Gate (approve/activate), permission checks, audit trail, and Admin
+lifecycle UI are in place. Focused tests **15/15 PASS**. `tsc --noEmit` **PASS**.
+Migration `20260880` created locally only — **not applied**. No commit / no push.
+No Gemini changes. No training / fine-tuning / inference.
 
 ## Exact files changed
 
-- `lib/privateAi/**`
-- `app/admin/private-ai/**`
-- `supabase/migrations/20260879_private_ai_foundation_v1.sql`
-- `vitest.config.ts`
-- `docs/architecture/PRIVATE_AI_FOUNDATION_V1.md`
+- `lib/privateAi/types.ts` — lifecycle + audit + schema v2
+- `lib/privateAi/lifecycle.ts` — legal transition matrix
+- `lib/privateAi/readiness.ts` — Readiness Gate
+- `lib/privateAi/audit.ts` — audit entry factory
+- `lib/privateAi/permissions.ts` — model lifecycle permission helper
+- `lib/privateAi/fileStore.ts` — schema v2 + legacy lifecycle migrate
+- `lib/privateAi/service.ts` — permissioned transitions + audit + readiness
+- `lib/privateAi/seed.ts` — new states + reviewer role
+- `lib/privateAi/index.ts` — exports
+- `lib/privateAi/privateAiFoundation.test.ts` — updated
+- `lib/privateAi/privateAiWorkflowLifecycle.test.ts` — new
+- `app/admin/private-ai/lifecycle/page.tsx` — workflow UI
+- `app/admin/private-ai/lifecycle/actions.ts` — server action
+- `app/admin/private-ai/PrivateAiShell.tsx` — workflow banner
+- `app/admin/private-ai/page.tsx` — overview metrics
+- `supabase/migrations/20260880_private_ai_workflow_lifecycle_v1.sql`
+- `docs/architecture/PRIVATE_AI_WORKFLOW_LIFECYCLE_V1.md`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
-- `docs/ai/PROJECT_STATE.md`
-- `docs/ai/SESSION_HANDOFF.md`
 
 ## Migrations created
 
-- `20260879_private_ai_foundation_v1.sql` — **not remote-applied**
+`supabase/migrations/20260880_private_ai_workflow_lifecycle_v1.sql`
+
+**Why:** Foundation SQL had registries but no lifecycle audit table / review
+reason column. Additive only. **Not remote-applied.**
 
 ## Security review
 
-- Admin pages platform-admin gated
-- Migration: FORCE RLS + admin SELECT only
-- Permission contracts for model/capability/dataset/experiment/audit
-- No secrets; no weights; no inference/provider runtime changes
+- Admin UI gated by existing `assertPlatformAdminDb`.
+- Service transitions require Private AI permission contracts.
+- Reviewer cannot activate (no `activate` / `lifecycle_update`).
+- No secrets. No training/inference paths.
 
 ## Tests
 
-`npx vitest run lib/privateAi/privateAiFoundation.test.ts` — **6/6 pass**
+```
+npx vitest run lib/privateAi/privateAiFoundation.test.ts \
+  lib/privateAi/privateAiWorkflowLifecycle.test.ts
+```
+
+**2 files / 15 tests PASS** (legal/illegal transitions, readiness, permissions,
+audit, edge cases).
 
 ## TypeScript
 
-`npx tsc --noEmit` — pass
+`npx tsc --noEmit` — **PASS**
 
 ## Build
 
-`npm run build` — pass (`/admin/private-ai` routes registered)
+Not required for this registry/workflow milestone. Not run.
 
 ## git diff --check
 
-`git diff --cached --check` — pass
+**PASS**
 
 ## git status --short
 
-Staged intended scope only. See Final Verification Report.
+See Final Verification Report (uncommitted; awaiting GO).
 
 ## Open issues
 
-- No runtime routing or hardware provisioning (by design)
-- Supabase tables unused until persistence cutover
-- No commit / push until GO
+1. Await GO for commit/push (manual commit, no trailers).
+2. Do not remote-apply `20260880` without explicit approval.
+3. Optional: sync SQL audit writer when DB becomes runtime SoT (file registry
+   remains SoT today).

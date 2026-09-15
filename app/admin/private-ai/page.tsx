@@ -10,12 +10,15 @@ export default async function PrivateAiOverviewPage() {
   const state = svc.getState();
 
   return (
-    <PrivateAiShell title="Private AI" subtitle="Foundation V1 — read-only">
+    <PrivateAiShell
+      title="Private AI"
+      subtitle="Workflow & Lifecycle V1"
+    >
       <section className="rounded-[28px] border border-white/10 bg-[#080816]/80 p-5 md:p-7">
-        <h1 className="text-xl font-black">Private AI Foundation</h1>
+        <h1 className="text-xl font-black">Private AI Workflow</h1>
         <p className="mt-2 text-sm text-white/55">
-          Architecture for UMTUBA-owned private AI models. Registries and
-          contracts only — no training, fine-tuning, inference, or weights.
+          Admin lifecycle for private model registries and contracts — no
+          training, fine-tuning, inference, or weights.
         </p>
         <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-3">
           {[
@@ -25,6 +28,16 @@ export default async function PrivateAiOverviewPage() {
             ["Hardware", state.hardwareContracts.length],
             ["Routing", state.routingContracts.length],
             ["Permissions", state.permissions.length],
+            ["Audit events", state.auditTrail.length],
+            [
+              "In review",
+              state.models.filter((m) => m.lifecycle === "submitted_for_review")
+                .length,
+            ],
+            [
+              "Active",
+              state.models.filter((m) => m.lifecycle === "active").length,
+            ],
           ].map(([label, value]) => (
             <div key={String(label)}>
               <dt className="text-xs font-bold uppercase tracking-[0.16em] text-white/45">
