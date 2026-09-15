@@ -13,6 +13,7 @@ import {
   hashReferralSignal,
 } from "../../lib/referral/cookies";
 import { normalizeReferralCode } from "../../lib/referral/config";
+import { clientIpFromHeaders } from "../../lib/security/actionRateLimit";
 
 export async function ensureMyReferralCodeAction() {
   const user = await getServerUser();
@@ -53,10 +54,7 @@ export async function recordReferralAttributionAction(code: string) {
   const supabase = await createClient();
   const visitorId = await ensureVisitorId();
   const hdrs = await headers();
-  const ip =
-    hdrs.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-    hdrs.get("x-real-ip") ||
-    null;
+  const ip = clientIpFromHeaders(hdrs);
   const ua = hdrs.get("user-agent");
 
   return recordReferralAttribution(supabase, {

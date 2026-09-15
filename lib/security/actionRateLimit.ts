@@ -3,6 +3,8 @@
  * Keyed by authenticated user id, else by request IP.
  */
 
+import { isIP } from "node:net";
+
 export const ACTION_RATE_LIMITS = {
   view: { limit: 60, windowMs: 60_000 },
   share: { limit: 20, windowMs: 60_000 },
@@ -84,21 +86,28 @@ export function resolveActionRateLimitActor(
   return "ip:unknown";
 }
 
+/**
+ * Trust only X-Real-IP. Apex and staging hit nginx directly; nginx sets
+ * `proxy_set_header X-Real-IP $remote_addr`, overwriting any client-sent
+ * value. CF-Connecting-IP and X-Forwarded-For are client-controlled here
+ * (only www is Cloudflare-proxied, and it redirects to the apex). Revisit
+ * this if the apex is ever put behind the Cloudflare proxy.
+ */
 export function clientIpFromHeaders(headerStore: {
   get(name: string): string | null;
 }): string | null {
-  const forwarded = headerStore.get("x-forwarded-for");
-  if (forwarded) {
-    const first = forwarded.split(",")[0]?.trim();
-    if (first) {
-      return first;
-    }
+  const raw = headerStore.get("x-real-ip")?.trim() ?? "";
+  if (!raw || !isTrustedClientIp(raw)) {
+    return null;
   }
-  return (
-    headerStore.get("x-real-ip")?.trim() ||
-    headerStore.get("cf-connecting-ip")?.trim() ||
-    null
-  );
+  return raw;
+}
+
+function isTrustedClientIp(value: string): boolean {
+  if (value.includes(",") || /\s/.test(value)) {
+    return false;
+  }
+  return isIP(value) !== 0;
 }
 
 export async function consumeNamedActionRateLimit(

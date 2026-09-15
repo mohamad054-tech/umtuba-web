@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import {
   clientIpFromHeaders,
@@ -35,15 +37,57 @@ describe("actionRateLimit", () => {
     );
   });
 
-  it("prefers user id over IP and reads the first forwarded hop", () => {
+  it("prefers user id over IP", () => {
     expect(resolveActionRateLimitActor("abc", "9.9.9.9")).toBe("u:abc");
     expect(resolveActionRateLimitActor(null, "9.9.9.9")).toBe("ip:9.9.9.9");
+    expect(resolveActionRateLimitActor(null, null)).toBe("ip:unknown");
+  });
+
+  it("uses only validated X-Real-IP and ignores spoofed hop headers", () => {
     expect(
       clientIpFromHeaders({
         get(name) {
-          return name === "x-forwarded-for" ? "1.1.1.1, 2.2.2.2" : null;
+          if (name === "x-real-ip") return "203.0.113.10";
+          if (name === "cf-connecting-ip") return "1.1.1.1";
+          if (name === "x-forwarded-for") return "8.8.8.8, 9.9.9.9";
+          return null;
         },
       })
-    ).toBe("1.1.1.1");
+    ).toBe("203.0.113.10");
+    expect(
+      clientIpFromHeaders({
+        get(name) {
+          if (name === "x-real-ip") return "2001:db8::1";
+          if (name === "cf-connecting-ip") return "1.1.1.1";
+          return null;
+        },
+      })
+    ).toBe("2001:db8::1");
+    expect(
+      clientIpFromHeaders({
+        get(name) {
+          if (name === "cf-connecting-ip") return "1.1.1.1";
+          if (name === "x-forwarded-for") return "8.8.8.8";
+          return null;
+        },
+      })
+    ).toBeNull();
+    expect(
+      clientIpFromHeaders({
+        get(name) {
+          return name === "x-real-ip" ? "not-an-ip" : null;
+        },
+      })
+    ).toBeNull();
+  });
+
+  it("referral attribution hashes IP from the shared X-Real-IP helper", () => {
+    const action = readFileSync(
+      join(process.cwd(), "app/actions/referral.ts"),
+      "utf8"
+    );
+    expect(action).toMatch(/clientIpFromHeaders/);
+    expect(action).not.toMatch(/x-forwarded-for/);
+    expect(action).not.toMatch(/x-real-ip/);
   });
 });
