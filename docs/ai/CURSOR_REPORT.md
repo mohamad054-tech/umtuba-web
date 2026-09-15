@@ -1,58 +1,47 @@
-# CURSOR_REPORT — COMPUTER_2_TRANSLATION_ALL_WORK_FINAL_PUSH_AND_HANDOFF_V1
+# CURSOR_REPORT — PC2-A3
 
 ## Summary
 
-**Verdict: HANDOFF_PUSH_COMPLETE — SUCCESS**
-
-All legitimate Computer-2 Translation durable handoff evidence for Central
-Server alpha integration is recorded and pushed on
-`office/platform-translation-trunk-port-v1`.
-
-- `TRANSLATION_STUDIO_V1` = **PRODUCTION_ACCEPTED / COMPLETE**
-- Source tip for Central integration: `c061c0a593662d03569c489246996bf2a3e034aa`
-  (implementation already on origin; this commit adds durable handoff docs)
-- Alpha observed: `62c6c5d04f962b9615c1fb8037bae6b76d7f8e36`
-- FF-eligible; textual conflicts none; Computer 2 does **not** merge alpha
-
-Canonical handoff:
-[`docs/translation/TRANSLATION_STUDIO_V1_CENTRAL_ALPHA_INTEGRATION_HANDOFF.md`](../translation/TRANSLATION_STUDIO_V1_CENTRAL_ALPHA_INTEGRATION_HANDOFF.md)
+`UM_CORE_PLATFORM_SDK_FACTORY_FOUNDATION_CONTRACT_V1` completed as **CONTRACT_ONLY**. Defined smallest evidence-based `createInMemoryUmCoreSdkFactory` borrowing P14–P17 ports (+ optional P4 register). **IMPLEMENTED=NO** due to magnet collision with A1/A2 and shared `sdk`/`packageIdentity`/`README` surfaces. Full report: `C:\Users\Giga store\Desktop\umtuba\worktrees\UM_CORE_PLATFORM_SDK_FACTORY_FOUNDATION_CONTRACT_V1_REPORT.md`.
 
 ## Exact files changed
 
-- `docs/translation/TRANSLATION_STUDIO_V1_CENTRAL_ALPHA_INTEGRATION_HANDOFF.md` (new)
-- `docs/ai/CURSOR_REPORT.md` (this handoff)
+- `C:\Users\Giga store\Desktop\umtuba\worktrees\UM_CORE_PLATFORM_SDK_FACTORY_FOUNDATION_CONTRACT_V1_REPORT.md` (report artifact; outside product tree)
+- Optional copy: `P:\TO-SERVER\OUTBOX_DROP\UM_CORE_PLATFORM_SDK_FACTORY_FOUNDATION_CONTRACT_V1_REPORT.md`
+- This `docs/ai/CURSOR_REPORT.md` handoff note
+
+No `platforms/core/**` product files modified.
 
 ## Migrations created
 
-**NONE.**
+NONE
 
 ## Security review
 
-- Docs-only; no secrets / tokens / cookies / `.env` / runtime journals
-- No Co-authored-by / Signed-off-by on handoff commit
+N/A (report-only). No secrets. No network/DB. No product wiring.
 
 ## Tests
 
-Docs handoff only — no paid AI; no Studio/DB mutation.
+Not run (no product code).
 
 ## TypeScript
 
-N/A (docs-only)
+Not run (no product code).
 
 ## Build
 
-N/A
+Not run (no product code).
 
 ## git diff --check
 
-PASS (handoff commit)
+N/A (no product diff).
 
 ## git status --short
 
-(filled after push — expect clean)
+PC2-A3 remained on `office/pc2-a3-ready` @ `bc09e13…` for product; report written under `worktrees\` root + OUTBOX. Alpha tip recorded: `c8f5c96…`.
 
 ## Open issues
 
-1. Central Server owns alpha FF/integration + migration history re-verify.
-2. Translation V2 / DB-primary / live publish remain deferred — do not start.
-3. Alpha SoT worktree on Computer 2 must remain untouched by this handoff.
+1. Central must serialize A1 RI + A2 fleet magnet merges before SDK impl GO.
+2. Phase label for SDK factory still contested (suggest P21 per post-P17 gap audit).
+3. `UmCoreSdkClient.register` still typed `void` on alpha; contract requires result-returning pass-through in future impl.

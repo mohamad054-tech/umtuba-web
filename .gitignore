@@ -55,3 +55,7 @@ next-env.d.ts
 scripts/store-e2e/config.local.sql
 scripts/store-e2e/_tmp*
 scripts/store-e2e/*.local.*
+
+# local token cache and CJ artifacts (never commit)
+.local/
+.local/cj/token-cache.json
