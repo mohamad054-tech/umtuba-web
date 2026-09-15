@@ -41,6 +41,8 @@ type VideoPlayerProps = {
   onWatchProgress?: (event: WatchProgressEvent) => void;
   restorePlaybackTimeSeconds?: number | null;
   restorePlaybackToken?: number;
+  onEnded?: () => void;
+  loopWhenEnded?: boolean;
 };
 
 export default function VideoPlayer({
@@ -54,6 +56,8 @@ export default function VideoPlayer({
   onWatchProgress,
   restorePlaybackTimeSeconds = null,
   restorePlaybackToken = 0,
+  onEnded,
+  loopWhenEnded = true,
 }: VideoPlayerProps) {
   const { t } = useTranslation();
   const { userWantsSound, setUserWantsSound, toggleUserWantsSound } =
@@ -77,6 +81,8 @@ export default function VideoPlayer({
   const playGenerationRef = useRef(0);
   const onWatchProgressRef = useRef(onWatchProgress);
   onWatchProgressRef.current = onWatchProgress;
+  const onEndedRef = useRef(onEnded);
+  onEndedRef.current = onEnded;
 
   useEffect(() => {
     const video = videoRef.current;
@@ -214,6 +220,7 @@ export default function VideoPlayer({
     const onEnded = () => {
       loopCountRef.current += 1;
       emit(true);
+      onEndedRef.current?.();
     };
 
     video.addEventListener("timeupdate", onTimeUpdate);
@@ -301,7 +308,7 @@ export default function VideoPlayer({
           src={src}
           poster={poster}
           playsInline
-          loop
+          loop={loopWhenEnded}
           muted={isCurrentlyMuted}
           preload={resolveWatchMediaPreload(active)}
           onClick={handleSurfaceClick}

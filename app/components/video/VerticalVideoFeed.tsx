@@ -271,6 +271,36 @@ export default function VerticalVideoFeed({
     });
   }, [restoreState, videos]);
 
+  const stepToIndex = useCallback(
+    (nextIndex: number) => {
+      const prefersReducedMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)"
+      ).matches;
+
+      const clampedIndex = Math.min(
+        Math.max(nextIndex, 0),
+        videos.length - 1
+      );
+
+      const nextVideo = videos[clampedIndex];
+      const node = nextVideo
+        ? slideNodesRef.current.get(nextVideo.id)
+        : null;
+
+      programmaticIndexRef.current = clampedIndex;
+      setActiveIndex(clampedIndex);
+
+      if (node && scrollerRef.current) {
+        scrollScrollerToSlide(
+          scrollerRef.current,
+          node,
+          prefersReducedMotion ? "auto" : "smooth"
+        );
+      }
+    },
+    [videos]
+  );
+
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
       if (
@@ -289,32 +319,9 @@ export default function VerticalVideoFeed({
 
       event.preventDefault();
 
-      const prefersReducedMotion = window.matchMedia(
-        "(prefers-reduced-motion: reduce)"
-      ).matches;
-
       const delta =
         event.key === "ArrowDown" || event.key === "j" ? 1 : -1;
-      const nextIndex = Math.min(
-        Math.max(activeIndex + delta, 0),
-        videos.length - 1
-      );
-
-      const nextVideo = videos[nextIndex];
-      const node = nextVideo
-        ? slideNodesRef.current.get(nextVideo.id)
-        : null;
-
-      programmaticIndexRef.current = nextIndex;
-      setActiveIndex(nextIndex);
-
-      if (node && scrollerRef.current) {
-        scrollScrollerToSlide(
-          scrollerRef.current,
-          node,
-          prefersReducedMotion ? "auto" : "smooth"
-        );
-      }
+      stepToIndex(activeIndex + delta);
     }
 
     window.addEventListener("keydown", onKeyDown);
@@ -322,7 +329,7 @@ export default function VerticalVideoFeed({
     return () => {
       window.removeEventListener("keydown", onKeyDown);
     };
-  }, [activeIndex, videos]);
+  }, [activeIndex, stepToIndex]);
 
   useEffect(() => {
     const scroller = scrollerRef.current;
@@ -361,6 +368,12 @@ export default function VerticalVideoFeed({
     >
       {videos.map((video, index) => {
         const shouldMountPlayer = mountedIndexes.has(index);
+        const shouldAutoAdvance =
+          index === activeIndex &&
+          index < videos.length - 1 &&
+          !forcePause &&
+          !transitionLocked &&
+          !shopShelfOpen;
 
         return (
           <div
@@ -376,6 +389,10 @@ export default function VerticalVideoFeed({
                 transitionLocked={transitionLocked}
                 shopProductCount={shopProductCount}
                 shopShelfOpen={shopShelfOpen}
+                onEnded={
+                  shouldAutoAdvance ? () => stepToIndex(index + 1) : undefined
+                }
+                loopWhenEnded={!shouldAutoAdvance}
                 onOpenPanel={onOpenPanel}
                 onPostJourney={onPostJourney}
                 onStatsChange={(stats) =>

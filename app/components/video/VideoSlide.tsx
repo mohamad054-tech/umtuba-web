@@ -38,6 +38,8 @@ type VideoSlideProps = {
   restorePlaybackTimeSeconds?: number | null;
   restorePlaybackToken?: number;
   slideRef?: (node: HTMLElement | null) => void;
+  onEnded?: () => void;
+  loopWhenEnded?: boolean;
 };
 
 export default function VideoSlide({
@@ -59,6 +61,8 @@ export default function VideoSlide({
   restorePlaybackTimeSeconds,
   restorePlaybackToken,
   slideRef,
+  onEnded,
+  loopWhenEnded,
 }: VideoSlideProps) {
   const [playbackStatus, setPlaybackStatus] = useState<
     "ok" | "expired" | "deleted" | "error"
@@ -196,6 +200,8 @@ export default function VideoSlide({
         }
         restorePlaybackTimeSeconds={restorePlaybackTimeSeconds}
         restorePlaybackToken={restorePlaybackToken}
+        onEnded={onEnded}
+        loopWhenEnded={loopWhenEnded}
       />
       <VideoOverlayLayer elements={video.overlays} />
       <VideoOverlay
