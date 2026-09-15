@@ -28,6 +28,7 @@ type DiscoverNativeVideoProps = {
   postId?: number | null;
   onSrcChange?: (src: string) => void;
   onWatchProgress?: (event: WatchProgressEvent) => void;
+  onEnded?: () => void;
 };
 
 type PlaybackStatus = "ok" | "expired" | "deleted" | "error";
@@ -45,6 +46,7 @@ export default function DiscoverNativeVideo({
   postId = null,
   onSrcChange,
   onWatchProgress,
+  onEnded,
 }: DiscoverNativeVideoProps) {
   const { t } = useTranslation();
   const { userWantsSound, setUserWantsSound } = useFeedMutePreference();
@@ -52,6 +54,8 @@ export default function DiscoverNativeVideo({
   const loopCountRef = useRef(0);
   const onWatchProgressRef = useRef(onWatchProgress);
   onWatchProgressRef.current = onWatchProgress;
+  const onEndedRef = useRef(onEnded);
+  onEndedRef.current = onEnded;
   const autoRemintAttemptedRef = useRef(false);
   const [playbackStatus, setPlaybackStatus] = useState<PlaybackStatus>("ok");
   const [retrying, setRetrying] = useState(false);
@@ -104,11 +108,14 @@ export default function DiscoverNativeVideo({
   useEffect(() => {
     const video = videoRef.current;
     const report = onWatchProgressRef.current;
-    if (!video || !report || !active || playbackStatus !== "ok") {
+    if (!video || !active || playbackStatus !== "ok") {
       return;
     }
 
     const emit = (completed = false) => {
+      if (!report) {
+        return;
+      }
       const durationMs = Number.isFinite(video.duration)
         ? Math.max(0, video.duration * 1000)
         : 0;
@@ -129,6 +136,7 @@ export default function DiscoverNativeVideo({
     const onEnded = () => {
       loopCountRef.current += 1;
       emit(true);
+      onEndedRef.current?.();
     };
 
     video.addEventListener("timeupdate", onTimeUpdate);

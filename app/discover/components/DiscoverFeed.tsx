@@ -228,6 +228,22 @@ export default function DiscoverFeed({
     onActiveChange?.(activeVideo, activeIndex);
   }, [activeIndex, activeVideo, onActiveChange]);
 
+  const stepByDelta = useCallback(
+    (delta: number) => {
+      const current = activeIndexRef.current;
+      const next = current + delta;
+
+      if (next < 0 || next >= videos.length) {
+        // At feed edge — do not trap keys so page/chrome remain usable.
+        return false;
+      }
+
+      scrollToIndex(next);
+      return true;
+    },
+    [scrollToIndex, videos.length]
+  );
+
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
       if (
@@ -255,7 +271,7 @@ export default function DiscoverFeed({
       }
 
       event.preventDefault();
-      scrollToIndex(next);
+      stepByDelta(delta);
     }
 
     window.addEventListener("keydown", onKeyDown);
@@ -263,7 +279,7 @@ export default function DiscoverFeed({
     return () => {
       window.removeEventListener("keydown", onKeyDown);
     };
-  }, [scrollToIndex, videos.length]);
+  }, [stepByDelta, videos.length]);
 
   if (videos.length === 0) {
     return (
@@ -284,6 +300,8 @@ export default function DiscoverFeed({
     >
       {videos.map((video, index) => {
         const shouldMountPlayer = mountedIndexes.has(index);
+        const shouldAutoAdvance =
+          index === activeIndex && index < videos.length - 1;
 
         return (
           <div
@@ -304,6 +322,9 @@ export default function DiscoverFeed({
                 onFollowChange={onFollowChange}
                 onSrcChange={(src) => onSrcChange?.(video.id, src)}
                 onDeleted={(postId) => onVideoDeleted?.(video.id, postId)}
+                onEnded={
+                  shouldAutoAdvance ? () => stepByDelta(1) : undefined
+                }
               />
             ) : (
               <div className="flex h-full w-full items-center justify-center bg-[#050510] text-white/40">

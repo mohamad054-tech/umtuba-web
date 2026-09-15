@@ -34,6 +34,7 @@ type DiscoverVideoCardProps = {
   onSrcChange?: (src: string) => void;
   slideRef?: (node: HTMLElement | null) => void;
   onDeleted?: (postId: number) => void;
+  onEnded?: () => void;
 };
 
 export default function DiscoverVideoCard({
@@ -48,6 +49,7 @@ export default function DiscoverVideoCard({
   onSrcChange,
   slideRef,
   onDeleted,
+  onEnded,
 }: DiscoverVideoCardProps) {
   const { t } = useTranslation();
   const router = useRouter();
@@ -187,6 +189,7 @@ export default function DiscoverVideoCard({
             ? handleWatchProgress
             : undefined
         }
+        onEnded={onEnded}
       />
 
       {active ? (
