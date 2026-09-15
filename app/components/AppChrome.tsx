@@ -3,6 +3,7 @@
 import type { ReactNode } from "react";
 import AppMobileBottomNav from "./AppMobileBottomNav";
 import ReferralClaimBootstrap from "./ReferralClaimBootstrap";
+import { FeedMuteProvider } from "./video/FeedMuteProvider";
 
 /**
  * Global chrome that mounts mobile primary navigation without duplicating
@@ -10,10 +11,10 @@ import ReferralClaimBootstrap from "./ReferralClaimBootstrap";
  */
 export default function AppChrome({ children }: { children: ReactNode }) {
   return (
-    <>
+    <FeedMuteProvider>
       <ReferralClaimBootstrap />
       {children}
       <AppMobileBottomNav />
-    </>
+    </FeedMuteProvider>
   );
 }

@@ -7,6 +7,9 @@ import {
   type KeyboardEvent,
   type MouseEvent,
 } from "react";
+import { initialElementMuted } from "../../../lib/video/feedMutePreference";
+import { useFeedMutePreference } from "./FeedMuteProvider";
+import TapToUnmuteOverlay from "./TapToUnmuteOverlay";
 import WatchFloatingControls from "./WatchFloatingControls";
 
 export type WatchProgressEvent = {
@@ -20,9 +23,7 @@ type VideoPlayerProps = {
   src: string;
   poster?: string;
   active: boolean;
-  muted: boolean;
   forcePause?: boolean;
-  onToggleMute: () => void;
   /** Remint signed URL when playback fails (expired / deleted). */
   onPlaybackError?: () => void;
   playbackStatus?: "ok" | "expired" | "deleted" | "error";
@@ -37,9 +38,7 @@ export default function VideoPlayer({
   src,
   poster,
   active,
-  muted,
   forcePause = false,
-  onToggleMute,
   onPlaybackError,
   playbackStatus = "ok",
   onRetryPlayback,
@@ -47,7 +46,18 @@ export default function VideoPlayer({
   restorePlaybackTimeSeconds = null,
   restorePlaybackToken = 0,
 }: VideoPlayerProps) {
+  const { userWantsSound, setUserWantsSound, toggleUserWantsSound } =
+    useFeedMutePreference();
   const videoRef = useRef<HTMLVideoElement>(null);
+  const muteEpoch = `${src}:${String(userWantsSound)}`;
+  const [muteEpochApplied, setMuteEpochApplied] = useState(muteEpoch);
+  const [autoplayFallbackMuted, setAutoplayFallbackMuted] = useState(false);
+  if (muteEpochApplied !== muteEpoch) {
+    setMuteEpochApplied(muteEpoch);
+    setAutoplayFallbackMuted(false);
+  }
+  const isCurrentlyMuted =
+    autoplayFallbackMuted || initialElementMuted(userWantsSound);
   const [pausedByUser, setPausedByUser] = useState(false);
   const [isPaused, setIsPaused] = useState(true);
   const [isReady, setIsReady] = useState(false);
@@ -73,9 +83,16 @@ export default function VideoPlayer({
       return;
     }
 
-    video.muted = muted;
-    void video.play().catch(() => undefined);
-  }, [active, muted, pausedByUser, src, playbackStatus]);
+    video.muted = initialElementMuted(userWantsSound);
+    void video.play().catch(() => {
+      if (initialElementMuted(userWantsSound)) {
+        return;
+      }
+      video.muted = true;
+      setAutoplayFallbackMuted(true);
+      void video.play().catch(() => undefined);
+    });
+  }, [active, userWantsSound, pausedByUser, src, playbackStatus]);
 
   useEffect(() => {
     if (!forcePause || !active) {
@@ -219,7 +236,15 @@ export default function VideoPlayer({
 
     if (video.paused) {
       setPausedByUser(false);
-      void video.play().catch(() => undefined);
+      video.muted = initialElementMuted(userWantsSound);
+      void video.play().catch(() => {
+        if (initialElementMuted(userWantsSound)) {
+          return;
+        }
+        video.muted = true;
+        setAutoplayFallbackMuted(true);
+        void video.play().catch(() => undefined);
+      });
       showFlash("play");
       return;
     }
@@ -260,7 +285,7 @@ export default function VideoPlayer({
           poster={poster}
           playsInline
           loop
-          muted={muted}
+          muted={isCurrentlyMuted}
           preload={active ? "auto" : "metadata"}
           onClick={handleSurfaceClick}
           onLoadedData={() => setIsReady(true)}
@@ -322,7 +347,31 @@ export default function VideoPlayer({
         </div>
       ) : null}
 
-      <WatchFloatingControls muted={muted} onToggleMute={onToggleMute} />
+      <TapToUnmuteOverlay
+        visible={active && isCurrentlyMuted}
+        label="Tap to unmute"
+        onUnmute={() => {
+          setUserWantsSound(true);
+          setAutoplayFallbackMuted(false);
+          const video = videoRef.current;
+          if (!video) {
+            return;
+          }
+          video.muted = false;
+          if (video.paused && !pausedByUser) {
+            void video.play().catch(() => {
+              video.muted = true;
+              setAutoplayFallbackMuted(true);
+              void video.play().catch(() => undefined);
+            });
+          }
+        }}
+      />
+
+      <WatchFloatingControls
+        muted={isCurrentlyMuted}
+        onToggleMute={toggleUserWantsSound}
+      />
     </div>
   );
 }
