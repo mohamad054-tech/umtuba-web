@@ -19,6 +19,9 @@ export type DemoCatalogQuery = {
   category?: DemoCategorySlug | "all";
   tag?: string;
   conceptKind?: DemoProduct["conceptKind"] | "all";
+  fulfillment?: DemoProduct["filterAttributes"]["fulfillment"];
+  color?: string;
+  inStock?: boolean;
 };
 
 export type DemoCatalogView = {
@@ -67,8 +70,29 @@ export function searchDemoCatalog(
       return false;
     }
     if (query.tag && !product.tags.includes(query.tag)) return false;
+    if (query.fulfillment && product.filterAttributes.fulfillment !== query.fulfillment) {
+      return false;
+    }
+    if (query.color && !product.filterAttributes.color.includes(query.color)) return false;
+    if (query.inStock === true) {
+      const available = product.variants.some(
+        (variant) => variant.stockState === "IN_STOCK" || variant.stockState === "LOW_STOCK"
+      );
+      if (!available) return false;
+    }
     if (!needle) return true;
-    const hay = `${product.title} ${product.shortDescription} ${product.tags.join(" ")} ${product.category}`;
+    const hay = [
+      product.title,
+      product.shortDescription,
+      product.description,
+      product.sku,
+      product.tags.join(" "),
+      product.searchKeywords.join(" "),
+      product.category,
+      product.taxonomy.path.join(" "),
+      product.specifications.map((row) => `${row.name} ${row.value}`).join(" "),
+      product.variants.map((variant) => `${variant.sku} ${variant.title}`).join(" "),
+    ].join(" ");
     return hay.toLowerCase().includes(needle);
   });
 

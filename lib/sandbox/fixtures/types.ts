@@ -153,7 +153,7 @@ export type StoreCommerceMode =
 export type SandboxStoreActor = {
   id: string;
   displayName: string;
-  kind: "supplier" | "marketplace_seller";
+  kind: "supplier" | "marketplace_seller" | "platform";
   synthetic: true;
 };
 

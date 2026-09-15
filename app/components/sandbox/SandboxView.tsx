@@ -308,8 +308,10 @@ function ProductDetail({ slug }: { slug: string }) {
       <ul className="mt-3 text-sm">
         {product.variants.map((variant) => (
           <li key={variant.id}>
-            {variant.title} · {formatMinorUnits(variant.priceMinor, variant.currency)} · onHand=
-            {variant.onHand} (synthetic)
+            {variant.title} · {formatMinorUnits(variant.priceMinor, variant.currency)} ·{" "}
+            {variant.inventoryKind === "DIGITAL"
+              ? "digital · no physical onHand"
+              : `onHand= ${variant.onHand} (synthetic)`}
           </li>
         ))}
       </ul>

@@ -74,6 +74,7 @@ describe("business sandbox fixtures", () => {
     expect(UMTUBA_DEMO_PRODUCTS).toHaveLength(26);
     expect(SANDBOX_STORE_LISTINGS).toHaveLength(26);
     expect(SANDBOX_STORE_ACTORS.map((actor) => actor.displayName)).toEqual([
+      "UMTUBA Demo Platform",
       "Demo Supplier A",
       "Demo Supplier B",
       "Demo Marketplace Seller C",
@@ -82,6 +83,12 @@ describe("business sandbox fixtures", () => {
       expect(listing.product.purchasable).toBe(false);
       expect(listing.purchasableInProduction).toBe(false);
       expect(listing.realInventory).toBe(false);
+      if (listing.commerceMode === "UMTUBA_OWNED") {
+        expect(listing.actorId).toBe("umtuba-demo-platform");
+        expect(listing.ownership.productOwnerActorId).toBe("umtuba-demo-platform");
+      } else {
+        expect(listing.actorId).not.toBe("umtuba-demo-platform");
+      }
     }
   });
 
