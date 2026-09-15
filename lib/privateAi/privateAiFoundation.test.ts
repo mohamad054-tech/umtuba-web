@@ -65,7 +65,7 @@ describe("Private AI Foundation", () => {
     ).toContain(model.id);
   });
 
-  it("enforces lifecycle transitions without training", () => {
+  it("enforces admin lifecycle transitions without training", () => {
     const svc = createPrivateAiService({ ephemeral: true, seed: false });
     const model = svc.registerModel({
       id: "pam_life",
@@ -73,21 +73,39 @@ describe("Private AI Foundation", () => {
       modelClass: "experimental",
       family: "adapter",
       version: "0.0.1",
+      capabilities: ["coding"],
+      deploymentProfileIds: ["development"],
+      hardwareContractId: "hw_cpu_dev",
+      routingContractIds: ["route_coding_v1"],
+      architecture: "adapter-placeholder",
     });
-    expect(canTransitionPrivateAiLifecycle("draft", "production")).toBe(false);
-    const planned = svc.advanceLifecycle({
+    expect(canTransitionPrivateAiLifecycle("draft", "active")).toBe(false);
+    const submitted = svc.advanceLifecycle({
       modelId: model.id,
-      to: "training_planned",
+      to: "submitted_for_review",
+      actorRole: "platform_admin",
     });
-    expect(planned.lifecycle).toBe("training_planned");
+    expect(submitted.lifecycle).toBe("submitted_for_review");
     expect(() =>
-      svc.advanceLifecycle({ modelId: model.id, to: "production" })
+      svc.advanceLifecycle({
+        modelId: model.id,
+        to: "active",
+        actorRole: "platform_admin",
+      })
     ).toThrow(/Invalid private AI lifecycle/);
-    const archived = svc.advanceLifecycle({
+    const retired = svc.advanceLifecycle({
       modelId: model.id,
-      to: "archived",
+      to: "rejected",
+      actorRole: "platform_admin",
+      reason: "incomplete contract pack",
     });
-    expect(archived.modelClass).toBe("archived");
+    expect(retired.lifecycle).toBe("rejected");
+    const done = svc.advanceLifecycle({
+      modelId: model.id,
+      to: "retired",
+      actorRole: "platform_admin",
+    });
+    expect(done.modelClass).toBe("archived");
   });
 
   it("validates routing and deployment contracts", () => {

@@ -6,7 +6,11 @@ import {
   ADMIN_STORE_UNAUTHORIZED,
   assertPlatformAdminDb,
 } from "../../lib/store/adminAuth";
-import { getTranslationStudioWorkflow } from "../../lib/translationStudio";
+import { aiService } from "../../lib/ai/services/aiService";
+import {
+  createAiServiceTranslationPort,
+  getTranslationStudioWorkflow,
+} from "../../lib/translationStudio";
 import { createClient, getServerUser } from "../../lib/supabase/server";
 import { APP_ROUTES } from "../lib/nav";
 
@@ -184,13 +188,21 @@ export async function requestAiSuggestionAction(
   formData: FormData
 ): Promise<void> {
   const { user } = await requireStudioAdmin();
+  const supabase = await createClient();
   const valueId = formString(formData, "valueId");
   const keyId = formString(formData, "keyId");
   const back = safeReturnTo(formData, `${STUDIO_BASE}/keys/${keyId}`);
+  const ai = createAiServiceTranslationPort(async (request) =>
+    aiService.runCapability(request, {
+      supabase,
+      userId: user.id,
+    })
+  );
   try {
     await getTranslationStudioWorkflow().requestAiSuggestion({
       valueId,
       actor: { userId: user.id },
+      ai,
     });
   } catch (error) {
     const message =

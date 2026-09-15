@@ -1,25 +1,27 @@
-# Session Handoff
+# SESSION_HANDOFF — Shared AI Surface Integration V1
 
-## Active task
+## Where
 
-Private AI Foundation V1
+- Worktree: `umtuba-web-shared-ai-surface-integration-v1`
+- Branch: `office/platform-shared-ai-surface-integration-v1`
+- Base HEAD: `30bda6a` Gemini live provider harden
 
-| Field | Value |
-|-------|-------|
-| Branch | `office/platform-private-ai-foundation-v1` |
-| Base | `2344c1b` (AI Data Platform Workflow & Dataset Approval V1) |
-| Worktree | `C:\Users\1\Desktop\umtuba\umtuba-web-private-ai-foundation-v1` |
-| Status | Implementation complete; awaiting commit GO |
+## Done this session
 
-## Scope reminder
+- Full AI surface inventory + classification matrix (see CURSOR_REPORT)
+- Translation Studio admin AI path wired through `aiService.runCapability`
+- Architecture guards for vendor domains / action bypass
+- Gemini secret sanitize for `AQ.` / `AIza` key shapes
+- Default `GEMINI_MODEL` → `gemini-3.5-flash-lite`
+- Focused integration tests
 
-Private AI registries and contracts. No training. No weights. No inference.
+## Not done
 
-## Do not
+- Commit / push (await GO)
+- Live smoke (no `.env.local` in this worktree)
 
-- Commit/push without GO
-- Apply migrations remotely
-- Train / fine-tune / run inference
-- Download model weights
-- Switch unrelated branches or worktrees
-- Use git trailers
+## Next GO
+
+1. Review Final Verification Report
+2. Optional: copy GEMINI_API_KEY into this worktree `.env.local` and re-run Core smoke
+3. Manual commit without trailers → push

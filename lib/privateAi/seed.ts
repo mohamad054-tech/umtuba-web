@@ -32,6 +32,7 @@ export function buildPrivateAiSeedState(
     providerHint: "umtuba-private",
     architecture: "registry-placeholder",
     notes: "Architecture placeholder — no weights, no training.",
+    reviewReason: null as string | null,
     createdAt: now,
     updatedAt: now,
   };
@@ -45,11 +46,12 @@ export function buildPrivateAiSeedState(
     capabilities: ["reasoning", "tool_use"] as const,
     lifecycle: "approved" as const,
     deploymentProfileIds: ["development", "internal", "testing"] as const,
-    hardwareContractId: null,
+    hardwareContractId: null as string | null,
     routingContractIds: ["route_reasoning_v1", "route_tool_use_v1"],
     providerHint: "external-provider-contract",
     architecture: "provider-api-contract",
     notes: "External provider contract reference only.",
+    reviewReason: null as string | null,
     createdAt: now,
     updatedAt: now,
   };
@@ -61,13 +63,14 @@ export function buildPrivateAiSeedState(
     family: "embedding" as const,
     version: "exp-0",
     capabilities: ["retrieval"] as const,
-    lifecycle: "training_planned" as const,
+    lifecycle: "submitted_for_review" as const,
     deploymentProfileIds: ["development", "air_gapped"] as const,
     hardwareContractId: "hw_airgap_secure",
     routingContractIds: ["route_retrieval_v1"],
     providerHint: "umtuba-local",
     architecture: "embedding-placeholder",
     notes: "Experimental local embedding — no training run.",
+    reviewReason: null as string | null,
     createdAt: now,
     updatedAt: now,
   };
@@ -80,7 +83,7 @@ export function buildPrivateAiSeedState(
   });
 
   return {
-    schemaVersion: 1,
+    schemaVersion: 2,
     updatedAt: now,
     models: [
       {
@@ -111,7 +114,7 @@ export function buildPrivateAiSeedState(
         role: "platform_admin",
         actions: [...DEFAULT_PLATFORM_ADMIN_ACTIONS],
         granted: true,
-        notes: "Platform admin model registry access.",
+        notes: "Platform admin model registry + workflow access.",
       }),
       createPrivateAiPermission({
         id: "perm_admin_capabilities",
@@ -145,6 +148,16 @@ export function buildPrivateAiSeedState(
         actions: ["read"],
         granted: true,
       }),
+      createPrivateAiPermission({
+        id: "perm_reviewer_models",
+        scope: "model",
+        resourceId: "*",
+        role: "model_reviewer",
+        actions: ["read", "request_changes", "reject", "approve"],
+        granted: true,
+        notes: "Reviewer may approve/reject; cannot activate.",
+      }),
     ],
+    auditTrail: [],
   };
 }

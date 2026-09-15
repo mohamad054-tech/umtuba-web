@@ -1,3 +1,4 @@
+import type { TranslationAiPort } from "../ai/translationAiPort";
 import { createStubTranslationAiPort } from "../ai/translationAiPort";
 import { getTranslationIntelligenceService } from "../intelligence/service";
 import { createProvenance, createUsageRights } from "../intelligence/provenance";
@@ -73,6 +74,8 @@ export type TranslationStudioWorkflow = {
   requestAiSuggestion(input: {
     valueId: string;
     actor: WorkflowActor;
+    /** Live Shared AI port. When omitted, uses workflow default (stub in tests). */
+    ai?: TranslationAiPort;
   }): Promise<TranslationSuggestion>;
   getHistory(valueId: string): TranslationVersionRecord[];
   getAudit(entityId?: string): AuditLogEntry[];
@@ -87,9 +90,16 @@ export function createTranslationStudioWorkflow(options?: {
   dataDir?: string;
   /** When true, never reads/writes disk — pure in-memory (tests). */
   ephemeral?: boolean;
+  /**
+   * Default AI port for suggestions.
+   * Production admin actions inject Shared AI (`ai_service`).
+   * Ephemeral tests keep the stub unless overridden.
+   */
+  ai?: TranslationAiPort;
 }): TranslationStudioWorkflow {
   const dataDir = resolveStudioDataDir(options?.dataDir);
   const ephemeral = options?.ephemeral === true;
+  const defaultAi = options?.ai ?? createStubTranslationAiPort();
 
   let state: PersistedStudioState =
     (!ephemeral ? readPersistedStudioState(dataDir) : null) ??
@@ -345,7 +355,7 @@ export function createTranslationStudioWorkflow(options?: {
         version: current.version + 1,
       }));
     },
-    async requestAiSuggestion({ valueId, actor }) {
+    async requestAiSuggestion({ valueId, actor, ai }) {
       const value = state.values.find((v) => v.id === valueId);
       if (!value) throw new Error("Unknown translation value.");
       const key = state.keys.find((k) => k.id === value.keyId);
@@ -356,7 +366,7 @@ export function createTranslationStudioWorkflow(options?: {
       const pipeline = createSuggestionPipeline({
         memory,
         terminology,
-        ai: createStubTranslationAiPort(),
+        ai: ai ?? defaultAi,
       });
 
       const started = Date.now();
