@@ -620,6 +620,7 @@ export type FoundationMessages = {
   "watch.pauseVideo": string;
   "watch.unmute": string;
   "watch.mute": string;
+  "watch.tapToUnmute": string;
   "watch.emptyFeed": string;
   "watch.aiSummary": string;
   "watch.openAiPanel": string;
@@ -820,7 +821,11 @@ export type FoundationMessages = {
   "create.backHome": string;
   "create.uploadSubtitle": string;
   "create.backToCreate": string;
-} & StoreMessages & TeacherMessages & LegalMessages & ModerationMessages;
+} & StoreMessages &
+  TeacherMessages &
+  LegalMessages &
+  ModerationMessages &
+  LearningHubMessages;
 
 /** Buyer-facing Store chrome. Do not translate seller/user product titles. */
 export type StoreMessages = {
@@ -1368,6 +1373,97 @@ export type ModerationMessages = {
   "admin.moderation.error.noPost": string;
   "admin.moderation.error.noUser": string;
   "feed.postRemoved": string;
+};
+
+/** Learning Hub composer + 1-to-1 booking chrome. Must exist in every AppLocale. */
+export type LearningHubMessages = {
+  "learning.hub.sectionsAria": string;
+  "learning.hub.section.home": string;
+  "learning.hub.section.myLearning": string;
+  "learning.hub.section.discover": string;
+  "learning.hub.section.courses": string;
+  "learning.hub.section.progress": string;
+  "learning.hub.section.live": string;
+  "learning.hub.section.assessments": string;
+  "learning.hub.section.oneToOne": string;
+  "learning.hub.section.teacher": string;
+  "learning.hub.section.marketplace": string;
+  "learning.hub.courses.current": string;
+  "learning.hub.progress.completion": string;
+  "learning.hub.progress.certificates": string;
+  "learning.hub.live.body": string;
+  "learning.hub.live.upcoming": string;
+  "learning.hub.live.openSchedule": string;
+  "learning.hub.live.openCalendar": string;
+  "learning.hub.live.empty": string;
+  "learning.hub.assessments.body": string;
+  "learning.hub.assessments.results": string;
+  "learning.hub.assessments.empty": string;
+  "learning.hub.marketplace.body": string;
+  "learning.hub.marketplace.open": string;
+  "learning.hub.teacher.tools": string;
+  "learning.oneToOne.title": string;
+  "learning.oneToOne.body": string;
+  "learning.oneToOne.findTeacher": string;
+  "learning.oneToOne.pickTeacher": string;
+  "learning.oneToOne.availability": string;
+  "learning.oneToOne.availableTimes": string;
+  "learning.oneToOne.noTimes": string;
+  "learning.oneToOne.empty": string;
+  "learning.oneToOne.signIn": string;
+  "learning.oneToOne.book": string;
+  "learning.oneToOne.request": string;
+  "learning.oneToOne.requested": string;
+  "learning.oneToOne.confirmed": string;
+  "learning.oneToOne.reschedule": string;
+  "learning.oneToOne.cancel": string;
+  "learning.oneToOne.cancelReason": string;
+  "learning.oneToOne.completed": string;
+  "learning.oneToOne.complete": string;
+  "learning.oneToOne.confirm": string;
+  "learning.oneToOne.paymentDisabled": string;
+  "learning.oneToOne.myBookings": string;
+  "learning.oneToOne.manageAvailability": string;
+  "learning.oneToOne.openWindow": string;
+  "learning.oneToOne.blockWindow": string;
+  "learning.oneToOne.requestsTitle": string;
+  "learning.oneToOne.staticOnly": string;
+  "learning.oneToOne.startsAt": string;
+  "learning.oneToOne.endsAt": string;
+  "learning.oneToOne.selectSlot": string;
+  "learning.oneToOne.upcoming": string;
+  "learning.oneToOne.status.requested": string;
+  "learning.oneToOne.status.confirmed": string;
+  "learning.oneToOne.status.cancelled": string;
+  "learning.oneToOne.status.completed": string;
+  "learning.oneToOne.status.open": string;
+  "learning.oneToOne.status.blocked": string;
+  "learning.oneToOne.error.generic": string;
+  "learning.oneToOne.error.signIn": string;
+  "learning.oneToOne.error.teacher": string;
+  "learning.oneToOne.error.time": string;
+  "learning.oneToOne.success.requested": string;
+  "learning.oneToOne.success.cancelled": string;
+  "learning.oneToOne.success.rescheduled": string;
+  "learning.oneToOne.success.confirmed": string;
+  "learning.oneToOne.success.availability": string;
+  "learning.oneToOne.range": string;
+  "learning.home.subtitle": string;
+  "learning.home.viewAll": string;
+  "learning.home.snapshot.courses": string;
+  "learning.home.snapshot.progress": string;
+  "learning.home.snapshot.nextSession": string;
+  "learning.home.snapshot.certificates": string;
+  "learning.home.snapshot.emptySession": string;
+  "learning.home.continueEmpty": string;
+  "learning.home.continueEmptyCta": string;
+  "learning.home.nextLesson": string;
+  "learning.home.dueTitle": string;
+  "learning.home.dueBody": string;
+  "learning.home.dueCta": string;
+  "learning.home.oneToOneBlocked": string;
+  "learning.home.partnerPreview": string;
+  "learning.home.morePartners": string;
 };
 
 export type TranslationKey = keyof FoundationMessages;

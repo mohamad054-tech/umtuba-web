@@ -1,6 +1,7 @@
 import { enMessages } from "./en";
 import { legalEnMessages } from "./legalCatalogs";
 import { storeFrMessages } from "./storeCatalogs";
+import { learningHubFrMessages } from "./learningHubCatalogs";
 import type { FoundationMessages } from "./types";
 
 /** French: foundation + App Shell chrome localized. */
@@ -8,6 +9,7 @@ export const frMessages: FoundationMessages = {
   ...enMessages,
   ...legalEnMessages,
   ...storeFrMessages,
+  ...learningHubFrMessages,
   "languages.ar": "Arabe",
   "languages.en": "Anglais",
   "languages.fr": "Français",
@@ -679,6 +681,7 @@ export const frMessages: FoundationMessages = {
   "watch.pauseVideo": "Mettre la vidéo en pause",
   "watch.unmute": "Activer le son",
   "watch.mute": "Couper le son",
+  "watch.tapToUnmute": "Appuyez pour activer le son",
   "watch.emptyFeed": "Aucune vidéo publiée pour le moment. Créez-en une pour commencer.",
   "watch.aiSummary": "Résumé IA",
   "watch.openAiPanel": "Ouvrir le panneau IA",

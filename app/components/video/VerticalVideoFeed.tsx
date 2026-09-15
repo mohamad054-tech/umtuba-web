@@ -93,7 +93,6 @@ export default function VerticalVideoFeed({
   const [activeIndex, setActiveIndex] = useState(() =>
     Math.min(Math.max(initialIndex, 0), Math.max(videos.length - 1, 0))
   );
-  const [muted, setMuted] = useState(true);
   const nearEndRequestedRef = useRef(false);
   const lastRestoreTokenRef = useRef<number | null>(null);
   const signingRef = useRef(new Set<number>());
@@ -325,14 +324,6 @@ export default function VerticalVideoFeed({
     };
   }, [activeIndex, videos]);
 
-  const handleToggleMute = useCallback(() => {
-    setMuted((value) => !value);
-  }, []);
-
-  const handleAutoplayMuted = useCallback(() => {
-    setMuted(true);
-  }, []);
-
   useEffect(() => {
     const scroller = scrollerRef.current;
     const activeId = activeVideo?.id;
@@ -380,14 +371,11 @@ export default function VerticalVideoFeed({
               <VideoSlide
                 video={video}
                 active={index === activeIndex}
-                muted={muted}
                 viewerId={viewerId}
                 forcePause={forcePause}
                 transitionLocked={transitionLocked}
                 shopProductCount={shopProductCount}
                 shopShelfOpen={shopShelfOpen}
-                onToggleMute={handleToggleMute}
-                onAutoplayMuted={handleAutoplayMuted}
                 onOpenPanel={onOpenPanel}
                 onPostJourney={onPostJourney}
                 onStatsChange={(stats) =>

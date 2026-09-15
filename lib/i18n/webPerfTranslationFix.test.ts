@@ -17,6 +17,7 @@ const NEW_KEYS: TranslationKey[] = [
   "watch.pauseVideo",
   "watch.unmute",
   "watch.mute",
+  "watch.tapToUnmute",
   "watch.emptyFeed",
   "live.opening",
 ];

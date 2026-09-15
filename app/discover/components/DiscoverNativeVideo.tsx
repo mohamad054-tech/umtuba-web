@@ -2,8 +2,11 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "../../components/i18n";
+import { useFeedMutePreference } from "../../components/video/FeedMuteProvider";
+import TapToUnmuteOverlay from "../../components/video/TapToUnmuteOverlay";
 import type { WatchProgressEvent } from "../../components/video/VideoPlayer";
 import { refreshWatchPlaybackAction } from "../../actions/loadWatchFeed";
+import { initialElementMuted } from "../../../lib/video/feedMutePreference";
 import {
   isPlayableHttpSrc,
   resolveHomeDiscoverMediaPreload,
@@ -44,6 +47,7 @@ export default function DiscoverNativeVideo({
   onWatchProgress,
 }: DiscoverNativeVideoProps) {
   const { t } = useTranslation();
+  const { userWantsSound, setUserWantsSound } = useFeedMutePreference();
   const videoRef = useRef<HTMLVideoElement>(null);
   const loopCountRef = useRef(0);
   const onWatchProgressRef = useRef(onWatchProgress);
@@ -52,6 +56,15 @@ export default function DiscoverNativeVideo({
   const [playbackStatus, setPlaybackStatus] = useState<PlaybackStatus>("ok");
   const [retrying, setRetrying] = useState(false);
   const [playbackSrc, setPlaybackSrc] = useState(src);
+  const muteEpoch = `${playbackSrc}:${String(userWantsSound)}`;
+  const [muteEpochApplied, setMuteEpochApplied] = useState(muteEpoch);
+  const [autoplayFallbackMuted, setAutoplayFallbackMuted] = useState(false);
+  if (muteEpochApplied !== muteEpoch) {
+    setMuteEpochApplied(muteEpoch);
+    setAutoplayFallbackMuted(false);
+  }
+  const isCurrentlyMuted =
+    autoplayFallbackMuted || initialElementMuted(userWantsSound);
 
   useEffect(() => {
     autoRemintAttemptedRef.current = false;
@@ -75,8 +88,14 @@ export default function DiscoverNativeVideo({
       return;
     }
 
-    void playActiveVideo(video, true);
-  }, [active, playbackSrc, playbackStatus]);
+    const startMuted = initialElementMuted(userWantsSound);
+    video.muted = startMuted;
+    void playActiveVideo(video, startMuted).then((result) => {
+      if (result === "muted_fallback") {
+        setAutoplayFallbackMuted(true);
+      }
+    });
+  }, [active, playbackSrc, playbackStatus, userWantsSound]);
 
   useEffect(() => {
     loopCountRef.current = 0;
@@ -184,7 +203,7 @@ export default function DiscoverNativeVideo({
           poster={poster}
           controls
           playsInline
-          muted
+          muted={isCurrentlyMuted}
           preload={resolveHomeDiscoverMediaPreload(active)}
           aria-label={displayLabel}
           onError={handlePlaybackError}
@@ -219,6 +238,24 @@ export default function DiscoverNativeVideo({
           ) : null}
         </div>
       )}
+      <TapToUnmuteOverlay
+        visible={active && attachMedia && isCurrentlyMuted}
+        label={t("watch.tapToUnmute")}
+        onUnmute={() => {
+          setUserWantsSound(true);
+          setAutoplayFallbackMuted(false);
+          const video = videoRef.current;
+          if (!video) {
+            return;
+          }
+          video.muted = false;
+          void playActiveVideo(video, false).then((result) => {
+            if (result === "muted_fallback") {
+              setAutoplayFallbackMuted(true);
+            }
+          });
+        }}
+      />
     </div>
   );
 }

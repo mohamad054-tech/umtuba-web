@@ -2,6 +2,7 @@ import { legalEnMessages } from "./legalCatalogs";
 import { moderationEnMessages } from "./moderationCatalogs";
 import { storeZhCNMessages } from "./storeCatalogs";
 import { teacherEnMessages } from "./teacherCatalogs";
+import { learningHubZhCNMessages } from "./learningHubCatalogs";
 import type { FoundationMessages } from "./types";
 
 /** Professional native chrome. UMTUBA stays Latin. Authored content stays source-language. */
@@ -10,6 +11,7 @@ export const zhCNMessages: FoundationMessages = {
   ...teacherEnMessages,
   ...legalEnMessages,
   ...moderationEnMessages,
+  ...learningHubZhCNMessages,
   "languages.ar": "阿拉伯语",
   "languages.en": "英语",
   "languages.fr": "法语",
@@ -600,6 +602,7 @@ export const zhCNMessages: FoundationMessages = {
   "watch.pauseVideo": "暂停视频",
   "watch.unmute": "打开声音",
   "watch.mute": "静音",
+  "watch.tapToUnmute": "点按打开声音",
   "watch.emptyFeed": "还没有已发布的视频。创建一条即可开始观看。",
   "watch.aiSummary": "AI 摘要",
   "watch.openAiPanel": "打开 AI 面板",

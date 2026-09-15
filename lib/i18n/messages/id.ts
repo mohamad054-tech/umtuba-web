@@ -2,6 +2,7 @@ import { legalEnMessages } from "./legalCatalogs";
 import { moderationEnMessages } from "./moderationCatalogs";
 import { storeIdMessages } from "./storeCatalogs";
 import { teacherEnMessages } from "./teacherCatalogs";
+import { learningHubIdMessages } from "./learningHubCatalogs";
 import type { FoundationMessages } from "./types";
 
 /** Professional native chrome. UMTUBA stays Latin. Authored content stays source-language. */
@@ -10,6 +11,7 @@ export const idMessages: FoundationMessages = {
   ...teacherEnMessages,
   ...legalEnMessages,
   ...moderationEnMessages,
+  ...learningHubIdMessages,
   "languages.ar": "Arab",
   "languages.en": "Inggris",
   "languages.fr": "Prancis",
@@ -606,6 +608,7 @@ export const idMessages: FoundationMessages = {
   "watch.pauseVideo": "Jeda video",
   "watch.unmute": "Nyala suara",
   "watch.mute": "Bisukan",
+  "watch.tapToUnmute": "Ketuk untuk nyalakan suara",
   "watch.emptyFeed": "Belum ada video terbit. Buat satu untuk mulai menonton.",
   "watch.aiSummary": "Ringkasan AI",
   "watch.openAiPanel": "Buka panel AI",

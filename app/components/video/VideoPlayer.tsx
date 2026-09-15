@@ -8,6 +8,7 @@ import {
   type MouseEvent,
 } from "react";
 import { useTranslation } from "../i18n";
+import { initialElementMuted } from "../../../lib/video/feedMutePreference";
 import {
   pauseInactiveVideo,
   playActiveVideo,
@@ -16,6 +17,8 @@ import {
   isPlayableHttpSrc,
   resolveWatchMediaPreload,
 } from "../../lib/video/playbackFetchPolicy";
+import { useFeedMutePreference } from "./FeedMuteProvider";
+import TapToUnmuteOverlay from "./TapToUnmuteOverlay";
 import WatchFloatingControls from "./WatchFloatingControls";
 
 export type WatchProgressEvent = {
@@ -29,11 +32,7 @@ type VideoPlayerProps = {
   src: string;
   poster?: string;
   active: boolean;
-  muted: boolean;
   forcePause?: boolean;
-  onToggleMute: () => void;
-  /** Sync parent mute UI when the browser forces muted autoplay. */
-  onAutoplayMuted?: () => void;
   /** Remint signed URL when playback fails (expired / deleted). */
   onPlaybackError?: () => void;
   playbackStatus?: "ok" | "expired" | "deleted" | "error";
@@ -48,10 +47,7 @@ export default function VideoPlayer({
   src,
   poster,
   active,
-  muted,
   forcePause = false,
-  onToggleMute,
-  onAutoplayMuted,
   onPlaybackError,
   playbackStatus = "ok",
   onRetryPlayback,
@@ -60,7 +56,18 @@ export default function VideoPlayer({
   restorePlaybackToken = 0,
 }: VideoPlayerProps) {
   const { t } = useTranslation();
+  const { userWantsSound, setUserWantsSound, toggleUserWantsSound } =
+    useFeedMutePreference();
   const videoRef = useRef<HTMLVideoElement>(null);
+  const muteEpoch = `${src}:${String(userWantsSound)}`;
+  const [muteEpochApplied, setMuteEpochApplied] = useState(muteEpoch);
+  const [autoplayFallbackMuted, setAutoplayFallbackMuted] = useState(false);
+  if (muteEpochApplied !== muteEpoch) {
+    setMuteEpochApplied(muteEpoch);
+    setAutoplayFallbackMuted(false);
+  }
+  const isCurrentlyMuted =
+    autoplayFallbackMuted || initialElementMuted(userWantsSound);
   const [pausedByUser, setPausedByUser] = useState(false);
   const [isPaused, setIsPaused] = useState(true);
   const [isReady, setIsReady] = useState(false);
@@ -92,15 +99,17 @@ export default function VideoPlayer({
 
     const generation = playGenerationRef.current + 1;
     playGenerationRef.current = generation;
-    void playActiveVideo(video, muted).then((result) => {
+    const startMuted = initialElementMuted(userWantsSound);
+    video.muted = startMuted;
+    void playActiveVideo(video, startMuted).then((result) => {
       if (playGenerationRef.current !== generation) {
         return;
       }
       if (result === "muted_fallback") {
-        onAutoplayMuted?.();
+        setAutoplayFallbackMuted(true);
       }
     });
-  }, [active, muted, pausedByUser, src, playbackStatus, onAutoplayMuted]);
+  }, [active, userWantsSound, pausedByUser, src, playbackStatus]);
 
   useEffect(() => {
     if (!forcePause || !active) {
@@ -244,9 +253,11 @@ export default function VideoPlayer({
 
     if (video.paused) {
       setPausedByUser(false);
-      void playActiveVideo(video, muted).then((result) => {
+      const startMuted = initialElementMuted(userWantsSound);
+      video.muted = startMuted;
+      void playActiveVideo(video, startMuted).then((result) => {
         if (result === "muted_fallback") {
-          onAutoplayMuted?.();
+          setAutoplayFallbackMuted(true);
         }
       });
       showFlash("play");
@@ -291,7 +302,7 @@ export default function VideoPlayer({
           poster={poster}
           playsInline
           loop
-          muted={muted}
+          muted={isCurrentlyMuted}
           preload={resolveWatchMediaPreload(active)}
           onClick={handleSurfaceClick}
           onLoadedData={() => setIsReady(true)}
@@ -354,9 +365,30 @@ export default function VideoPlayer({
         </div>
       ) : null}
 
+      <TapToUnmuteOverlay
+        visible={active && isCurrentlyMuted}
+        label={t("watch.tapToUnmute")}
+        onUnmute={() => {
+          setUserWantsSound(true);
+          setAutoplayFallbackMuted(false);
+          const video = videoRef.current;
+          if (!video) {
+            return;
+          }
+          video.muted = false;
+          if (video.paused && !pausedByUser) {
+            void playActiveVideo(video, false).then((result) => {
+              if (result === "muted_fallback") {
+                setAutoplayFallbackMuted(true);
+              }
+            });
+          }
+        }}
+      />
+
       <WatchFloatingControls
-        muted={muted}
-        onToggleMute={onToggleMute}
+        muted={isCurrentlyMuted}
+        onToggleMute={toggleUserWantsSound}
         unmuteLabel={t("watch.unmute")}
         muteLabel={t("watch.mute")}
       />

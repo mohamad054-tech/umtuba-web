@@ -2,6 +2,7 @@ import { legalEnMessages } from "./legalCatalogs";
 import { moderationEnMessages } from "./moderationCatalogs";
 import { storeKoMessages } from "./storeCatalogs";
 import { teacherEnMessages } from "./teacherCatalogs";
+import { learningHubKoMessages } from "./learningHubCatalogs";
 import type { FoundationMessages } from "./types";
 
 /** Professional native chrome. UMTUBA stays Latin. Authored content stays source-language. */
@@ -10,6 +11,7 @@ export const koMessages: FoundationMessages = {
   ...teacherEnMessages,
   ...legalEnMessages,
   ...moderationEnMessages,
+  ...learningHubKoMessages,
   "languages.ar": "아랍어",
   "languages.en": "영어",
   "languages.fr": "프랑스어",
@@ -605,6 +607,7 @@ export const koMessages: FoundationMessages = {
   "watch.pauseVideo": "영상 일시정지",
   "watch.unmute": "소리 켜기",
   "watch.mute": "음소거",
+  "watch.tapToUnmute": "탭하여 소리 켜기",
   "watch.emptyFeed": "게시된 영상이 아직 없습니다. 하나 만들어 시청을 시작하세요.",
   "watch.aiSummary": "AI 요약",
   "watch.openAiPanel": "AI 패널 열기",

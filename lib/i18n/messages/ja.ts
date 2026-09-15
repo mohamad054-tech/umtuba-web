@@ -2,6 +2,7 @@ import { legalEnMessages } from "./legalCatalogs";
 import { moderationEnMessages } from "./moderationCatalogs";
 import { storeJaMessages } from "./storeCatalogs";
 import { teacherEnMessages } from "./teacherCatalogs";
+import { learningHubJaMessages } from "./learningHubCatalogs";
 import type { FoundationMessages } from "./types";
 
 /** Professional native chrome. UMTUBA stays Latin. Authored content stays source-language. */
@@ -10,6 +11,7 @@ export const jaMessages: FoundationMessages = {
   ...teacherEnMessages,
   ...legalEnMessages,
   ...moderationEnMessages,
+  ...learningHubJaMessages,
   "languages.ar": "アラビア語",
   "languages.en": "英語",
   "languages.fr": "フランス語",
@@ -605,6 +607,7 @@ export const jaMessages: FoundationMessages = {
   "watch.pauseVideo": "動画を一時停止",
   "watch.unmute": "ミュート解除",
   "watch.mute": "ミュート",
+  "watch.tapToUnmute": "タップして音声をオンにする",
   "watch.emptyFeed": "公開動画はまだありません。作成すると視聴を始められます。",
   "watch.aiSummary": "AI要約",
   "watch.openAiPanel": "AIパネルを開く",

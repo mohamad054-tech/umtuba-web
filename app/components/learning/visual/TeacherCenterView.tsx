@@ -86,7 +86,12 @@ export default function TeacherCenterView({
 
   if (embedded) return body;
   return (
-    <VisualShell title={t("teacher.center.title")} subtitle={t("teacher.center.subtitle")} source={model.source}>
+    <VisualShell
+      title={t("teacher.center.title")}
+      subtitle={t("teacher.center.subtitle")}
+      source={model.source}
+      learningNav={{ isTeacher: model.canOperate, activeSection: "teacher" }}
+    >
       {body}
     </VisualShell>
   );

@@ -2,6 +2,7 @@ import { legalEnMessages } from "./legalCatalogs";
 import { moderationEnMessages } from "./moderationCatalogs";
 import { storeHiMessages } from "./storeCatalogs";
 import { teacherEnMessages } from "./teacherCatalogs";
+import { learningHubHiMessages } from "./learningHubCatalogs";
 import type { FoundationMessages } from "./types";
 
 /** Professional native chrome. UMTUBA stays Latin. Authored content stays source-language. */
@@ -10,6 +11,7 @@ export const hiMessages: FoundationMessages = {
   ...teacherEnMessages,
   ...legalEnMessages,
   ...moderationEnMessages,
+  ...learningHubHiMessages,
   "languages.ar": "अरबी",
   "languages.en": "अंग्रेज़ी",
   "languages.fr": "फ़्रेंच",
@@ -606,6 +608,7 @@ export const hiMessages: FoundationMessages = {
   "watch.pauseVideo": "वीडियो रोकें",
   "watch.unmute": "आवाज़ चालू करें",
   "watch.mute": "आवाज़ बंद करें",
+  "watch.tapToUnmute": "आवाज़ चालू करने के लिए टैप करें",
   "watch.emptyFeed": "अभी कोई प्रकाशित वीडियो नहीं। देखने के लिए एक बनाएँ।",
   "watch.aiSummary": "एआई सारांश",
   "watch.openAiPanel": "एआई पैनल खोलें",

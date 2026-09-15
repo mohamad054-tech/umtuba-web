@@ -2,6 +2,7 @@ import { legalEnMessages } from "./legalCatalogs";
 import { moderationEnMessages } from "./moderationCatalogs";
 import { storeRuMessages } from "./storeCatalogs";
 import { teacherEnMessages } from "./teacherCatalogs";
+import { learningHubRuMessages } from "./learningHubCatalogs";
 import type { FoundationMessages } from "./types";
 
 /** Professional native chrome. UMTUBA stays Latin. Authored content stays source-language. */
@@ -10,6 +11,7 @@ export const ruMessages: FoundationMessages = {
   ...teacherEnMessages,
   ...legalEnMessages,
   ...moderationEnMessages,
+  ...learningHubRuMessages,
   "languages.ar": "Арабский",
   "languages.en": "Английский",
   "languages.fr": "Французский",
@@ -606,6 +608,7 @@ export const ruMessages: FoundationMessages = {
   "watch.pauseVideo": "Пауза",
   "watch.unmute": "Включить звук",
   "watch.mute": "Выключить звук",
+  "watch.tapToUnmute": "Нажмите, чтобы включить звук",
   "watch.emptyFeed": "Пока нет опубликованных видео. Создайте одно, чтобы начать просмотр.",
   "watch.aiSummary": "Сводка ИИ",
   "watch.openAiPanel": "Открыть панель ИИ",

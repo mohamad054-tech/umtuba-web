@@ -2,6 +2,7 @@ import { legalEnMessages } from "./legalCatalogs";
 import { moderationEnMessages } from "./moderationCatalogs";
 import { storeTrMessages } from "./storeCatalogs";
 import { teacherEnMessages } from "./teacherCatalogs";
+import { learningHubTrMessages } from "./learningHubCatalogs";
 import type { FoundationMessages } from "./types";
 
 /** Professional native chrome. UMTUBA stays Latin. Authored content stays source-language. */
@@ -10,6 +11,7 @@ export const trMessages: FoundationMessages = {
   ...teacherEnMessages,
   ...legalEnMessages,
   ...moderationEnMessages,
+  ...learningHubTrMessages,
   "languages.ar": "Arapça",
   "languages.en": "İngilizce",
   "languages.fr": "Fransızca",
@@ -606,6 +608,7 @@ export const trMessages: FoundationMessages = {
   "watch.pauseVideo": "Videoyu duraklat",
   "watch.unmute": "Sesi aç",
   "watch.mute": "Sesi kapat",
+  "watch.tapToUnmute": "Sesi açmak için dokunun",
   "watch.emptyFeed": "Henüz yayımlanmış video yok. İzlemeye başlamak için bir tane oluştur.",
   "watch.aiSummary": "YZ özeti",
   "watch.openAiPanel": "YZ panelini aç",
