@@ -1,55 +1,74 @@
-# Cursor Report — Signed-in visibility PostgREST fix V1
+# Cursor Report — release/v1 Learning Hub merge
 
 ## Summary
 
-Hotfix on `feat/legal-pages-v1` at `e3431744`. Signed-in Home/Discover failed because `applyViewerVisibility` put embed column names (`visibility_author.moderation_status`) inside a parent PostgREST `or=(...)` tree. Anonymous still used `.is` + `.eq` and worked.
+Created local `release/v1` from `origin/feat/legal-pages-v1` (`4cb958c5`) and merged **only** `origin/desktop/learning-hub-safe-integration-v1` (`8a592bb1`). Merge commit: `9637960f` (`merge(learning): integrate Learning Hub into release/v1`).
 
-Picked **option (a)**: embed `.or(..., { referencedTable: "visibility_author" })` plus a separate base-table `.or()`. Cleanest because it stays one `.from("posts")` builder, needs no migration/RPC, and keeps the boolean identical to `post_is_visible_to_viewer`. The owner check for shadowbanned authors uses `visibility_author.id` (same value as `posts.user_id` via `profiles!user_id!inner`). Mixing those in one parent `or()` is what PostgREST cannot parse.
+Did **not** merge `feat/store-catalog-540` (deferred) or `fix/feed-audio-persistence` (superseded by Learning Hub `feedMutePreference` + cookie + `TapToUnmuteOverlay`). Owner authorized push of `origin/release/v1` only. Do not merge into any other branch.
 
-Option (b) as two mixed-free filters without `referencedTable` cannot express `(active OR (shadowbanned AND owner))` in one request. Option (c) would work but needs a new view/RPC and a production apply.
+11 conflicts, all expected: `AppChrome.tsx` plus 10 i18n files. No unexpected conflicts. No shared i18n key existed on both sides with different values (legal+moderation vs learningHub: 0 overlap; teacher vs learningHub: 0 overlap).
 
-Anonymous path is unchanged. One helper still owns the rule. Feed error logging now includes PostgREST `code` and `message` on the server only; the client still gets the generic string.
+Conflict resolution:
 
-Not committed.
+- i18n catalogs: kept both sides (legal + moderation + learning Hub spreads; both `ModerationMessages` and `LearningHubMessages` types).
+- `AppChrome.tsx`: both `SiteFooter` and `FeedMuteProvider` present.
 
 ## Exact files changed
 
-- `lib/supabase/postVisibility.ts` — signed-in filters rewritten; `or` accepts `{ referencedTable }`
-- `lib/supabase/postVisibility.test.ts` — signed-in call shape, boolean equivalence, real supabase-js query-string syntax
-- `lib/supabase/videoPostsServer.ts` — diagnosable feed error log
+Merge resolution only (plus the Learning Hub tree from the incoming branch). Resolved files:
+
+- `app/components/AppChrome.tsx`
+- `lib/i18n/messages/ar.ts`
+- `lib/i18n/messages/en.ts`
+- `lib/i18n/messages/hi.ts`
+- `lib/i18n/messages/id.ts`
+- `lib/i18n/messages/ja.ts`
+- `lib/i18n/messages/ko.ts`
+- `lib/i18n/messages/ru.ts`
+- `lib/i18n/messages/tr.ts`
+- `lib/i18n/messages/zh-CN.ts`
+- `lib/i18n/messages/types.ts`
+
+Handoff docs committed on `release/v1`:
+
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 
 ## Migrations created
 
-None.
+None in this merge step. Incoming Learning Hub added `supabase/migrations/20260910142900_learning_one_to_one_booking_v1.sql`. Not applied. `supabase db push` not run.
 
 ## Security review
 
-- Visibility boolean unchanged. Others' live shadowbanned posts stay hidden: embed `or` is `active OR (shadowbanned AND visibility_author.id = viewer)`, ANDed with `deleted_at IS NULL OR posts.user_id = viewer`.
-- Viewer UUID is still validated before interpolation.
-- Suspended/banned authors still fail the embed `or` (status is neither active nor shadowbanned).
-- `/admin/moderation` still does not call the helper.
-- Server log adds `error.code` and `error.message` only. Client response is still `"Unable to load videos. Please try again."`
-- No secrets, env files, RLS edits, or remote DB access.
+- No secrets, env files, or service-role keys touched.
+- No remote DB access. No RLS edits in this step.
+- Catalog 540 storefront loaders stay out of this release.
+- Feed audio is the Learning Hub cookie/`FeedMuteProvider` path, not the superseded sessionStorage helper.
+- Admin and moderation routes remain present; they were not rewritten in the conflict resolution.
 
 ## Tests
 
-```
-npx vitest run lib/supabase/postVisibility.test.ts \
-  lib/moderation/ugcPostVisibilityFoundation.test.ts
-```
+Conflict-key overlap script: 0 shared keys with different values.
 
-PASS — 18 tests (2 files). New coverage: signed-in supabase-js URL has `visibility_author.or=(moderation_status.eq.active,and(moderation_status.eq.shadowbanned,id.eq.<uuid>))` and parent `or=(deleted_at.is.null,user_id.eq.<uuid>)`. Each logic tree leaf is `column.op.value` with no embed name inside the parent `or`. Anonymous URL is still `deleted_at=is.null` and `visibility_author.moderation_status=eq.active`.
+i18n catalog counts (composed messages objects): all 13 locales match.
 
-```
-npx vitest run lib/supabase/followingFeed.test.ts \
-  lib/search/globalSearchFoundation.test.ts \
-  lib/store/videoCommerce.test.ts \
-  app/watch/lib/mapWatchVideo.test.ts
-```
+| locale | legal.* | learning.* | total keys |
+| --- | ---: | ---: | ---: |
+| ar | 322 | 275 | 1728 |
+| de | 322 | 275 | 1728 |
+| en | 322 | 275 | 1728 |
+| es | 322 | 275 | 1728 |
+| fr | 322 | 275 | 1728 |
+| hi | 322 | 275 | 1728 |
+| id | 322 | 275 | 1728 |
+| ja | 322 | 275 | 1728 |
+| ko | 322 | 275 | 1728 |
+| pt | 322 | 275 | 1728 |
+| ru | 322 | 275 | 1728 |
+| tr | 322 | 275 | 1728 |
+| zh-CN | 322 | 275 | 1728 |
 
-PASS — 29 tests.
+`learning.*` includes teacher-catalog learning keys plus Learning Hub keys (disjoint).
 
 ## TypeScript
 
@@ -65,7 +84,7 @@ PASS.
 npm run build
 ```
 
-PASS. Next.js 16.2.11 Turbopack. Pre-existing `next.config.ts` NFT warning unchanged.
+PASS. Next.js 16.2.11 Turbopack. Pre-existing `next.config.ts` NFT warning unchanged. Build lists all 9 legal routes, `/admin`, `/admin/moderation`, and `/learning`.
 
 ## git diff --check
 
@@ -74,15 +93,14 @@ PASS. No whitespace errors.
 ## git status --short
 
 ```
- M docs/ai/CURRENT_TASK.md
- M docs/ai/CURSOR_REPORT.md
- M lib/supabase/postVisibility.test.ts
- M lib/supabase/postVisibility.ts
- M lib/supabase/videoPostsServer.ts
+(clean after handoff commit)
 ```
+
+Owner authorized `git push origin release/v1`. Do not merge that branch into main, legal-pages, or any other ref.
 
 ## Open issues
 
-- Not committed. Not pushed. Not deployed.
-- Live signed-in Home/Discover was not clicked in a browser here (needs a real session against a host running this tree). Query construction is covered by the supabase-js URL test.
-- Other `console.error` feed loaders (following, Life, saved) still log the raw error object only. Out of scope.
+- Do not merge `release/v1` into any other branch.
+- `20260941` and `20260942` do not exist on `release/v1`, and they also do not exist on either parent. Numbering skips from `20260940` to `20260943` on legal-pages. Present: `20260939`, `20260940`, `20260943`, `20260944`, plus Learning Hub `20260910142900`.
+- Browser click-through of legal/admin/learning pages was not run on a live host.
+- Store catalog 540 remains deferred.
