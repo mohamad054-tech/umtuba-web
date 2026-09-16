@@ -1,10 +1,18 @@
+# Cursor Report — merge release/v1 (20260948 record) into feat/video-view-count-v1
+
+## Summary
+
+Merged `origin/release/v1` (`b5146049`, docs-only record that `20260948_abuse_limits_v1` was applied on production) into `feat/video-view-count-v1` (`63828f11`, already deployed and user-tested). Conflicts were docs-only (`CURRENT_TASK.md`, `CURSOR_REPORT.md`); both histories were kept. Application code is unchanged from `63828f11` except the docs-only 20260948 files from `b5146049`. No SQL applied. Not deployed. No force-push.
+
+---
+
 # Cursor Report — Show view count on videos
 
 ## Summary
 
 Video posts now show an eye icon and compact view count on Home (Discover action rail), `/watch` (Watch action rail), and UM Life video cards. Counts come from the existing `posts.views` column already selected by `postColumns` + `postsSelectVisible`. When `record_post_view` returns `counted=true`, Home and Watch patch the displayed count from the returned `views` value only (no refetch). `0` renders as `"0"`. Visible to everyone, including guests. Not a button. Like / comment / share behaviour is unchanged.
 
-No SQL. Not deployed.
+No SQL. Not deployed from the feature worktree (feature was later deployed and user-tested OK).
 
 ## Exact files changed
 
@@ -120,8 +128,57 @@ Recorded at commit time on `feat/video-view-count-v1`.
 
 ## Open issues
 
-- `origin/release/v1` was `b5146049` (docs-only 20260948 record) when this branch was created from requested SHA `af28f5ea`. Feature branch is one docs commit behind current `origin/release/v1`.
 - UM Life does not call `recordFeedViewOnce`; it displays the mapped count only. Live increment still happens on Home / Watch when a video becomes active.
 - Profile aggregate view stats were not changed.
 - Browser click-through of the new rail/Life count was not verified here (no signed-in feed in this worktree).
-- SQL not applied. Not deployed.
+- SQL not applied from the feature worktree.
+
+---
+
+# Cursor Report — record 20260948 applied
+
+## Summary
+
+Documented that `20260948_abuse_limits_v1.sql` was applied manually on production 2026-09-16. The `event_type` CHECK replacement block was skipped because live `video_commerce_events_event_type_check` already matches. SQL body unchanged. No SQL applied from this machine. Not deployed.
+
+## Exact files changed
+
+- `supabase/migrations/20260948_abuse_limits_v1.sql` (header comment only)
+- `docs/audit/PROD_SECURITY_SQL_2026-09-15.md`
+- `lib/security/abuseLimits.foundation.test.ts`
+- `docs/ai/CURRENT_TASK.md`
+- `docs/ai/CURSOR_REPORT.md`
+
+## Migrations created
+
+None. `20260948` already existed; header only.
+
+## Security review
+
+- Docs-only. No application code. No remote DB writes.
+- Note recorded: `rpc_abuse_events` ~700 rows/day; add 7-day cleanup before traffic grows.
+
+## Tests
+
+- `npx vitest run lib/security/abuseLimits.foundation.test.ts` — run at handoff.
+
+## TypeScript
+
+Not required (docs/comments/test assertion only).
+
+## Build
+
+Not required.
+
+## git diff --check
+
+Run at handoff.
+
+## git status --short
+
+Run at handoff.
+
+## Open issues
+
+- Cleanup job for `rpc_abuse_events` (delete rows older than 7 days) is not implemented.
+- File still contains the skipped CHECK replacement SQL; do not re-apply blindly.
