@@ -4,7 +4,7 @@ import { join } from "node:path";
 
 const ROOT = process.cwd();
 
-describe("20260948 abuse limits migration (applied 2026-09-16)", () => {
+describe("20260948 abuse limits migration (not applied to production)", () => {
   const sql = readFileSync(
     join(ROOT, "supabase/migrations/20260948_abuse_limits_v1.sql"),
     "utf8"
@@ -34,9 +34,7 @@ describe("20260948 abuse limits migration (applied 2026-09-16)", () => {
     expect(sql).toMatch(/badge_opened/);
     expect(sql).toMatch(/product_viewed/);
     expect(sql).toMatch(/ROLLBACK/);
-    expect(sql).toMatch(
-      /APPLIED MANUALLY TO PRODUCTION 2026-09-16 \(event_type CHECK replacement block was skipped; live constraint already equivalent\)\. Do not re-apply blindly\./
-    );
-    expect(sql).not.toMatch(/^-- NOT APPLIED\./m);
+    expect(sql).toMatch(/^-- NOT APPLIED TO PRODUCTION/m);
+    expect(sql).not.toMatch(/APPLIED MANUALLY TO PRODUCTION/);
   });
 });

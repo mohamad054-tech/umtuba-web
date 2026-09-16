@@ -1,4 +1,4 @@
--- ALREADY APPLIED MANUALLY TO PRODUCTION 2026-09-15. Recorded for history. Do not re-apply blindly.
+-- NOT APPLIED TO PRODUCTION
 
 begin;
 drop policy if exists "Anyone can create posts" on public.posts;
@@ -12,8 +12,16 @@ drop policy if exists "Posts are viewable by everyone" on public.posts;
 create policy "Posts visible if public or owned"
   on public.posts for select to anon, authenticated
   using (
-    deleted_at is null
-    and (visibility = 'public' or (select auth.uid()) = user_id)
+    public.post_is_visible_to_viewer(
+      deleted_at,
+      user_id,
+      (select p.moderation_status from public.profiles p where p.id = posts.user_id),
+      (select auth.uid())
+    )
+    and (
+      (select auth.uid()) = user_id
+      or visibility = 'public'
+    )
   );
 revoke insert, update, delete on table public.posts from anon;
 create or replace function public.guard_post_owner_columns()
