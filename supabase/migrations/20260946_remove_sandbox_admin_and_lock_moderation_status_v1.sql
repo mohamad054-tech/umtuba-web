@@ -1,4 +1,4 @@
--- ALREADY APPLIED MANUALLY TO PRODUCTION 2026-09-15. Recorded for history. Do not re-apply blindly.
+-- NOT APPLIED TO PRODUCTION
 
 delete from public.platform_admins
 where note like 'UMTUBA_E2E_%';
