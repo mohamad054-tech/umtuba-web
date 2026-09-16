@@ -1,11 +1,13 @@
 import { isSandboxProductIdentity, isSandboxStoreIdentity } from "../store/sandboxCatalog";
 import { SITEMAP_STATIC_ROUTES } from "./indexing";
+import { isDemoLearningCatalogSlug } from "./learningSeo";
 
 export const SITEMAP_DYNAMIC_LIMIT = 200;
 
 export function publicCourseSitemapPath(slug: string): string | null {
   const value = slug.trim();
   if (!value || value.includes("/") || value.includes("?")) return null;
+  if (isDemoLearningCatalogSlug(value)) return null;
   return `/learning/catalog/${value}`;
 }
 

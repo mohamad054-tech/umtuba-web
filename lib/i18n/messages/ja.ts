@@ -545,6 +545,12 @@ export const jaMessages: FoundationMessages = {
   "discover.nowExploring": "探索中",
   "discover.worldwide": "世界中",
   "video.untitled": "無題の動画",
+  "video.seo.titleByAuthor": "UMTUBA の {name} (@{username})",
+  "video.seo.titleByName": "UMTUBA の {name}",
+  "video.seo.descriptionByAuthor": "UMTUBA の {name} (@{username}) の動画。",
+  "video.seo.descriptionByAuthorLocation":
+    "{location} の {name} (@{username}) による UMTUBA の動画。",
+  "video.seo.descriptionByName": "UMTUBA の {name} の動画。",
   "home.creator": "クリエイター",
   "home.message": "メッセージ",
   "home.messageOpening": "開いています…",

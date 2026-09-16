@@ -619,6 +619,12 @@ export const enMessages: FoundationMessages = {
   "discover.nowExploring": "Now exploring",
   "discover.worldwide": "Worldwide",
   "video.untitled": "Untitled video",
+  "video.seo.titleByAuthor": "{name} (@{username}) on UMTUBA",
+  "video.seo.titleByName": "{name} on UMTUBA",
+  "video.seo.descriptionByAuthor": "A video by {name} (@{username}) on UMTUBA.",
+  "video.seo.descriptionByAuthorLocation":
+    "A video by {name} (@{username}) from {location} on UMTUBA.",
+  "video.seo.descriptionByName": "A video by {name} on UMTUBA.",
   "home.creator": "Creator",
   "home.message": "Message",
   "home.messageOpening": "Opening…",

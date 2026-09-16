@@ -545,6 +545,12 @@ export const koMessages: FoundationMessages = {
   "discover.nowExploring": "지금 탐색 중",
   "discover.worldwide": "전 세계",
   "video.untitled": "제목 없는 동영상",
+  "video.seo.titleByAuthor": "UMTUBA의 {name} (@{username})",
+  "video.seo.titleByName": "UMTUBA의 {name}",
+  "video.seo.descriptionByAuthor": "UMTUBA의 {name} (@{username}) 영상.",
+  "video.seo.descriptionByAuthorLocation":
+    "{location}의 {name} (@{username})이(가) 올린 UMTUBA 영상.",
+  "video.seo.descriptionByName": "UMTUBA의 {name} 영상.",
   "home.creator": "크리에이터",
   "home.message": "메시지",
   "home.messageOpening": "여는 중…",

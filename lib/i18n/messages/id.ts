@@ -546,6 +546,12 @@ export const idMessages: FoundationMessages = {
   "discover.nowExploring": "Sedang menjelajah",
   "discover.worldwide": "Seluruh dunia",
   "video.untitled": "Video tanpa judul",
+  "video.seo.titleByAuthor": "{name} (@{username}) di UMTUBA",
+  "video.seo.titleByName": "{name} di UMTUBA",
+  "video.seo.descriptionByAuthor": "Video oleh {name} (@{username}) di UMTUBA.",
+  "video.seo.descriptionByAuthorLocation":
+    "Video oleh {name} (@{username}) dari {location} di UMTUBA.",
+  "video.seo.descriptionByName": "Video oleh {name} di UMTUBA.",
   "home.creator": "Kreator",
   "home.message": "Pesan",
   "home.messageOpening": "Membuka…",

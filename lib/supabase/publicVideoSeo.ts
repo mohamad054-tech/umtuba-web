@@ -1,10 +1,19 @@
 import { applyViewerVisibility, isPostVisibleToViewer, postsSelectVisible } from "./postVisibility";
 import { createClient } from "./server";
 import type { PublicVideoSeoInput } from "../site/videoSeo";
-import { VIDEO_SITEMAP_LIMIT } from "../site/videoSeo";
+import { shouldIndexPublicVideo, VIDEO_SITEMAP_LIMIT } from "../site/videoSeo";
+
+const SEO_AUTHOR_EMBED =
+  "visibility_author:profiles!user_id!inner(moderation_status, city, country)";
 
 const SEO_POST_COLUMNS =
-  "id, user_id, content, created_at, media_duration_ms, author_name, author_username, article_id, post_type, media_status, video_path, deleted_at";
+  `id, user_id, content, created_at, media_duration_ms, author_name, author_username, article_id, post_type, media_status, video_path, thumbnail_path, deleted_at, ${SEO_AUTHOR_EMBED}`;
+
+type SeoAuthorEmbed = {
+  moderation_status?: string | null;
+  city?: string | null;
+  country?: string | null;
+};
 
 type SeoPostRow = {
   id: number;
@@ -18,8 +27,9 @@ type SeoPostRow = {
   post_type: string | null;
   media_status: string | null;
   video_path: string | null;
+  thumbnail_path?: string | null;
   deleted_at?: string | null;
-  visibility_author?: unknown;
+  visibility_author?: SeoAuthorEmbed | SeoAuthorEmbed[] | null;
 };
 
 function isPublicEligibleVideo(row: SeoPostRow): boolean {
@@ -29,7 +39,27 @@ function isPublicEligibleVideo(row: SeoPostRow): boolean {
   return Boolean(path);
 }
 
+function readAuthorLocation(row: SeoPostRow): {
+  city: string | null;
+  country: string | null;
+} {
+  const embed = row.visibility_author;
+  const author = Array.isArray(embed) ? embed[0] : embed;
+  const city =
+    typeof author?.city === "string" && author.city.trim()
+      ? author.city.trim()
+      : null;
+  const country =
+    typeof author?.country === "string" && author.country.trim()
+      ? author.country.trim()
+      : null;
+  return { city, country };
+}
+
 function mapRow(row: SeoPostRow): PublicVideoSeoInput {
+  const location = readAuthorLocation(row);
+  const thumbnail =
+    typeof row.thumbnail_path === "string" ? row.thumbnail_path.trim() : "";
   return {
     id: row.id,
     caption: typeof row.content === "string" ? row.content : null,
@@ -41,6 +71,9 @@ function mapRow(row: SeoPostRow): PublicVideoSeoInput {
     authorName: row.author_name,
     authorUsername: row.author_username,
     articleTitle: null,
+    authorCity: location.city,
+    authorCountry: location.country,
+    hasThumbnail: Boolean(thumbnail),
   };
 }
 
@@ -107,7 +140,8 @@ export async function listPublicVideosForSitemap(
       .filter(
         (row) => isPublicEligibleVideo(row) && isPostVisibleToViewer(row, null)
       )
-      .map(mapRow);
+      .map(mapRow)
+      .filter(shouldIndexPublicVideo);
   } catch (error) {
     console.error("listPublicVideosForSitemap failed:", error);
     return [];

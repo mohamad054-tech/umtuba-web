@@ -541,6 +541,12 @@ export const zhCNMessages: FoundationMessages = {
   "discover.nowExploring": "正在探索",
   "discover.worldwide": "全球",
   "video.untitled": "未命名视频",
+  "video.seo.titleByAuthor": "{name} (@{username}) 在 UMTUBA",
+  "video.seo.titleByName": "{name} 在 UMTUBA",
+  "video.seo.descriptionByAuthor": "{name} (@{username}) 在 UMTUBA 上的视频。",
+  "video.seo.descriptionByAuthorLocation":
+    "{name} (@{username}) 来自 {location}，在 UMTUBA 上的视频。",
+  "video.seo.descriptionByName": "{name} 在 UMTUBA 上的视频。",
   "home.creator": "创作者",
   "home.message": "私信",
   "home.messageOpening": "正在打开…",

@@ -616,6 +616,12 @@ export const deMessages: FoundationMessages = {
   "discover.nowExploring": "Jetzt unterwegs",
   "discover.worldwide": "Weltweit",
   "video.untitled": "Video ohne Titel",
+  "video.seo.titleByAuthor": "{name} (@{username}) auf UMTUBA",
+  "video.seo.titleByName": "{name} auf UMTUBA",
+  "video.seo.descriptionByAuthor": "Ein Video von {name} (@{username}) auf UMTUBA.",
+  "video.seo.descriptionByAuthorLocation":
+    "Ein Video von {name} (@{username}) aus {location} auf UMTUBA.",
+  "video.seo.descriptionByName": "Ein Video von {name} auf UMTUBA.",
   "home.creator": "Creator",
   "home.message": "Nachricht",
   "home.messageOpening": "Wird geöffnet…",

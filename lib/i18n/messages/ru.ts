@@ -546,6 +546,12 @@ export const ruMessages: FoundationMessages = {
   "discover.nowExploring": "Сейчас исследуем",
   "discover.worldwide": "Весь мир",
   "video.untitled": "Видео без названия",
+  "video.seo.titleByAuthor": "{name} (@{username}) на UMTUBA",
+  "video.seo.titleByName": "{name} на UMTUBA",
+  "video.seo.descriptionByAuthor": "Видео от {name} (@{username}) на UMTUBA.",
+  "video.seo.descriptionByAuthorLocation":
+    "Видео от {name} (@{username}) из {location} на UMTUBA.",
+  "video.seo.descriptionByName": "Видео от {name} на UMTUBA.",
   "home.creator": "Автор",
   "home.message": "Сообщение",
   "home.messageOpening": "Открытие…",

@@ -27,6 +27,8 @@ import {
   publicProductSitemapPath,
   publicStorefrontSitemapPath,
 } from "./publicSitemap";
+import { buildDemoPreviewMetadata } from "./demoSeo";
+import { isDemoLearningCatalogSlug } from "./learningSeo";
 import { storeCartMetadata, storeSearchMetadata } from "./routeMetadata";
 
 const ROOT = process.cwd();
@@ -164,6 +166,9 @@ describe("Google SEO full optimization V1", () => {
     expect(publicCourseSitemapPath("intro-to-arabic")).toBe(
       "/learning/catalog/intro-to-arabic"
     );
+    expect(publicCourseSitemapPath("ja-01")).toBeNull();
+    expect(publicCourseSitemapPath("ai-foundations-for-builders")).toBeNull();
+    expect(publicCourseSitemapPath("signals-of-thought-ai-studio")).toBeNull();
     expect(publicProductSitemapPath("ada-shop", "mug")).toBe(
       "/store/ada-shop/product/mug"
     );
@@ -177,6 +182,29 @@ describe("Google SEO full optimization V1", () => {
   it("marks cart and store search noindex", () => {
     expect(storeCartMetadata.robots).toMatchObject({ index: false });
     expect(storeSearchMetadata.robots).toMatchObject({ index: false });
+  });
+
+  it("keeps demo store and sample learning catalog pages noindex with a self canonical", () => {
+    const demo = buildDemoPreviewMetadata({ title: "Demo catalog preview" });
+    expect(demo.alternates?.canonical).toBe("/store/demo-preview");
+    expect(demo.robots).toMatchObject({ index: false, follow: false });
+    expect(demo.alternates?.languages).toBeUndefined();
+    const product = buildDemoPreviewMetadata({
+      title: "Demo product preview",
+      slug: "umtuba-demo-canvas-tote",
+    });
+    expect(product.alternates?.canonical).toBe(
+      "/store/demo-preview/umtuba-demo-canvas-tote"
+    );
+    expect(isDemoLearningCatalogSlug("ja-01")).toBe(true);
+    expect(isDemoLearningCatalogSlug("JA-09")).toBe(true);
+    expect(isDemoLearningCatalogSlug("intro-to-arabic")).toBe(false);
+    const demoPage = readFileSync(
+      join(ROOT, "app/store/demo-preview/page.tsx"),
+      "utf8"
+    );
+    expect(demoPage).toMatch(/buildDemoPreviewMetadata/);
+    expect(demoPage).not.toMatch(/title: "Demo catalog preview \| UMTUBA"/);
   });
 
   it("wires layout JSON-LD and public generateMetadata", () => {

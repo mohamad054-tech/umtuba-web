@@ -9,6 +9,8 @@ import {
   buildWatchPostPath,
   iso8601DurationFromMs,
   parsePublicPostId,
+  readWatchPostQuery,
+  shouldIndexPublicVideo,
   truthfulVideoDescription,
   truthfulVideoTitle,
 } from "./videoSeo";
@@ -24,6 +26,12 @@ describe("video SEO V1", () => {
     expect(parsePublicPostId("52")).toBe(52);
     expect(parsePublicPostId("0")).toBeNull();
     expect(parsePublicPostId("nope")).toBeNull();
+    expect(readWatchPostQuery({}).provided).toBe(false);
+    expect(readWatchPostQuery({ post: "abc" })).toEqual({
+      provided: true,
+      postId: null,
+    });
+    expect(readWatchPostQuery({ post: "12" }).postId).toBe(12);
   });
 
   it("uses truthful titles and does not invent captions", () => {
@@ -49,7 +57,22 @@ describe("video SEO V1", () => {
         authorUsername: "ada",
         articleTitle: null,
       })
-    ).toBe("Video by Ada");
+    ).toBe("Ada (@ada) on UMTUBA");
+
+    expect(
+      truthfulVideoTitle(
+        {
+          id: 2,
+          caption: "",
+          createdAt: "2026-08-01T00:00:00.000Z",
+          durationMs: null,
+          authorName: "آدا",
+          authorUsername: "ada",
+          articleTitle: null,
+        },
+        "ar"
+      )
+    ).toBe("آدا (@ada) على UMTUBA");
   });
 
   it("omits duration when unknown and formats ISO-8601 when known", () => {
@@ -127,11 +150,40 @@ describe("video SEO V1", () => {
     expect(langs.en).toBe("/watch?post=8&hl=en");
   });
 
+  it("noindexes empty-caption videos that have no thumbnail", () => {
+    const emptyNoThumb = {
+      id: 9,
+      caption: "  ",
+      createdAt: "2026-08-01T00:00:00.000Z",
+      durationMs: null,
+      authorName: "Ada",
+      authorUsername: "ada",
+      articleTitle: null,
+      hasThumbnail: false,
+    };
+    expect(shouldIndexPublicVideo(emptyNoThumb)).toBe(false);
+    expect(shouldIndexPublicVideo({ ...emptyNoThumb, hasThumbnail: true })).toBe(
+      true
+    );
+    const meta = buildWatchPostMetadata(emptyNoThumb);
+    expect(meta.robots).toMatchObject({ index: false, follow: false });
+    expect(meta.title).toBe("Ada (@ada) on UMTUBA");
+    expect(String(meta.description)).toMatch(/Ada \(@ada\)/);
+    expect(
+      truthfulVideoDescription({
+        ...emptyNoThumb,
+        authorCity: "Amman",
+        authorCountry: "Jordan",
+      })
+    ).toBe("A video by Ada (@ada) from Amman, Jordan on UMTUBA.");
+  });
+
   it("watch page uses generateMetadata and VideoObject JSON-LD", () => {
     const watch = readFileSync(join(ROOT, "app/watch/page.tsx"), "utf8");
     expect(watch).toMatch(/export async function generateMetadata/);
     expect(watch).toMatch(/buildWatchPostMetadata/);
-    expect(watch).toMatch(/buildWatchUnavailableMetadata/);
+    expect(watch).toMatch(/notFound\(/);
+    expect(watch).toMatch(/readWatchPostQuery/);
     expect(watch).toMatch(/VideoObjectJsonLdScript/);
     expect(watch).not.toMatch(/export const metadata = watchMetadata/);
   });

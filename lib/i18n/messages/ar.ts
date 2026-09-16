@@ -605,6 +605,12 @@ export const arMessages: FoundationMessages = {
   "discover.nowExploring": "تستكشف الآن",
   "discover.worldwide": "حول العالم",
   "video.untitled": "فيديو بدون عنوان",
+  "video.seo.titleByAuthor": "{name} (@{username}) على UMTUBA",
+  "video.seo.titleByName": "{name} على UMTUBA",
+  "video.seo.descriptionByAuthor": "فيديو من {name} (@{username}) على UMTUBA.",
+  "video.seo.descriptionByAuthorLocation":
+    "فيديو من {name} (@{username}) من {location} على UMTUBA.",
+  "video.seo.descriptionByName": "فيديو من {name} على UMTUBA.",
   "home.creator": "الصانع",
   "home.message": "رسالة",
   "home.messageOpening": "جارٍ الفتح…",

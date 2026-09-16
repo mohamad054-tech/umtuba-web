@@ -557,6 +557,11 @@ export type FoundationMessages = {
   "discover.nowExploring": string;
   "discover.worldwide": string;
   "video.untitled": string;
+  "video.seo.titleByAuthor": string;
+  "video.seo.titleByName": string;
+  "video.seo.descriptionByAuthor": string;
+  "video.seo.descriptionByAuthorLocation": string;
+  "video.seo.descriptionByName": string;
   "home.creator": string;
   "home.message": string;
   "home.messageOpening": string;

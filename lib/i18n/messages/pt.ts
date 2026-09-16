@@ -613,6 +613,12 @@ export const ptMessages: FoundationMessages = {
   "discover.nowExploring": "A explorar agora",
   "discover.worldwide": "Todo o mundo",
   "video.untitled": "Vídeo sem título",
+  "video.seo.titleByAuthor": "{name} (@{username}) no UMTUBA",
+  "video.seo.titleByName": "{name} no UMTUBA",
+  "video.seo.descriptionByAuthor": "Um vídeo de {name} (@{username}) no UMTUBA.",
+  "video.seo.descriptionByAuthorLocation":
+    "Um vídeo de {name} (@{username}) de {location} no UMTUBA.",
+  "video.seo.descriptionByName": "Um vídeo de {name} no UMTUBA.",
   "home.creator": "Criador",
   "home.message": "Mensagem",
   "home.messageOpening": "A abrir…",

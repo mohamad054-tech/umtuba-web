@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { resolveRequestLocale } from "../../../../lib/i18n/server";
 import { buildPageMetadata } from "../../../../lib/site/metadata";
 import { BRAND } from "../../../../lib/site/brand";
+import { isDemoLearningCatalogSlug } from "../../../../lib/site/learningSeo";
 import {
   loadLearningCourseSurface,
   shouldPreferLiveLearningData,
@@ -18,17 +19,18 @@ type PageProps = {
 export async function generateMetadata({ params }: PageProps) {
   const { locale } = await resolveRequestLocale();
   const { courseSlug } = await Promise.resolve(params);
-  if (!shouldPreferLiveLearningData()) {
+  const path = `/learning/catalog/${courseSlug}`;
+  const demoOrSample = isDemoLearningCatalogSlug(courseSlug);
+  if (!shouldPreferLiveLearningData() || demoOrSample) {
     return buildPageMetadata({
       title: "Course",
       description: `A ${BRAND.name} Learning course.`,
-      path: `/learning/catalog/${courseSlug}`,
+      path,
       index: "noindex",
       locale,
     });
   }
   const landing = await getCachedPublicCourseBySlug(courseSlug);
-  const path = `/learning/catalog/${courseSlug}`;
   if (!landing) {
     return buildPageMetadata({
       title: "Course",

@@ -90,6 +90,7 @@ describe("GSC full indexing repair V1", () => {
     expect(lesson).toMatch(/buildLearningLessonMetadata/);
     expect(lesson).not.toMatch(/Lesson · Learning \| UMTUBA/);
     const watch = readFileSync(join(ROOT, "app/watch/page.tsx"), "utf8");
-    expect(watch).toMatch(/buildWatchUnavailableMetadata/);
+    expect(watch).toMatch(/notFound\(/);
+    expect(watch).toMatch(/readWatchPostQuery/);
   });
 });

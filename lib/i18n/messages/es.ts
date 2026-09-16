@@ -612,6 +612,12 @@ export const esMessages: FoundationMessages = {
   "discover.nowExploring": "Explorando ahora",
   "discover.worldwide": "Todo el mundo",
   "video.untitled": "Vídeo sin título",
+  "video.seo.titleByAuthor": "{name} (@{username}) en UMTUBA",
+  "video.seo.titleByName": "{name} en UMTUBA",
+  "video.seo.descriptionByAuthor": "Un vídeo de {name} (@{username}) en UMTUBA.",
+  "video.seo.descriptionByAuthorLocation":
+    "Un vídeo de {name} (@{username}) desde {location} en UMTUBA.",
+  "video.seo.descriptionByName": "Un vídeo de {name} en UMTUBA.",
   "home.creator": "Creador",
   "home.message": "Mensaje",
   "home.messageOpening": "Abriendo…",

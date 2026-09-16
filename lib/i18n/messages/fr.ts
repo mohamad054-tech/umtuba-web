@@ -617,6 +617,12 @@ export const frMessages: FoundationMessages = {
   "discover.nowExploring": "Exploration en cours",
   "discover.worldwide": "Monde entier",
   "video.untitled": "Vidéo sans titre",
+  "video.seo.titleByAuthor": "{name} (@{username}) sur UMTUBA",
+  "video.seo.titleByName": "{name} sur UMTUBA",
+  "video.seo.descriptionByAuthor": "Une vidéo de {name} (@{username}) sur UMTUBA.",
+  "video.seo.descriptionByAuthorLocation":
+    "Une vidéo de {name} (@{username}) à {location} sur UMTUBA.",
+  "video.seo.descriptionByName": "Une vidéo de {name} sur UMTUBA.",
   "home.creator": "Créateur",
   "home.message": "Message",
   "home.messageOpening": "Ouverture…",

@@ -1,9 +1,11 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import StoreEmptyState from "../../components/store/StoreEmptyState";
 import StorePageHeader from "../../components/store/StorePageHeader";
 import StoreShell from "../../components/store/StoreShell";
 import { createTranslator } from "../../../lib/i18n";
 import { resolveRequestLocale } from "../../../lib/i18n/server";
+import { buildDemoPreviewMetadata } from "../../../lib/site/demoSeo";
 import { DEMO_CATEGORY_SLUGS } from "../../../lib/store/demo/types";
 import { searchDemoCatalog } from "../../../lib/store/demo/surface";
 import { formatMinorUnits } from "../../../lib/store/money";
@@ -19,10 +21,11 @@ type PageProps = {
   }>;
 };
 
-export const metadata = {
-  title: "Demo catalog preview | UMTUBA",
-  robots: { index: false, follow: false },
-};
+export function generateMetadata(): Metadata {
+  return buildDemoPreviewMetadata({
+    title: "Demo catalog preview",
+  });
+}
 
 export default async function StoreDemoPreviewPage({ searchParams }: PageProps) {
   const params = (await searchParams) ?? {};

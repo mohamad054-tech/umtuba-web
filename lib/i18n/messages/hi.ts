@@ -546,6 +546,12 @@ export const hiMessages: FoundationMessages = {
   "discover.nowExploring": "अब देख रहे हैं",
   "discover.worldwide": "पूरी दुनिया",
   "video.untitled": "बिना शीर्षक वाला वीडियो",
+  "video.seo.titleByAuthor": "{name} (@{username}) UMTUBA पर",
+  "video.seo.titleByName": "{name} UMTUBA पर",
+  "video.seo.descriptionByAuthor": "{name} (@{username}) का वीडियो UMTUBA पर।",
+  "video.seo.descriptionByAuthorLocation":
+    "{name} (@{username}) का {location} से वीडियो UMTUBA पर।",
+  "video.seo.descriptionByName": "{name} का वीडियो UMTUBA पर।",
   "home.creator": "क्रिएटर",
   "home.message": "संदेश",
   "home.messageOpening": "खोला जा रहा है…",

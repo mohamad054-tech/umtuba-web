@@ -1,9 +1,11 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import StoreEmptyState from "../../../components/store/StoreEmptyState";
 import StoreShell from "../../../components/store/StoreShell";
 import { createTranslator } from "../../../../lib/i18n";
 import { resolveRequestLocale } from "../../../../lib/i18n/server";
+import { buildDemoPreviewMetadata } from "../../../../lib/site/demoSeo";
 import {
   demoCheckoutSandbox,
   describeDemoPdp,
@@ -18,10 +20,13 @@ type PageProps = {
   searchParams?: Promise<{ demo_token?: string }>;
 };
 
-export const metadata = {
-  title: "Demo product preview | UMTUBA",
-  robots: { index: false, follow: false },
-};
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { slug } = await params;
+  return buildDemoPreviewMetadata({
+    title: "Demo product preview",
+    slug,
+  });
+}
 
 export default async function StoreDemoProductPreviewPage({
   params,

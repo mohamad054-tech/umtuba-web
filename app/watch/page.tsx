@@ -1,17 +1,17 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import {
   encodeWatchPageCursor,
   getWatchVideosPageServer,
 } from "../../lib/supabase/videoPostsServer";
 import { getServerUser } from "../../lib/supabase/server";
-import { watchMetadata } from "../../lib/site/routeMetadata";
+import { buildLocalizedRouteMetadata } from "../../lib/site/localizedSeo";
 import { getSiteUrl } from "../../lib/site/siteUrl";
 import {
   buildVideoObjectJsonLd,
   buildWatchPostMetadata,
-  buildWatchUnavailableMetadata,
-  parsePublicPostId,
+  readWatchPostQuery,
 } from "../../lib/site/videoSeo";
 import { loadPublicVideoSeoById } from "../../lib/supabase/publicVideoSeo";
 import ProductEmptyState from "../components/product/ProductEmptyState";
@@ -39,18 +39,26 @@ type WatchPageProps = {
 export async function generateMetadata({
   searchParams,
 }: WatchPageProps): Promise<Metadata> {
+  const { locale } = await resolveRequestLocale();
   const params = await Promise.resolve(searchParams ?? {});
-  const postId = parsePublicPostId(params.post ?? params.id ?? null);
+  const { provided, postId } = readWatchPostQuery(params);
+  if (!provided) {
+    return buildLocalizedRouteMetadata({
+      key: "watch",
+      path: "/watch",
+      locale,
+    });
+  }
   if (!postId) {
-    return watchMetadata;
+    notFound();
   }
 
   const video = await loadPublicVideoSeoById(postId);
   if (!video) {
-    return buildWatchUnavailableMetadata(postId);
+    notFound();
   }
 
-  return buildWatchPostMetadata(video);
+  return buildWatchPostMetadata(video, locale);
 }
 
 async function WatchFallback() {
@@ -148,13 +156,19 @@ async function WatchLoader({ searchParams }: WatchPageProps) {
 
 async function WatchSeo({ searchParams }: WatchPageProps) {
   const params = await Promise.resolve(searchParams ?? {});
-  const postId = parsePublicPostId(params.post ?? params.id ?? null);
+  const { provided, postId } = readWatchPostQuery(params);
+  if (provided && !postId) {
+    notFound();
+  }
   if (!postId) return null;
   const video = await loadPublicVideoSeoById(postId);
-  if (!video) return null;
+  if (!video) {
+    notFound();
+  }
+  const { locale } = await resolveRequestLocale();
   return (
     <VideoObjectJsonLdScript
-      data={buildVideoObjectJsonLd(video, getSiteUrl())}
+      data={buildVideoObjectJsonLd(video, getSiteUrl(), locale)}
     />
   );
 }

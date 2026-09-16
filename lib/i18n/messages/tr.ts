@@ -546,6 +546,12 @@ export const trMessages: FoundationMessages = {
   "discover.nowExploring": "Şimdi keşfediliyor",
   "discover.worldwide": "Dünya çapında",
   "video.untitled": "Başlıksız video",
+  "video.seo.titleByAuthor": "{name} (@{username}) UMTUBA’da",
+  "video.seo.titleByName": "{name} UMTUBA’da",
+  "video.seo.descriptionByAuthor": "{name} (@{username}) adlı kullanıcının UMTUBA videosu.",
+  "video.seo.descriptionByAuthorLocation":
+    "{name} (@{username}) adlı kullanıcının {location} konumundan UMTUBA videosu.",
+  "video.seo.descriptionByName": "{name} adlı kullanıcının UMTUBA videosu.",
   "home.creator": "Üretici",
   "home.message": "Mesaj",
   "home.messageOpening": "Açılıyor…",

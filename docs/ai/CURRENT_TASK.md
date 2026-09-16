@@ -2,88 +2,52 @@
 
 ## Task title
 
-MERGE_VIDEO_VIEW_COUNT_INTO_RELEASE_V1
+FIX_SEO_BATCH1_V1
 
 ## Status
 
-Merge `origin/release/v1` (`b5146049`, docs-only 20260948 applied record) into `feat/video-view-count-v1` (`63828f11`, already deployed and user-tested). Docs conflicts only. No SQL. Not deployed from this merge.
+Implement SEO batch 1 from the 2026-09-15 site audit: real Watch 404s, empty-caption titles, demo noindex + self-canonical, sitemap exclusions, hreflang verification. No SQL. Not deployed.
 
 ```
-TASK_ID = MERGE_VIDEO_VIEW_COUNT_INTO_RELEASE_V1
+TASK_ID = FIX_SEO_BATCH1_V1
 STATUS = COMPLETE
 DATE = 2026-09-16
-BRANCH = feat/video-view-count-v1
-FEATURE = origin/feat/video-view-count-v1 @ 63828f11
-RELEASE = origin/release/v1 @ b5146049
+BRANCH = fix/seo-batch1-v1
+WORKTREE = D:\umtuba-central\repos\umtuba-web-seo-batch1-v1
+BASE = origin/release/v1 @ 5ebab735406707f28878c118770579a361042e52
 PRODUCTION_DB = DO_NOT_TOUCH
 SUPABASE_DB_PUSH = FORBIDDEN
 DEPLOY = FORBIDDEN
 ```
 
----
+Audit source: `docs/audit/SITE_AUDIT_2026-09-15.md` SEO-01 / SEO-02 / SEO-03 / SEO-04 / SEO-06 / SEO-07 (file lives on docs/site-audit branch; findings copied into this task).
 
-## Prior task — FEAT_VIDEO_VIEW_COUNT_V1
+### Findings to fix
 
-Show `posts.views` on Home, Watch, and UM Life video surfaces. Feature already deployed and user-tested OK. SQL not applied from that worktree.
-
-```
-TASK_ID = FEAT_VIDEO_VIEW_COUNT_V1
-STATUS = COMPLETE
-DATE = 2026-09-16
-BRANCH = feat/video-view-count-v1
-BASE = af28f5eac638efe7c7e6bde082ffc03873ad479d
-PRODUCTION_DB = DO_NOT_TOUCH
-SUPABASE_DB_PUSH = FORBIDDEN
-DEPLOY = FORBIDDEN
-```
-
-Note: `origin/release/v1` had moved to `b5146049` (docs-only 20260948 record) when this branch was created. Work started from the requested SHA `af28f5ea`.
+- **SEO-03:** `/watch?post=99999999` returns HTTP 200 (soft 404, noindex). Missing / deleted / non-public / inactive-author / invalid id must be a real 404 for the server render.
+- **SEO-02 / SEO-06:** Empty captions render as "Untitled video" / "Video by ..." titles and generic VideoObject names. Use `"<display name> (@username) on UMTUBA"` style + author/location description. If caption empty AND no thumbnail: noindex + exclude from video sitemap.
+- **SEO-04:** `/store/demo-preview` is noindex but canonical points to home. Self-canonical + noindex, nofollow.
+- **SEO-07:** Demo catalog courses (e.g. ja-01) are indexable. Demo/sample store and learning catalog pages: noindex, nofollow; self-canonical; excluded from all sitemaps.
+- **SEO-01:** Audit saw 0 hreflang tags on live HTML while code emits `?hl=` alternates. Verify on local production build; fix if missing.
+- Unknown routes must return 404 (not 200).
+- Do not change `robots.txt` rules for `/world` or `/learning` unless a demo page is wrongly indexable.
 
 ### Allowed scope
 
-- Select/map `views` on the shared video/post model used by Home, Watch, and UM Life (no extra queries per video).
-- Eye icon + compact count on Home and Watch action rails directly under Share (not a button).
-- Eye icon + compact count on UM Life **video** cards next to existing counts.
-- Reuse `formatInteractionCount`; show `0` as `"0"`; visible to everyone.
-- In-place count update when `record_post_view` returns `counted=true` (returned `views` only, no refetch).
-- i18n `video.views.label` written in `en` and `ar`; other locales fall back to English.
-- Related tests and handoff docs.
+- Watch server metadata / notFound for missing or non-public posts (do not break client-side feed navigation or in-app 'post unavailable').
+- Watch / VideoObject / sitemap title and robots helpers for empty captions.
+- Demo/sample store and learning catalog metadata, canonical, sitemap exclusion.
+- hreflang emission if local build is missing tags the code intends.
+- Existing metadata / jsonLd / videoSeo / hreflang helpers.
+- New i18n keys via existing catalogs (prefer all 13 locales).
+- Related tests and handoff docs (`CURRENT_TASK.md`, `CURSOR_REPORT.md`).
 
 ### Forbidden scope
 
+- Do not apply SQL or run `supabase db push`.
 - Do not deploy.
-- Do not apply Supabase migrations or run `supabase db push`.
-- Do not change like / comment / share behaviour.
-- Do not change profile stats unless required (not required).
-- Do not commit onto `release/v1`, `chore/record-20260948-applied`, or `feat/life-more-menu-v1`.
-
----
-
-## Prior task — CHORE_RECORD_20260948_APPLIED
-
-Record that `20260948_abuse_limits_v1` was applied manually on production 2026-09-16. Docs/comments/tests only. SQL body unchanged. Not deployed. No SQL applied from this machine.
-
-```
-TASK_ID = CHORE_RECORD_20260948_APPLIED
-STATUS = COMPLETE
-DATE = 2026-09-16
-BRANCH = chore/record-20260948-applied
-BASE = origin/release/v1 @ af28f5ea
-PRODUCTION_DB = DO_NOT_TOUCH
-SUPABASE_DB_PUSH = FORBIDDEN
-DEPLOY = FORBIDDEN
-```
-
-### Allowed scope
-
-- Header comment on `supabase/migrations/20260948_abuse_limits_v1.sql` only (not the SQL body).
-- `docs/audit/PROD_SECURITY_SQL_2026-09-15.md` applied-list + cleanup note.
-- Tests that asserted `20260948` said `NOT APPLIED`.
-- Handoff docs.
-
-### Forbidden scope
-
-- Do not change application code.
-- Do not change the SQL body of 20260948.
-- Do not deploy.
-- Do not apply Supabase migrations or run `supabase db push`.
+- Do not force-push, rebase, hard-reset.
+- Do not expose secrets / `.env`.
+- Do not change `robots.txt` rules for `/world` or `/learning` (noindex is intended) unless a demo page is wrongly indexable.
+- Do not commit onto `release/v1`.
+- Do not reuse dirty sibling worktrees.
