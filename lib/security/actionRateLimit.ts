@@ -12,6 +12,7 @@ export const ACTION_RATE_LIMITS = {
   videoCommerce: { limit: 40, windowMs: 60_000 },
   report: { limit: 5, windowMs: 60_000 },
   caption: { limit: 10, windowMs: 60_000 },
+  cspReport: { limit: 30, windowMs: 60_000 },
 } as const;
 
 export type ActionRateLimitName = keyof typeof ACTION_RATE_LIMITS;

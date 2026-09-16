@@ -81,6 +81,12 @@ describe("actionRateLimit", () => {
     ).toBeNull();
   });
 
+  it("exposes a dedicated CSP report bucket", async () => {
+    const { ACTION_RATE_LIMITS } = await import("./actionRateLimit");
+    expect(ACTION_RATE_LIMITS.cspReport.limit).toBeGreaterThan(0);
+    expect(ACTION_RATE_LIMITS.cspReport.windowMs).toBe(60_000);
+  });
+
   it("referral attribution hashes IP from the shared X-Real-IP helper", () => {
     const action = readFileSync(
       join(process.cwd(), "app/actions/referral.ts"),

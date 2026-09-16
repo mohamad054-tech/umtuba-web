@@ -1,37 +1,21 @@
-# Cursor Report — SEO batch 1 (soft 404, empty titles, demo noindex, hreflang)
+# Cursor Report — dependency patch + CSP report-only
 
 ## Summary
 
-SEO batch 1 on `fix/seo-batch1-v1` from `origin/release/v1` @ `5ebab735`. Watch URLs for missing, deleted, non-public, inactive-author, or invalid post ids now return a real HTTP 404 from the server render (`notFound()`). Empty-caption Watch titles/descriptions/VideoObject names use a localized `"<display name> (@username) on UMTUBA"` pattern, with author city/country in the description when present; empty caption **and** no thumbnail is `noindex` and is excluded from the video sitemap. `/store/demo-preview/*` is self-canonical + `noindex, nofollow`. Demo/sample learning catalog slugs (`ja-01`, `ja-*`, `ai-foundations-for-builders`, visual demo courses) are `noindex, nofollow`, self-canonical, and excluded from all sitemaps. Local production HTML emits 13 locale + `x-default` alternate links on indexable pages (Next.js serializes the attribute as `hrefLang`). No SQL. Not deployed.
+Same-major security dependency patch plus `Content-Security-Policy-Report-Only` on `chore/deps-csp-v1` from `origin/release/v1` @ `899635099b58a04fc6c648c163926f16cd49fee7`. Next 16.2.11 → 16.3.5 (latest 16.x; no 16.2.x patched release exists). Transitive `nanoid`, `postcss`, and `sharp` moved to patched same-major versions. Proxy (`proxy.ts`) emits report-only CSP with a per-request nonce, `report-uri`, `Report-To`, and `Reporting-Endpoints`. `/api/csp-report` accepts POSTs, is rate-limited and size-capped, logs a compact line, returns 204, and never writes to the DB. No enforcing `Content-Security-Policy`. No SQL. Not deployed.
 
 ## Exact files changed
 
-- `app/watch/page.tsx`
-- `app/store/demo-preview/page.tsx`
-- `app/store/demo-preview/[slug]/page.tsx`
-- `app/learning/catalog/[courseSlug]/page.tsx`
-- `lib/site/videoSeo.ts`
-- `lib/site/videoSeo.test.ts`
-- `lib/site/demoSeo.ts` (new)
-- `lib/site/learningSeo.ts`
-- `lib/site/publicSitemap.ts`
-- `lib/site/googleSeo.test.ts`
-- `lib/site/gscIndexingRepair.test.ts`
-- `lib/supabase/publicVideoSeo.ts`
-- `lib/i18n/messages/types.ts`
-- `lib/i18n/messages/en.ts`
-- `lib/i18n/messages/ar.ts`
-- `lib/i18n/messages/fr.ts`
-- `lib/i18n/messages/es.ts`
-- `lib/i18n/messages/de.ts`
-- `lib/i18n/messages/pt.ts`
-- `lib/i18n/messages/id.ts`
-- `lib/i18n/messages/hi.ts`
-- `lib/i18n/messages/ru.ts`
-- `lib/i18n/messages/tr.ts`
-- `lib/i18n/messages/zh-CN.ts`
-- `lib/i18n/messages/ja.ts`
-- `lib/i18n/messages/ko.ts`
+- `package.json`
+- `package-lock.json`
+- `proxy.ts`
+- `lib/security/actionRateLimit.ts`
+- `lib/security/actionRateLimit.test.ts`
+- `lib/security/cspPolicy.ts` (new)
+- `lib/security/cspPolicy.test.ts` (new)
+- `lib/security/cspReport.ts` (new)
+- `lib/security/cspReport.test.ts` (new)
+- `app/api/csp-report/route.ts` (new)
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
 
@@ -42,23 +26,23 @@ none
 ## Security review
 
 - No SQL, no `supabase db push`, no deploy, no secrets/`.env` reads or writes.
-- Watch 404 uses the existing public-video SEO loader (`applyViewerVisibility` + `isPostVisibleToViewer` as anonymous). Deleted posts, non-public posts, and inactive authors stay hidden and now 404 for the server render.
-- Demo/sample store and learning catalog pages stay `noindex, nofollow` with a self-canonical (no home canonical).
-- Empty-caption videos without a thumbnail are `noindex` and omitted from the video sitemap.
-- `robots.txt` Disallow for `/world` and `/learning` was **not** changed. `/store/demo-preview` remains Disallow.
-- Client Watch feed (`WatchExperience`) and in-app “post unavailable” UI were not rewritten.
+- No enforcing `Content-Security-Policy` header. Response helper deletes that header if present and sets `Content-Security-Policy-Report-Only` only.
+- Request-only `Content-Security-Policy` + `x-nonce` is set so Next can stamp script nonces. That header is stripped from the browser response.
+- CSP report endpoint: `consumeNamedActionRateLimit("cspReport")`, 8 KiB body cap, 204, console log of directive / blocked host / page path only (no query strings, no DB).
+- Report endpoint itself does not receive report-only headers.
+- External origins are derived at runtime from `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_LIVEKIT_URL` / `LIVEKIT_URL` (origin only). This worktree had no public env, so the measured local header has `'self'` only for connect/img/media extras.
+- `next/font/google` (Geist) is self-hosted at build time; Google Fonts CDN was not added.
+- `mapbox-gl` and `react-globe.gl` are unused in app source; not added.
+- Earth textures and create-flow previews use `'self'` / `blob:`.
+- `frame-ancestors 'none'` (report-only). Live nginx still has `X-Frame-Options: SAMEORIGIN`.
 
 ## Tests
 
 Related vitest (PASS):
 
-- `lib/site/videoSeo.test.ts` (11)
-- `lib/site/metadata.test.ts` (10)
-- `lib/site/googleSeo.test.ts` (11)
-- `lib/site/gscIndexingRepair.test.ts` (6)
-- `lib/i18n/arabicLeakWatchAutoplayCloseout.test.ts` (4)
-
-Coverage added/updated: invalid Watch query, empty-caption author titles (en/ar), location description, noindex without thumbnail, demo self-canonical, demo/sample course sitemap exclusion, Watch `notFound()` wiring.
+- `lib/security/actionRateLimit.test.ts` (6)
+- `lib/security/cspPolicy.test.ts` (11)
+- `lib/security/cspReport.test.ts` (7)
 
 ## TypeScript
 
@@ -66,7 +50,7 @@ Coverage added/updated: invalid Watch query, empty-caption author titles (en/ar)
 
 ## Build
 
-`npm run build` — PASS (Next.js 16.2.11)
+`npm run build` — PASS (Next.js 16.3.5)
 
 ## git diff --check
 
@@ -74,111 +58,93 @@ PASS (no whitespace errors)
 
 ## git status --short
 
-See commit on `fix/seo-batch1-v1` after this report is committed.
+See commit on `chore/deps-csp-v1` after this report is committed.
 
 ## ESLint (edited files)
 
-`npx eslint` on the edited TS/TSX files listed above (plus `types.ts` / `en.ts` / `ar.ts`): **exit 0, no findings**.
+`npx eslint` on `proxy.ts`, `lib/security/cspPolicy.ts`, `lib/security/cspReport.ts`, `lib/security/actionRateLimit.ts`, `app/api/csp-report/route.ts`, and their tests — PASS, 0 findings. No new issues; no pre-existing findings on these files.
 
-No new vs pre-existing split: edited-file run was clean (0 errors, 0 warnings). Locale catalog string files follow the same pattern as `en.ts`/`ar.ts`.
+## npm audit --omit=dev
 
-## Local production HTML (after) — `next start` :3051
+### Before (16.2.11)
 
-Stopped after measurement. Server logs: `Supabase URL is not configured.`
+| Severity | Package | Advisory |
+| --- | --- | --- |
+| critical | next 16.2.11 | Windows-host RCE; Image Optimization AVIF RCE (GHSA-p293-qw3h-jr36, GHSA-2xp9-vwfh-vxw4). Production is Linux. |
+| high | nanoid <=3.3.17 | Non-secure / custom generator infinite loop |
+| high | postcss <=8.5.22 | CSS stringify XSS / sourceMappingURL file read (nested 8.4.31 under next) |
+| high | sharp <=0.35.4-rc.0 | libvips / libheif (0.34.5) |
+| moderate | baseline-browser-mapping | DoS on invalid input |
+| moderate | fflate 0.6.x (three-stdlib) | ZIP64 unzip loop |
 
-### Which checks ran without Supabase data
+### After (16.3.5)
 
-**Without Supabase:** `/`, `/life`, `/watch`, `/watch?post=*`, `/learning`, `/learning/catalog`, `/learning/catalog/ja-01`, `/learning/catalog/ai-foundations-for-builders`, `/sitemap.xml` dynamic extras, `/video-sitemap.xml` video list.
+| Severity | Package | Status / reason |
+| --- | --- | --- |
+| critical | next | **Gone.** 16.3.5 is outside the vulnerable range (through 16.3.2). |
+| high | nanoid / postcss / sharp | **Gone.** 3.3.19 / 8.5.23 / 0.35.4. |
+| moderate | baseline-browser-mapping >=2.0.0 <2.11.0 | Left in place. Not high/critical. Transitive. Same-major fix is 2.11.0 via `npm audit fix` (not applied). |
+| moderate | fflate 0.6.0–0.6.10 | Left in place. Nested under `three-stdlib`. Not high/critical. |
 
-**No Supabase required:** unknown paths, `/privacy`, `/store/demo-preview`, invalid Watch ids (`abc`, `0`), static sitemap routes, robots.txt.
+Full `npm audit` (includes dev) still lists high on `brace-expansion`, `browserslist`, `js-yaml`, `playwright`. Those are **devDependencies** and do not appear in `--omit=dev`. Vitest 5 would be a major bump; not done.
 
-`/watch?post=99999999` 404 is the missing-post path; without Supabase the loader also returns null, which is the same `notFound()` branch as a missing/non-public row.
+No remaining high/critical `--omit=dev` advisory requires a major bump.
 
-Could not measure a **real public Watch post** (empty-caption title / VideoObject on HTML) — no Supabase. Covered by unit tests.
+## Package version deltas
 
-### Before / after per SEO item
+Direct:
 
-hreflang counts below use case-insensitive `hrefLang` / `hreflang`. Next.js 16 emits `hrefLang` (HTML-valid). A case-sensitive `hreflang=` grep reports 0 — that matches the 2026-09-15 live audit method.
+| Package | Before | After |
+| --- | --- | --- |
+| next | 16.2.11 | 16.3.5 |
+| eslint-config-next | 16.2.11 | 16.3.5 |
 
-| Item | Field | Before (live 2026-09-15 audit) | After (local prod build) |
-|---|---|---|---|
-| SEO-03 `/watch?post=99999999` | status | 200 | **404** |
-| | title | Watch \| UMTUBA | UMTUBA - Ideas Without Borders (default 404) |
-| | robots | noindex, nofollow | noindex |
-| | canonical | `/watch?post=99999999` | `https://umtuba.com` (404 document) |
-| | hreflang | 0 | 0 (404 page) |
-| SEO-03 `/watch?post=abc` and `post=0` | status | (not sampled; invalid ids were 200 hub) | **404** |
-| | title | Watch hub | default 404 |
-| | robots | index, follow (hub) | noindex |
-| | canonical | `/watch` | `https://umtuba.com` |
-| | hreflang | — | 0 |
-| SEO-02 / SEO-06 empty caption | title / VideoObject | “Video by {name}” / Untitled | Unit tests: `Ada (@ada) on UMTUBA`; ar: `آدا (@ada) على UMTUBA`; location description when city/country set; noindex if no thumbnail. **HTML of a real public post: no Supabase** |
-| SEO-04 `/store/demo-preview` | status | 200 | 200 |
-| | title | Demo catalog preview \| UMTUBA \| UMTUBA | **Demo catalog preview \| UMTUBA** |
-| | robots | noindex, nofollow | noindex, nofollow |
-| | canonical | `https://umtuba.com` (home) | **`https://umtuba.com/store/demo-preview`** |
-| | hreflang | 0 | 0 (noindex; intended) |
-| SEO-07 `/learning/catalog/ja-01` | status | 200 | 200 |
-| | title | JA-01 — AI Foundations for Builders \| UMTUBA | Course \| UMTUBA (no live course payload; **no Supabase**) |
-| | robots | index, follow | **noindex, nofollow** |
-| | canonical | self | self |
-| | hreflang | 0 | 0 (noindex) |
-| SEO-07 sitemap | ja-01 / demo-preview | catalog slugs present on live | **absent** from local `/sitemap.xml` and `/video-sitemap.xml` |
-| SEO-01 `/` | status | 200 | 200 |
-| | title | (brand) | UMTUBA - Ideas Without Borders |
-| | robots | index, follow | index, follow |
-| | canonical | home | `https://umtuba.com` |
-| | hreflang | 0 (live grep) | **14** (x-default + 13 locales) |
-| SEO-01 `/life` | status | 200 | 200 |
-| | title | — | UM Life - UMTUBA |
-| | robots | index, follow | index, follow |
-| | canonical | `/life` | `https://umtuba.com/life` |
-| | hreflang | 0 | **14** |
-| SEO-01 `/privacy` | status | 200 | 200 |
-| | title | Privacy Policy | Privacy Policy \| UMTUBA |
-| | robots | index, follow | index, follow |
-| | canonical | `/privacy` | `https://umtuba.com/privacy` |
-| | hreflang | 0 | **14** |
-| SEO-01 `/watch` (hub) | status | 200 | 200 |
-| | title | Watch | Watch - UMTUBA |
-| | robots | index, follow | index, follow |
-| | canonical | `/watch` | `https://umtuba.com/watch` |
-| | hreflang | 0 | **14** |
-| SEO-01 `/learning` | status | 200 | 200 |
-| | title | — | My Learning \| UMTUBA |
-| | robots | noindex (intended) | noindex, nofollow |
-| | canonical | `/learning` | `https://umtuba.com/learning` |
-| | hreflang | 0 | 0 (noindex; intended) |
-| SEO-01 `/learning/catalog` | status | 200 | 200 |
-| | title | — | Learning Catalog - UMTUBA |
-| | robots | index, follow | index, follow |
-| | canonical | catalog | `https://umtuba.com/learning/catalog` |
-| | hreflang | 0 | **14** |
-| Unknown `/this-route-does-not-exist-seo-batch1` | status | 404 (audit) | **404** |
-| | title | — | 404: This page could not be found. |
-| | robots | — | noindex |
-| | canonical | — | `https://umtuba.com` |
-| | hreflang | — | 0 |
-| Unknown `/random-unknown-xyz-404` | status | — | **404** / noindex / 0 hreflang |
+Transitive (security-relevant):
 
-SEO-01 conclusion: this SHA already emits 13 + x-default via `alternates.languages`. Local production HTML contains 14 `<link rel="alternate" hrefLang="…">` tags on indexable routes. Live audit 0 is consistent with **deploy drift** (older live SHA) and/or a **case-sensitive `hreflang=` grep** (Next 16.2.11 writes `hrefLang`). No extra emitter was added; Metadata API output is present.
+| Package | Before | After |
+| --- | --- | --- |
+| nanoid | 3.3.15 | 3.3.19 |
+| postcss (top-level) | 8.5.16 | 8.5.23 |
+| next/node_modules/postcss | 8.4.31 | removed (next uses patched postcss) |
+| sharp | 0.34.5 | 0.35.4 |
+
+16.2.11 → 16.3.5 is a same-major minor. Required: advisory range is `9.3.4-canary.0 – 16.3.2`; 16.2.12 remains vulnerable.
+
+## Local production header check
+
+`next start` on `127.0.0.1:50469` (stopped after measurement). All five routes returned HTML 200 with report-only CSP and **no** enforcing CSP.
+
+| Route | Status | HTML | Report-Only | Enforcing CSP |
+| --- | --- | --- | --- | --- |
+| `/` | 200 | yes (49645) | yes | none |
+| `/watch` | 200 | yes (30417) | yes | none |
+| `/life` | 200 | yes (42179) | yes | none |
+| `/learning` | 200 | yes (226358) | yes | none |
+| `/store` | 200 | yes (78567) | yes | none |
+
+Exact `Content-Security-Policy-Report-Only` from local prod `GET /` (nonce is per-request; this is the captured value):
+
+```
+default-src 'self'; script-src 'self' 'nonce-Zjg1MTRlMGItMDVlYS00ZjZhLTljOWItYzc5YjRhMzFjM2Vm' 'strict-dynamic'; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data:; media-src 'self' blob:; font-src 'self'; connect-src 'self'; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; report-uri /api/csp-report; report-to csp-endpoint
+```
+
+Also on that response:
+
+- `Reporting-Endpoints: csp-endpoint="/api/csp-report"`
+- `Report-To: {"group":"csp-endpoint","max_age":10886400,"endpoints":[{"url":"http://localhost:50469/api/csp-report"}]}`
+
+A follow-up `GET /` HTML included the matching `nonce` on 23 script tags. `POST /api/csp-report` returned 204 with neither CSP header.
+
+## Uncertainties
+
+- This worktree had no `.env.local` / `NEXT_PUBLIC_SUPABASE_URL`. The measured header therefore has no Supabase or LiveKit origins. Runtime derivation is implemented; production `next start` will add `https://<project>` and `wss://<project>` when those public vars are set. Origins are never logged.
+- `style-src` allows `'unsafe-inline'` because the app uses React `style={{}}` attributes. Script policy uses nonce + `'strict-dynamic'`.
+- `Report-To` uses the incoming request origin. Behind nginx, that should be the public host if `Host` is forwarded.
+- Live nginx still owns HSTS / XFO / nosniff / Referrer-Policy / Permissions-Policy. This change only adds report-only CSP from Next.
+- Remaining `--omit=dev` moderates were not patched.
 
 ## Open issues
 
-- No real public Watch HTML for empty-caption / VideoObject / thumbnail noindex (needs Supabase + a public post).
-- Default Next 404 document canonicalizes to home (real 404 status still set).
-- `/learning/catalog/ja-01` title is generic “Course” without live course data; robots/canonical are correct.
-- In-app Home “Untitled video” UI label was not changed (SEO titles/meta/VideoObject only).
-- Live hreflang still needs a deploy of this SHA (or newer) to appear on umtuba.com.
-
-```
-TASK_ID = FIX_SEO_BATCH1_V1
-STATUS = COMPLETE
-DATE = 2026-09-16
-BRANCH = fix/seo-batch1-v1
-WORKTREE = D:\umtuba-central\repos\umtuba-web-seo-batch1-v1
-BASE = 5ebab735406707f28878c118770579a361042e52
-SQL = NONE
-DEPLOY = NO
-SUPABASE_DB_PUSH = FORBIDDEN
-```
+- Flip report-only to enforcing CSP only after production report noise is reviewed.
+- Optional same-major follow-up for `baseline-browser-mapping` 2.11+ and nested `fflate`.
+- Dev-only highs (playwright, js-yaml, browserslist, brace-expansion) are outside `--omit=dev`.

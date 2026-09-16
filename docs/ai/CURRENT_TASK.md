@@ -2,44 +2,37 @@
 
 ## Task title
 
-FIX_SEO_BATCH1_V1
+CHORE_DEPS_CSP_V1
 
 ## Status
 
-Implement SEO batch 1 from the 2026-09-15 site audit: real Watch 404s, empty-caption titles, demo noindex + self-canonical, sitemap exclusions, hreflang verification. No SQL. Not deployed.
+Implement UMTUBA dependency security patch (same-major only) plus Content-Security-Policy-Report-Only. No SQL. Not deployed.
 
 ```
-TASK_ID = FIX_SEO_BATCH1_V1
+TASK_ID = CHORE_DEPS_CSP_V1
 STATUS = COMPLETE
 DATE = 2026-09-16
-BRANCH = fix/seo-batch1-v1
-WORKTREE = D:\umtuba-central\repos\umtuba-web-seo-batch1-v1
-BASE = origin/release/v1 @ 5ebab735406707f28878c118770579a361042e52
+BRANCH = chore/deps-csp-v1
+WORKTREE = D:\umtuba-central\repos\umtuba-web-deps-csp-v1
+BASE = origin/release/v1 @ 899635099b58a04fc6c648c163926f16cd49fee7
 PRODUCTION_DB = DO_NOT_TOUCH
 SUPABASE_DB_PUSH = FORBIDDEN
 DEPLOY = FORBIDDEN
 ```
 
-Audit source: `docs/audit/SITE_AUDIT_2026-09-15.md` SEO-01 / SEO-02 / SEO-03 / SEO-04 / SEO-06 / SEO-07 (file lives on docs/site-audit branch; findings copied into this task).
+Audit source: `docs/audit/SITE_AUDIT_2026-09-15.md` SEC-01 / SEC-16 / SEC-06 (file lives on docs/site-audit branch; findings copied into this task).
 
 ### Findings to fix
 
-- **SEO-03:** `/watch?post=99999999` returns HTTP 200 (soft 404, noindex). Missing / deleted / non-public / inactive-author / invalid id must be a real 404 for the server render.
-- **SEO-02 / SEO-06:** Empty captions render as "Untitled video" / "Video by ..." titles and generic VideoObject names. Use `"<display name> (@username) on UMTUBA"` style + author/location description. If caption empty AND no thumbnail: noindex + exclude from video sitemap.
-- **SEO-04:** `/store/demo-preview` is noindex but canonical points to home. Self-canonical + noindex, nofollow.
-- **SEO-07:** Demo catalog courses (e.g. ja-01) are indexable. Demo/sample store and learning catalog pages: noindex, nofollow; self-canonical; excluded from all sitemaps.
-- **SEO-01:** Audit saw 0 hreflang tags on live HTML while code emits `?hl=` alternates. Verify on local production build; fix if missing.
-- Unknown routes must return 404 (not 200).
-- Do not change `robots.txt` rules for `/world` or `/learning` unless a demo page is wrongly indexable.
+- **SEC-01:** Next.js critical advisory (only exploitable on Windows hosts with the AVIF image optimizer; production is Linux). Patch Next 16.x to latest same-major patch if available.
+- **SEC-16:** high advisories in nanoid, postcss, sharp. Patch within the same major only.
+- **SEC-06:** no Content-Security-Policy header (HSTS, X-Frame-Options, nosniff, Referrer-Policy, Permissions-Policy already present). Add report-only CSP only — never an enforcing `Content-Security-Policy`.
 
 ### Allowed scope
 
-- Watch server metadata / notFound for missing or non-public posts (do not break client-side feed navigation or in-app 'post unavailable').
-- Watch / VideoObject / sitemap title and robots helpers for empty captions.
-- Demo/sample store and learning catalog metadata, canonical, sitemap exclusion.
-- hreflang emission if local build is missing tags the code intends.
-- Existing metadata / jsonLd / videoSeo / hreflang helpers.
-- New i18n keys via existing catalogs (prefer all 13 locales).
+- Same-major dependency patches via `npm install` (keep `package-lock.json`; no lockfile delete).
+- CSP Report-Only header on HTML routes via existing security-header path (middleware / proxy / next.config).
+- `/api/csp-report` (or equivalent) rate-limited with `actionRateLimit`, size-capped, 204, no DB writes.
 - Related tests and handoff docs (`CURRENT_TASK.md`, `CURSOR_REPORT.md`).
 
 ### Forbidden scope
@@ -48,6 +41,9 @@ Audit source: `docs/audit/SITE_AUDIT_2026-09-15.md` SEO-01 / SEO-02 / SEO-03 / S
 - Do not deploy.
 - Do not force-push, rebase, hard-reset.
 - Do not expose secrets / `.env`.
-- Do not change `robots.txt` rules for `/world` or `/learning` (noindex is intended) unless a demo page is wrongly indexable.
+- Do not add an enforcing `Content-Security-Policy` header.
+- Do not bump any package major version.
 - Do not commit onto `release/v1`.
 - Do not reuse dirty sibling worktrees.
+- Do not junction `node_modules`.
+- Do not delete `package-lock.json`.
