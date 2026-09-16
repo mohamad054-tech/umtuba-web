@@ -12,7 +12,7 @@
 --
 -- Does NOT: per-question results, keys, Progress mutations, grading, analytics
 -- UI, certificates, assignments, Games/Ads/UM Points.
--- Migration apply status: NOT APPLIED (Git-only until explicitly approved).
+-- Migration apply status: Git-only until explicitly approved.
 
 -- ---------------------------------------------------------------------------
 -- 1) results_available_at on activity settings (after_close clock)

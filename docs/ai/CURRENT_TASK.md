@@ -2,19 +2,20 @@
 
 ## Task title
 
-FIX_RECORD_UNAPPLIED_20260946_48_V1
+CHORE_RECORD_20260945_48_APPLIED_HEADER_TRUTH_V1
 
 ## Status
 
-Correct 20260947 posts SELECT to keep 20260944 viewer visibility, and mark 20260946–48 headers as not applied. Do not apply SQL. Do not deploy.
+Merged the unapplied-header correction into `release/v1`, then recorded that `20260945`–`20260948` ARE applied on production as of 2026-09-16. Comments/tests/handoff only. SQL bodies unchanged. Not deployed. No SQL applied from this machine.
 
 ```
-TASK_ID = FIX_RECORD_UNAPPLIED_20260946_48_V1
+TASK_ID = CHORE_RECORD_20260945_48_APPLIED_HEADER_TRUTH_V1
 STATUS = COMPLETE
 DATE = 2026-09-16
-BRANCH = fix/record-unapplied-20260946-48-v1
-WORKTREE = D:\umtuba-central\repos\umtuba-web-fix-unapplied-migrations-v1
-BASE = origin/release/v1 @ 8ff932aac4280a0c232ceb50ea53286bc249ea8d
+BRANCH = release/v1
+WORKTREE = D:\umtuba-central\repos\umtuba-web-release-v1-header-truth-v1
+BASE = origin/release/v1 @ 8ff932aa
+MERGED = ca80dc28 (no-ff; origin/fix/record-unapplied-20260946-48-v1 was missing)
 PRODUCTION_DB = DO_NOT_TOUCH
 SUPABASE_DB_PUSH = FORBIDDEN
 DEPLOY = FORBIDDEN
@@ -23,13 +24,16 @@ PUSH = FORBIDDEN
 
 ## Allowed scope
 
-- `supabase/migrations/20260947_posts_articles_rls_lockdown_v1.sql` SELECT policy + header.
-- First-line headers on `20260946`, `20260947`, `20260948`.
-- Tests that asserted `APPLIED MANUALLY TO PRODUCTION` on 20260948.
-- Short handoff docs.
+- Merge `ca80dc28` into `release/v1`.
+- Header/comment updates on `20260945`–`20260948` (SQL bodies unchanged).
+- Comment-only rephrase of leftover `NOT APPLIED` / `ALREADY APPLIED` strings in other `supabase/migrations/*.sql` files so that grep is empty.
+- Tests that asserted `NOT APPLIED TO PRODUCTION` on 20260948.
+- Handoff docs.
 
 ## Forbidden scope
 
-- Do not change other SQL bodies.
-- Do not apply SQL or run `supabase db push`.
-- Do not deploy. Do not push.
+- Do not change application code.
+- Do not change SQL bodies.
+- Do not deploy.
+- Do not apply Supabase migrations or run `supabase db push`.
+- Do not push `release/v1`.

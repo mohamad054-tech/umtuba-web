@@ -1,4 +1,4 @@
--- NOT APPLIED TO PRODUCTION
+-- APPLIED TO PRODUCTION 2026-09-16
 
 delete from public.platform_admins
 where note like 'UMTUBA_E2E_%';

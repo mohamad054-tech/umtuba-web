@@ -1,4 +1,6 @@
--- NOT APPLIED TO PRODUCTION
+-- APPLIED TO PRODUCTION 2026-09-16
+-- Production apply also dropped the 20260943 policies
+-- "Anon reads public posts" and "Authenticated reads posts".
 
 begin;
 drop policy if exists "Anyone can create posts" on public.posts;

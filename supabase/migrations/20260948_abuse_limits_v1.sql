@@ -1,6 +1,8 @@
--- NOT APPLIED TO PRODUCTION
+-- APPLIED TO PRODUCTION 2026-09-16
 -- Adds per-viewer view/share/watch-signal/referral throttle plus
 -- video_commerce_events write lockdown (revoke UPDATE/DELETE; metadata size).
+-- Production apply skipped the event_type CHECK replacement block;
+-- the live constraint was already equivalent.
 
 begin;
 
@@ -685,6 +687,8 @@ alter table public.video_commerce_events
   add constraint video_commerce_events_metadata_size_chk
   check (octet_length(coalesce(metadata::text, '')) <= 4096);
 
+-- Production apply skipped this event_type CHECK replacement block;
+-- the live constraint was already equivalent.
 alter table public.video_commerce_events
   drop constraint if exists video_commerce_events_event_type_check;
 alter table public.video_commerce_events
@@ -697,7 +701,7 @@ alter table public.video_commerce_events
 commit;
 
 -- ---------------------------------------------------------------------------
--- ROLLBACK (do not run blindly; 20260948 is not applied on production)
+-- ROLLBACK (do not run blindly; 20260948 is applied on production)
 -- ---------------------------------------------------------------------------
 -- begin;
 -- alter table public.video_commerce_events

@@ -7,7 +7,7 @@
 --
 -- Does NOT: gameplay, economy, UM Points, Ads, matchmaking, public
 -- leaderboards, anti-cheat, or game logic.
--- Migration apply status: NOT APPLIED (Git-only until explicitly approved).
+-- Migration apply status: Git-only until explicitly approved.
 
 -- ---------------------------------------------------------------------------
 -- 1) Extend games with catalog metadata (defaults fail-closed / hidden)

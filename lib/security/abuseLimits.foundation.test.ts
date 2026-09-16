@@ -4,7 +4,7 @@ import { join } from "node:path";
 
 const ROOT = process.cwd();
 
-describe("20260948 abuse limits migration (not applied to production)", () => {
+describe("20260948 abuse limits migration (applied 2026-09-16)", () => {
   const sql = readFileSync(
     join(ROOT, "supabase/migrations/20260948_abuse_limits_v1.sql"),
     "utf8"
@@ -34,7 +34,8 @@ describe("20260948 abuse limits migration (not applied to production)", () => {
     expect(sql).toMatch(/badge_opened/);
     expect(sql).toMatch(/product_viewed/);
     expect(sql).toMatch(/ROLLBACK/);
-    expect(sql).toMatch(/^-- NOT APPLIED TO PRODUCTION/m);
-    expect(sql).not.toMatch(/APPLIED MANUALLY TO PRODUCTION/);
+    expect(sql).toMatch(/^-- APPLIED TO PRODUCTION 2026-09-16/m);
+    expect(sql).not.toMatch(/NOT APPLIED TO PRODUCTION/);
+    expect(sql).not.toMatch(/ALREADY APPLIED MANUALLY TO PRODUCTION/);
   });
 });

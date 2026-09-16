@@ -1,5 +1,5 @@
+-- APPLIED TO PRODUCTION 2026-09-16
 -- UMTUBA owner caption edit V1
--- WRITE ONLY. Do not apply. Never supabase db push.
 -- Narrow RPC: authenticated owner may update public.posts.content only.
 -- Existing RLS "Users can update their own posts" already allows owner UPDATE
 -- of any column; this RPC is the caption-only contract the app prefers.

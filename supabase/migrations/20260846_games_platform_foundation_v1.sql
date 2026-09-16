@@ -14,7 +14,7 @@
 --
 -- Trust boundary: client result payloads are CLAIMS only. Fail-closed
 -- validation. Internal helpers revoked from authenticated.
--- Migration apply status: NOT APPLIED (Git-only until explicitly approved).
+-- Migration apply status: Git-only until explicitly approved.
 
 -- ---------------------------------------------------------------------------
 -- 1) games — catalog

@@ -16,7 +16,7 @@
 --
 -- Does NOT: UM Points, certificates, badges, AI/manual grading UI, Games, Ads,
 -- public leaderboards, per-question learner exposure.
--- Migration apply status: NOT APPLIED (Git-only until explicitly approved).
+-- Migration apply status: Git-only until explicitly approved.
 
 -- ---------------------------------------------------------------------------
 -- 1) Expand completion_source allowlist
