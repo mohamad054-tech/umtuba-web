@@ -1,5 +1,4 @@
--- NOT APPLIED. Written 2026-09-15 for history / future apply.
--- Do not supabase db push. Do not apply blindly to production.
+-- APPLIED MANUALLY TO PRODUCTION 2026-09-16 (event_type CHECK replacement block was skipped; live constraint already equivalent). Do not re-apply blindly.
 -- Adds per-viewer view/share/watch-signal/referral throttle plus
 -- video_commerce_events write lockdown (revoke UPDATE/DELETE; metadata size).
 
