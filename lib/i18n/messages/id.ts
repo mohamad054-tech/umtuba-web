@@ -802,6 +802,7 @@ export const idMessages: FoundationMessages = {
   "card.badge.draft": "Draf",
   "card.badge.premium": "Berbayar",
   "card.badge.pinned": "Disematkan",
+  "video.views.label": "{count} views",
   "create.title": "Buat",
   "create.subtitle": "Pilih yang ingin diterbitkan",
   "create.backHome": "Kembali ke Beranda",

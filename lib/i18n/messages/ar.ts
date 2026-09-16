@@ -866,6 +866,8 @@ export const arMessages: FoundationMessages = {
   "card.badge.premium": "مدفوع",
   "card.badge.pinned": "مثبّت",
 
+  "video.views.label": "{count} مشاهدة",
+
   "create.title": "إنشاء",
   "create.subtitle": "اختر ما تريد نشره",
   "create.backHome": "العودة إلى الرئيسية",

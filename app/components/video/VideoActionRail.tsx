@@ -16,6 +16,7 @@ import {
 import { createClient } from "../../../lib/supabase/client";
 import ShareMenu from "../social/ShareMenu";
 import VideoMoreMenu from "../social/VideoMoreMenu";
+import VideoViewCountStat from "./VideoViewCountStat";
 import { APP_ROUTES } from "../../lib/nav";
 import {
   formatInteractionCount,
@@ -350,6 +351,8 @@ export default function VideoActionRail({
           />
         ) : null}
       </div>
+
+      <VideoViewCountStat views={displayStats.views} />
 
       <ActionButton
         label="Save"

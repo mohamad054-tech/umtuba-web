@@ -796,6 +796,7 @@ export const zhCNMessages: FoundationMessages = {
   "card.badge.draft": "草稿",
   "card.badge.premium": "付费",
   "card.badge.pinned": "已置顶",
+  "video.views.label": "{count} views",
   "create.title": "创作",
   "create.subtitle": "选择要发布的内容",
   "create.backHome": "返回首页",

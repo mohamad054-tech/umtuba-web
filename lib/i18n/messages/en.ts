@@ -881,6 +881,8 @@ export const enMessages: FoundationMessages = {
   "card.badge.premium": "Premium",
   "card.badge.pinned": "Pinned",
 
+  "video.views.label": "{count} views",
+
   "create.title": "Create",
   "create.subtitle": "Choose what to publish",
   "create.backHome": "Back to Home",

@@ -203,6 +203,8 @@ describe("UM Life Phase 1 — feed, focused post, RTL, locales", () => {
     expect(image?.imageUrl).toBe("https://img.example/a.jpg");
     expect(video?.videoUrl).toBe("https://cdn.example/v.mp4");
     expect(video?.content).toBe("");
+    expect(video?.views).toBe(10);
+    expect(mapPublicPostToLifePost(samplePost({ views: 0 }))?.views).toBe(0);
     expect(mapPublicPostToLifePost(samplePost({ post_type: "idea" }))).toBeNull();
 
     const card = read("app/life/LifePostCard.tsx");

@@ -246,7 +246,7 @@ export default function WatchExperience({
 
     void recordFeedViewOnce(video.postId, recordedViewsRef.current).then(
       (result) => {
-        if (!result.ok) return;
+        if (!result.ok || !result.counted) return;
         setVideos((current) =>
           current.map((item) =>
             item.id === video.id

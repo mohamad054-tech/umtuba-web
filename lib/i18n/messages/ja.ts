@@ -801,6 +801,7 @@ export const jaMessages: FoundationMessages = {
   "card.badge.draft": "下書き",
   "card.badge.premium": "有料",
   "card.badge.pinned": "固定",
+  "video.views.label": "{count} views",
   "create.title": "作成",
   "create.subtitle": "公開するものを選ぶ",
   "create.backHome": "ホームに戻る",

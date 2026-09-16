@@ -1,29 +1,76 @@
-# Cursor Report — UM Life More menu + hide native download
+# Cursor Report — Show view count on videos
 
 ## Summary
 
-UM Life post cards (text, image, and video) now use the same `VideoMoreMenu` as Home and Watch. Owner actions: Edit caption, Copy link, Delete. Others: Copy link, Not interested, Report. Labels reuse `video.more.*`. The menu sits in the card header (`ms-auto`, RTL-safe) so it does not overlap native video controls. “Not interested” and successful delete remove the card from the current Life list.
-
-Every native `<video controls>` in the app now has `controlsList="nodownload"` (playback speed and picture-in-picture stay). Watch `VideoPlayer` and other custom players without native `controls` were not changed.
+Video posts now show an eye icon and compact view count on Home (Discover action rail), `/watch` (Watch action rail), and UM Life video cards. Counts come from the existing `posts.views` column already selected by `postColumns` + `postsSelectVisible`. When `record_post_view` returns `counted=true`, Home and Watch patch the displayed count from the returned `views` value only (no refetch). `0` renders as `"0"`. Visible to everyone, including guests. Not a button. Like / comment / share behaviour is unchanged.
 
 No SQL. Not deployed.
 
 ## Exact files changed
 
-- `app/life/LifePostCard.tsx`
-- `app/life/LifeExperience.tsx`
-- `app/life/page.tsx`
+- `app/components/video/VideoViewCountStat.tsx` (new)
+- `app/discover/components/DiscoverActionRail.tsx`
+- `app/components/video/VideoActionRail.tsx`
+- `app/discover/components/DiscoverVideoCard.tsx`
+- `app/watch/WatchExperience.tsx`
+- `app/life/LifeEngagementBar.tsx`
+- `app/life/lib/lifePosts.ts`
+- `lib/supabase/videoPosts.ts`
+- `lib/i18n/messages/types.ts`
+- `lib/i18n/messages/en.ts`
+- `lib/i18n/messages/ar.ts`
+- `lib/i18n/messages/fr.ts` — unchanged (inherits English via `...enMessages`)
+- `lib/i18n/messages/es.ts` — unchanged (inherits English via `...enMessages`)
+- `lib/i18n/messages/de.ts` — unchanged (inherits English via `...enMessages`)
+- `lib/i18n/messages/pt.ts` — unchanged (inherits English via `...enMessages`)
+- `lib/i18n/messages/id.ts`
+- `lib/i18n/messages/hi.ts`
+- `lib/i18n/messages/ru.ts`
+- `lib/i18n/messages/tr.ts`
+- `lib/i18n/messages/zh-CN.ts`
+- `lib/i18n/messages/ja.ts`
+- `lib/i18n/messages/ko.ts`
+- `app/lib/social/shareAndViews.format.test.ts` (new)
+- `app/lib/video/videoViewCount.contract.test.ts` (new)
 - `app/life/umLifePhase1.contract.test.ts`
-- `app/components/social/videoMoreMenu.contract.test.ts`
-- `app/components/video/OnDemandSignedVideo.tsx`
-- `app/discover/components/DiscoverNativeVideo.tsx`
-- `app/admin/ads/creatives/page.tsx`
-- `app/components/learning/ContinueWatchingVideo.tsx`
-- `app/components/learning/WelcomeVideoHook.tsx`
-- `app/components/learning/ContentBlockRenderer.tsx`
-- `app/create/video/VideoOverlayEditor.tsx`
 - `docs/ai/CURRENT_TASK.md`
 - `docs/ai/CURSOR_REPORT.md`
+
+## How views are selected / mapped
+
+- Shared `postColumns` in `lib/supabase/videoPosts.ts` already includes `views`.
+- Home / Watch / Life loaders already wrap that list with `postsSelectVisible(...)`.
+- `attachPlaybackUrls` maps `views: post.views ?? 0` onto `PublicPostDTO`.
+- `mapVideoPostToDiscover` maps `stats.views` (now `post.views ?? 0`).
+- `discoverVideoToWatchVideo` copies `stats`.
+- `mapPublicPostToLifePost` maps `views: post.views ?? 0`.
+- No extra query per video.
+
+## Where UI was added
+
+- **Home:** `DiscoverActionRail` — `VideoViewCountStat` directly under Share, before More.
+- **Watch:** `VideoActionRail` — `VideoViewCountStat` directly under Share, before Save.
+- **UM Life:** `LifeEngagementBar` — `VideoViewCountStat` variant `life` next to like/comment/share/save, **video posts only**.
+
+Non-button. Same compact count style as like/comment/share. RTL-safe (flex/grid + logical classes; no `left`/`right`/`ml`/`mr`).
+
+## Formatter used
+
+Existing `formatInteractionCount` in `app/lib/social/shareAndViews.ts` (`0` → `"0"`, `1200` → `"1.2K"`, `3400000` → `"3.4M"`). Same helper as like/comment/share so counts stay consistent. Not Intl-compact (that would change sibling rail counts).
+
+## Live update path when `counted=true`
+
+- Home: `DiscoverVideoCard` calls `recordFeedViewOnce`; if `result.ok && result.counted`, `onStatsChange({ views: result.views })`.
+- Watch: `WatchExperience.handleActiveChange` same gate; patches that video’s `stats.views` from `result.views`.
+- Rate-limit / throttle (`counted=false`, including `views: 0`) does **not** overwrite the displayed count.
+- No refetch.
+
+## i18n
+
+- Key: `video.views.label`
+- **en:** `{count} views`
+- **ar:** `{count} مشاهدة`
+- Locales that fall back to English: `fr`, `es`, `de`, `pt` (via `...enMessages`), `id`, `hi`, `ru`, `tr`, `zh-CN`, `ja`, `ko` (explicit English string for catalog type completeness).
 
 ## Migrations created
 
@@ -31,15 +78,19 @@ None.
 
 ## Security review
 
-- Reuses existing `VideoMoreMenu` ownership (`viewerMaySeeDeleteControl`), caption/delete/report/copy-link actions, and `surface="life"`.
-- Viewer id comes from `getServerUser()` on `/life` only; no new endpoints.
-- `controlsList="nodownload"` is a browser UI hint only (not a DRM control).
-- No secrets printed. No remote DB writes.
+- Reads the already-public `posts.views` column. No new RPC, no new endpoint, no extra SELECT.
+- Display is visible to guests. Write path remains `record_post_view` (SECURITY DEFINER, throttled).
+- Optimistic UI uses only the RPC’s returned `views` when `counted=true`.
+- No secrets printed. No remote DB writes from this machine.
 
 ## Tests
 
 - `npx tsc --noEmit` PASS
-- `npx vitest run app/life/umLifePhase1.contract.test.ts app/components/social/videoMoreMenu.contract.test.ts` PASS (14)
+- `npx vitest run` related suites PASS:
+  - `app/lib/social/shareAndViews.format.test.ts` (3)
+  - `app/lib/video/videoViewCount.contract.test.ts` (6)
+  - `app/life/umLifePhase1.contract.test.ts` (13)
+  - also `feedUnification`, `socialEngagement.harden`, `mapWatchVideo`, `videoMoreMenu.contract`, `authorIdentity`, `i18nFoundation`
 - `npm run build` PASS
 
 ## TypeScript
@@ -48,27 +99,29 @@ PASS (`npx tsc --noEmit` and Next build TypeScript step)
 
 ## Build
 
-PASS (`npm run build`). Pre-existing Turbopack NFT warning on `next.config.ts` / translation-studio journal unchanged.
+PASS (`npm run build`)
 
 ## ESLint (edited files)
 
 New issues: none.
 
-Pre-existing:
+Pre-existing (unchanged by this task):
 
-- `DiscoverNativeVideo.tsx`: 4 errors (`react-hooks/refs` ×2, `react-hooks/set-state-in-effect` ×2) and 1 `exhaustive-deps` warning. Unrelated to `controlsList`.
-- `LifePostCard.tsx`: 2 `@next/next/no-img-element` warnings on existing post images.
+- `WatchExperience.tsx`: 4 `react-hooks/refs` errors (ref writes during render). Unrelated to the counted-view patch.
+- `LifeEngagementBar.tsx`: 1 `@typescript-eslint/no-unused-vars` warning (`shareWithNative`). Pre-existing unused import.
 
 ## git diff --check
 
-Run at handoff.
+PASS (no whitespace errors)
 
 ## git status --short
 
-Run at handoff.
+Recorded at commit time on `feat/video-view-count-v1`.
 
 ## Open issues
 
-- Live browser click-through of More menu was not verified here (no signed-in Life feed in this worktree).
-- `controlsList="nodownload"` hides the browser Download item; it does not prevent saving the media URL by other means.
-- DiscoverNativeVideo still uses native `controls` (Home); only the Download item was hidden. Watch custom player has no native controls and was left unchanged.
+- `origin/release/v1` was `b5146049` (docs-only 20260948 record) when this branch was created from requested SHA `af28f5ea`. Feature branch is one docs commit behind current `origin/release/v1`.
+- UM Life does not call `recordFeedViewOnce`; it displays the mapped count only. Live increment still happens on Home / Watch when a video becomes active.
+- Profile aggregate view stats were not changed.
+- Browser click-through of the new rail/Life count was not verified here (no signed-in feed in this worktree).
+- SQL not applied. Not deployed.

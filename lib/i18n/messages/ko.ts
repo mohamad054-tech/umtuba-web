@@ -801,6 +801,7 @@ export const koMessages: FoundationMessages = {
   "card.badge.draft": "초안",
   "card.badge.premium": "유료",
   "card.badge.pinned": "고정됨",
+  "video.views.label": "{count} views",
   "create.title": "만들기",
   "create.subtitle": "게시할 내용을 선택하세요",
   "create.backHome": "홈으로",

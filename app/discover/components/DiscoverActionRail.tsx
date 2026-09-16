@@ -10,6 +10,7 @@ import {
 import { createClient } from "../../../lib/supabase/client";
 import ShareMenu from "../../components/social/ShareMenu";
 import VideoMoreMenu from "../../components/social/VideoMoreMenu";
+import VideoViewCountStat from "../../components/video/VideoViewCountStat";
 import { APP_ROUTES } from "../../lib/nav";
 import {
   formatInteractionCount,
@@ -402,6 +403,8 @@ export default function DiscoverActionRail({
           onSelect={(target) => void handleShareTarget(target)}
         />
       </div>
+
+      <VideoViewCountStat views={stats.views} />
 
       <VideoMoreMenu
         postId={postId}

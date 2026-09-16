@@ -802,6 +802,7 @@ export const ruMessages: FoundationMessages = {
   "card.badge.draft": "Черновик",
   "card.badge.premium": "Платное",
   "card.badge.pinned": "Закреплено",
+  "video.views.label": "{count} views",
   "create.title": "Создать",
   "create.subtitle": "Выберите, что опубликовать",
   "create.backHome": "На главную",

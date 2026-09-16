@@ -10,6 +10,7 @@ import {
 } from "../actions/socialInteractions";
 import CommentsPanel from "../components/social/CommentsPanel";
 import ShareMenu from "../components/social/ShareMenu";
+import VideoViewCountStat from "../components/video/VideoViewCountStat";
 import { APP_ROUTES, buildLifePostHref } from "../lib/nav";
 import {
   formatInteractionCount,
@@ -206,7 +207,9 @@ export default function LifeEngagementBar({
       ) : null}
 
       <div
-        className="grid grid-cols-2 gap-2 sm:grid-cols-4"
+        className={`grid grid-cols-2 gap-2 ${
+          post.type === "video" ? "sm:grid-cols-5" : "sm:grid-cols-4"
+        }`}
         aria-busy={busy}
       >
         <button
@@ -259,6 +262,9 @@ export default function LifeEngagementBar({
         >
           ⌁ {formatInteractionCount(post.saves)}
         </button>
+        {post.type === "video" ? (
+          <VideoViewCountStat views={post.views} variant="life" />
+        ) : null}
       </div>
 
       {commentsOpen && commentsVariant === "inline" ? (

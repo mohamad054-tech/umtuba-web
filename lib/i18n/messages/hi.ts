@@ -802,6 +802,7 @@ export const hiMessages: FoundationMessages = {
   "card.badge.draft": "मसौदा",
   "card.badge.premium": "पेड",
   "card.badge.pinned": "पिन किया",
+  "video.views.label": "{count} views",
   "create.title": "बनाएँ",
   "create.subtitle": "प्रकाशित करने के लिए चुनें",
   "create.backHome": "होम पर वापस",

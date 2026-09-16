@@ -533,7 +533,7 @@ export function mapVideoPostToDiscover(post: PublicPostDTO): DiscoverVideo | nul
       comments: post.comments,
       shares: post.shares,
       saves: post.saves,
-      views: post.views,
+      views: post.views ?? 0,
     },
     likedByMe: post.likedByMe,
     savedByMe: post.savedByMe,

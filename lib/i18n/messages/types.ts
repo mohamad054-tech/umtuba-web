@@ -1397,6 +1397,7 @@ export type ModerationMessages = {
   "video.more.editCancel": string;
   "video.more.editSuccess": string;
   "video.more.editError": string;
+  "video.views.label": string;
 };
 
 /** Learning Hub composer + 1-to-1 booking chrome. Must exist in every AppLocale. */

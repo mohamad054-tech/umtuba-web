@@ -802,6 +802,7 @@ export const trMessages: FoundationMessages = {
   "card.badge.draft": "Taslak",
   "card.badge.premium": "Ücretli",
   "card.badge.pinned": "Sabitlendi",
+  "video.views.label": "{count} views",
   "create.title": "Oluştur",
   "create.subtitle": "Yayımlanacak içeriği seçin",
   "create.backHome": "Ana sayfaya dön",
