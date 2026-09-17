@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   collectWorldMapPoints,
+  toWorldMapCenter,
   toWorldMapPoint,
   worldMapHref,
 } from "./mapPoints";
@@ -41,6 +42,44 @@ describe("world map points", () => {
         place,
       ])
     ).toEqual([place, city]);
+  });
+
+  it("coerces string coordinates and rejects null/NaN", () => {
+    expect(
+      toWorldMapPoint({
+        id: "ba",
+        kind: "city",
+        name: "Buenos Aires",
+        category: "Argentina",
+        slug: "buenos-aires",
+        latitude: "-34.6039",
+        longitude: "-58.3814",
+      })
+    ).toEqual({
+      id: "ba",
+      kind: "city",
+      name: "Buenos Aires",
+      category: "Argentina",
+      slug: "buenos-aires",
+      latitude: -34.6039,
+      longitude: -58.3814,
+    });
+    expect(
+      toWorldMapCenter({ latitude: "-34.6039", longitude: "-58.3814" })
+    ).toEqual({ latitude: -34.6039, longitude: -58.3814 });
+    expect(toWorldMapCenter({ latitude: null, longitude: null })).toBeNull();
+    expect(toWorldMapCenter({ latitude: "x", longitude: "y" })).toBeNull();
+    expect(
+      toWorldMapPoint({
+        id: "zero-trap",
+        kind: "city",
+        name: "Null island trap",
+        category: "x",
+        slug: "null-island",
+        latitude: null,
+        longitude: null,
+      })
+    ).toBeNull();
   });
 
   it("links markers to existing World pages", () => {

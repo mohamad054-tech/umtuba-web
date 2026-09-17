@@ -9,16 +9,22 @@ import ProductEmptyState from "../../../components/product/ProductEmptyState";
 import { createTranslator } from "../../../../lib/i18n";
 import { resolveRequestLocale } from "../../../../lib/i18n/server";
 import { APP_ROUTES } from "../../../lib/nav";
+import { isSupabasePublicConfigured } from "../../../../lib/env/supabasePublic";
 import { createClient } from "../../../../lib/supabase/server";
 import { sanitizeWorldSlug } from "../../../../lib/world/domain";
-import { loadWorldDiscoveryBootstrap } from "../../../../lib/world/discovery";
+import { loadWorldDiscoveryBootstrapSafe } from "../../../../lib/world/loadWorldDiscoveryBootstrapSafe";
+import { catalogWorldCityProfile } from "../../../../lib/world/mapCatalogFallback";
 import { loadWorldCityProfile } from "../../../../lib/world/profiles";
 import {
   bundledCityCopy,
   resolveCityDisplayName,
   resolveCityOverview,
 } from "../../../../lib/world/cityCatalogCopy";
-import { collectWorldMapPoints, toWorldMapPoint } from "../../../../lib/world/mapPoints";
+import {
+  collectWorldMapPoints,
+  toWorldMapCenter,
+  toWorldMapPoint,
+} from "../../../../lib/world/mapPoints";
 import WorldMapSection from "../../components/WorldMapSection";
 
 type Props = {
@@ -56,12 +62,34 @@ export default async function WorldCityPage({ params, searchParams }: Props) {
   const slug = sanitizeWorldSlug(decodeURIComponent(citySlug));
   if (!slug) notFound();
 
-  const supabase = await createClient();
-  const [{ locale }, result, bootstrap] = await Promise.all([
+  const [{ locale }, bootstrap] = await Promise.all([
     resolveRequestLocale(),
-    loadWorldCityProfile(supabase, slug),
-    loadWorldDiscoveryBootstrap(supabase),
+    loadWorldDiscoveryBootstrapSafe(),
   ]);
+  let result = {
+    data: catalogWorldCityProfile(slug),
+    error: null as string | null,
+    databaseReady: bootstrap.databaseReady,
+  };
+  if (isSupabasePublicConfigured()) {
+    try {
+      const supabase = await createClient();
+      const loaded = await loadWorldCityProfile(supabase, slug);
+      result = loaded.data
+        ? loaded
+        : {
+            data: catalogWorldCityProfile(slug),
+            error: loaded.error,
+            databaseReady: loaded.databaseReady,
+          };
+    } catch {
+      result = {
+        data: catalogWorldCityProfile(slug),
+        error: null,
+        databaseReady: false,
+      };
+    }
+  }
   const t = createTranslator(locale);
   if (!result.data) {
     if (!result.databaseReady || result.error) {
@@ -91,6 +119,21 @@ export default async function WorldCityPage({ params, searchParams }: Props) {
     locale,
     city.overview
   );
+  const mapPoints = collectWorldMapPoints([
+    toWorldMapPoint({
+      id: city.id,
+      kind: "city",
+      name: displayName,
+      category: city.countryName,
+      slug: city.slug,
+      latitude: city.centerLatitude,
+      longitude: city.centerLongitude,
+    }),
+  ]);
+  const mapCenter = toWorldMapCenter({
+    latitude: city.centerLatitude,
+    longitude: city.centerLongitude,
+  });
 
   const placesByKind = Object.entries(
     city.featuredPlaces.reduce<
@@ -290,26 +333,15 @@ export default async function WorldCityPage({ params, searchParams }: Props) {
             </Link>
           </div>
         </header>
-        <div className="mt-6">
-          <WorldMapSection
-            points={collectWorldMapPoints([
-              toWorldMapPoint({
-                id: city.id,
-                kind: "city",
-                name: displayName,
-                category: city.countryName,
-                slug: city.slug,
-                latitude: city.centerLatitude,
-                longitude: city.centerLongitude,
-              }),
-            ])}
-            center={{
-              latitude: city.centerLatitude,
-              longitude: city.centerLongitude,
-            }}
-            zoom={11}
-          />
-        </div>
+        {mapPoints.length || mapCenter ? (
+          <div className="mt-6">
+            <WorldMapSection
+              points={mapPoints}
+              center={mapCenter}
+              zoom={11}
+            />
+          </div>
+        ) : null}
         <div className="mt-6">
           <WorldLayerTabs tabs={tabs} initialTab={query.tab} />
         </div>

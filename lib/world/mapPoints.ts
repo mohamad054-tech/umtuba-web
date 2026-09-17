@@ -17,6 +17,22 @@ export type WorldMapCenter = {
   longitude: number;
 };
 
+export function coerceMapCoordinate(value: unknown): number {
+  if (typeof value === "number") return value;
+  if (typeof value === "string" && value.trim() !== "") return Number(value);
+  return Number.NaN;
+}
+
+export function toWorldMapCenter(
+  input?: { latitude?: unknown; longitude?: unknown } | null
+): WorldMapCenter | null {
+  if (!input) return null;
+  const latitude = coerceMapCoordinate(input.latitude);
+  const longitude = coerceMapCoordinate(input.longitude);
+  if (!isValidCoordinatePair(latitude, longitude)) return null;
+  return { latitude, longitude };
+}
+
 export function toWorldMapPoint(input: {
   id: string;
   kind: WorldMapPointKind;
@@ -26,9 +42,8 @@ export function toWorldMapPoint(input: {
   latitude: unknown;
   longitude: unknown;
 }): WorldMapPoint | null {
-  const latitude = typeof input.latitude === "number" ? input.latitude : Number.NaN;
-  const longitude =
-    typeof input.longitude === "number" ? input.longitude : Number.NaN;
+  const latitude = coerceMapCoordinate(input.latitude);
+  const longitude = coerceMapCoordinate(input.longitude);
   if (!input.id || !input.slug || !input.name) return null;
   if (!isValidCoordinatePair(latitude, longitude)) return null;
   return {

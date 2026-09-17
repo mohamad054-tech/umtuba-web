@@ -84,9 +84,26 @@ export default function WorldDiscoveryClient({
   const router = useRouter();
   const searchParams = useSearchParams();
   const selectedCity = cities.find((city) => city.id === cityId) ?? null;
-  const mapPoints = useMemo(() => {
-    if (places.length) {
-      return collectWorldMapPoints(
+  const cityMapPoints = useMemo(
+    () =>
+      collectWorldMapPoints(
+        cities.map((city) =>
+          toWorldMapPoint({
+            id: city.id,
+            kind: "city",
+            name: city.city_name,
+            category: city.country_name,
+            slug: city.slug,
+            latitude: city.center_latitude,
+            longitude: city.center_longitude,
+          })
+        )
+      ),
+    [cities]
+  );
+  const placeMapPoints = useMemo(
+    () =>
+      collectWorldMapPoints(
         places.map((place) =>
           toWorldMapPoint({
             id: place.place_id,
@@ -98,24 +115,12 @@ export default function WorldDiscoveryClient({
             longitude: place.longitude,
           })
         )
-      );
-    }
-    return collectWorldMapPoints(
-      cities.map((city) =>
-        toWorldMapPoint({
-          id: city.id,
-          kind: "city",
-          name: city.city_name,
-          category: city.country_name,
-          slug: city.slug,
-          latitude: city.center_latitude,
-          longitude: city.center_longitude,
-        })
-      )
-    );
-  }, [cities, places]);
+      ),
+    [places]
+  );
+  const mapPoints = placeMapPoints.length ? placeMapPoints : cityMapPoints;
   const mapCenter = useMemo(() => {
-    if (places.length) return null;
+    if (placeMapPoints.length) return null;
     const point = selectedCity
       ? toWorldMapPoint({
           id: selectedCity.id,
@@ -130,7 +135,8 @@ export default function WorldDiscoveryClient({
     return point
       ? { latitude: point.latitude, longitude: point.longitude }
       : null;
-  }, [places.length, selectedCity]);
+  }, [placeMapPoints.length, selectedCity]);
+  const showMap = mapPoints.length > 0;
   const categoryOptions = useMemo(() => {
     const roots = categories.filter((category) => !category.parent_id);
     return roots.flatMap((root) => [
@@ -263,6 +269,37 @@ export default function WorldDiscoveryClient({
         <p className="text-sm text-white/45">
           {t("world.location.holdNoPermission")}
         </p>
+        {cities.length ? (
+          <ul
+            aria-label={t("world.destination")}
+            className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4"
+          >
+            {cities.map((city) => (
+              <li key={city.id}>
+                <p className="text-[10px] font-bold uppercase tracking-wider text-cyan-200/70">
+                  {city.country_name}
+                </p>
+                <p className="mt-1 text-lg font-black text-white">
+                  {city.city_name}
+                </p>
+                <Link
+                  href={`/world/city/${encodeURIComponent(city.slug)}`}
+                  className="mt-2 inline-flex text-xs font-bold text-cyan-100 hover:underline"
+                >
+                  {t("world.openCity")}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        ) : null}
+        {showMap ? (
+          <WorldMapSection
+            points={mapPoints}
+            center={mapCenter}
+            zoom={mapCenter ? 10 : undefined}
+            collapsible
+          />
+        ) : null}
         <div className="flex flex-wrap gap-2">
           <Link
             href="/"
@@ -432,12 +469,14 @@ export default function WorldDiscoveryClient({
         </p>
       ) : null}
 
-      <WorldMapSection
-        points={mapPoints}
-        center={mapCenter}
-        zoom={mapCenter ? 10 : undefined}
-        collapsible
-      />
+      {showMap ? (
+        <WorldMapSection
+          points={mapPoints}
+          center={mapCenter}
+          zoom={mapCenter ? 10 : undefined}
+          collapsible
+        />
+      ) : null}
 
       {places.length ? (
         <section aria-label="Discovered places" className="grid gap-3 md:grid-cols-2">

@@ -26,11 +26,15 @@ function MapUnavailable({ message }: { message: string }) {
   );
 }
 
+function MapPlaceholder() {
+  return <div className="h-56 rounded-2xl bg-black/20 md:h-80" aria-hidden />;
+}
+
 function WorldMapImportFailed({ onError }: { onError?: () => void }) {
   useEffect(() => {
     onError?.();
   }, [onError]);
-  return null;
+  return <MapPlaceholder />;
 }
 
 const WorldMap = dynamic(
@@ -38,7 +42,7 @@ const WorldMap = dynamic(
     import("./WorldMap").catch(() => ({
       default: WorldMapImportFailed,
     })),
-  { ssr: false, loading: () => null }
+  { ssr: false, loading: () => <MapPlaceholder /> }
 );
 
 class MapErrorBoundary extends Component<
@@ -69,12 +73,15 @@ export default function WorldMapSection({
 }: Props) {
   const { t, direction } = useTranslation();
   const hostRef = useRef<HTMLElement | null>(null);
-  const [nearViewport, setNearViewport] = useState(
-    () => typeof IntersectionObserver === "undefined"
-  );
+  const [mounted, setMounted] = useState(false);
+  const [nearViewport, setNearViewport] = useState(false);
   const [expanded, setExpanded] = useState(true);
   const [failed, setFailed] = useState(false);
   const [narrow, setNarrow] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (typeof window === "undefined" || typeof window.matchMedia !== "function") {
@@ -88,10 +95,13 @@ export default function WorldMapSection({
   }, []);
 
   useEffect(() => {
-    if (!expanded) return;
+    if (!mounted || !expanded) return;
     const node = hostRef.current;
-    if (!node || nearViewport) return;
-    if (typeof IntersectionObserver === "undefined") return;
+    if (!node) return;
+    if (typeof IntersectionObserver === "undefined") {
+      setNearViewport(true);
+      return;
+    }
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry?.isIntersecting) {
@@ -103,11 +113,12 @@ export default function WorldMapSection({
     );
     observer.observe(node);
     return () => observer.disconnect();
-  }, [expanded, nearViewport]);
+  }, [mounted, expanded]);
 
   const showToggle = collapsible && narrow;
   const showMap = (!showToggle || expanded) && !failed;
   const fallback = <MapUnavailable message={t("world.map.unavailable")} />;
+  const enableMap = mounted && nearViewport;
 
   return (
     <section
@@ -130,7 +141,7 @@ export default function WorldMapSection({
       </div>
       {showMap ? (
         <div className="mt-3">
-          {nearViewport ? (
+          {enableMap ? (
             <MapErrorBoundary fallback={fallback} onError={() => setFailed(true)}>
               <WorldMap
                 points={points}
@@ -140,7 +151,7 @@ export default function WorldMapSection({
               />
             </MapErrorBoundary>
           ) : (
-            <div className="h-56 rounded-2xl bg-black/20 md:h-80" aria-hidden />
+            <MapPlaceholder />
           )}
         </div>
       ) : failed ? (

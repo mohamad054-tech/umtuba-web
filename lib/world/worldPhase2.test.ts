@@ -314,6 +314,18 @@ describe("World Phase 2 input and context contracts", () => {
         layers,
       })
     ).not.toBeNull();
+    expect(
+      parseWorldCityProfile({
+        id: "c",
+        slug: "buenos-aires",
+        name: "Buenos Aires",
+        countryCode: "AR",
+        countryName: "Argentina",
+        centerLatitude: "-34.6039",
+        centerLongitude: "-58.3814",
+        layers,
+      })?.centerLatitude
+    ).toBe(-34.6039);
   });
 
   it("restores only after an external navigation actually departed", () => {

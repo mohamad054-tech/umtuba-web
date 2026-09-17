@@ -7,12 +7,16 @@ import {
   LngLatBounds,
   Map as MapLibreMap,
   NavigationControl,
+  setWorkerUrl,
   type MapLayerMouseEvent,
 } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
+
+setWorkerUrl("/maplibre/maplibre-gl-worker.mjs");
 import { useTranslation } from "../../components/i18n";
 import {
   collectWorldMapPoints,
+  toWorldMapCenter,
   worldMapHref,
   type WorldMapCenter,
   type WorldMapPoint,
@@ -69,15 +73,26 @@ function toFeatureCollection(points: WorldMapPoint[]) {
   };
 }
 
+function numericCenter(
+  points: WorldMapPoint[],
+  center: WorldMapCenter | null | undefined
+): [number, number] {
+  const safe = toWorldMapCenter(center);
+  if (safe) return [safe.longitude, safe.latitude];
+  if (points[0]) return [points[0].longitude, points[0].latitude];
+  return [20, 15];
+}
+
 function fitMap(
   map: MapLibreMap,
   points: WorldMapPoint[],
   center: WorldMapCenter | null | undefined,
   zoom: number | undefined
 ) {
-  if (center) {
+  const safeCenter = toWorldMapCenter(center);
+  if (safeCenter) {
     map.jumpTo({
-      center: [center.longitude, center.latitude],
+      center: [safeCenter.longitude, safeCenter.latitude],
       zoom: zoom ?? (points.length <= 1 ? 12 : 10),
     });
     return;
@@ -113,6 +128,10 @@ function readOverlay(properties: GeoJsonFeature["properties"] | undefined): Over
   };
 }
 
+function hasLayoutSize(node: HTMLElement) {
+  return node.clientWidth > 0 && node.clientHeight > 0;
+}
+
 export default function WorldMap({
   points,
   center = null,
@@ -123,13 +142,21 @@ export default function WorldMap({
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
   const onErrorRef = useRef(onError);
+  const viewRef = useRef({
+    points: [] as WorldMapPoint[],
+    center: null as WorldMapCenter | null,
+    zoom,
+  });
   const [overlay, setOverlay] = useState<Overlay | null>(null);
   const safePoints = useMemo(() => collectWorldMapPoints(points), [points]);
+  const safeCenter = useMemo(() => toWorldMapCenter(center), [center]);
   const visibleOverlay =
     overlay &&
     safePoints.some((point) => worldMapHref(point) === overlay.href)
       ? overlay
       : null;
+
+  viewRef.current = { points: safePoints, center: safeCenter, zoom };
 
   useEffect(() => {
     onErrorRef.current = onError;
@@ -138,50 +165,36 @@ export default function WorldMap({
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
-    let map: MapLibreMap;
-    try {
-      map = new MapLibreMap({
-        container,
-        style: resolveMapStyleUrl(),
-        attributionControl: false,
-        cooperativeGestures: true,
-        center: center ? [center.longitude, center.latitude] : [20, 15],
-        zoom: zoom ?? (center ? 11 : 1.4),
-      });
-    } catch {
-      onErrorRef.current?.();
-      return;
-    }
 
-    const controlPosition = direction === "rtl" ? "top-left" : "top-right";
-    map.addControl(
-      new NavigationControl({ showCompass: false }),
-      controlPosition
-    );
-    map.addControl(
-      new AttributionControl({ compact: true }),
-      "bottom-right"
-    );
+    let cancelled = false;
+    let map: MapLibreMap | null = null;
+    let warned = false;
+    let frame = 0;
 
-    const fail = () => onErrorRef.current?.();
-    map.on("error", fail);
+    const warnOnce = () => {
+      if (warned) return;
+      warned = true;
+      console.warn("World map failed to render");
+    };
 
-    const applyData = () => {
-      const collection = toFeatureCollection(safePoints);
-      const existing = map.getSource(SOURCE_ID) as GeoJSONSource | undefined;
+    const applyData = (target: MapLibreMap) => {
+      const { points: nextPoints, center: nextCenter, zoom: nextZoom } =
+        viewRef.current;
+      const collection = toFeatureCollection(nextPoints);
+      const existing = target.getSource(SOURCE_ID) as GeoJSONSource | undefined;
       if (existing) {
         existing.setData(collection);
-        fitMap(map, safePoints, center, zoom);
+        fitMap(target, nextPoints, nextCenter, nextZoom);
         return;
       }
-      map.addSource(SOURCE_ID, {
+      target.addSource(SOURCE_ID, {
         type: "geojson",
         data: collection,
         cluster: true,
         clusterMaxZoom: 14,
         clusterRadius: 50,
       });
-      map.addLayer({
+      target.addLayer({
         id: CLUSTER_LAYER,
         type: "circle",
         source: SOURCE_ID,
@@ -192,7 +205,7 @@ export default function WorldMap({
           "circle-opacity": 0.88,
         },
       });
-      map.addLayer({
+      target.addLayer({
         id: CLUSTER_COUNT_LAYER,
         type: "symbol",
         source: SOURCE_ID,
@@ -206,7 +219,7 @@ export default function WorldMap({
           "text-color": "#041018",
         },
       });
-      map.addLayer({
+      target.addLayer({
         id: POINT_LAYER,
         type: "circle",
         source: SOURCE_ID,
@@ -218,46 +231,94 @@ export default function WorldMap({
           "circle-stroke-color": "#082f49",
         },
       });
-      fitMap(map, safePoints, center, zoom);
+      fitMap(target, nextPoints, nextCenter, nextZoom);
     };
 
-    map.on("load", applyData);
+    const createMap = () => {
+      if (cancelled || map || !hasLayoutSize(container)) return;
+      const { points: nextPoints, center: nextCenter, zoom: nextZoom } =
+        viewRef.current;
+      try {
+        map = new MapLibreMap({
+          container,
+          style: resolveMapStyleUrl(),
+          attributionControl: false,
+          cooperativeGestures: true,
+          center: numericCenter(nextPoints, nextCenter),
+          zoom: nextZoom ?? (nextCenter || nextPoints.length ? 11 : 1.4),
+        });
+      } catch {
+        warnOnce();
+        onErrorRef.current?.();
+        return;
+      }
 
-    map.on("click", CLUSTER_LAYER, (event: MapLayerMouseEvent) => {
-      const feature = event.features?.[0];
-      const clusterId = feature?.properties?.cluster_id;
-      const source = map.getSource(SOURCE_ID) as GeoJSONSource | undefined;
-      if (typeof clusterId !== "number" || !source || !feature?.geometry) return;
-      if (feature.geometry.type !== "Point") return;
-      const coordinates = feature.geometry.coordinates as [number, number];
-      void source.getClusterExpansionZoom(clusterId).then((nextZoom: number) => {
-        map.easeTo({ center: coordinates, zoom: nextZoom });
-      });
-    });
-
-    map.on("click", POINT_LAYER, (event: MapLayerMouseEvent) => {
-      const next = readOverlay(
-        event.features?.[0]?.properties as GeoJsonFeature["properties"] | undefined
+      const controlPosition = direction === "rtl" ? "top-left" : "top-right";
+      map.addControl(
+        new NavigationControl({ showCompass: false }),
+        controlPosition
       );
-      setOverlay(next);
+      map.addControl(new AttributionControl({ compact: true }), "bottom-right");
+      map.resize();
+      map.on("error", warnOnce);
+      map.on("webglcontextlost", warnOnce);
+      map.on("load", () => {
+        if (!map) return;
+        applyData(map);
+        map.resize();
+      });
+      map.on("click", CLUSTER_LAYER, (event: MapLayerMouseEvent) => {
+        if (!map) return;
+        const feature = event.features?.[0];
+        const clusterId = feature?.properties?.cluster_id;
+        const source = map.getSource(SOURCE_ID) as GeoJSONSource | undefined;
+        if (typeof clusterId !== "number" || !source || !feature?.geometry) return;
+        if (feature.geometry.type !== "Point") return;
+        const coordinates = feature.geometry.coordinates as [number, number];
+        void source.getClusterExpansionZoom(clusterId).then((nextZoom: number) => {
+          map?.easeTo({ center: coordinates, zoom: nextZoom });
+        });
+      });
+      map.on("click", POINT_LAYER, (event: MapLayerMouseEvent) => {
+        const next = readOverlay(
+          event.features?.[0]?.properties as GeoJsonFeature["properties"] | undefined
+        );
+        setOverlay(next);
+      });
+      const pointer = (cursor: string) => {
+        if (!map) return;
+        map.getCanvas().style.cursor = cursor;
+      };
+      map.on("mouseenter", CLUSTER_LAYER, () => pointer("pointer"));
+      map.on("mouseleave", CLUSTER_LAYER, () => pointer(""));
+      map.on("mouseenter", POINT_LAYER, () => pointer("pointer"));
+      map.on("mouseleave", POINT_LAYER, () => pointer(""));
+      mapRef.current = map;
+    };
+
+    const observer = new ResizeObserver(() => {
+      if (!map) {
+        createMap();
+        return;
+      }
+      map.resize();
+    });
+    observer.observe(container);
+    createMap();
+    frame = requestAnimationFrame(() => {
+      createMap();
+      map?.resize();
     });
 
-    const pointer = (cursor: string) => {
-      map.getCanvas().style.cursor = cursor;
-    };
-    map.on("mouseenter", CLUSTER_LAYER, () => pointer("pointer"));
-    map.on("mouseleave", CLUSTER_LAYER, () => pointer(""));
-    map.on("mouseenter", POINT_LAYER, () => pointer("pointer"));
-    map.on("mouseleave", POINT_LAYER, () => pointer(""));
-
-    mapRef.current = map;
     return () => {
-      map.off("error", fail);
-      map.remove();
-      mapRef.current = null;
+      cancelled = true;
+      cancelAnimationFrame(frame);
+      observer.disconnect();
+      if (map) {
+        map.remove();
+        mapRef.current = null;
+      }
     };
-    // Map instance is created once; data updates use the source effect below.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [direction]);
 
   useEffect(() => {
@@ -266,8 +327,8 @@ export default function WorldMap({
     const source = map.getSource(SOURCE_ID) as GeoJSONSource | undefined;
     if (!source) return;
     source.setData(toFeatureCollection(safePoints));
-    fitMap(map, safePoints, center, zoom);
-  }, [safePoints, center, zoom]);
+    fitMap(map, safePoints, safeCenter, zoom);
+  }, [safePoints, safeCenter, zoom]);
 
   return (
     <div className="relative h-56 w-full overflow-hidden rounded-2xl md:h-80">

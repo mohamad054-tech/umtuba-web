@@ -6,6 +6,7 @@ import {
   type WorldPlaceProfile,
 } from "./domain";
 import { WORLD_PLACE_KINDS, type WorldPlaceKind } from "./discovery";
+import { coerceMapCoordinate } from "./mapPoints";
 
 export type WorldProfileResult<T> = {
   data: T | null;
@@ -22,7 +23,8 @@ function asString(value: unknown): string | null {
 }
 
 function asNumber(value: unknown): number | null {
-  return typeof value === "number" && Number.isFinite(value) ? value : null;
+  const next = coerceMapCoordinate(value);
+  return Number.isFinite(next) ? next : null;
 }
 
 function parseLayers(value: unknown): WorldLayerMap {

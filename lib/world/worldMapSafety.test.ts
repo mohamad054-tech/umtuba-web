@@ -34,4 +34,27 @@ describe("world map safety", () => {
     expect(section).toContain("world.map.unavailable");
     expect(section).toContain("MapErrorBoundary");
   });
+
+  it("renders the same placeholder before mount to avoid hydration mismatch", () => {
+    const section = read("app/world/components/WorldMapSection.tsx");
+    expect(section).toContain("const [mounted, setMounted] = useState(false)");
+    expect(section).toContain("const [nearViewport, setNearViewport] = useState(false)");
+    expect(section).not.toMatch(
+      /useState\(\s*\(\)\s*=>\s*typeof IntersectionObserver/
+    );
+    expect(section).toContain("loading: () => <MapPlaceholder />");
+  });
+
+  it("creates the map after the container has size and warns once on failure", () => {
+    const map = read("app/world/components/WorldMap.tsx");
+    expect(map).toContain('import "maplibre-gl/dist/maplibre-gl.css"');
+    expect(map).toContain("hasLayoutSize");
+    expect(map).toContain("ResizeObserver");
+    expect(map).toContain("map.resize()");
+    expect(map).toContain("toWorldMapCenter");
+    expect(map).toContain("fitBounds");
+    expect(map).toContain("webglcontextlost");
+    expect(map).toContain("console.warn");
+    expect(map).toContain('setWorkerUrl("/maplibre/maplibre-gl-worker.mjs")');
+  });
 });

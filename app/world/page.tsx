@@ -2,8 +2,7 @@ import AppTopNav from "../components/AppTopNav";
 import { Suspense } from "react";
 import { createTranslator } from "../../lib/i18n";
 import { resolveRequestLocale } from "../../lib/i18n/server";
-import { createClient } from "../../lib/supabase/server";
-import { loadWorldDiscoveryBootstrap } from "../../lib/world/discovery";
+import { loadWorldDiscoveryBootstrapSafe } from "../../lib/world/loadWorldDiscoveryBootstrapSafe";
 import {
   isWorldDiscoveryPubliclyLive,
   worldDiscoveryHoldMessage,
@@ -22,12 +21,11 @@ type Props = {
 
 export default async function WorldDiscoveryPage({ searchParams }: Props) {
   const query = await searchParams;
-  const [{ locale }, supabase] = await Promise.all([
+  const [{ locale }, bootstrap] = await Promise.all([
     resolveRequestLocale(),
-    createClient(),
+    loadWorldDiscoveryBootstrapSafe(),
   ]);
   const t = createTranslator(locale);
-  const bootstrap = await loadWorldDiscoveryBootstrap(supabase);
   const publiclyLive = isWorldDiscoveryPubliclyLive(bootstrap);
 
   return (

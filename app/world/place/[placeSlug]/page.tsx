@@ -14,7 +14,11 @@ import { sanitizeWorldSlug } from "../../../../lib/world/domain";
 import { loadWorldDiscoveryBootstrap } from "../../../../lib/world/discovery";
 import { loadWorldPlaceProfile } from "../../../../lib/world/profiles";
 import { sanitizeWorldOutboundUrl } from "../../../../lib/world/safeUrl";
-import { collectWorldMapPoints, toWorldMapPoint } from "../../../../lib/world/mapPoints";
+import {
+  collectWorldMapPoints,
+  toWorldMapCenter,
+  toWorldMapPoint,
+} from "../../../../lib/world/mapPoints";
 import WorldMapSection from "../../components/WorldMapSection";
 
 type Props = {
@@ -257,10 +261,10 @@ export default async function WorldPlacePage({ params, searchParams }: Props) {
                 longitude: place.longitude,
               }),
             ])}
-            center={{
+            center={toWorldMapCenter({
               latitude: place.latitude,
               longitude: place.longitude,
-            }}
+            })}
             zoom={14}
           />
         </div>
