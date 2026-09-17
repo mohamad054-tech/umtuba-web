@@ -34,7 +34,9 @@ describe("cspPolicy origins", () => {
     expect(origins.connect).toEqual([
       "https://proj.livekit.cloud",
       "wss://proj.livekit.cloud",
+      "https://tiles.openfreemap.org",
     ]);
+    expect(origins.font).toEqual(["https://tiles.openfreemap.org"]);
   });
 
   it("ignores malformed public URLs without echoing them", () => {
@@ -44,7 +46,7 @@ describe("cspPolicy origins", () => {
       collectCspExternalOrigins({
         NEXT_PUBLIC_SUPABASE_URL: "ftp://example.supabase.co",
       }).connect
-    ).toEqual([]);
+    ).toEqual(["https://tiles.openfreemap.org"]);
   });
 });
 
@@ -65,11 +67,13 @@ describe("buildCspReportOnlyValue", () => {
     expect(value).toContain(`script-src 'self' 'nonce-${nonce}' 'strict-dynamic'`);
     expect(value).not.toContain("unsafe-eval");
     expect(value).toContain("style-src 'self' 'unsafe-inline'");
-    expect(value).toContain("img-src 'self' blob: data: https://example.supabase.co");
-    expect(value).toContain("media-src 'self' blob: https://example.supabase.co");
-    expect(value).toContain("font-src 'self'");
     expect(value).toContain(
-      "connect-src 'self' https://example.supabase.co wss://example.supabase.co https://proj.livekit.cloud wss://proj.livekit.cloud"
+      "img-src 'self' blob: data: https://example.supabase.co https://tiles.openfreemap.org"
+    );
+    expect(value).toContain("media-src 'self' blob: https://example.supabase.co");
+    expect(value).toContain("font-src 'self' https://tiles.openfreemap.org");
+    expect(value).toContain(
+      "connect-src 'self' https://example.supabase.co wss://example.supabase.co https://proj.livekit.cloud wss://proj.livekit.cloud https://tiles.openfreemap.org"
     );
     expect(value).toContain("worker-src 'self' blob:");
     expect(value).toContain("object-src 'none'");
@@ -92,6 +96,20 @@ describe("buildCspReportOnlyValue", () => {
     expect(() =>
       buildCspReportOnlyValue({ nonce: "bad; nonce", isDev: false })
     ).toThrow(/nonce/i);
+  });
+
+  it("allows an optional map style origin besides OpenFreeMap", () => {
+    const value = buildCspReportOnlyValue({
+      nonce,
+      isDev: false,
+      env: {
+        NEXT_PUBLIC_MAP_STYLE_URL: "https://tiles.example.org/styles/liberty",
+      },
+    });
+    expect(value).toContain("https://tiles.openfreemap.org");
+    expect(value).toContain("https://tiles.example.org");
+    expect(value).toMatch(/font-src[^;]*https:\/\/tiles\.openfreemap\.org/);
+    expect(value).toMatch(/font-src[^;]*https:\/\/tiles\.example\.org/);
   });
 });
 

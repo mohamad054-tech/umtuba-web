@@ -399,6 +399,14 @@ export type FoundationMessages = {
   "world.place.unavailableTitle": string;
   "world.place.unavailableBody": string;
   "world.backToWorld": string;
+  "world.map.title": string;
+  "world.map.show": string;
+  "world.map.hide": string;
+  "world.map.unavailable": string;
+  "world.map.attribution": string;
+  "world.map.openPlace": string;
+  "world.map.openCity": string;
+  "world.map.pointsLabel": string;
 
   "learning.lesson.unavailableTitle": string;
   "learning.lesson.unavailableBody": string;

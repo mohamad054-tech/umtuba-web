@@ -450,6 +450,15 @@ export const enMessages: FoundationMessages = {
   "world.place.unavailableTitle": "Place profile is not available yet",
   "world.place.unavailableBody": "This place is being prepared.",
   "world.backToWorld": "Back to World",
+  "world.map.title": "Map",
+  "world.map.show": "Show map",
+  "world.map.hide": "Hide map",
+  "world.map.unavailable": "Map could not be loaded.",
+  "world.map.attribution":
+    "© OpenFreeMap · OpenMapTiles · OpenStreetMap contributors",
+  "world.map.openPlace": "Open place",
+  "world.map.openCity": "Open city",
+  "world.map.pointsLabel": "Places on the map",
   "learning.lesson.unavailableTitle": "Lesson unavailable",
   "learning.lesson.unavailableBody":
     "This lesson is not available. It may be unpublished, removed, or require enrollment.",

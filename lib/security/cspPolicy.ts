@@ -11,6 +11,7 @@ export type CspPolicyEnv = {
   NEXT_PUBLIC_SUPABASE_URL?: string;
   NEXT_PUBLIC_LIVEKIT_URL?: string;
   LIVEKIT_URL?: string;
+  NEXT_PUBLIC_MAP_STYLE_URL?: string;
 };
 
 export function createCspNonce(): string {
@@ -85,16 +86,25 @@ function uniqueOrigins(values: Array<string | null | undefined>): string[] {
   return out;
 }
 
+/** OpenFreeMap tiles / glyphs / sprites. No API key. */
+export const OPENFREEMAP_CSP_ORIGIN = "https://tiles.openfreemap.org";
+
+function mapStyleOverrideOrigin(raw: string | undefined): string | null {
+  return publicHttpOriginFromUrl(raw);
+}
+
 export function collectCspExternalOrigins(env: CspPolicyEnv): {
   connect: string[];
   media: string[];
   img: string[];
+  font: string[];
 } {
   const supabaseHttp = publicHttpOriginFromUrl(env.NEXT_PUBLIC_SUPABASE_URL);
   const supabaseWs = publicWsOriginFromUrl(env.NEXT_PUBLIC_SUPABASE_URL);
   const livekitRaw = env.NEXT_PUBLIC_LIVEKIT_URL || env.LIVEKIT_URL;
   const livekitHttp = publicHttpOriginFromUrl(httpUrlFromMaybeWs(livekitRaw));
   const livekitWs = publicWsOriginFromUrl(livekitRaw);
+  const mapStyleOrigin = mapStyleOverrideOrigin(env.NEXT_PUBLIC_MAP_STYLE_URL);
 
   const supabaseAndLivekit = uniqueOrigins([
     supabaseHttp,
@@ -102,11 +112,13 @@ export function collectCspExternalOrigins(env: CspPolicyEnv): {
     livekitHttp,
     livekitWs,
   ]);
+  const mapOrigins = uniqueOrigins([OPENFREEMAP_CSP_ORIGIN, mapStyleOrigin]);
 
   return {
-    connect: supabaseAndLivekit,
+    connect: uniqueOrigins([...supabaseAndLivekit, ...mapOrigins]),
     media: uniqueOrigins([supabaseHttp]),
-    img: uniqueOrigins([supabaseHttp]),
+    img: uniqueOrigins([supabaseHttp, ...mapOrigins]),
+    font: mapOrigins,
   };
 }
 
@@ -136,6 +148,7 @@ export function buildCspReportOnlyValue(options: {
   const connectSrc = ["'self'", ...origins.connect].join(" ");
   const mediaSrc = ["'self'", "blob:", ...origins.media].join(" ");
   const imgSrc = ["'self'", "blob:", "data:", ...origins.img].join(" ");
+  const fontSrc = ["'self'", ...origins.font].join(" ");
 
   const directives = [
     "default-src 'self'",
@@ -143,7 +156,7 @@ export function buildCspReportOnlyValue(options: {
     "style-src 'self' 'unsafe-inline'",
     `img-src ${imgSrc}`,
     `media-src ${mediaSrc}`,
-    "font-src 'self'",
+    `font-src ${fontSrc}`,
     `connect-src ${connectSrc}`,
     "worker-src 'self' blob:",
     "object-src 'none'",

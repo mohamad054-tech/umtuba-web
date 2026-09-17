@@ -41,6 +41,8 @@ export type WorldCity = {
   region_name: string | null;
   city_name: string;
   slug: string;
+  center_latitude?: number | null;
+  center_longitude?: number | null;
 };
 
 export type WorldCategory = {
@@ -100,7 +102,9 @@ export async function loadWorldDiscoveryBootstrap(
     supabase.from("world_feature_flags").select("key, enabled"),
     supabase
       .from("world_cities")
-      .select("id, country_code, country_name, region_name, city_name, slug")
+      .select(
+        "id, country_code, country_name, region_name, city_name, slug, center_latitude, center_longitude"
+      )
       .eq("is_active", true)
       .eq("profile_status", "published")
       .order("country_name")

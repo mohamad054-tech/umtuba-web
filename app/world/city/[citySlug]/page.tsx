@@ -18,6 +18,8 @@ import {
   resolveCityDisplayName,
   resolveCityOverview,
 } from "../../../../lib/world/cityCatalogCopy";
+import { collectWorldMapPoints, toWorldMapPoint } from "../../../../lib/world/mapPoints";
+import WorldMapSection from "../../components/WorldMapSection";
 
 type Props = {
   params: Promise<{ citySlug: string }>;
@@ -288,6 +290,26 @@ export default async function WorldCityPage({ params, searchParams }: Props) {
             </Link>
           </div>
         </header>
+        <div className="mt-6">
+          <WorldMapSection
+            points={collectWorldMapPoints([
+              toWorldMapPoint({
+                id: city.id,
+                kind: "city",
+                name: displayName,
+                category: city.countryName,
+                slug: city.slug,
+                latitude: city.centerLatitude,
+                longitude: city.centerLongitude,
+              }),
+            ])}
+            center={{
+              latitude: city.centerLatitude,
+              longitude: city.centerLongitude,
+            }}
+            zoom={11}
+          />
+        </div>
         <div className="mt-6">
           <WorldLayerTabs tabs={tabs} initialTab={query.tab} />
         </div>

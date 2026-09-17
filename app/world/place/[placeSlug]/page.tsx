@@ -14,6 +14,8 @@ import { sanitizeWorldSlug } from "../../../../lib/world/domain";
 import { loadWorldDiscoveryBootstrap } from "../../../../lib/world/discovery";
 import { loadWorldPlaceProfile } from "../../../../lib/world/profiles";
 import { sanitizeWorldOutboundUrl } from "../../../../lib/world/safeUrl";
+import { collectWorldMapPoints, toWorldMapPoint } from "../../../../lib/world/mapPoints";
+import WorldMapSection from "../../components/WorldMapSection";
 
 type Props = {
   params: Promise<{ placeSlug: string }>;
@@ -240,6 +242,28 @@ export default async function WorldPlacePage({ params, searchParams }: Props) {
             </Link>
           </div>
         </header>
+        <div className="mt-6">
+          <WorldMapSection
+            points={collectWorldMapPoints([
+              toWorldMapPoint({
+                id: place.id,
+                kind: "place",
+                name: place.name,
+                category:
+                  place.categories[0]?.name ||
+                  place.kind.replace(/_/g, " "),
+                slug: place.slug,
+                latitude: place.latitude,
+                longitude: place.longitude,
+              }),
+            ])}
+            center={{
+              latitude: place.latitude,
+              longitude: place.longitude,
+            }}
+            zoom={14}
+          />
+        </div>
         <div className="mt-6">
           <WorldLayerTabs tabs={tabs} initialTab={query.tab} />
         </div>

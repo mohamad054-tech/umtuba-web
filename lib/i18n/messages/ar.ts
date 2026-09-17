@@ -439,6 +439,15 @@ export const arMessages: FoundationMessages = {
   "world.place.unavailableTitle": "ملف المكان غير متاح بعد",
   "world.place.unavailableBody": "هذا المكان قيد التجهيز.",
   "world.backToWorld": "العودة إلى العالم",
+  "world.map.title": "الخريطة",
+  "world.map.show": "إظهار الخريطة",
+  "world.map.hide": "إخفاء الخريطة",
+  "world.map.unavailable": "تعذّر تحميل الخريطة.",
+  "world.map.attribution":
+    "© OpenFreeMap · OpenMapTiles · مساهمو OpenStreetMap",
+  "world.map.openPlace": "افتح المكان",
+  "world.map.openCity": "افتح المدينة",
+  "world.map.pointsLabel": "أماكن على الخريطة",
   "learning.lesson.unavailableTitle": "الدرس غير متاح",
   "learning.lesson.unavailableBody":
     "هذا الدرس غير متاح. قد يكون غير منشور أو محذوفًا أو يتطلب التسجيل.",

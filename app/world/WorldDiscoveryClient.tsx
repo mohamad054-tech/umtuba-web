@@ -18,6 +18,11 @@ import {
 } from "../../lib/world/discovery";
 import { worldDiscoveryHoldMessage } from "../../lib/world/holdUi";
 import { resolveWorldDestination } from "../../lib/world/worldDestination";
+import {
+  collectWorldMapPoints,
+  toWorldMapPoint,
+} from "../../lib/world/mapPoints";
+import WorldMapSection from "./components/WorldMapSection";
 
 type LocationPermissionState =
   | "not_requested"
@@ -79,6 +84,53 @@ export default function WorldDiscoveryClient({
   const router = useRouter();
   const searchParams = useSearchParams();
   const selectedCity = cities.find((city) => city.id === cityId) ?? null;
+  const mapPoints = useMemo(() => {
+    if (places.length) {
+      return collectWorldMapPoints(
+        places.map((place) =>
+          toWorldMapPoint({
+            id: place.place_id,
+            kind: "place",
+            name: place.name,
+            category: place.category,
+            slug: place.slug,
+            latitude: place.latitude,
+            longitude: place.longitude,
+          })
+        )
+      );
+    }
+    return collectWorldMapPoints(
+      cities.map((city) =>
+        toWorldMapPoint({
+          id: city.id,
+          kind: "city",
+          name: city.city_name,
+          category: city.country_name,
+          slug: city.slug,
+          latitude: city.center_latitude,
+          longitude: city.center_longitude,
+        })
+      )
+    );
+  }, [cities, places]);
+  const mapCenter = useMemo(() => {
+    if (places.length) return null;
+    const point = selectedCity
+      ? toWorldMapPoint({
+          id: selectedCity.id,
+          kind: "city",
+          name: selectedCity.city_name,
+          category: selectedCity.country_name,
+          slug: selectedCity.slug,
+          latitude: selectedCity.center_latitude,
+          longitude: selectedCity.center_longitude,
+        })
+      : null;
+    return point
+      ? { latitude: point.latitude, longitude: point.longitude }
+      : null;
+  }, [places.length, selectedCity]);
   const categoryOptions = useMemo(() => {
     const roots = categories.filter((category) => !category.parent_id);
     return roots.flatMap((root) => [
@@ -379,6 +431,13 @@ export default function WorldDiscoveryClient({
           {message}
         </p>
       ) : null}
+
+      <WorldMapSection
+        points={mapPoints}
+        center={mapCenter}
+        zoom={mapCenter ? 10 : undefined}
+        collapsible
+      />
 
       {places.length ? (
         <section aria-label="Discovered places" className="grid gap-3 md:grid-cols-2">
