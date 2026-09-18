@@ -1,0 +1,549 @@
+.um-play-root {
+  --um-field: #0c2723;
+  --um-surface: #14352f;
+  --um-raise: #1b443c;
+  --um-line: #255a50;
+  --um-ink: #eaf2ee;
+  --um-muted: #8fb3aa;
+  --um-gold: #f0a93b;
+  --um-gold-dim: #9a6e22;
+  --um-clay: #d46a5e;
+  --um-mint: #5fcba4;
+  --um-r: 14px;
+  color: var(--um-ink);
+  font-family: inherit;
+}
+
+.um-play-catalog {
+  display: grid;
+  gap: 12px;
+}
+
+.um-play-card {
+  display: block;
+  background: var(--um-surface);
+  border: 1px solid var(--um-line);
+  border-radius: var(--um-r);
+  padding: 16px 18px;
+  color: inherit;
+  text-decoration: none;
+  min-height: 44px;
+}
+
+.um-play-card:hover {
+  border-color: var(--um-gold-dim);
+}
+
+.um-play-card:focus-visible {
+  outline: 2px solid var(--um-mint);
+  outline-offset: 3px;
+}
+
+.um-play-card-kicker {
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--um-muted);
+  font-weight: 600;
+}
+
+.um-play-card h2 {
+  margin: 6px 0 4px;
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.um-play-card p {
+  margin: 0;
+  color: var(--um-muted);
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+
+.um-play-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 12px;
+  font-size: 0.86rem;
+}
+
+.um-play-card-best {
+  color: var(--um-gold);
+  font-weight: 650;
+}
+
+.um-play-card-cta {
+  color: #14261c;
+  background: var(--um-gold);
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-weight: 700;
+  min-height: 36px;
+}
+
+.um-play-panel {
+  background: var(--um-surface);
+  border: 1px solid var(--um-line);
+  border-radius: var(--um-r);
+  overflow: hidden;
+}
+
+.um-play-bar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 13px 16px;
+  border-bottom: 1px solid var(--um-line);
+  flex-wrap: wrap;
+}
+
+.um-play-stat {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+}
+
+.um-play-stat .k {
+  font-size: 11px;
+  color: var(--um-muted);
+  font-weight: 400;
+}
+
+.um-play-stat .v {
+  font-size: 17px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.um-play-stat .v.warn {
+  color: var(--um-clay);
+}
+
+.um-play-grow {
+  flex: 1;
+}
+
+.um-play-strand {
+  height: 3px;
+  background: var(--um-raise);
+}
+
+.um-play-body {
+  padding: clamp(14px, 3.5vw, 22px);
+}
+
+.um-play-btn {
+  font: inherit;
+  font-weight: 700;
+  font-size: 15px;
+  border-radius: 10px;
+  cursor: pointer;
+  padding: 11px 18px;
+  min-height: 44px;
+  border: 1px solid var(--um-line);
+  background: var(--um-raise);
+  color: var(--um-ink);
+}
+
+.um-play-btn:hover:not(:disabled) {
+  border-color: var(--um-gold-dim);
+}
+
+.um-play-btn.go {
+  background: var(--um-gold);
+  border-color: var(--um-gold);
+  color: #14261c;
+}
+
+.um-play-btn:focus-visible {
+  outline: 2px solid var(--um-mint);
+  outline-offset: 3px;
+}
+
+.um-play-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.um-play-btn.on {
+  border-color: var(--um-gold);
+  color: var(--um-gold);
+}
+
+.um-play-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+
+.um-play-result {
+  text-align: center;
+  padding: 20px 0 4px;
+}
+
+.um-play-score {
+  font-size: clamp(38px, 10vw, 56px);
+  font-weight: 800;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.um-play-score small {
+  font-size: 0.42em;
+  font-weight: 400;
+  color: var(--um-muted);
+}
+
+.um-play-verdict {
+  font-size: 18px;
+  font-weight: 700;
+  margin-top: 12px;
+}
+
+.um-play-detail {
+  color: var(--um-muted);
+  font-size: 14px;
+  margin-top: 6px;
+}
+
+.um-play-sudoku {
+  display: grid;
+  grid-template-columns: repeat(9, minmax(0, 1fr));
+  gap: 2px;
+  max-width: 360px;
+  margin-inline: auto;
+  background: var(--um-line);
+  border: 2px solid var(--um-line);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.um-play-sudoku button {
+  aspect-ratio: 1;
+  border: 0;
+  background: var(--um-raise);
+  color: var(--um-ink);
+  font: inherit;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  min-height: 34px;
+  cursor: pointer;
+}
+
+.um-play-sudoku button:nth-child(9n + 3),
+.um-play-sudoku button:nth-child(9n + 6) {
+  border-inline-end: 2px solid var(--um-gold-dim);
+}
+
+.um-play-sudoku button:nth-child(n + 19):nth-child(-n + 27),
+.um-play-sudoku button:nth-child(n + 46):nth-child(-n + 54) {
+  border-bottom: 2px solid var(--um-gold-dim);
+}
+
+.um-play-sudoku button.given {
+  background: var(--um-field);
+  color: var(--um-muted);
+}
+
+.um-play-sudoku button.sel {
+  outline: 2px solid var(--um-gold);
+  outline-offset: -2px;
+}
+
+.um-play-sudoku button.err {
+  color: var(--um-clay);
+}
+
+.um-play-sudoku button .note {
+  display: block;
+  font-size: 8px;
+  font-weight: 500;
+  color: var(--um-muted);
+  line-height: 1.1;
+}
+
+.um-play-pad {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+  max-width: 360px;
+  margin: 14px auto 0;
+}
+
+.um-play-g2048 {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  max-width: 360px;
+  margin-inline: auto;
+  touch-action: none;
+}
+
+.um-play-t2048 {
+  aspect-ratio: 1;
+  border-radius: 10px;
+  background: var(--um-raise);
+  border: 1px solid var(--um-line);
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  font-size: clamp(16px, 5vw, 22px);
+  font-variant-numeric: tabular-nums;
+}
+
+.um-play-t2048.v2 {
+  color: var(--um-ink);
+}
+.um-play-t2048.v4 {
+  color: var(--um-mint);
+}
+.um-play-t2048.v8,
+.um-play-t2048.v16 {
+  color: var(--um-gold);
+}
+.um-play-t2048.v32,
+.um-play-t2048.v64 {
+  color: #14261c;
+  background: var(--um-gold-dim);
+  border-color: var(--um-gold-dim);
+}
+.um-play-t2048.v128,
+.um-play-t2048.v256,
+.um-play-t2048.v512,
+.um-play-t2048.v1024,
+.um-play-t2048.v2048 {
+  color: #14261c;
+  background: var(--um-gold);
+  border-color: var(--um-gold);
+}
+
+.um-play-snake {
+  display: grid;
+  gap: 2px;
+  background: var(--um-line);
+  border: 2px solid var(--um-line);
+  border-radius: 8px;
+  max-width: 360px;
+  margin-inline: auto;
+  aspect-ratio: 1;
+}
+
+.um-play-scell {
+  background: var(--um-raise);
+}
+
+.um-play-scell.s {
+  background: var(--um-mint);
+}
+
+.um-play-scell.head {
+  background: var(--um-gold);
+}
+
+.um-play-scell.food {
+  background: var(--um-clay);
+}
+
+.um-play-dpad {
+  display: grid;
+  grid-template-columns: repeat(3, 56px);
+  gap: 8px;
+  justify-content: center;
+  margin-top: 14px;
+}
+
+.um-play-dpad button {
+  height: 44px;
+}
+
+.um-play-memgrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 9px;
+  max-width: 400px;
+  margin-inline: auto;
+}
+
+.um-play-mem-card {
+  aspect-ratio: 1;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+}
+
+.um-play-mem-card:focus-visible {
+  outline: 2px solid var(--um-mint);
+  outline-offset: 3px;
+  border-radius: 11px;
+}
+
+.um-play-mem-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.35s;
+  transform-style: preserve-3d;
+}
+
+.um-play-mem-card.up .um-play-mem-inner,
+.um-play-mem-card.done .um-play-mem-inner {
+  transform: rotateY(180deg);
+}
+
+.um-play-mem-face {
+  position: absolute;
+  inset: 0;
+  border-radius: 11px;
+  display: grid;
+  place-items: center;
+  backface-visibility: hidden;
+  border: 1px solid var(--um-line);
+}
+
+.um-play-mem-back {
+  background: var(--um-raise);
+}
+
+.um-play-mem-back::after {
+  content: "";
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid var(--um-line);
+}
+
+.um-play-mem-front {
+  background: var(--um-surface);
+  transform: rotateY(180deg);
+  font-size: clamp(22px, 6vw, 28px);
+}
+
+.um-play-mem-card.done .um-play-mem-front {
+  border-color: var(--um-mint);
+  background: rgba(95, 203, 164, 0.13);
+}
+
+.um-play-xo {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  max-width: 320px;
+  margin-inline: auto;
+}
+
+.um-play-xo button {
+  aspect-ratio: 1;
+  border-radius: 12px;
+  border: 1px solid var(--um-line);
+  background: var(--um-raise);
+  color: var(--um-ink);
+  font: inherit;
+  font-size: clamp(28px, 8vw, 40px);
+  font-weight: 800;
+  min-height: 72px;
+  cursor: pointer;
+}
+
+.um-play-xo button.x {
+  color: var(--um-gold);
+}
+
+.um-play-xo button.o {
+  color: var(--um-mint);
+}
+
+.um-play-xo button.win {
+  border-color: var(--um-gold);
+  box-shadow: inset 0 0 0 2px var(--um-gold);
+}
+
+.um-play-turn {
+  text-align: center;
+  margin-bottom: 12px;
+  font-weight: 650;
+}
+
+.um-play-hanoi {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  align-items: end;
+  min-height: 220px;
+  margin-top: 8px;
+}
+
+.um-play-peg {
+  background: var(--um-field);
+  border: 1px solid var(--um-line);
+  border-radius: 11px;
+  min-height: 200px;
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: center;
+  padding: 10px 6px 16px;
+  cursor: pointer;
+  gap: 4px;
+  position: relative;
+  min-width: 0;
+}
+
+.um-play-peg::before {
+  content: "";
+  position: absolute;
+  bottom: 16px;
+  width: 6px;
+  height: 70%;
+  background: var(--um-line);
+  border-radius: 4px;
+}
+
+.um-play-peg.sel {
+  border-color: var(--um-gold);
+}
+
+.um-play-disc {
+  height: 18px;
+  border-radius: 9px;
+  background: var(--um-gold);
+  border: 1px solid var(--um-gold-dim);
+  position: relative;
+  z-index: 1;
+  color: #14261c;
+  font-size: 11px;
+  font-weight: 700;
+  display: grid;
+  place-items: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .um-play-root *,
+  .um-play-root *::before,
+  .um-play-root *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .um-play-mem-inner {
+    transform: none !important;
+  }
+
+  .um-play-mem-card.up .um-play-mem-front,
+  .um-play-mem-card.done .um-play-mem-front {
+    display: grid;
+  }
+
+  .um-play-mem-card:not(.up):not(.done) .um-play-mem-front {
+    display: none;
+  }
+
+  .um-play-mem-card.up .um-play-mem-back,
+  .um-play-mem-card.done .um-play-mem-back {
+    display: none;
+  }
+}

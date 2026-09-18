@@ -838,7 +838,8 @@ export type FoundationMessages = {
   TeacherMessages &
   LegalMessages &
   ModerationMessages &
-  LearningHubMessages;
+  LearningHubMessages &
+  GamesMessages;
 
 /** Buyer-facing Store chrome. Do not translate seller/user product titles. */
 export type StoreMessages = {
@@ -1502,6 +1503,61 @@ export type LearningHubMessages = {
   "learning.home.oneToOneBlocked": string;
   "learning.home.partnerPreview": string;
   "learning.home.morePartners": string;
+};
+
+/** Playable /games shell + engine chrome. Full copy for ar + en; other locales may reuse English. */
+export type GamesMessages = {
+  "games.title": string;
+  "games.subtitle": string;
+  "games.catalogEyebrow": string;
+  "games.play": string;
+  "games.backToCatalog": string;
+  "games.localBest": string;
+  "games.localBestEmpty": string;
+  "games.newGame": string;
+  "games.moves": string;
+  "games.time": string;
+  "games.score": string;
+  "games.pairs": string;
+  "games.youWin": string;
+  "games.youLose": string;
+  "games.draw": string;
+  "games.playAgain": string;
+  "games.perfect": string;
+  "games.good": string;
+  "games.okay": string;
+  "games.weak": string;
+  "games.solved": string;
+  "games.hint": string;
+  "games.check": string;
+  "games.notes": string;
+  "games.erase": string;
+  "games.paused": string;
+  "games.yourTurn": string;
+  "games.cpuTurn": string;
+  "games.you": string;
+  "games.cpu": string;
+  "games.wins": string;
+  "games.losses": string;
+  "games.draws": string;
+  "games.record": string;
+  "games.discs": string;
+  "games.emptyCell": string;
+  "games.cardFacedown": string;
+  "games.peg": string;
+  "games.sudoku.title": string;
+  "games.sudoku.blurb": string;
+  "games.g2048.title": string;
+  "games.g2048.blurb": string;
+  "games.snake.title": string;
+  "games.snake.blurb": string;
+  "games.memory.title": string;
+  "games.memory.blurb": string;
+  "games.xo.title": string;
+  "games.xo.blurb": string;
+  "games.xo.newRound": string;
+  "games.hanoi.title": string;
+  "games.hanoi.blurb": string;
 };
 
 export type TranslationKey = keyof FoundationMessages;

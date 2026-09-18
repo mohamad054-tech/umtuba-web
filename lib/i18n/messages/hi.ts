@@ -1,3 +1,4 @@
+import { gamesEnMessages } from "./gamesCatalogs";
 import { legalEnMessages } from "./legalCatalogs";
 import { moderationEnMessages } from "./moderationCatalogs";
 import { storeHiMessages } from "./storeCatalogs";
@@ -12,6 +13,7 @@ export const hiMessages: FoundationMessages = {
   ...legalEnMessages,
   ...moderationEnMessages,
   ...learningHubHiMessages,
+  ...gamesEnMessages,
   "languages.ar": "अरबी",
   "languages.en": "अंग्रेज़ी",
   "languages.fr": "फ़्रेंच",

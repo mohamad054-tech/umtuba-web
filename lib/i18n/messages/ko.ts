@@ -1,3 +1,4 @@
+import { gamesEnMessages } from "./gamesCatalogs";
 import { legalEnMessages } from "./legalCatalogs";
 import { moderationEnMessages } from "./moderationCatalogs";
 import { storeKoMessages } from "./storeCatalogs";
@@ -12,6 +13,7 @@ export const koMessages: FoundationMessages = {
   ...legalEnMessages,
   ...moderationEnMessages,
   ...learningHubKoMessages,
+  ...gamesEnMessages,
   "languages.ar": "아랍어",
   "languages.en": "영어",
   "languages.fr": "프랑스어",

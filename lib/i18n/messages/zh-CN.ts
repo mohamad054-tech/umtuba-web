@@ -1,3 +1,4 @@
+import { gamesEnMessages } from "./gamesCatalogs";
 import { legalEnMessages } from "./legalCatalogs";
 import { moderationEnMessages } from "./moderationCatalogs";
 import { storeZhCNMessages } from "./storeCatalogs";
@@ -12,6 +13,7 @@ export const zhCNMessages: FoundationMessages = {
   ...legalEnMessages,
   ...moderationEnMessages,
   ...learningHubZhCNMessages,
+  ...gamesEnMessages,
   "languages.ar": "阿拉伯语",
   "languages.en": "英语",
   "languages.fr": "法语",

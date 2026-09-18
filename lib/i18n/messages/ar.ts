@@ -1,3 +1,4 @@
+import { gamesArMessages } from "./gamesCatalogs";
 import { legalArMessages } from "./legalCatalogs";
 import { moderationArMessages } from "./moderationCatalogs";
 import { storeArMessages } from "./storeCatalogs";
@@ -11,6 +12,7 @@ export const arMessages: FoundationMessages = {
   ...legalArMessages,
   ...moderationArMessages,
   ...learningHubArMessages,
+  ...gamesArMessages,
   "languages.ar": "العربية",
   "languages.en": "الإنجليزية",
   "languages.fr": "الفرنسية",

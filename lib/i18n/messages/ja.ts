@@ -1,3 +1,4 @@
+import { gamesEnMessages } from "./gamesCatalogs";
 import { legalEnMessages } from "./legalCatalogs";
 import { moderationEnMessages } from "./moderationCatalogs";
 import { storeJaMessages } from "./storeCatalogs";
@@ -12,6 +13,7 @@ export const jaMessages: FoundationMessages = {
   ...legalEnMessages,
   ...moderationEnMessages,
   ...learningHubJaMessages,
+  ...gamesEnMessages,
   "languages.ar": "アラビア語",
   "languages.en": "英語",
   "languages.fr": "フランス語",
