@@ -55,6 +55,16 @@ export default function GamesCatalog() {
                 <span className="um-play-card-copy">
                   <h2>{t(game.titleKey)}</h2>
                   <p>{t(game.blurbKey)}</p>
+                  {game.arabicContent || game.demoData ? (
+                    <span className="um-play-card-tags">
+                      {game.arabicContent ? (
+                        <span data-game-tag="arabic">{t("games.arabicContent")}</span>
+                      ) : null}
+                      {game.demoData ? (
+                        <span data-game-tag="demo">{t("games.demoData")}</span>
+                      ) : null}
+                    </span>
+                  ) : null}
                   <span className="um-play-card-best" data-game-best={game.slug}>
                     {typeof best === "number"
                       ? t("games.localBest", {

@@ -1,0 +1,209 @@
+"use client";
+
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useI18n } from "../../components/i18n";
+import type { TranslationKey } from "../../../lib/i18n/messages/types";
+import { CHOICE_TAGS, type QuizItem } from "../../../lib/games/play/banks";
+import {
+  createPlayCountdown,
+  createPlaySfx,
+  formatPlayNumber,
+  verdictFromScore,
+} from "../../../lib/games/play/engine";
+import { writeBestIfHigher } from "../../../lib/games/play/scores";
+import type { PlayableGameSlug } from "../../../lib/games/play/catalog";
+import {
+  PlayHowTo,
+  PlayPanel,
+  PlayResult,
+  PlayStat,
+  usePlayHelp,
+} from "./PlayChrome";
+
+type Props = {
+  slug: PlayableGameSlug;
+  howTo: [TranslationKey, TranslationKey, TranslationKey];
+  load: () => QuizItem[];
+  seconds: number;
+  extra?: (item: QuizItem, index: number) => ReactNode;
+  hidePrompt?: boolean;
+};
+
+export default function QuizPlay({ slug, howTo, load, seconds, extra, hidePrompt }: Props) {
+  const { t, locale } = useI18n();
+  const sfx = useMemo(() => createPlaySfx(), []);
+  const { helpOpen, ready, dismissHelp, toggleHelp, keepReadyOnReplay } = usePlayHelp();
+  const [deck, setDeck] = useState<QuizItem[]>([]);
+  const [index, setIndex] = useState(0);
+  const [score, setScore] = useState(0);
+  const [streak, setStreak] = useState(0);
+  const [best, setBest] = useState(0);
+  const [right, setRight] = useState(0);
+  const [left, setLeft] = useState(seconds);
+  const [pick, setPick] = useState<number | null>(null);
+  const [timedOut, setTimedOut] = useState(false);
+  const [done, setDone] = useState(false);
+  const locked = pick != null || timedOut;
+  const clockRef = useRef(
+    createPlayCountdown(seconds, setLeft, () => setTimedOut(true))
+  );
+
+  const begin = () => {
+    if (!ready) {
+      setDeck(load());
+      setIndex(0);
+      setScore(0);
+      setStreak(0);
+      setBest(0);
+      setRight(0);
+      setPick(null);
+      setTimedOut(false);
+      setDone(false);
+    }
+    dismissHelp();
+  };
+
+  const restart = () => {
+    clockRef.current.stop();
+    setDeck(load());
+    setIndex(0);
+    setScore(0);
+    setStreak(0);
+    setBest(0);
+    setRight(0);
+    setPick(null);
+    setTimedOut(false);
+    setDone(false);
+    keepReadyOnReplay();
+  };
+
+  useEffect(() => {
+    if (!ready || done || deck.length === 0 || pick != null) return;
+    clockRef.current.start(seconds);
+    return () => {
+      clockRef.current.stop();
+    };
+  }, [ready, done, deck, index, pick, seconds]);
+
+  useEffect(() => {
+    if (!timedOut || pick != null) return;
+    setPick(-1);
+    clockRef.current.stop();
+    setStreak(0);
+    sfx.no();
+  }, [timedOut, pick, sfx]);
+
+  const item = deck[index];
+
+  const answer = (choice: number) => {
+    if (!ready || !item || locked) return;
+    clockRef.current.stop();
+    const hit = choice === item.correct;
+    setPick(choice);
+    if (hit) {
+      const nextStreak = streak + 1;
+      setRight((n) => n + 1);
+      setStreak(nextStreak);
+      setBest((n) => Math.max(n, nextStreak));
+      setScore((n) => n + 70 + Math.round(Math.max(clockRef.current.left, 0) * 2));
+      sfx.ok();
+    } else {
+      setStreak(0);
+      sfx.no();
+    }
+  };
+
+  const advance = () => {
+    if (index + 1 >= deck.length) {
+      const pts = score;
+      writeBestIfHigher(slug, pts);
+      setDone(true);
+      if (right >= Math.ceil(deck.length * 0.75)) sfx.win();
+      return;
+    }
+    setIndex((n) => n + 1);
+    setPick(null);
+    setTimedOut(false);
+  };
+
+  if (done) {
+    return (
+      <PlayPanel
+        stats={<PlayStat label={t("games.score")} value={formatPlayNumber(locale, score)} />}
+        helpOpen={helpOpen}
+        onToggleHelp={toggleHelp}
+      >
+        <PlayHowTo open={helpOpen} lines={howTo.map((key) => t(key))} cta="gotIt" onDismiss={dismissHelp} />
+        <PlayResult
+          score={score}
+          verdictKey={verdictFromScore("high", score)}
+          detail={`${formatPlayNumber(locale, right)} ${t("games.of")} ${formatPlayNumber(locale, deck.length)} · ${t("games.streak")} ${formatPlayNumber(locale, best)}`}
+          onAgain={restart}
+        />
+      </PlayPanel>
+    );
+  }
+
+  return (
+    <PlayPanel
+      stats={
+        <>
+          <PlayStat label={t("games.score")} value={formatPlayNumber(locale, score)} />
+          <PlayStat label={t("games.streak")} value={formatPlayNumber(locale, streak)} />
+          {ready ? <PlayStat label={t("games.time")} value={formatPlayNumber(locale, left)} warn={left <= 5} /> : null}
+        </>
+      }
+      helpOpen={helpOpen}
+      onToggleHelp={toggleHelp}
+    >
+      <PlayHowTo
+        open={helpOpen}
+        lines={howTo.map((key) => t(key))}
+        cta={ready ? "gotIt" : "start"}
+        onDismiss={begin}
+      />
+      {ready && item ? (
+        <div className="um-play-quiz" dir="ltr">
+          <p className="um-play-qnum">
+            {t("games.question")} {formatPlayNumber(locale, index + 1)} {t("games.of")}{" "}
+            {formatPlayNumber(locale, deck.length)}
+          </p>
+          {extra ? extra(item, index) : null}
+          {hidePrompt ? null : <p className="um-play-qtext">{item.prompt}</p>}
+          <div className="um-play-choices">
+            {item.choices.map((text, choice) => (
+              <button
+                key={`${item.prompt}-${choice}`}
+                type="button"
+                className={`um-play-choice${pick != null && choice === item.correct ? " right" : ""}${
+                  pick != null && pick === choice && choice !== item.correct ? " wrong" : ""
+                }`}
+                data-play-item="true"
+                disabled={locked}
+                onClick={() => answer(choice)}
+              >
+                <span className="tag">{CHOICE_TAGS[choice] ?? choice + 1}</span>
+                <span>{text}</span>
+              </button>
+            ))}
+          </div>
+          {pick != null ? (
+            <>
+              <div className={`um-play-why${pick === item.correct ? " ok" : " no"}`}>
+                <strong>
+                  {pick < 0 ? t("games.timeout") : pick === item.correct ? t("games.correct") : t("games.wrong")}
+                </strong>
+                {item.why ? <span> {item.why}</span> : null}
+              </div>
+              <div className="um-play-row">
+                <button type="button" className="um-play-btn go" data-play-item="true" onClick={advance}>
+                  {index + 1 >= deck.length ? t("games.results") : t("games.next")}
+                </button>
+              </div>
+            </>
+          ) : null}
+        </div>
+      ) : null}
+    </PlayPanel>
+  );
+}

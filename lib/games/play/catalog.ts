@@ -7,6 +7,29 @@ export const PLAYABLE_GAME_SLUGS = [
   "memory",
   "xo",
   "hanoi",
+  "lesson-quiz",
+  "guess-city",
+  "landmark",
+  "collector",
+  "price",
+  "wheel",
+  "basket",
+  "hangword",
+  "flag-guess",
+  "farther-pair",
+  "larger-country",
+  "cheaper",
+  "sort-price",
+  "guess-discount",
+  "quick-q",
+  "order-steps",
+  "match-term",
+  "vocab",
+  "fill-blank",
+  "solitaire",
+  "shapes",
+  "typerace",
+  "uno",
 ] as const;
 
 export type PlayableGameSlug = (typeof PLAYABLE_GAME_SLUGS)[number];
@@ -15,39 +38,40 @@ export type PlayableGame = {
   slug: PlayableGameSlug;
   titleKey: TranslationKey;
   blurbKey: TranslationKey;
+  arabicContent?: boolean;
+  demoData?: boolean;
 };
 
 export const PLAYABLE_GAMES: readonly PlayableGame[] = [
-  {
-    slug: "sudoku",
-    titleKey: "games.sudoku.title",
-    blurbKey: "games.sudoku.blurb",
-  },
-  {
-    slug: "g2048",
-    titleKey: "games.g2048.title",
-    blurbKey: "games.g2048.blurb",
-  },
-  {
-    slug: "snake",
-    titleKey: "games.snake.title",
-    blurbKey: "games.snake.blurb",
-  },
-  {
-    slug: "memory",
-    titleKey: "games.memory.title",
-    blurbKey: "games.memory.blurb",
-  },
-  {
-    slug: "xo",
-    titleKey: "games.xo.title",
-    blurbKey: "games.xo.blurb",
-  },
-  {
-    slug: "hanoi",
-    titleKey: "games.hanoi.title",
-    blurbKey: "games.hanoi.blurb",
-  },
+  { slug: "sudoku", titleKey: "games.sudoku.title", blurbKey: "games.sudoku.blurb" },
+  { slug: "g2048", titleKey: "games.g2048.title", blurbKey: "games.g2048.blurb" },
+  { slug: "snake", titleKey: "games.snake.title", blurbKey: "games.snake.blurb" },
+  { slug: "memory", titleKey: "games.memory.title", blurbKey: "games.memory.blurb" },
+  { slug: "xo", titleKey: "games.xo.title", blurbKey: "games.xo.blurb" },
+  { slug: "hanoi", titleKey: "games.hanoi.title", blurbKey: "games.hanoi.blurb" },
+  { slug: "lesson-quiz", titleKey: "games.lesson-quiz.title", blurbKey: "games.lesson-quiz.blurb", arabicContent: true },
+  { slug: "guess-city", titleKey: "games.guess-city.title", blurbKey: "games.guess-city.blurb", demoData: true },
+  { slug: "landmark", titleKey: "games.landmark.title", blurbKey: "games.landmark.blurb", demoData: true },
+  { slug: "collector", titleKey: "games.collector.title", blurbKey: "games.collector.blurb", demoData: true },
+  { slug: "price", titleKey: "games.price.title", blurbKey: "games.price.blurb", demoData: true },
+  { slug: "wheel", titleKey: "games.wheel.title", blurbKey: "games.wheel.blurb", demoData: true },
+  { slug: "basket", titleKey: "games.basket.title", blurbKey: "games.basket.blurb", demoData: true },
+  { slug: "hangword", titleKey: "games.hangword.title", blurbKey: "games.hangword.blurb", arabicContent: true },
+  { slug: "flag-guess", titleKey: "games.flag-guess.title", blurbKey: "games.flag-guess.blurb", demoData: true },
+  { slug: "farther-pair", titleKey: "games.farther-pair.title", blurbKey: "games.farther-pair.blurb", demoData: true },
+  { slug: "larger-country", titleKey: "games.larger-country.title", blurbKey: "games.larger-country.blurb", demoData: true },
+  { slug: "cheaper", titleKey: "games.cheaper.title", blurbKey: "games.cheaper.blurb", demoData: true },
+  { slug: "sort-price", titleKey: "games.sort-price.title", blurbKey: "games.sort-price.blurb", demoData: true },
+  { slug: "guess-discount", titleKey: "games.guess-discount.title", blurbKey: "games.guess-discount.blurb", demoData: true },
+  { slug: "quick-q", titleKey: "games.quick-q.title", blurbKey: "games.quick-q.blurb", arabicContent: true },
+  { slug: "order-steps", titleKey: "games.order-steps.title", blurbKey: "games.order-steps.blurb", arabicContent: true },
+  { slug: "match-term", titleKey: "games.match-term.title", blurbKey: "games.match-term.blurb", arabicContent: true },
+  { slug: "vocab", titleKey: "games.vocab.title", blurbKey: "games.vocab.blurb", arabicContent: true },
+  { slug: "fill-blank", titleKey: "games.fill-blank.title", blurbKey: "games.fill-blank.blurb", arabicContent: true },
+  { slug: "solitaire", titleKey: "games.solitaire.title", blurbKey: "games.solitaire.blurb" },
+  { slug: "shapes", titleKey: "games.shapes.title", blurbKey: "games.shapes.blurb" },
+  { slug: "typerace", titleKey: "games.typerace.title", blurbKey: "games.typerace.blurb", arabicContent: true },
+  { slug: "uno", titleKey: "games.uno.title", blurbKey: "games.uno.blurb" },
 ] as const;
 
 export function isPlayableGameSlug(value: string): value is PlayableGameSlug {

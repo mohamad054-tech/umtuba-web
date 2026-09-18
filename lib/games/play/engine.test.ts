@@ -14,7 +14,9 @@ import {
   xoBestMove,
   xoCpuMove,
   xoHumanCenterThenBlock,
+  unoCpuIndex,
   xoWinner,
+  type UnoCard,
   type XoMark,
 } from "./engine";
 
@@ -115,6 +117,18 @@ describe("play engine", () => {
     expect(hanoiCanPlace(3, 2)).toBe(true);
     expect(hanoiCanPlace(1, 2)).toBe(false);
     expect(hanoiCanPlace(undefined, 3)).toBe(true);
+  });
+
+  it("picks a beatable Uno CPU move", () => {
+    const top: UnoCard = { c: "gold", v: "3" };
+    const hand: UnoCard[] = [
+      { c: "gold", v: "+2" },
+      { c: "mint", v: "3" },
+      { c: "ink", v: "9" },
+    ];
+    expect(unoCpuIndex(hand, top, () => 0.9)).toBe(0);
+    expect(unoCpuIndex(hand, top, () => 0.1)).not.toBe(-1);
+    expect(unoCpuIndex([{ c: "ink", v: "9" }], top, () => 0.5)).toBe(-1);
   });
 
   it("accepts a solved sudoku board", () => {

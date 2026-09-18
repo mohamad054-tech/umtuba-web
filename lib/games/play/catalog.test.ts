@@ -12,7 +12,7 @@ import {
 const ROOT = join(process.cwd());
 
 describe("playable games catalog", () => {
-  it("lists the six approved slugs and 404s unknown ids", () => {
+  it("lists the twenty-nine playable slugs and 404s unknown ids", () => {
     expect([...PLAYABLE_GAME_SLUGS]).toEqual([
       "sudoku",
       "g2048",
@@ -20,10 +20,35 @@ describe("playable games catalog", () => {
       "memory",
       "xo",
       "hanoi",
+      "lesson-quiz",
+      "guess-city",
+      "landmark",
+      "collector",
+      "price",
+      "wheel",
+      "basket",
+      "hangword",
+      "flag-guess",
+      "farther-pair",
+      "larger-country",
+      "cheaper",
+      "sort-price",
+      "guess-discount",
+      "quick-q",
+      "order-steps",
+      "match-term",
+      "vocab",
+      "fill-blank",
+      "solitaire",
+      "shapes",
+      "typerace",
+      "uno",
     ]);
     expect(isPlayableGameSlug("sudoku")).toBe(true);
-    expect(isPlayableGameSlug("quick-q")).toBe(false);
+    expect(isPlayableGameSlug("quick-q")).toBe(true);
     expect(getPlayableGame("missing")).toBeNull();
+    expect(getPlayableGame("quick-q")?.arabicContent).toBe(true);
+    expect(getPlayableGame("guess-city")?.demoData).toBe(true);
   });
 
   it("writes Arabic and English games chrome and keeps the play page noindex", () => {
@@ -54,7 +79,7 @@ describe("playable games catalog", () => {
     expect(art).not.toMatch(/xlink:href|href=["']data:/);
     expect(art).not.toMatch(/unsplash|shutterstock|midjourney|dall-e|openai|stable diffusion/i);
     for (const slug of PLAYABLE_GAME_SLUGS) {
-      expect(art).toMatch(new RegExp(`\\b${slug}:`));
+      expect(art).toMatch(new RegExp(`["']?${slug}["']?:`));
     }
   });
 });

@@ -423,3 +423,75 @@ export function sudokuCell(grid: string, index: number): number {
 export function sudokuIsSolved(board: readonly number[], solution: string): boolean {
   return board.every((value, index) => value === sudokuCell(solution, index));
 }
+
+export function createPlayCountdown(
+  seconds: number,
+  onTick: (left: number) => void,
+  onEnd: () => void
+) {
+  let left = seconds;
+  let timer: ReturnType<typeof setInterval> | null = null;
+  let ended = false;
+
+  const clear = () => {
+    if (timer) {
+      clearInterval(timer);
+      timer = null;
+    }
+  };
+
+  return {
+    start(next = seconds) {
+      ended = false;
+      left = next;
+      onTick(left);
+      clear();
+      timer = setInterval(() => {
+        left -= 1;
+        onTick(Math.max(left, 0));
+        if (left <= 0) {
+          clear();
+          if (!ended) {
+            ended = true;
+            onEnd();
+          }
+        }
+      }, 1000);
+    },
+    stop() {
+      clear();
+      return left;
+    },
+    get left() {
+      return left;
+    },
+  };
+}
+
+export type UnoCard = { c: "red" | "gold" | "mint" | "ink"; v: string };
+
+export function unoMatch(a: UnoCard, b: UnoCard): boolean {
+  return a.c === b.c || a.v === b.v;
+}
+
+export const UNO_CPU_RANDOM_CHANCE = 0.25;
+
+/** 75% prefer action/color match, 25% a random legal card. */
+export function unoCpuIndex(
+  hand: readonly UnoCard[],
+  top: UnoCard,
+  rng: () => number = Math.random
+): number {
+  const legal = hand.flatMap((card, index) => (unoMatch(card, top) ? [index] : []));
+  if (legal.length === 0) return -1;
+  if (legal.length > 1 && rng() < UNO_CPU_RANDOM_CHANCE) {
+    return legal[Math.floor(rng() * legal.length)] ?? legal[0] ?? -1;
+  }
+  const action = legal.find((index) => {
+    const value = hand[index]?.v;
+    return value === "+2" || value === "skip" || value === "rev";
+  });
+  if (action != null) return action;
+  const color = legal.find((index) => hand[index]?.c === top.c);
+  return color ?? legal[0] ?? -1;
+}
