@@ -14,7 +14,6 @@ import {
   OrderStepsGame,
   PriceGame,
   ShapesGame,
-  SolitaireGame,
   SortPriceGame,
   TypeRaceGame,
   UnoGame,
@@ -33,6 +32,7 @@ import {
   QuickQGame,
   VocabGame,
 } from "./QuizGames";
+import SolitaireGame from "./SolitaireGame";
 import SnakeGame from "./SnakeGame";
 import SudokuGame from "./SudokuGame";
 import XoGame from "./XoGame";

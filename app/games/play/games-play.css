@@ -891,29 +891,146 @@
   border-radius: 3px;
 }
 
-.um-play-klondike {
-  display: flex;
-  flex-wrap: wrap;
+.um-klondike {
+  display: grid;
   gap: 8px;
-  align-items: flex-start;
 }
 
-.um-play-cardmini {
-  min-width: 36px;
-  min-height: 48px;
-  padding: 6px;
+.um-klondike-row {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+  align-items: start;
+}
+
+.um-kslot,
+.um-ktableau {
+  position: relative;
+  min-height: 72px;
+}
+
+.um-kslot.spacer {
+  min-height: 0;
+}
+
+.um-ktableau {
+  min-height: 168px;
+}
+
+.um-kslot-hit,
+.um-kcard {
+  display: block;
+  position: relative;
+  width: 100%;
+  min-height: 68px;
+  padding: 0;
+  border: 1px solid var(--um-gold-dim);
   border-radius: 8px;
-  border: 1px solid var(--um-line);
-  background: var(--um-raise);
+  background: var(--um-field);
   color: inherit;
+  font: inherit;
+}
+
+.um-ktableau-hit {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 72px;
+}
+
+.um-kcard.stacked {
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 1;
+}
+
+.um-kcard.face {
+  background: #f3f7f4;
+  box-shadow: 0 1px 0 #0c272333;
+}
+
+.um-kcard.red {
+  color: #c44b3f;
+}
+
+.um-kcard.black {
+  color: #0c2723;
+}
+
+.um-kcard.sel {
+  outline: 2px solid var(--um-gold);
+  outline-offset: 1px;
+  z-index: 3;
+}
+
+.um-kcard.back {
+  background: #12352f;
+  border-color: var(--um-gold);
+}
+
+.um-kcard-pattern {
+  display: block;
+  margin: 5px;
+  min-height: 54px;
+  border-radius: 5px;
+  background:
+    repeating-linear-gradient(
+      45deg,
+      #f0a93b55 0 3px,
+      transparent 3px 8px
+    ),
+    repeating-linear-gradient(
+      -45deg,
+      #9a6e2255 0 3px,
+      transparent 3px 8px
+    );
+}
+
+.um-kcard-idx {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 3px 4px 0;
+  font-size: 0.72rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.um-kcard-idx i {
+  font-style: normal;
+}
+
+.um-kcard-idx.bot {
+  position: absolute;
+  right: 3px;
+  bottom: 3px;
+  align-items: flex-end;
+  transform: rotate(180deg);
+}
+
+.um-kcard-suit {
   display: grid;
   place-items: center;
-  font-weight: 800;
+  min-height: 22px;
+  font-size: 1.15rem;
+  line-height: 1;
 }
 
-.um-play-pile {
+.um-kslot-empty {
   display: grid;
-  gap: 4px;
+  place-items: center;
+  min-height: 68px;
+  color: var(--um-gold-dim);
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.um-kdeck-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
 }
 
 .um-play-unohand {
