@@ -7,11 +7,18 @@ import {
   klondikeAllCards,
   klondikeDraw,
   klondikeFoundationCanPlace,
+  klondikeRankLabel,
   klondikeTableauCanPlace,
   klondikeTryMove,
 } from "./klondike";
 
 describe("klondike rules", () => {
+  it("prints only Latin poker ranks", () => {
+    const labels = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13].map(klondikeRankLabel);
+    expect(labels).toEqual(["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"]);
+    expect(labels.every((label) => /^(A|[2-9]|10|J|Q|K)$/.test(label))).toBe(true);
+  });
+
   it("builds tableau down in alternating colours", () => {
     expect(klondikeTableauCanPlace({ suit: "H", rank: 6 }, { suit: "S", rank: 7 })).toBe(true);
     expect(klondikeTableauCanPlace({ suit: "H", rank: 6 }, { suit: "D", rank: 7 })).toBe(false);

@@ -28,12 +28,10 @@ export function klondikeColor(suit: KlondikeSuit): "red" | "black" {
   return suit === "H" || suit === "D" ? "red" : "black";
 }
 
+const LATIN_RANKS = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"] as const;
+
 export function klondikeRankLabel(rank: number): string {
-  if (rank === 1) return "A";
-  if (rank === 11) return "J";
-  if (rank === 12) return "Q";
-  if (rank === 13) return "K";
-  return String(rank);
+  return LATIN_RANKS[rank - 1] ?? "A";
 }
 
 export function klondikeSuitMark(suit: KlondikeSuit): string {

@@ -232,7 +232,9 @@
 }
 
 .um-play-body {
-  padding: clamp(14px, 3.5vw, 22px);
+  padding: clamp(10px, 2.4vw, 18px);
+  min-width: 0;
+  overflow: visible;
 }
 
 .um-play-btn {
@@ -894,19 +896,27 @@
 .um-klondike {
   display: grid;
   gap: 8px;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  overflow: visible;
 }
 
 .um-klondike-row {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
-  gap: 4px;
+  gap: clamp(2px, 0.6vw, 8px);
   align-items: start;
+  width: 100%;
+  min-width: 0;
 }
 
 .um-kslot,
 .um-ktableau {
   position: relative;
-  min-height: 72px;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .um-kslot.spacer {
@@ -914,7 +924,8 @@
 }
 
 .um-ktableau {
-  min-height: 168px;
+  min-height: 0;
+  padding-bottom: calc((100% * 7 / 5) + 96px);
 }
 
 .um-kslot-hit,
@@ -922,25 +933,36 @@
   display: block;
   position: relative;
   width: 100%;
-  min-height: 68px;
+  max-width: 100%;
+  height: auto;
+  min-height: 0;
+  aspect-ratio: 5 / 7;
   padding: 0;
   border: 1px solid var(--um-gold-dim);
-  border-radius: 8px;
+  border-radius: 7px;
   background: var(--um-field);
   color: inherit;
   font: inherit;
+  box-sizing: border-box;
+  direction: ltr;
+  unicode-bidi: isolate;
+  font-language-override: "ENG";
+  font-feature-settings: "locl" 0;
+  font-variant-numeric: lining-nums tabular-nums;
 }
 
 .um-ktableau-hit {
   position: absolute;
   inset: 0 0 auto;
-  height: 72px;
+  height: auto;
+  aspect-ratio: 5 / 7;
 }
 
 .um-kcard.stacked {
   position: absolute;
   left: 0;
   right: 0;
+  width: 100%;
   z-index: 1;
 }
 
@@ -959,7 +981,7 @@
 
 .um-kcard.sel {
   outline: 2px solid var(--um-gold);
-  outline-offset: 1px;
+  outline-offset: 0;
   z-index: 3;
 }
 
@@ -969,10 +991,9 @@
 }
 
 .um-kcard-pattern {
-  display: block;
-  margin: 5px;
-  min-height: 54px;
-  border-radius: 5px;
+  position: absolute;
+  inset: 5px;
+  border-radius: 4px;
   background:
     repeating-linear-gradient(
       45deg,
@@ -987,42 +1008,52 @@
 }
 
 .um-kcard-idx {
+  position: absolute;
+  top: 3px;
+  left: 4px;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  padding: 3px 4px 0;
-  font-size: 0.72rem;
+  align-items: center;
+  font-size: clamp(0.62rem, 1.7vw, 0.82rem);
   font-weight: 800;
   line-height: 1;
+  direction: ltr;
+  unicode-bidi: isolate;
 }
 
-.um-kcard-idx i {
+.um-kcard-rank,
+.um-kcard-pip {
   font-style: normal;
+  font-feature-settings: "locl" 0;
+  font-variant-numeric: lining-nums tabular-nums;
 }
 
 .um-kcard-idx.bot {
-  position: absolute;
-  right: 3px;
+  top: auto;
+  left: auto;
+  right: 4px;
   bottom: 3px;
-  align-items: flex-end;
   transform: rotate(180deg);
+  transform-origin: center center;
 }
 
 .um-kcard-suit {
   display: grid;
   place-items: center;
-  min-height: 22px;
-  font-size: 1.15rem;
+  height: 100%;
+  font-size: clamp(0.95rem, 2.6vw, 1.35rem);
   line-height: 1;
 }
 
-.um-kslot-empty {
+.um-kslot-empty,
+.um-kslot-suit {
   display: grid;
   place-items: center;
-  min-height: 68px;
+  height: 100%;
   color: var(--um-gold-dim);
-  font-size: 0.7rem;
-  font-weight: 700;
+  font-size: clamp(1.1rem, 3vw, 1.6rem);
+  font-weight: 500;
+  opacity: 0.45;
 }
 
 .um-kdeck-sr {

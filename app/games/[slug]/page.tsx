@@ -63,7 +63,7 @@ export default async function GamePlayPage({ params }: Props) {
           </Link>
         }
       />
-      <div className="mx-auto max-w-3xl px-5 py-8 md:px-8">
+      <div className="mx-auto max-w-5xl min-w-0 px-4 py-8 sm:px-5 md:px-8">
         <h2 className="mb-4 text-2xl font-black tracking-tight">{t(game.titleKey)}</h2>
         <GamePlayClient slug={slug} />
       </div>

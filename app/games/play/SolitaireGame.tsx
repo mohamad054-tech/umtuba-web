@@ -79,6 +79,8 @@ function PlayingCard({
   return (
     <button
       type="button"
+      dir="ltr"
+      lang="en"
       className={`um-kcard${card.up ? ` face ${color}` : " back"}${selected ? " sel" : ""}${
         stacked ? " stacked" : ""
       }`}
@@ -87,6 +89,7 @@ function PlayingCard({
       data-kcard={card.id}
       data-suit={card.suit}
       data-rank={card.rank}
+      data-rank-label={card.up ? label : ""}
       data-up={card.up ? "true" : "false"}
       data-color={color}
       aria-label={card.up ? `${label} ${mark}` : "facedown"}
@@ -94,16 +97,22 @@ function PlayingCard({
     >
       {card.up ? (
         <>
-          <span className="um-kcard-idx">
-            {label}
-            <i>{mark}</i>
+          <span className="um-kcard-idx" dir="ltr" lang="en">
+            <span className="um-kcard-rank" lang="en" data-k-rank="true">
+              {label}
+            </span>
+            <span className="um-kcard-pip" aria-hidden="true">
+              {mark}
+            </span>
           </span>
           <span className="um-kcard-suit" aria-hidden="true">
             {mark}
           </span>
-          <span className="um-kcard-idx bot">
-            {label}
-            <i>{mark}</i>
+          <span className="um-kcard-idx bot" dir="ltr" lang="en" aria-hidden="true">
+            <span className="um-kcard-rank" lang="en" data-k-rank="true">
+              {label}
+            </span>
+            <span className="um-kcard-pip">{mark}</span>
           </span>
         </>
       ) : (
@@ -333,13 +342,17 @@ export default function SolitaireGame() {
                     ) : (
                       <button
                         type="button"
+                        dir="ltr"
                         className="um-kslot-hit"
                         data-play-item="true"
                         data-foundation-empty={pileIndex}
-                        aria-label={`${t("games.foundation")} ${pileIndex + 1}`}
+                        data-foundation-suit={["S", "H", "D", "C"][pileIndex]}
+                        aria-label={`${t("games.foundation")} ${["♠", "♥", "♦", "♣"][pileIndex]}`}
                         onClick={() => tryDest({ zone: "foundation", pile: pileIndex })}
                       >
-                        <span className="um-kslot-empty">A</span>
+                        <span className="um-kslot-suit" aria-hidden="true">
+                          {["♠", "♥", "♦", "♣"][pileIndex]}
+                        </span>
                       </button>
                     )}
                   </div>
