@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type TouchEvent } from "react";
 import { useI18n } from "../../components/i18n";
 import {
   createPlaySfx,
@@ -8,13 +8,20 @@ import {
   prefersReducedMotion,
   SNAKE_SIZE,
   snakeKey,
+  snakeTickMs,
   stepSnake,
   type Dir4,
   type SnakePoint,
   verdictFromScore,
 } from "../../../lib/games/play/engine";
 import { writeBestIfHigher } from "../../../lib/games/play/scores";
-import { PlayPanel, PlayResult, PlayStat } from "./PlayChrome";
+import {
+  PlayHowTo,
+  PlayPanel,
+  PlayResult,
+  PlayStat,
+  usePlayHelp,
+} from "./PlayChrome";
 
 function randomFood(body: readonly SnakePoint[]): SnakePoint {
   const taken = new Set(body.map(snakeKey));
@@ -33,9 +40,18 @@ const START: SnakePoint[] = [
   { x: 6, y: 8 },
 ];
 
+function keyToDir(key: string): Dir4 | null {
+  if (key === "ArrowLeft" || key === "a" || key === "A") return "left";
+  if (key === "ArrowRight" || key === "d" || key === "D") return "right";
+  if (key === "ArrowUp" || key === "w" || key === "W") return "up";
+  if (key === "ArrowDown" || key === "s" || key === "S") return "down";
+  return null;
+}
+
 export default function SnakeGame() {
   const { t, locale } = useI18n();
   const sfx = useMemo(() => createPlaySfx(), []);
+  const { helpOpen, ready, dismissHelp, toggleHelp, keepReadyOnReplay } = usePlayHelp();
   const [body, setBody] = useState<SnakePoint[]>(START);
   const [food, setFood] = useState<SnakePoint>({ x: 11, y: 8 });
   const [score, setScore] = useState(0);
@@ -45,6 +61,7 @@ export default function SnakeGame() {
   const bodyRef = useRef(body);
   const foodRef = useRef(food);
   const scoreRef = useRef(0);
+  const touch = useRef<{ x: number; y: number } | null>(null);
 
   useEffect(() => {
     bodyRef.current = body;
@@ -59,6 +76,7 @@ export default function SnakeGame() {
     setDead(false);
     dirRef.current = "right";
     pendingRef.current = "right";
+    keepReadyOnReplay();
   };
 
   const turn = useCallback((next: Dir4) => {
@@ -72,20 +90,24 @@ export default function SnakeGame() {
   }, []);
 
   useEffect(() => {
+    if (!ready || dead) return;
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === "ArrowLeft" || event.key === "a") turn("left");
-      if (event.key === "ArrowRight" || event.key === "d") turn("right");
-      if (event.key === "ArrowUp" || event.key === "w") turn("up");
-      if (event.key === "ArrowDown" || event.key === "s") turn("down");
+      const dir = keyToDir(event.key);
+      if (!dir) return;
+      event.preventDefault();
+      turn(dir);
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [turn]);
+  }, [dead, ready, turn]);
 
   useEffect(() => {
-    if (dead) return;
-    const ms = prefersReducedMotion() ? 240 : 140;
-    const id = window.setInterval(() => {
+    if (dead || !ready) return;
+    let cancelled = false;
+    let timer = 0;
+    const reduced = prefersReducedMotion();
+    const tick = () => {
+      if (cancelled) return;
       dirRef.current = pendingRef.current;
       const stepped = stepSnake(bodyRef.current, dirRef.current, foodRef.current);
       if (stepped.dead) {
@@ -103,9 +125,32 @@ export default function SnakeGame() {
         setFood(randomFood(stepped.body));
         sfx.ok();
       }
-    }, ms);
-    return () => window.clearInterval(id);
-  }, [dead, sfx]);
+      timer = window.setTimeout(tick, snakeTickMs(scoreRef.current, reduced));
+    };
+    timer = window.setTimeout(tick, snakeTickMs(scoreRef.current, reduced));
+    return () => {
+      cancelled = true;
+      if (timer) window.clearTimeout(timer);
+    };
+  }, [dead, ready, sfx]);
+
+  const onTouchStart = (event: TouchEvent) => {
+    const point = event.changedTouches[0];
+    if (!point || !ready) return;
+    touch.current = { x: point.clientX, y: point.clientY };
+  };
+
+  const onTouchEnd = (event: TouchEvent) => {
+    const start = touch.current;
+    const point = event.changedTouches[0];
+    touch.current = null;
+    if (!ready || !start || !point) return;
+    const dx = point.clientX - start.x;
+    const dy = point.clientY - start.y;
+    if (Math.max(Math.abs(dx), Math.abs(dy)) < 24) return;
+    if (Math.abs(dx) > Math.abs(dy)) turn(dx > 0 ? "right" : "left");
+    else turn(dy > 0 ? "down" : "up");
+  };
 
   const cells = useMemo(() => {
     const head = body[0];
@@ -121,11 +166,21 @@ export default function SnakeGame() {
     });
   }, [body, food]);
 
+  const head = body[0] ?? START[0];
+
   if (dead) {
     return (
       <PlayPanel
         stats={<PlayStat label={t("games.score")} value={formatPlayNumber(locale, score)} />}
+        helpOpen={helpOpen}
+        onToggleHelp={toggleHelp}
       >
+        <PlayHowTo
+          open={helpOpen}
+          lines={[t("games.snake.howTo1"), t("games.snake.howTo2"), t("games.snake.howTo3")]}
+          cta="gotIt"
+          onDismiss={dismissHelp}
+        />
         <PlayResult
           score={score}
           verdictKey={verdictFromScore("high", score)}
@@ -139,18 +194,42 @@ export default function SnakeGame() {
   return (
     <PlayPanel
       stats={<PlayStat label={t("games.score")} value={formatPlayNumber(locale, score)} />}
+      helpOpen={helpOpen}
+      onToggleHelp={toggleHelp}
     >
+      <PlayHowTo
+        open={helpOpen}
+        lines={[t("games.snake.howTo1"), t("games.snake.howTo2"), t("games.snake.howTo3")]}
+        cta={ready ? "gotIt" : "start"}
+        onDismiss={dismissHelp}
+      />
       <div
-        className="um-play-snake"
+        className="um-play-snake um-play-board"
+        dir="ltr"
+        data-board-dir="ltr"
+        data-head-x={head.x}
+        data-head-y={head.y}
         style={{ gridTemplateColumns: `repeat(${SNAKE_SIZE}, minmax(0, 1fr))` }}
         role="img"
         aria-label={t("games.snake.title")}
+        onTouchStart={onTouchStart}
+        onTouchEnd={onTouchEnd}
       >
-        {cells.map((kind, index) => (
-          <div key={index} className={`um-play-scell${kind ? ` ${kind}` : ""}`} />
-        ))}
+        {cells.map((kind, index) => {
+          const x = index % SNAKE_SIZE;
+          const y = Math.floor(index / SNAKE_SIZE);
+          return (
+            <div
+              key={index}
+              className={`um-play-scell${kind ? ` ${kind}` : ""}`}
+              data-x={x}
+              data-y={y}
+              data-snake-head={kind === "head" ? "true" : undefined}
+            />
+          );
+        })}
       </div>
-      <div className="um-play-dpad">
+      <div className="um-play-dpad" dir="ltr">
         <span />
         <button type="button" className="um-play-btn" onClick={() => turn("up")} aria-label="up">
           ↑

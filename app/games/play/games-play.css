@@ -132,6 +132,41 @@
   background: var(--um-raise);
 }
 
+.um-play-help-btn {
+  padding: 8px 12px;
+  min-height: 36px;
+  font-size: 13px;
+}
+
+.um-play-howto {
+  background: var(--um-field);
+  border: 1px solid var(--um-line);
+  border-radius: 11px;
+  padding: 12px 14px 10px;
+  margin-bottom: 14px;
+}
+
+.um-play-howto-title {
+  font-weight: 800;
+  margin: 0 0 6px;
+}
+
+.um-play-howto p {
+  margin: 0 0 6px;
+  color: var(--um-muted);
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
+.um-play-howto p:last-of-type {
+  margin-bottom: 0;
+}
+
+.um-play-board {
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
 .um-play-body {
   padding: clamp(14px, 3.5vw, 22px);
 }
@@ -209,6 +244,17 @@
   color: var(--um-muted);
   font-size: 14px;
   margin-top: 6px;
+}
+
+.um-play-sudoku,
+.um-play-g2048,
+.um-play-snake,
+.um-play-memgrid,
+.um-play-xo,
+.um-play-hanoi,
+.um-play-dpad,
+.um-play-pad {
+  direction: ltr;
 }
 
 .um-play-sudoku {

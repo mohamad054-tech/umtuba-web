@@ -11,7 +11,13 @@ import {
   verdictFromScore,
 } from "../../../lib/games/play/engine";
 import { writeBestIfHigher } from "../../../lib/games/play/scores";
-import { PlayPanel, PlayResult, PlayStat } from "./PlayChrome";
+import {
+  PlayHowTo,
+  PlayPanel,
+  PlayResult,
+  PlayStat,
+  usePlayHelp,
+} from "./PlayChrome";
 
 const FACES = ["🌿", "🕌", "🏔️", "🌊", "🪁", "🎻", "🫖", "🧭"];
 
@@ -28,8 +34,16 @@ function deal(): Card[] {
 
 export default function MemoryGame() {
   const { t, locale } = useI18n();
+  const { helpOpen, ready, dismissHelp, toggleHelp, keepReadyOnReplay } = usePlayHelp();
   const sfx = useMemo(() => createPlaySfx(), []);
-  const [cards, setCards] = useState(deal);
+  const [cards, setCards] = useState<Card[]>(() =>
+    [...FACES, ...FACES].map((face, id) => ({
+      id,
+      face,
+      up: false,
+      done: false,
+    }))
+  );
   const [moves, setMoves] = useState(0);
   const [found, setFound] = useState(0);
   const [elapsed, setElapsed] = useState(0);
@@ -38,6 +52,11 @@ export default function MemoryGame() {
   const [score, setScore] = useState(0);
   const openRef = useRef<number[]>([]);
   const watchRef = useRef(createPlayStopwatch(setElapsed));
+
+  const begin = () => {
+    if (!ready) setCards(deal());
+    dismissHelp();
+  };
 
   const restart = () => {
     watchRef.current.stop();
@@ -49,19 +68,21 @@ export default function MemoryGame() {
     setLock(false);
     setDone(false);
     setScore(0);
+    keepReadyOnReplay();
     watchRef.current.start();
   };
 
   useEffect(() => {
+    if (!ready) return;
     watchRef.current.start();
     return () => {
       watchRef.current.stop();
     };
-  }, []);
+  }, [ready]);
 
   const flip = (index: number) => {
     const card = cards[index];
-    if (!card || lock || card.up || card.done || done) return;
+    if (!ready || !card || lock || card.up || card.done || done) return;
     sfx.flip();
     const nextOpen = [...openRef.current, index];
     setCards((prev) => prev.map((item, i) => (i === index ? { ...item, up: true } : item)));
@@ -109,15 +130,23 @@ export default function MemoryGame() {
 
   if (done) {
     return (
-      <PlayPanel
-        stats={
-          <>
-            <PlayStat label={t("games.moves")} value={formatPlayNumber(locale, moves)} />
-            <PlayStat label={t("games.time")} value={formatPlayClock(elapsed)} />
-          </>
-        }
-      >
-        <PlayResult
+    <PlayPanel
+      stats={
+        <>
+          <PlayStat label={t("games.moves")} value={formatPlayNumber(locale, moves)} />
+          <PlayStat label={t("games.time")} value={formatPlayClock(elapsed)} />
+        </>
+      }
+      helpOpen={helpOpen}
+      onToggleHelp={toggleHelp}
+    >
+      <PlayHowTo
+        open={helpOpen}
+        lines={[t("games.memory.howTo1"), t("games.memory.howTo2"), t("games.memory.howTo3")]}
+        cta="gotIt"
+        onDismiss={dismissHelp}
+      />
+      <PlayResult
           score={score}
           verdictKey={verdictFromScore("moves", moves)}
           detail={`${formatPlayNumber(locale, moves)} ${t("games.moves")} · ${formatPlayClock(elapsed)}`}
@@ -139,8 +168,16 @@ export default function MemoryGame() {
           <PlayStat label={t("games.time")} value={formatPlayClock(elapsed)} />
         </>
       }
+      helpOpen={helpOpen}
+      onToggleHelp={toggleHelp}
     >
-      <div className="um-play-memgrid">
+      <PlayHowTo
+        open={helpOpen}
+        lines={[t("games.memory.howTo1"), t("games.memory.howTo2"), t("games.memory.howTo3")]}
+        cta={ready ? "gotIt" : "start"}
+        onDismiss={begin}
+      />
+      <div className="um-play-memgrid um-play-board" dir="ltr">
         {cards.map((card, index) => (
           <button
             key={card.id}

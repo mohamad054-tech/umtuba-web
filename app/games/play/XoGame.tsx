@@ -1,24 +1,31 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useI18n } from "../../components/i18n";
 import type { TranslationKey } from "../../../lib/i18n/messages/types";
 import {
   createPlaySfx,
   formatPlayNumber,
-  xoBestMove,
+  xoCpuMove,
   xoWinner,
   type XoMark,
   verdictFromScore,
 } from "../../../lib/games/play/engine";
 import { writeBestIfHigher } from "../../../lib/games/play/scores";
-import { PlayPanel, PlayResult, PlayStat } from "./PlayChrome";
+import {
+  PlayHowTo,
+  PlayPanel,
+  PlayResult,
+  PlayStat,
+  usePlayHelp,
+} from "./PlayChrome";
 
 const EMPTY: XoMark[] = ["", "", "", "", "", "", "", "", ""];
 
 export default function XoGame() {
   const { t, locale } = useI18n();
   const sfx = useMemo(() => createPlaySfx(), []);
+  const { helpOpen, ready, dismissHelp, toggleHelp, keepReadyOnReplay } = usePlayHelp();
   const [board, setBoard] = useState<XoMark[]>(EMPTY);
   const [over, setOver] = useState(false);
   const [line, setLine] = useState<number[]>([]);
@@ -28,14 +35,18 @@ export default function XoGame() {
   const [score, setScore] = useState(0);
   const [sessionDone, setSessionDone] = useState(false);
   const [turnLabel, setTurnLabel] = useState<TranslationKey>("games.yourTurn");
+  const busyRef = useRef(false);
+  const boardRef = useRef<XoMark[]>(EMPTY);
 
   const paintWin = (marks: XoMark[]) => {
     const result = xoWinner(marks);
     if (!result) {
       setTurnLabel("games.yourTurn");
+      busyRef.current = false;
       return false;
     }
     setOver(true);
+    busyRef.current = false;
     if (result.line) setLine([...result.line]);
     const played = wins + draws + losses + 1;
     if (played >= 5) {
@@ -68,14 +79,24 @@ export default function XoGame() {
   };
 
   const play = (index: number) => {
-    if (over || sessionDone || board[index]) return;
-    const afterYou: XoMark[] = board.map((cell, i) => (i === index ? "X" : cell));
+    if (!ready || over || sessionDone || busyRef.current || boardRef.current[index]) {
+      return;
+    }
+    busyRef.current = true;
+    const afterYou: XoMark[] = boardRef.current.map((cell, i) =>
+      i === index ? "X" : cell
+    );
+    boardRef.current = afterYou;
     setBoard(afterYou);
     sfx.flip();
     if (paintWin(afterYou)) return;
-    const cpu = xoBestMove(afterYou, "O");
-    if (cpu < 0) return;
+    const cpu = xoCpuMove(afterYou);
+    if (cpu < 0) {
+      busyRef.current = false;
+      return;
+    }
     const afterCpu: XoMark[] = afterYou.map((cell, i) => (i === cpu ? "O" : cell));
+    boardRef.current = afterCpu;
     setBoard(afterCpu);
     paintWin(afterCpu);
   };
@@ -87,13 +108,18 @@ export default function XoGame() {
       setSessionDone(true);
       return;
     }
+    boardRef.current = EMPTY;
+    busyRef.current = false;
     setBoard(EMPTY);
     setOver(false);
     setLine([]);
     setTurnLabel("games.yourTurn");
+    keepReadyOnReplay();
   };
 
   const restart = () => {
+    boardRef.current = EMPTY;
+    busyRef.current = false;
     setBoard(EMPTY);
     setOver(false);
     setLine([]);
@@ -103,7 +129,17 @@ export default function XoGame() {
     setScore(0);
     setSessionDone(false);
     setTurnLabel("games.yourTurn");
+    keepReadyOnReplay();
   };
+
+  const howTo = (
+    <PlayHowTo
+      open={helpOpen}
+      lines={[t("games.xo.howTo1"), t("games.xo.howTo2"), t("games.xo.howTo3")]}
+      cta={ready ? "gotIt" : "start"}
+      onDismiss={dismissHelp}
+    />
+  );
 
   if (sessionDone) {
     return (
@@ -117,7 +153,10 @@ export default function XoGame() {
             />
           </>
         }
+        helpOpen={helpOpen}
+        onToggleHelp={toggleHelp}
       >
+        {howTo}
         <PlayResult
           score={score}
           verdictKey={verdictFromScore("high", score)}
@@ -139,16 +178,20 @@ export default function XoGame() {
           />
         </>
       }
+      helpOpen={helpOpen}
+      onToggleHelp={toggleHelp}
     >
+      {howTo}
       <div className="um-play-turn">{t(turnLabel)}</div>
-      <div className="um-play-xo">
+      <div className="um-play-xo um-play-board" dir="ltr" data-board-dir="ltr">
         {board.map((mark, index) => (
           <button
             key={index}
             type="button"
+            data-xo-index={index}
             className={`${mark === "X" ? "x" : mark === "O" ? "o" : ""}${line.includes(index) ? " win" : ""}`}
             onClick={() => play(index)}
-            disabled={over || Boolean(mark)}
+            disabled={!ready || over || Boolean(mark)}
             aria-label={mark ? mark : t("games.emptyCell")}
           >
             {mark === "X" ? "✕" : mark === "O" ? "◯" : ""}

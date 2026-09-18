@@ -13,7 +13,13 @@ import {
   verdictFromScore,
 } from "../../../lib/games/play/engine";
 import { writeBestIfHigher } from "../../../lib/games/play/scores";
-import { PlayPanel, PlayResult, PlayStat } from "./PlayChrome";
+import {
+  PlayHowTo,
+  PlayPanel,
+  PlayResult,
+  PlayStat,
+  usePlayHelp,
+} from "./PlayChrome";
 
 function pickPuzzle() {
   return SUDOKU_PUZZLES[Math.floor(Math.random() * SUDOKU_PUZZLES.length)] ?? SUDOKU_PUZZLES[0];
@@ -25,6 +31,7 @@ function emptyNotes(): number[][] {
 
 export default function SudokuGame() {
   const { t, locale } = useI18n();
+  const { helpOpen, ready, dismissHelp, toggleHelp, keepReadyOnReplay } = usePlayHelp();
   const sfx = useMemo(() => createPlaySfx(), []);
   const [pack, setPack] = useState(pickPuzzle);
   const [board, setBoard] = useState(() =>
@@ -58,15 +65,17 @@ export default function SudokuGame() {
     setScore(0);
     watchRef.current.stop();
     watchRef.current = createPlayStopwatch(setElapsed);
-    watchRef.current.start();
-  }, []);
+    if (ready) watchRef.current.start();
+    keepReadyOnReplay();
+  }, [keepReadyOnReplay, ready]);
 
   useEffect(() => {
+    if (!ready) return;
     watchRef.current.start();
     return () => {
       watchRef.current.stop();
     };
-  }, []);
+  }, [ready]);
 
   const finish = useCallback(
     (nextBoard: number[]) => {
@@ -83,7 +92,7 @@ export default function SudokuGame() {
 
   const place = useCallback(
     (value: number) => {
-      if (done || given[selected]) return;
+      if (!ready || done || given[selected]) return;
       if (noteMode) {
         if (value === 0) {
           setNotes((prev) => {
@@ -119,7 +128,7 @@ export default function SudokuGame() {
       const nextBoard = board.map((cell, i) => (i === selected ? value : cell));
       finish(nextBoard);
     },
-    [board, done, finish, given, noteMode, selected, sfx]
+    [board, done, finish, given, noteMode, ready, selected, sfx]
   );
 
   const hint = () => {
@@ -140,7 +149,7 @@ export default function SudokuGame() {
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
-      if (done) return;
+      if (done || !ready) return;
       if (event.key >= "1" && event.key <= "9") {
         place(Number(event.key));
         return;
@@ -162,7 +171,7 @@ export default function SudokuGame() {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [done, place, selected]);
+  }, [done, place, ready, selected]);
 
   if (done) {
     return (
@@ -173,7 +182,15 @@ export default function SudokuGame() {
             <PlayStat label={t("games.time")} value={formatPlayClock(elapsed)} />
           </>
         }
+        helpOpen={helpOpen}
+        onToggleHelp={toggleHelp}
       >
+        <PlayHowTo
+          open={helpOpen}
+          lines={[t("games.sudoku.howTo1"), t("games.sudoku.howTo2"), t("games.sudoku.howTo3")]}
+          cta="gotIt"
+          onDismiss={dismissHelp}
+        />
         <PlayResult
           score={score}
           verdictKey={verdictFromScore("high", score)}
@@ -192,8 +209,16 @@ export default function SudokuGame() {
           <PlayStat label={t("games.hint")} value={formatPlayNumber(locale, hints)} />
         </>
       }
+      helpOpen={helpOpen}
+      onToggleHelp={toggleHelp}
     >
-      <div className="um-play-sudoku" role="grid" aria-label={t("games.sudoku.title")}>
+      <PlayHowTo
+        open={helpOpen}
+        lines={[t("games.sudoku.howTo1"), t("games.sudoku.howTo2"), t("games.sudoku.howTo3")]}
+        cta={ready ? "gotIt" : "start"}
+        onDismiss={dismissHelp}
+      />
+      <div className="um-play-sudoku um-play-board" dir="ltr" role="grid" aria-label={t("games.sudoku.title")}>
         {board.map((value, index) => (
           <button
             key={index}
@@ -203,9 +228,9 @@ export default function SudokuGame() {
             aria-label={value ? String(value) : t("games.emptyCell")}
           >
             {value ? (
-              formatPlayNumber(locale, value)
+              String(value)
             ) : notes[index]?.length ? (
-              <span className="note">{notes[index].map((n) => formatPlayNumber(locale, n)).join(" ")}</span>
+              <span className="note">{notes[index].join(" ")}</span>
             ) : null}
           </button>
         ))}
@@ -213,7 +238,7 @@ export default function SudokuGame() {
       <div className="um-play-pad">
         {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => (
           <button key={n} type="button" className="um-play-btn" onClick={() => place(n)}>
-            {formatPlayNumber(locale, n)}
+            {String(n)}
           </button>
         ))}
         <button type="button" className="um-play-btn" onClick={() => place(0)}>

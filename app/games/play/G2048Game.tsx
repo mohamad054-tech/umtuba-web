@@ -20,7 +20,13 @@ import {
   verdictFromScore,
 } from "../../../lib/games/play/engine";
 import { writeBestIfHigher } from "../../../lib/games/play/scores";
-import { PlayPanel, PlayResult, PlayStat } from "./PlayChrome";
+import {
+  PlayHowTo,
+  PlayPanel,
+  PlayResult,
+  PlayStat,
+  usePlayHelp,
+} from "./PlayChrome";
 
 function keyToDir(key: string): Dir4 | null {
   if (key === "ArrowLeft" || key === "a" || key === "A") return "left";
@@ -33,7 +39,8 @@ function keyToDir(key: string): Dir4 | null {
 export default function G2048Game() {
   const { t, locale } = useI18n();
   const sfx = useMemo(() => createPlaySfx(), []);
-  const [board, setBoard] = useState(create2048Board);
+  const { helpOpen, ready, dismissHelp, toggleHelp, keepReadyOnReplay } = usePlayHelp();
+  const [board, setBoard] = useState(() => Array.from({ length: 16 }, () => 0));
   const [score, setScore] = useState(0);
   const [best, setBest] = useState(0);
   const [over, setOver] = useState(false);
@@ -47,7 +54,7 @@ export default function G2048Game() {
 
   const apply = useCallback(
     (direction: Dir4) => {
-      if (over) return;
+      if (over || !ready) return;
       setBoard((current) => {
         const moved = move2048(current, direction);
         if (!moved.moved) return current;
@@ -68,14 +75,20 @@ export default function G2048Game() {
         return next;
       });
     },
-    [over, sfx]
+    [over, ready, sfx]
   );
+
+  const begin = () => {
+    if (!ready) setBoard(create2048Board());
+    dismissHelp();
+  };
 
   const restart = () => {
     setBoard(create2048Board());
     setScore(0);
     setOver(false);
     setWon(false);
+    keepReadyOnReplay();
   };
 
   useEffect(() => {
@@ -107,16 +120,34 @@ export default function G2048Game() {
     else apply(dy > 0 ? "down" : "up");
   };
 
+  const highest = board.reduce((max, value) => Math.max(max, value), 0);
+  const target = highest >= 2048 ? 2048 : Math.max(4, highest * 2);
+
+  const howTo = (
+    <PlayHowTo
+      open={helpOpen}
+      lines={[t("games.g2048.howTo1"), t("games.g2048.howTo2"), t("games.g2048.howTo3")]}
+      cta={ready ? "gotIt" : "start"}
+      onDismiss={begin}
+    />
+  );
+
   if (over) {
     return (
       <PlayPanel
         stats={
           <>
             <PlayStat label={t("games.score")} value={formatPlayNumber(locale, score)} />
-            <PlayStat label={t("games.localBest").split(":")[0] ?? t("games.score")} value={formatPlayNumber(locale, best)} />
+            <PlayStat
+              label={t("games.localBest").split(":")[0] ?? t("games.score")}
+              value={formatPlayNumber(locale, best)}
+            />
           </>
         }
+        helpOpen={helpOpen}
+        onToggleHelp={toggleHelp}
       >
+        {howTo}
         <PlayResult
           score={score}
           verdictKey={won ? "games.youWin" : verdictFromScore("high", score)}
@@ -132,18 +163,32 @@ export default function G2048Game() {
       stats={
         <>
           <PlayStat label={t("games.score")} value={formatPlayNumber(locale, score)} />
+          <PlayStat label={t("games.target")} value={formatPlayNumber(locale, target)} />
         </>
       }
+      helpOpen={helpOpen}
+      onToggleHelp={toggleHelp}
     >
+      {howTo}
       <div
-        className="um-play-g2048"
+        className="um-play-g2048 um-play-board"
+        dir="ltr"
+        data-board-dir="ltr"
+        data-highest={highest}
+        data-target={target}
         role="grid"
         aria-label={t("games.g2048.title")}
         onTouchStart={onTouchStart}
         onTouchEnd={onTouchEnd}
       >
         {board.map((value, index) => (
-          <div key={index} className={`um-play-t2048${value ? ` v${value}` : ""}`}>
+          <div
+            key={index}
+            className={`um-play-t2048${value ? ` v${value}` : ""}`}
+            data-row={Math.floor(index / 4)}
+            data-col={index % 4}
+            data-val={value}
+          >
             {value ? formatPlayNumber(locale, value) : ""}
           </div>
         ))}

@@ -243,6 +243,25 @@ export function canMove2048(board: readonly number[]): boolean {
 }
 
 export const SNAKE_SIZE = 16;
+/** First-food tick. Slow enough to read the board on a phone. */
+export const SNAKE_TICK_START_MS = 260;
+/** Floor after many foods. */
+export const SNAKE_TICK_MIN_MS = 120;
+/** Drop this many ms per food (+10 score). */
+export const SNAKE_TICK_STEP_MS = 12;
+export const SNAKE_TICK_REDUCED_START_MS = 380;
+export const SNAKE_TICK_REDUCED_MIN_MS = 220;
+
+export function snakeTickMs(score: number, reducedMotion = false): number {
+  const foods = Math.max(0, Math.floor(score / 10));
+  if (reducedMotion) {
+    return Math.max(
+      SNAKE_TICK_REDUCED_MIN_MS,
+      SNAKE_TICK_REDUCED_START_MS - foods * 8
+    );
+  }
+  return Math.max(SNAKE_TICK_MIN_MS, SNAKE_TICK_START_MS - foods * SNAKE_TICK_STEP_MS);
+}
 
 export type SnakePoint = { x: number; y: number };
 
@@ -333,6 +352,49 @@ export function xoBestMove(board: readonly XoMark[], me: "X" | "O"): number {
   };
 
   return search(cells, me, 0).index;
+}
+
+export const XO_CPU_RANDOM_CHANCE = 0.25;
+
+export function xoLegalMoves(board: readonly XoMark[]): number[] {
+  return board.flatMap((cell, index) => (cell ? [] : [index]));
+}
+
+export function xoLineThreat(board: readonly XoMark[], mark: "X" | "O"): number {
+  for (const line of XO_LINES) {
+    const marks = line.map((index) => board[index]);
+    const filled = marks.filter((cell) => cell === mark).length;
+    const empty = line.filter((index) => !board[index]);
+    if (filled === 2 && empty.length === 1) return empty[0] ?? -1;
+  }
+  return -1;
+}
+
+/** Normal CPU: 75% best move, 25% random other legal cell. */
+export function xoCpuMove(
+  board: readonly XoMark[],
+  rng: () => number = Math.random
+): number {
+  const legal = xoLegalMoves(board);
+  if (legal.length === 0) return -1;
+  const best = xoBestMove(board, "O");
+  if (legal.length > 1 && rng() < XO_CPU_RANDOM_CHANCE) {
+    const others = legal.filter((index) => index !== best);
+    const pool = others.length ? others : legal;
+    return pool[Math.floor(rng() * pool.length)] ?? best;
+  }
+  return best < 0 ? (legal[0] ?? -1) : best;
+}
+
+export function xoHumanCenterThenBlock(board: readonly XoMark[]): number {
+  if (!board[4]) return 4;
+  const win = xoLineThreat(board, "X");
+  if (win >= 0) return win;
+  const block = xoLineThreat(board, "O");
+  if (block >= 0) return block;
+  const corner = [0, 2, 6, 8].find((index) => !board[index]);
+  if (corner != null) return corner;
+  return board.findIndex((cell) => !cell);
 }
 
 export function hanoiCanPlace(onto: number | undefined, disc: number): boolean {

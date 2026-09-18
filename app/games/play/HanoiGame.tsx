@@ -9,13 +9,20 @@ import {
   verdictFromScore,
 } from "../../../lib/games/play/engine";
 import { writeBestIfHigher } from "../../../lib/games/play/scores";
-import { PlayPanel, PlayResult, PlayStat } from "./PlayChrome";
+import {
+  PlayHowTo,
+  PlayPanel,
+  PlayResult,
+  PlayStat,
+  usePlayHelp,
+} from "./PlayChrome";
 
 const DISCS = 4;
 const START: number[][] = [[3, 2, 1, 0], [], []];
 
 export default function HanoiGame() {
   const { t, locale } = useI18n();
+  const { helpOpen, ready, dismissHelp, toggleHelp, keepReadyOnReplay } = usePlayHelp();
   const sfx = useMemo(() => createPlaySfx(), []);
   const [pegs, setPegs] = useState<number[][]>(START.map((peg) => [...peg]));
   const [selected, setSelected] = useState<number | null>(null);
@@ -29,10 +36,11 @@ export default function HanoiGame() {
     setMoves(0);
     setDone(false);
     setScore(0);
+    keepReadyOnReplay();
   };
 
   const tap = (pegIndex: number) => {
-    if (done) return;
+    if (!ready || done) return;
     if (selected == null) {
       if ((pegs[pegIndex] ?? []).length === 0) return;
       setSelected(pegIndex);
@@ -72,7 +80,15 @@ export default function HanoiGame() {
     return (
       <PlayPanel
         stats={<PlayStat label={t("games.moves")} value={formatPlayNumber(locale, moves)} />}
+        helpOpen={helpOpen}
+        onToggleHelp={toggleHelp}
       >
+        <PlayHowTo
+          open={helpOpen}
+          lines={[t("games.hanoi.howTo1"), t("games.hanoi.howTo2"), t("games.hanoi.howTo3")]}
+          cta="gotIt"
+          onDismiss={dismissHelp}
+        />
         <PlayResult
           score={score}
           verdictKey={verdictFromScore("moves", moves)}
@@ -91,8 +107,16 @@ export default function HanoiGame() {
           <PlayStat label={t("games.discs")} value={formatPlayNumber(locale, DISCS)} />
         </>
       }
+      helpOpen={helpOpen}
+      onToggleHelp={toggleHelp}
     >
-      <div className="um-play-hanoi">
+      <PlayHowTo
+        open={helpOpen}
+        lines={[t("games.hanoi.howTo1"), t("games.hanoi.howTo2"), t("games.hanoi.howTo3")]}
+        cta={ready ? "gotIt" : "start"}
+        onDismiss={dismissHelp}
+      />
+      <div className="um-play-hanoi um-play-board" dir="ltr">
         {pegs.map((stack, pegIndex) => (
           <button
             key={pegIndex}
