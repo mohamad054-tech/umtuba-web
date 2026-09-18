@@ -4,6 +4,7 @@ import { createTranslator } from "../../lib/i18n";
 import { resolveRequestLocale } from "../../lib/i18n/server";
 import { buildLocalizedRouteMetadata } from "../../lib/site/localizedSeo";
 import GamesCatalog from "./GamesCatalog";
+import "./play/games-play.css";
 
 export async function generateMetadata() {
   const { locale } = await resolveRequestLocale();
@@ -20,7 +21,7 @@ export default async function GamesHubPage() {
 
   return (
     <main
-      className={`relative min-h-screen bg-[#050510] text-white ${MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS}`}
+      className={`um-games-shell relative min-h-screen text-white ${MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS}`}
     >
       <AppTopNav title={t("games.title")} subtitle={t("games.subtitle")} sticky />
       <div className="mx-auto max-w-6xl px-5 py-12 md:px-8">

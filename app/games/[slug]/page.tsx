@@ -11,6 +11,7 @@ import {
 } from "../../../lib/games/play/catalog";
 import { buildPageMetadata } from "../../../lib/site/metadata";
 import GamePlayClient from "../play/GamePlayClient";
+import "../play/games-play.css";
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -48,7 +49,7 @@ export default async function GamePlayPage({ params }: Props) {
 
   return (
     <main
-      className={`relative min-h-screen bg-[#050510] text-white ${MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS}`}
+      className={`um-games-shell relative min-h-screen text-white ${MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS}`}
     >
       <AppTopNav
         title={t(game.titleKey)}

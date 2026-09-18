@@ -3,16 +3,16 @@
  * No inline scripts, no Google Fonts, no cloud scores.
  */
 
-export const PLAY_FIELD = "#0C2723";
-export const PLAY_SURFACE = "#14352F";
-export const PLAY_RAISE = "#1B443C";
-export const PLAY_LINE = "#255A50";
-export const PLAY_INK = "#EAF2EE";
-export const PLAY_MUTED = "#8FB3AA";
+export const PLAY_FIELD = "#0A1028";
+export const PLAY_SURFACE = "#12182F";
+export const PLAY_RAISE = "#1A2140";
+export const PLAY_LINE = "#343C6A";
+export const PLAY_INK = "#EEF1FB";
+export const PLAY_MUTED = "#A4ADD0";
 export const PLAY_GOLD = "#F0A93B";
 export const PLAY_GOLD_DIM = "#9A6E22";
 export const PLAY_CLAY = "#D46A5E";
-export const PLAY_MINT = "#5FCBA4";
+export const PLAY_MINT = "#7ED9B8";
 export const PLAY_RADIUS_PX = 14;
 
 export function prefersReducedMotion(): boolean {

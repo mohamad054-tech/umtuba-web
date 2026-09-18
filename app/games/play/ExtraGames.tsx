@@ -759,7 +759,7 @@ export function ShapesGame() {
 
   const deal = () => {
     const shapes = ["circle", "square", "diamond"];
-    const cols = ["#F0A93B", "#5FCBA4"];
+    const cols = ["#F0A93B", "#7ED9B8"];
     const pack: Card[] = [];
     shapes.forEach((sh) => cols.forEach((col) => {
       pack.push({ sh, col, up: false, done: false }, { sh, col, up: false, done: false });
@@ -812,7 +812,7 @@ export function ShapesGame() {
       <div className="um-play-shapeg" dir="ltr">
         {cards.map((card, index) => (
           <button key={index} type="button" className={`um-play-scard${card.up || card.done ? " up" : ""}`} data-play-item="true" onClick={() => flip(index)}>
-            <span className={`um-play-shape ${card.sh}`} style={{ background: card.up || card.done ? card.col : "#1b443c" }} />
+            <span className={`um-play-shape ${card.sh}`} style={{ background: card.up || card.done ? card.col : "#1a2140" }} />
           </button>
         ))}
       </div>

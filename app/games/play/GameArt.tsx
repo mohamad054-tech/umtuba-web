@@ -4,15 +4,15 @@ import type { PlayableGameSlug } from "../../../lib/games/play/catalog";
 /** Original Umtuba tile marks. Geometric only — not derived from third-party art. */
 
 const C = {
-  field: "#0C2723",
-  surface: "#14352F",
-  raise: "#1B443C",
-  line: "#255A50",
+  field: "#0A1028",
+  surface: "#12182F",
+  raise: "#1A2140",
+  line: "#343C6A",
   gold: "#F0A93B",
   goldDim: "#9A6E22",
-  ink: "#EAF2EE",
+  ink: "#EEF1FB",
   clay: "#D46A5E",
-  mint: "#5FCBA4",
+  mint: "#7ED9B8",
 };
 
 function Frame({ children }: { children: ReactNode }) {

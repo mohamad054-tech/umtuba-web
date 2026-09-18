@@ -1,17 +1,50 @@
+.um-games-shell,
 .um-play-root {
-  --um-field: #0c2723;
-  --um-surface: #14352f;
-  --um-raise: #1b443c;
-  --um-line: #255a50;
-  --um-ink: #eaf2ee;
-  --um-muted: #8fb3aa;
+  --um-night-black: #050510;
+  --um-night-navy: #0a1028;
+  --um-night-blue: #141e45;
+  --um-night-purple: #1b1438;
+  --um-play-bg:
+    radial-gradient(
+      120% 90% at 8% -8%,
+      color-mix(in srgb, var(--um-night-purple) 86%, transparent) 0%,
+      transparent 54%
+    ),
+    radial-gradient(
+      85% 70% at 104% 4%,
+      color-mix(in srgb, var(--um-night-blue) 72%, transparent) 0%,
+      transparent 50%
+    ),
+    linear-gradient(
+      168deg,
+      var(--um-night-navy) 0%,
+      var(--um-night-black) 46%,
+      var(--um-night-purple) 100%
+    );
+  --um-field: var(--um-night-navy);
+  --um-surface: #12182f;
+  --um-raise: #1a2140;
+  --um-line: #343c6a;
+  --um-ink: #eef1fb;
+  --um-muted: #a4add0;
   --um-gold: #f0a93b;
   --um-gold-dim: #9a6e22;
   --um-clay: #d46a5e;
-  --um-mint: #5fcba4;
+  --um-mint: #7ed9b8;
   --um-r: 14px;
   color: var(--um-ink);
   font-family: inherit;
+}
+
+.um-games-shell {
+  background-color: var(--um-night-black);
+  background-image: var(--um-play-bg);
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.um-play-root {
+  background: transparent;
 }
 
 .um-play-catalog {
@@ -69,7 +102,7 @@
   bottom: 0;
   z-index: 1;
   padding: 10px 12px 11px;
-  background: #0c2723eb;
+  background: color-mix(in srgb, var(--um-night-navy) 92%, transparent);
   border-top: 1px solid var(--um-line);
 }
 
@@ -766,10 +799,10 @@
     conic-gradient(
       #d46a5e 0 60deg,
       #f0a93b 60deg 120deg,
-      #5fcba4 120deg 180deg,
-      #255a50 180deg 240deg,
+      #7ed9b8 120deg 180deg,
+      #343c6a 180deg 240deg,
       #9a6e22 240deg 300deg,
-      #1b443c 300deg 360deg
+      #1a2140 300deg 360deg
     );
   display: grid;
   place-items: center;
@@ -986,7 +1019,7 @@
 }
 
 .um-kcard.back {
-  background: #12352f;
+  background: var(--um-night-navy);
   border-color: var(--um-gold);
 }
 
@@ -1014,7 +1047,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  font-size: clamp(0.62rem, 1.7vw, 0.82rem);
+  font-size: clamp(0.95rem, 2.8vw, 1.25rem);
   font-weight: 800;
   line-height: 1;
   direction: ltr;
@@ -1026,6 +1059,14 @@
   font-style: normal;
   font-feature-settings: "locl" 0;
   font-variant-numeric: lining-nums tabular-nums;
+}
+
+.um-kcard-rank {
+  letter-spacing: -0.04em;
+}
+
+.um-kcard-pip {
+  font-size: 0.92em;
 }
 
 .um-kcard-idx.bot {
@@ -1041,7 +1082,7 @@
   display: grid;
   place-items: center;
   height: 100%;
-  font-size: clamp(0.95rem, 2.6vw, 1.35rem);
+  font-size: clamp(1.5rem, 4.6vw, 2.2rem);
   line-height: 1;
 }
 
