@@ -189,6 +189,7 @@ export default function XoGame() {
             key={index}
             type="button"
             data-xo-index={index}
+            data-xo-cell="true"
             className={`${mark === "X" ? "x" : mark === "O" ? "o" : ""}${line.includes(index) ? " win" : ""}`}
             onClick={() => play(index)}
             disabled={!ready || over || Boolean(mark)}

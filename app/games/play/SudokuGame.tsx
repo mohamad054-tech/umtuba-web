@@ -223,6 +223,7 @@ export default function SudokuGame() {
           <button
             key={index}
             type="button"
+            data-sudoku-cell="true"
             className={`${given[index] ? "given" : ""} ${selected === index ? "sel" : ""} ${errors.includes(index) ? "err" : ""}`}
             onClick={() => setSelected(index)}
             aria-label={value ? String(value) : t("games.emptyCell")}

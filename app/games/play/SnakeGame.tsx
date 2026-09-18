@@ -206,6 +206,7 @@ export default function SnakeGame() {
       <div
         className="um-play-snake um-play-board"
         dir="ltr"
+        data-snake-board="true"
         data-board-dir="ltr"
         data-head-x={head.x}
         data-head-y={head.y}

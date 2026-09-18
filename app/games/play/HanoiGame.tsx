@@ -122,6 +122,7 @@ export default function HanoiGame() {
             key={pegIndex}
             type="button"
             className={`um-play-peg${selected === pegIndex ? " sel" : ""}`}
+            data-hanoi-peg="true"
             onClick={() => tap(pegIndex)}
             aria-label={t("games.peg", { values: { n: pegIndex + 1 } })}
           >
@@ -129,6 +130,7 @@ export default function HanoiGame() {
               <span
                 key={disc}
                 className="um-play-disc"
+                data-hanoi-disc="true"
                 style={{ width: `${36 + (3 - disc) * 16}%` }}
               >
                 {formatPlayNumber(locale, disc + 1)}

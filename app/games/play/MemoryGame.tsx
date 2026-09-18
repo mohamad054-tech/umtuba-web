@@ -36,14 +36,7 @@ export default function MemoryGame() {
   const { t, locale } = useI18n();
   const { helpOpen, ready, dismissHelp, toggleHelp, keepReadyOnReplay } = usePlayHelp();
   const sfx = useMemo(() => createPlaySfx(), []);
-  const [cards, setCards] = useState<Card[]>(() =>
-    [...FACES, ...FACES].map((face, id) => ({
-      id,
-      face,
-      up: false,
-      done: false,
-    }))
-  );
+  const [cards, setCards] = useState<Card[]>([]);
   const [moves, setMoves] = useState(0);
   const [found, setFound] = useState(0);
   const [elapsed, setElapsed] = useState(0);
@@ -54,7 +47,7 @@ export default function MemoryGame() {
   const watchRef = useRef(createPlayStopwatch(setElapsed));
 
   const begin = () => {
-    if (!ready) setCards(deal());
+    if (!ready || cards.length === 0) setCards(deal());
     dismissHelp();
   };
 
@@ -177,27 +170,34 @@ export default function MemoryGame() {
         cta={ready ? "gotIt" : "start"}
         onDismiss={begin}
       />
-      <div className="um-play-memgrid um-play-board" dir="ltr">
-        {cards.map((card, index) => (
-          <button
-            key={card.id}
-            type="button"
-            className={`um-play-mem-card${card.up ? " up" : ""}${card.done ? " done" : ""}`}
-            onClick={() => flip(index)}
-            aria-label={card.up || card.done ? card.face : t("games.cardFacedown")}
-          >
-            <span className="um-play-mem-inner">
-              <span className="um-play-mem-face um-play-mem-back" />
-              <span className="um-play-mem-face um-play-mem-front">{card.face}</span>
-            </span>
+      {cards.length > 0 ? (
+        <div className="um-play-memgrid um-play-board" dir="ltr" data-mem-board="true">
+          {cards.map((card, index) => (
+            <button
+              key={card.id}
+              type="button"
+              className={`um-play-mem-card${card.up ? " up" : ""}${card.done ? " done" : ""}`}
+              data-mem-card="true"
+              onClick={() => flip(index)}
+              aria-label={card.up || card.done ? card.face : t("games.cardFacedown")}
+            >
+              <span className="um-play-mem-inner">
+                <span className="um-play-mem-face um-play-mem-back" data-mem-face="back" />
+                <span className="um-play-mem-face um-play-mem-front" data-mem-face="front">
+                  {card.face}
+                </span>
+              </span>
+            </button>
+          ))}
+        </div>
+      ) : null}
+      {ready ? (
+        <div className="um-play-row" style={{ justifyContent: "center" }}>
+          <button type="button" className="um-play-btn" onClick={restart}>
+            {t("games.newGame")}
           </button>
-        ))}
-      </div>
-      <div className="um-play-row" style={{ justifyContent: "center" }}>
-        <button type="button" className="um-play-btn" onClick={restart}>
-          {t("games.newGame")}
-        </button>
-      </div>
+        </div>
+      ) : null}
     </PlayPanel>
   );
 }

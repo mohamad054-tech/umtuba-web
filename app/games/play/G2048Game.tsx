@@ -185,6 +185,7 @@ export default function G2048Game() {
           <div
             key={index}
             className={`um-play-t2048${value ? ` v${value}` : ""}`}
+            data-g2048-tile="true"
             data-row={Math.floor(index / 4)}
             data-col={index % 4}
             data-val={value}
