@@ -60,17 +60,24 @@ function cardSelected(sel: KlondikeSel | null, zone: KlondikeSel): boolean {
   return false;
 }
 
+const PEEK_DOWN_PX = 12;
+const PEEK_UP_PX = 38;
+
 function PlayingCard({
   card,
   selected,
   stacked = false,
-  offset = 0,
+  lead = false,
+  peek = 0,
+  stackIndex = 0,
   onPress,
 }: {
   card: KlondikeCard;
   selected: boolean;
   stacked?: boolean;
-  offset?: number;
+  lead?: boolean;
+  peek?: number;
+  stackIndex?: number;
   onPress: () => void;
 }) {
   const color = klondikeColor(card.suit);
@@ -83,15 +90,27 @@ function PlayingCard({
       lang="en"
       className={`um-kcard${card.up ? ` face ${color}` : " back"}${selected ? " sel" : ""}${
         stacked ? " stacked" : ""
-      }`}
-      style={stacked ? { top: offset, zIndex: offset + 1 } : undefined}
+      }${lead ? " lead" : ""}`}
+      style={
+        stacked
+          ? {
+              ["--um-k-peek" as string]: `${peek}px`,
+              zIndex: stackIndex + 1,
+            }
+          : undefined
+      }
       data-play-item="true"
       data-kcard={card.id}
-      data-suit={card.suit}
-      data-rank={card.rank}
-      data-rank-label={card.up ? label : ""}
       data-up={card.up ? "true" : "false"}
-      data-color={color}
+      data-k-peek={stacked ? (lead ? "lead" : peek === PEEK_UP_PX ? "up" : "down") : undefined}
+      {...(card.up
+        ? {
+            "data-suit": card.suit,
+            "data-rank": card.rank,
+            "data-rank-label": label,
+            "data-color": color,
+          }
+        : {})}
       aria-label={card.up ? `${label} ${mark}` : "facedown"}
       onClick={onPress}
     >
@@ -374,23 +393,29 @@ export default function SolitaireGame() {
                     aria-label={`${t("games.solitaire.title")} ${pileIndex + 1}`}
                     onClick={() => tryDest({ zone: "tableau", pile: pileIndex })}
                   />
-                  {pile.map((card, index) => (
-                    <PlayingCard
-                      key={card.id}
-                      card={card}
-                      stacked
-                      offset={index * 16}
-                      selected={cardSelected(sel, { zone: "tableau", pile: pileIndex, index })}
-                      onPress={() => {
-                        if (!card.up) return;
-                        selectOrMove(
-                          { zone: "tableau", pile: pileIndex, index },
-                          { zone: "tableau", pile: pileIndex },
-                          `${pileIndex}-${index}`
-                        );
-                      }}
-                    />
-                  ))}
+                  {pile.map((card, index) => {
+                    const prev = pile[index - 1];
+                    const peek = index === 0 ? 0 : prev?.up ? PEEK_UP_PX : PEEK_DOWN_PX;
+                    return (
+                      <PlayingCard
+                        key={card.id}
+                        card={card}
+                        stacked
+                        lead={index === 0}
+                        peek={peek}
+                        stackIndex={index}
+                        selected={cardSelected(sel, { zone: "tableau", pile: pileIndex, index })}
+                        onPress={() => {
+                          if (!card.up) return;
+                          selectOrMove(
+                            { zone: "tableau", pile: pileIndex, index },
+                            { zone: "tableau", pile: pileIndex },
+                            `${pileIndex}-${index}`
+                          );
+                        }}
+                      />
+                    );
+                  })}
                 </div>
               ))}
             </div>
@@ -408,7 +433,7 @@ export default function SolitaireGame() {
               )}
             </div>
           </div>
-          <div className="um-play-row" style={{ justifyContent: "center", marginTop: 10 }}>
+          <div className="um-play-row um-klondike-actions">
             <button type="button" className="um-play-btn" data-play-item="true" data-klondike-undo="true" onClick={undo} disabled={!history.length}>
               {t("games.undo")}
             </button>

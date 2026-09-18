@@ -927,6 +927,8 @@
 }
 
 .um-klondike {
+  --um-k-peek-down: 12px;
+  --um-k-peek-up: 38px;
   display: grid;
   gap: 8px;
   width: 100%;
@@ -958,7 +960,14 @@
 
 .um-ktableau {
   min-height: 0;
-  padding-bottom: calc((100% * 7 / 5) + 96px);
+}
+
+.um-klondike-actions {
+  position: relative;
+  z-index: 6;
+  justify-content: center;
+  margin-top: 16px;
+  flex-shrink: 0;
 }
 
 .um-kslot-hit,
@@ -971,6 +980,7 @@
   min-height: 0;
   aspect-ratio: 5 / 7;
   padding: 0;
+  overflow: hidden;
   border: 1px solid var(--um-gold-dim);
   border-radius: 7px;
   background: var(--um-field);
@@ -987,16 +997,26 @@
 .um-ktableau-hit {
   position: absolute;
   inset: 0 0 auto;
+  width: 100%;
   height: auto;
   aspect-ratio: 5 / 7;
+  z-index: 0;
+}
+
+.um-ktableau[data-tableau-count="0"] .um-ktableau-hit {
+  position: relative;
 }
 
 .um-kcard.stacked {
-  position: absolute;
-  left: 0;
-  right: 0;
+  position: relative;
+  left: auto;
+  right: auto;
   width: 100%;
-  z-index: 1;
+  margin-top: calc(var(--um-k-peek, var(--um-k-peek-up)) - (100% * 7 / 5));
+}
+
+.um-kcard.stacked.lead {
+  margin-top: 0;
 }
 
 .um-kcard.face {

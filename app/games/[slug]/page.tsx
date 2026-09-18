@@ -53,7 +53,6 @@ export default async function GamePlayPage({ params }: Props) {
     >
       <AppTopNav
         title={t(game.titleKey)}
-        subtitle={t("games.subtitle")}
         sticky
         actions={
           <Link
@@ -65,7 +64,10 @@ export default async function GamePlayPage({ params }: Props) {
         }
       />
       <div className="mx-auto max-w-5xl min-w-0 px-4 py-8 sm:px-5 md:px-8">
-        <h2 className="mb-4 text-2xl font-black tracking-tight">{t(game.titleKey)}</h2>
+        <h2 className="text-2xl font-black tracking-tight">{t(game.titleKey)}</h2>
+        <p className="mb-4 mt-2 text-sm leading-7 text-white/55" data-games-subtitle="true">
+          {t("games.subtitle")}
+        </p>
         <GamePlayClient slug={slug} />
       </div>
     </main>
