@@ -12,6 +12,7 @@ import {
   GAMES_BEST_STORAGE_KEY,
   parseBestMap,
 } from "../../lib/games/play/scores";
+import GameArt from "./play/GameArt";
 import "./play/games-play.css";
 
 function subscribeBests(onChange: () => void) {
@@ -38,24 +39,30 @@ export default function GamesCatalog() {
       <p className="um-play-card-kicker">{t("games.catalogEyebrow")}</p>
       <h1 className="mt-2 text-3xl font-black tracking-tight">{t("games.title")}</h1>
       <p className="mt-3 mb-6 text-sm leading-7 text-white/55">{t("games.subtitle")}</p>
-      <ul className="um-play-catalog">
+      <ul className="um-play-catalog" data-catalog-grid="true">
         {PLAYABLE_GAMES.map((game) => {
           const best = bests[game.slug];
           return (
             <li key={game.slug}>
-              <Link href={gamesPlayPath(game.slug)} className="um-play-card" data-game-card={game.slug}>
-                <h2>{t(game.titleKey)}</h2>
-                <p>{t(game.blurbKey)}</p>
-                <div className="um-play-card-meta">
-                  <span className="um-play-card-best">
+              <Link
+                href={gamesPlayPath(game.slug)}
+                className="um-play-card"
+                data-game-card={game.slug}
+              >
+                <span className="um-play-card-art" aria-hidden="true" dir="ltr">
+                  <GameArt slug={game.slug} />
+                </span>
+                <span className="um-play-card-copy">
+                  <h2>{t(game.titleKey)}</h2>
+                  <p>{t(game.blurbKey)}</p>
+                  <span className="um-play-card-best" data-game-best={game.slug}>
                     {typeof best === "number"
                       ? t("games.localBest", {
                           values: { score: formatPlayNumber(locale, best) },
                         })
                       : t("games.localBestEmpty")}
                   </span>
-                  <span className="um-play-card-cta">{t("games.play")}</span>
-                </div>
+                </span>
               </Link>
             </li>
           );

@@ -45,4 +45,16 @@ describe("playable games catalog", () => {
     expect(sitemap).not.toMatch(/\/games\/\[slug\]/);
     expect(sitemap).not.toMatch(/gamesPlayPath/);
   });
+
+  it("uses original inline SVG tiles with no third-party artwork", () => {
+    const art = readFileSync(join(ROOT, "app/games/play/GameArt.tsx"), "utf8");
+    const withoutXmlns = art.replaceAll('xmlns="http://www.w3.org/2000/svg"', "");
+    expect(withoutXmlns).not.toMatch(/https?:\/\//);
+    expect(art).not.toMatch(/<image\b/);
+    expect(art).not.toMatch(/xlink:href|href=["']data:/);
+    expect(art).not.toMatch(/unsplash|shutterstock|midjourney|dall-e|openai|stable diffusion/i);
+    for (const slug of PLAYABLE_GAME_SLUGS) {
+      expect(art).toMatch(new RegExp(`\\b${slug}:`));
+    }
+  });
 });
