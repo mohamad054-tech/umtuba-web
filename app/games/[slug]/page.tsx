@@ -47,9 +47,13 @@ export default async function GamePlayPage({ params }: Props) {
   const game = getPlayableGame(slug);
   if (!game) notFound();
 
+  const fit = slug === "solitaire";
+
   return (
     <main
-      className={`um-games-shell relative min-h-screen text-white ${MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS}`}
+      className={`um-games-shell relative text-white ${
+        fit ? "um-game-fit" : "min-h-screen"
+      } ${MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS}`}
     >
       <AppTopNav
         title={t(game.titleKey)}
@@ -63,9 +67,24 @@ export default async function GamePlayPage({ params }: Props) {
           </Link>
         }
       />
-      <div className="mx-auto max-w-5xl min-w-0 px-4 py-8 sm:px-5 md:px-8">
-        <h2 className="text-2xl font-black tracking-tight">{t(game.titleKey)}</h2>
-        <p className="mb-4 mt-2 text-sm leading-7 text-white/55" data-games-subtitle="true">
+      <div
+        className={
+          fit
+            ? "um-game-fit-body mx-auto w-full max-w-5xl min-w-0 px-3 sm:px-5"
+            : "mx-auto max-w-5xl min-w-0 px-4 py-8 sm:px-5 md:px-8"
+        }
+      >
+        <h2 className={fit ? "text-lg font-black tracking-tight" : "text-2xl font-black tracking-tight"}>
+          {t(game.titleKey)}
+        </h2>
+        <p
+          className={
+            fit
+              ? "mb-1 mt-0.5 text-xs leading-5 text-white/55"
+              : "mb-4 mt-2 text-sm leading-7 text-white/55"
+          }
+          data-games-subtitle="true"
+        >
           {t("games.subtitle")}
         </p>
         <GamePlayClient slug={slug} />

@@ -46,16 +46,18 @@ export function PlayPanel({
   stats,
   helpOpen = false,
   onToggleHelp,
+  fill = false,
   children,
 }: {
   stats: ReactNode;
   helpOpen?: boolean;
   onToggleHelp?: () => void;
+  fill?: boolean;
   children: ReactNode;
 }) {
   const { t } = useI18n();
   return (
-    <div className="um-play-panel" data-game-mounted="true">
+    <div className={`um-play-panel${fill ? " fit" : ""}`} data-game-mounted="true">
       <div className="um-play-bar">
         {stats}
         <div className="um-play-grow" />

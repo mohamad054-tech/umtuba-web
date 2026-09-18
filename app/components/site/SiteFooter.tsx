@@ -44,7 +44,7 @@ export default function SiteFooter() {
   const pathname = usePathname() || "/";
   const { t } = useI18n();
 
-  if (!isPublicFooterPath(pathname)) {
+  if (!isPublicFooterPath(pathname) || pathname.startsWith("/games/")) {
     return null;
   }
 

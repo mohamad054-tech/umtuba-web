@@ -117,6 +117,34 @@ export function dealKlondikeLegalOpen(): KlondikeState {
   };
 }
 
+/** 13 face-up cards on one pile so viewport layout can be tested. */
+export function dealKlondikeLongPile(): KlondikeState {
+  const deck = createKlondikeDeck();
+  const long = deck
+    .filter((card) => card.suit === "H")
+    .map((card) => ({ ...card, up: true }));
+  const rest = deck.filter((card) => card.suit !== "H");
+  const tableau: KlondikeCard[][] = [
+    [{ ...rest[0]!, up: true }],
+    [
+      { ...rest[1]!, up: false },
+      { ...rest[2]!, up: true },
+    ],
+    [{ ...rest[3]!, up: true }],
+    long,
+    [{ ...rest[4]!, up: true }],
+    [{ ...rest[5]!, up: true }],
+    [{ ...rest[6]!, up: true }],
+  ];
+  const used = new Set(tableau.flat().map((card) => card.id));
+  return {
+    tableau,
+    foundations: [[], [], [], []],
+    stock: deck.filter((card) => !used.has(card.id)).map((card) => ({ ...card, up: false })),
+    waste: [],
+  };
+}
+
 export function klondikeTableauCanPlace(
   moving: Pick<KlondikeCard, "suit" | "rank">,
   destTop?: Pick<KlondikeCard, "suit" | "rank">

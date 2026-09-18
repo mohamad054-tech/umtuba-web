@@ -189,6 +189,56 @@
   overflow: visible;
 }
 
+html:has(.um-game-fit),
+body:has(.um-game-fit) {
+  height: 100%;
+  max-height: 100dvh;
+  overflow: hidden;
+}
+
+.um-game-fit {
+  height: 100dvh;
+  max-height: 100dvh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.um-game-fit-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+.um-game-fit .um-play-root,
+.um-play-panel.fit {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.um-play-panel.fit {
+  overflow: hidden;
+}
+
+.um-play-panel.fit .um-play-bar {
+  flex-shrink: 0;
+  padding: 8px 12px;
+}
+
+.um-play-panel.fit .um-play-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 8px 10px;
+}
+
 .um-play-bar {
   display: flex;
   align-items: center;
@@ -926,16 +976,29 @@
   border-radius: 3px;
 }
 
+.um-klondike-shell {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
 .um-klondike {
   --um-k-peek-down: 12px;
   --um-k-peek-up: 38px;
+  --um-k-card-w: 72px;
+  --um-k-card-h: 100.8px;
+  flex: 1;
+  min-height: 0;
   display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
   gap: 8px;
   width: 100%;
   max-width: 100%;
   min-width: 0;
   box-sizing: border-box;
-  overflow: visible;
+  overflow: hidden;
 }
 
 .um-klondike-row {
@@ -950,6 +1013,9 @@
 .um-kslot,
 .um-ktableau {
   position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   min-width: 0;
   max-width: 100%;
 }
@@ -966,7 +1032,7 @@
   position: relative;
   z-index: 6;
   justify-content: center;
-  margin-top: 16px;
+  margin-top: 0;
   flex-shrink: 0;
 }
 
@@ -974,9 +1040,9 @@
 .um-kcard {
   display: block;
   position: relative;
-  width: 100%;
+  width: var(--um-k-card-w, 100%);
   max-width: 100%;
-  height: auto;
+  height: var(--um-k-card-h, auto);
   min-height: 0;
   aspect-ratio: 5 / 7;
   padding: 0;
@@ -996,10 +1062,11 @@
 
 .um-ktableau-hit {
   position: absolute;
-  inset: 0 0 auto;
-  width: 100%;
-  height: auto;
-  aspect-ratio: 5 / 7;
+  inset-inline: 0;
+  top: 0;
+  width: var(--um-k-card-w);
+  height: var(--um-k-card-h);
+  margin-inline: auto;
   z-index: 0;
 }
 
@@ -1011,8 +1078,9 @@
   position: relative;
   left: auto;
   right: auto;
-  width: 100%;
-  margin-top: calc(var(--um-k-peek, var(--um-k-peek-up)) - (100% * 7 / 5));
+  width: var(--um-k-card-w);
+  height: var(--um-k-card-h);
+  margin-top: calc(var(--um-k-peek, var(--um-k-peek-up)) - var(--um-k-card-h));
 }
 
 .um-kcard.stacked.lead {
@@ -1067,7 +1135,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  font-size: clamp(0.95rem, 2.8vw, 1.25rem);
+  font-size: clamp(0.55rem, calc(var(--um-k-card-h) * 0.145), 1.05rem);
   font-weight: 800;
   line-height: 1;
   direction: ltr;
@@ -1102,7 +1170,7 @@
   display: grid;
   place-items: center;
   height: 100%;
-  font-size: clamp(1.5rem, 4.6vw, 2.2rem);
+  font-size: clamp(0.7rem, calc(var(--um-k-card-h) * 0.28), 1.6rem);
   line-height: 1;
 }
 
@@ -1110,7 +1178,8 @@
 .um-kslot-suit {
   display: grid;
   place-items: center;
-  height: 100%;
+  width: var(--um-k-card-w, 100%);
+  height: var(--um-k-card-h, 100%);
   color: var(--um-gold-dim);
   font-size: clamp(1.1rem, 3vw, 1.6rem);
   font-weight: 500;

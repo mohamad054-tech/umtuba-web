@@ -4,6 +4,7 @@ import {
   createKlondikeDeck,
   dealKlondike,
   dealKlondikeLegalOpen,
+  dealKlondikeLongPile,
   klondikeAllCards,
   klondikeDraw,
   klondikeFoundationCanPlace,
@@ -11,6 +12,7 @@ import {
   klondikeTableauCanPlace,
   klondikeTryMove,
 } from "./klondike";
+import { KLONDIKE_PEEK_UP_MIN, klondikePileMetrics } from "./klondikeLayout";
 
 describe("klondike rules", () => {
   it("prints only Latin poker ranks", () => {
@@ -79,5 +81,22 @@ describe("klondike rules", () => {
     );
     expect(illegal.ok).toBe(false);
     expect(illegal.next.tableau[0]?.[0]?.id).toBe("H-6");
+  });
+
+  it("seeds a 13-card face-up pile without losing cards", () => {
+    const state = dealKlondikeLongPile();
+    expect(state.tableau[3]).toHaveLength(13);
+    expect(state.tableau[3]?.every((card) => card.up)).toBe(true);
+    expect(new Set(klondikeAllCards(state).map((card) => card.id)).size).toBe(52);
+  });
+});
+
+describe("klondike layout", () => {
+  it("keeps a 19-card pile inside the board at 25% minimum peek", () => {
+    const piles = [Array.from({ length: 19 }, () => ({ up: true }))];
+    const layout = klondikePileMetrics(piles, 980, 420);
+    const tallest = layout.cardH + 18 * layout.peekUp;
+    expect(layout.cardH + 8 + tallest).toBeLessThanOrEqual(420 + 1);
+    expect(layout.peekUp / layout.cardH).toBeGreaterThanOrEqual(KLONDIKE_PEEK_UP_MIN - 0.001);
   });
 });

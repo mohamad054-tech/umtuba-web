@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { useI18n } from "../../components/i18n";
 import {
   createPlaySfx,
@@ -14,6 +14,7 @@ import {
   createKlondikeDeck,
   dealKlondike,
   dealKlondikeLegalOpen,
+  dealKlondikeLongPile,
   klondikeAutoFoundation,
   klondikeColor,
   klondikeDraw,
@@ -26,6 +27,7 @@ import {
   type KlondikeSel,
   type KlondikeState,
 } from "../../../lib/games/play/klondike";
+import { klondikePileMetrics } from "../../../lib/games/play/klondikeLayout";
 import { writeBestIfHigher } from "../../../lib/games/play/scores";
 import {
   PlayHowTo,
@@ -36,8 +38,8 @@ import {
 } from "./PlayChrome";
 
 function readFixtureDeal() {
-  if (typeof window === "undefined") return false;
-  return window.sessionStorage.getItem("umtuba.klondike.deal") === "legal-open";
+  if (typeof window === "undefined") return "";
+  return window.sessionStorage.getItem("umtuba.klondike.deal") ?? "";
 }
 
 function sameSel(a: KlondikeSel | null, b: KlondikeSel): boolean {
@@ -60,15 +62,13 @@ function cardSelected(sel: KlondikeSel | null, zone: KlondikeSel): boolean {
   return false;
 }
 
-const PEEK_DOWN_PX = 12;
-const PEEK_UP_PX = 38;
-
 function PlayingCard({
   card,
   selected,
   stacked = false,
   lead = false,
   peek = 0,
+  peekKind,
   stackIndex = 0,
   onPress,
 }: {
@@ -77,6 +77,7 @@ function PlayingCard({
   stacked?: boolean;
   lead?: boolean;
   peek?: number;
+  peekKind?: "lead" | "up" | "down";
   stackIndex?: number;
   onPress: () => void;
 }) {
@@ -102,7 +103,7 @@ function PlayingCard({
       data-play-item="true"
       data-kcard={card.id}
       data-up={card.up ? "true" : "false"}
-      data-k-peek={stacked ? (lead ? "lead" : peek === PEEK_UP_PX ? "up" : "down") : undefined}
+      data-k-peek={stacked ? peekKind : undefined}
       {...(card.up
         ? {
             "data-suit": card.suit,
@@ -157,11 +158,34 @@ export default function SolitaireGame() {
   const [lastMove, setLastMove] = useState<"ok" | "no" | "none">("none");
   const lastTap = useRef<{ key: string; at: number }>({ key: "", at: 0 });
   const clock = useMemo(() => createPlayStopwatch(setElapsed), []);
+  const [boardBox, setBoardBox] = useState({ w: 720, h: 420 });
+  const boardObserver = useRef<ResizeObserver | null>(null);
+  const bindBoard = useCallback((node: HTMLDivElement | null) => {
+    boardObserver.current?.disconnect();
+    boardObserver.current = null;
+    if (!node) return;
+    const update = () => {
+      const rect = node.getBoundingClientRect();
+      setBoardBox({ w: rect.width, h: rect.height });
+    };
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(node);
+    boardObserver.current = observer;
+  }, []);
+  const layout = useMemo(
+    () => klondikePileMetrics(state.tableau, boardBox.w, boardBox.h),
+    [state.tableau, boardBox.w, boardBox.h]
+  );
 
   const deal = () => {
-    const next = readFixtureDeal()
-      ? dealKlondikeLegalOpen()
-      : dealKlondike(shuffled(createKlondikeDeck()));
+    const fixture = readFixtureDeal();
+    const next =
+      fixture === "legal-open"
+        ? dealKlondikeLegalOpen()
+        : fixture === "long-pile"
+          ? dealKlondikeLongPile()
+          : dealKlondike(shuffled(createKlondikeDeck()));
     setState(next);
     setSel(null);
     setHistory([]);
@@ -283,6 +307,7 @@ export default function SolitaireGame() {
 
   return (
     <PlayPanel
+      fill
       stats={
         <>
           <PlayStat label={t("games.moves")} value={formatPlayNumber(locale, moves)} />
@@ -299,12 +324,22 @@ export default function SolitaireGame() {
         onDismiss={begin}
       />
       {help.ready ? (
-        <>
+        <div className="um-klondike-shell">
           <div
+            ref={bindBoard}
             className="um-klondike"
             dir="ltr"
             data-klondike-board="true"
             data-last-move={lastMove}
+            data-k-card-h={layout.cardH.toFixed(2)}
+            data-k-peek-up={layout.peekUp.toFixed(2)}
+            data-k-peek-down={layout.peekDown.toFixed(2)}
+            style={{
+              ["--um-k-card-w" as string]: `${layout.cardW}px`,
+              ["--um-k-card-h" as string]: `${layout.cardH}px`,
+              ["--um-k-peek-up" as string]: `${layout.peekUp}px`,
+              ["--um-k-peek-down" as string]: `${layout.peekDown}px`,
+            }}
           >
             <div className="um-klondike-row top">
               <div className="um-kslot" data-kslot="stock">
@@ -395,7 +430,7 @@ export default function SolitaireGame() {
                   />
                   {pile.map((card, index) => {
                     const prev = pile[index - 1];
-                    const peek = index === 0 ? 0 : prev?.up ? PEEK_UP_PX : PEEK_DOWN_PX;
+                    const peek = index === 0 ? 0 : prev?.up ? layout.peekUp : layout.peekDown;
                     return (
                       <PlayingCard
                         key={card.id}
@@ -403,6 +438,7 @@ export default function SolitaireGame() {
                         stacked
                         lead={index === 0}
                         peek={peek}
+                        peekKind={index === 0 ? "lead" : prev?.up ? "up" : "down"}
                         stackIndex={index}
                         selected={cardSelected(sel, { zone: "tableau", pile: pileIndex, index })}
                         onPress={() => {
@@ -450,7 +486,7 @@ export default function SolitaireGame() {
               {t("games.toFoundation")}
             </button>
           </div>
-        </>
+        </div>
       ) : null}
     </PlayPanel>
   );
