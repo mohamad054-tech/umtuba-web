@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>UMTUBA — ألعاب التعليم</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --field:#0C2723; --surface:#14352F; --raise:#1B443C; --line:#255A50;
+  --ink:#EAF2EE; --muted:#8FB3AA; --gold:#F0A93B; --gold-dim:#9A6E22;
+  --clay:#D46A5E; --mint:#5FCBA4; --r:14px; --pad:clamp(14px,3.5vw,26px);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--field);color:var(--ink);
+  font-family:"IBM Plex Sans Arabic",system-ui,sans-serif;line-height:1.65;
+  -webkit-font-smoothing:antialiased;padding:var(--pad);display:flex;justify-content:center}
+.app{width:100%;max-width:760px}
+.masthead{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.mark{font-weight:700;font-size:clamp(21px,4.6vw,27px);letter-spacing:-.015em}
+.mark span{color:var(--gold)}
+.sub{color:var(--muted);font-size:14px;font-weight:300}
+.rule{height:1px;background:var(--line);margin:18px 0 20px}
+.surfaces{display:flex;gap:8px;flex-wrap:wrap}
+.surf{background:transparent;border:1px solid var(--line);color:var(--muted);font:inherit;
+  font-size:14px;font-weight:500;padding:8px 15px;border-radius:999px;cursor:pointer;
+  transition:color .15s,border-color .15s,background .15s}
+.surf:hover{color:var(--ink);border-color:var(--gold-dim)}
+.surf[aria-selected="true"]{background:var(--gold);border-color:var(--gold);color:#14261C;font-weight:600}
+.surf:focus-visible{outline:2px solid var(--mint);outline-offset:3px}
+.where{color:var(--muted);font-size:13px;font-weight:300;margin:12px 0 20px}
+.where b{color:var(--ink);font-weight:600}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.bar{display:flex;align-items:center;gap:14px;padding:13px 16px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.stat{display:flex;flex-direction:column;line-height:1.25}
+.stat .k{font-size:11px;color:var(--muted);font-weight:300}
+.stat .v{font-size:17px;font-weight:600;font-variant-numeric:tabular-nums}
+.stat .v.warn{color:var(--clay)}
+.grow{flex:1}
+.strand{height:3px;background:var(--raise);position:relative;overflow:hidden}
+.strand i{position:absolute;inset-block:0;inset-inline-start:0;background:var(--gold);width:0;transition:width .25s linear}
+.strand i.tight{background:var(--clay)}
+.body{padding:clamp(16px,4vw,24px)}
+button.btn{font:inherit;font-weight:600;font-size:15px;border-radius:10px;cursor:pointer;
+  padding:11px 20px;border:1px solid var(--line);background:var(--raise);color:var(--ink)}
+button.btn:hover:not(:disabled){border-color:var(--gold-dim)}
+button.btn.go{background:var(--gold);border-color:var(--gold);color:#14261C}
+button.btn.go:hover:not(:disabled){background:#F6B64F}
+button.btn:focus-visible{outline:2px solid var(--mint);outline-offset:3px}
+button.btn:disabled{opacity:.4;cursor:not-allowed}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+.qnum{font-size:12px;color:var(--muted);font-weight:300;margin-bottom:8px}
+.qtext{font-size:clamp(16px,3.4vw,20px);font-weight:600;line-height:1.5;margin-bottom:16px}
+.choices{display:flex;flex-direction:column;gap:9px}
+.choice{font:inherit;font-size:15px;text-align:start;cursor:pointer;background:var(--raise);
+  border:1px solid var(--line);color:var(--ink);border-radius:11px;padding:13px 15px;
+  display:flex;align-items:center;gap:12px}
+.choice:hover:not(:disabled){border-color:var(--gold-dim)}
+.choice:focus-visible{outline:2px solid var(--mint);outline-offset:2px}
+.choice .tag{width:26px;height:26px;flex:none;border-radius:7px;background:var(--surface);
+  border:1px solid var(--line);display:grid;place-items:center;font-size:13px;font-weight:600;color:var(--muted)}
+.choice.right{border-color:var(--mint);background:rgba(95,203,164,.13)}
+.choice.wrong{border-color:var(--clay);background:rgba(212,106,94,.13)}
+.choice.sel{border-color:var(--gold);background:rgba(240,169,59,.12)}
+.choice.done{border-color:var(--mint);opacity:.85}
+.choice:disabled{cursor:default}
+.why{margin-top:16px;padding:14px 16px;border-radius:11px;background:var(--field);
+  border:1px solid var(--line);font-size:14.5px;line-height:1.7}
+.why .lead{font-weight:600;display:block;margin-bottom:3px}
+.why.ok .lead{color:var(--mint)}
+.why.no .lead{color:var(--clay)}
+.sortlist{display:flex;flex-direction:column;gap:8px}
+.step{font:inherit;text-align:start;cursor:pointer;background:var(--raise);border:1px solid var(--line);
+  color:var(--ink);border-radius:11px;padding:12px 14px;display:flex;align-items:center;gap:12px}
+.step:hover:not(:disabled){border-color:var(--gold-dim)}
+.step:focus-visible{outline:2px solid var(--mint);outline-offset:2px}
+.step.sel{border-color:var(--gold);background:rgba(240,169,59,.12)}
+.step .n{width:26px;height:26px;border-radius:7px;background:var(--surface);border:1px solid var(--line);
+  display:grid;place-items:center;font-weight:600;font-size:13px;color:var(--muted);flex:none}
+.matchgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:420px){.matchgrid{grid-template-columns:1fr}}
+.enword{font-size:clamp(22px,6vw,32px);font-weight:700;text-align:center;margin:8px 0 18px;color:var(--gold)}
+.result{text-align:center;padding:24px 0 6px}
+.score{font-size:clamp(38px,10vw,56px);font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
+.score small{font-size:.42em;font-weight:400;color:var(--muted)}
+.verdict{font-size:18px;font-weight:600;margin-top:12px}
+.detail{color:var(--muted);font-size:14px;font-weight:300;margin-top:6px}
+.board-list{margin-top:20px;text-align:start;border-top:1px solid var(--line)}
+.board-list .li{display:flex;gap:12px;align-items:center;padding:10px 2px;border-bottom:1px solid var(--line);font-size:14px}
+.board-list .rk{width:22px;color:var(--muted);font-weight:600;font-variant-numeric:tabular-nums}
+.board-list .nm{flex:1}
+.board-list .pt{font-weight:600;font-variant-numeric:tabular-nums}
+.board-list .li.you,.board-list .li.you .rk{color:var(--gold)}
+.note{color:var(--muted);font-size:13px;font-weight:300;margin-top:26px;line-height:1.8}
+@media (prefers-reduced-motion:reduce){*{transition:none !important}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="masthead">
+    <div class="mark">UM<span>TUBA</span> — التعليم</div>
+    <div class="sub">خمس ألعاب درس على نفس المحرك</div>
+  </header>
+  <div class="rule"></div>
+  <div class="surfaces" role="tablist" aria-label="ألعاب التعليم">
+    <button class="surf" role="tab" aria-selected="true" data-g="quick-q">سؤال سريع</button>
+    <button class="surf" role="tab" aria-selected="false" data-g="order-steps">ترتيب الخطوات</button>
+    <button class="surf" role="tab" aria-selected="false" data-g="match-term">وصّل المصطلح</button>
+    <button class="surf" role="tab" aria-selected="false" data-g="vocab">تحدي المفردات</button>
+    <button class="surf" role="tab" aria-selected="false" data-g="fill-blank">أكمل الجملة</button>
+  </div>
+  <p class="where" id="where"></p>
+  <main id="stage"></main>
+  <p class="note">محتوى الدرس تجريبي. عند الربط تُستبدل الأسئلة من كتالوج التعليم.</p>
+</div>
+<script>
+"use strict";
+
+const UM = (() => {
+  const memory = new Map();
+  const store = {
+    async get(k){ return memory.has(k) ? memory.get(k) : null; },
+    async set(k,v){ memory.set(k,v); return v; }
+  };
+  const strings = {
+    ar:{
+      score:"النقاط", time:"الوقت", streak:"متتالية", mistakes:"أخطاء",
+      question:"سؤال", of:"من", start:"ابدأ", again:"العب مرة ثانية",
+      next:"التالي", results:"النتيجة", correct:"إجابة صحيحة",
+      wrong:"إجابة خاطئة", timeout:"انتهى الوقت", point:"نقطة",
+      leaders:"المتصدّرون", you:"أنت", hint:"تلميح", newGame:"لعبة جديدة",
+      solved:"انحلّت", perfect:"علامة كاملة", good:"شغل ممتاز",
+      okay:"نتيجة مقبولة", weak:"محتاج مراجعة", left:"باقي",
+      confirm:"تأكيد", tapSwap:"اضغط خطوتين للتبديل", term:"المصطلح", def:"التعريف"
+    },
+    en:{
+      score:"Score", time:"Time", streak:"Streak", mistakes:"Mistakes",
+      question:"Question", of:"of", start:"Start", again:"Play again",
+      next:"Next", results:"Results", correct:"Correct",
+      wrong:"Incorrect", timeout:"Time's up", point:"pt",
+      leaders:"Leaderboard", you:"You", hint:"Hint", newGame:"New game",
+      solved:"Solved", perfect:"Perfect score", good:"Well done",
+      okay:"Decent result", weak:"Needs review", left:"left",
+      confirm:"Confirm", tapSwap:"Tap two steps to swap", term:"Term", def:"Definition"
+    }
+  };
+  let lang = "ar";
+  const t = k => (strings[lang] && strings[lang][k]) || strings.ar[k] || k;
+  const rtl = () => ["ar","fa","ur","he"].includes(lang);
+  const num = n => lang === "ar" ? String(n).replace(/\d/g, d => "٠١٢٣٤٥٦٧٨٩"[d]) : String(n);
+  const clock = s => num(Math.floor(s/60)) + ":" + num(String(s%60).padStart(2,"0"));
+  let ac = null;
+  function tone(freq, ms, type="sine", vol=.06){
+    try{
+      ac = ac || new (window.AudioContext||window.webkitAudioContext)();
+      const o = ac.createOscillator(), g = ac.createGain();
+      o.type = type; o.frequency.value = freq;
+      g.gain.setValueAtTime(vol, ac.currentTime);
+      g.gain.exponentialRampToValueAtTime(.0001, ac.currentTime + ms/1000);
+      o.connect(g); g.connect(ac.destination);
+      o.start(); o.stop(ac.currentTime + ms/1000);
+    }catch(e){}
+  }
+  const sfx = {
+    ok:   () => { tone(660,90); setTimeout(()=>tone(880,130),75); },
+    no:   () => tone(180,200,"square",.05),
+    tick: () => tone(440,40,"triangle",.03),
+    win:  () => [0,110,220,380].forEach((d,i)=>setTimeout(()=>tone([523,659,784,1047][i],220),d))
+  };
+  async function submit(gameId, points){
+    const key = "lb:" + gameId;
+    const rows = (await store.get(key)) || seedBoard();
+    const mine = rows.find(r => r.me);
+    if (mine) mine.points = Math.max(mine.points, points);
+    else rows.push({ name: t("you"), points, me: true });
+    rows.sort((a,b) => b.points - a.points);
+    await store.set(key, rows);
+    return rows.slice(0, 5);
+  }
+  function seedBoard(){
+    return ["ليان","مهند","سلمى","يوسف","رنا"].map((n,i)=>({name:n,points:540-i*(36+i*8)}));
+  }
+  function timer(seconds, onTick, onEnd){
+    let left = seconds, id = null;
+    const step = () => { left--; onTick(left); if (left <= 0){ stop(); onEnd(); } };
+    const start = () => { stop(); onTick(left); id = setInterval(step, 1000); };
+    const stop  = () => { if (id) clearInterval(id); id = null; };
+    return { start, stop, get left(){ return left; }, set left(v){ left = v; } };
+  }
+  function stopwatch(onTick){
+    let s = 0, id = null;
+    return {
+      start(){ this.stop(); id = setInterval(()=>{ s++; onTick(s); },1000); },
+      stop(){ if(id) clearInterval(id); id = null; },
+      get elapsed(){ return s; }
+    };
+  }
+  function el(tag, cls, html){
+    const n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (html != null) n.innerHTML = html;
+    return n;
+  }
+  const registry = new Map();
+  return { store, t, num, clock, sfx, submit, timer, stopwatch, el,
+           register:(id,d)=>registry.set(id,d), get:id=>registry.get(id),
+           rtl, get lang(){ return lang; }, set lang(v){ lang = v; } };
+})();
+
+function stat(k,v){
+  const n=UM.el("div","stat");
+  n.append(UM.el("span","k",k),UM.el("span","v",v));
+  return { node:n, set:x=>n.querySelector(".v").textContent=x,
+           warn:on=>n.querySelector(".v").classList.toggle("warn",on) };
+}
+async function board(id,pts){
+  const rows=await UM.submit(id,pts), w=UM.el("div","board-list");
+  const h=UM.el("div","qnum",UM.t("leaders")); h.style.paddingTop="10px"; w.append(h);
+  rows.forEach((r,i)=>{
+    const li=UM.el("div","li"+(r.me?" you":""));
+    li.append(UM.el("span","rk",UM.num(i+1)),UM.el("span","nm",r.name),
+              UM.el("span","pt",UM.num(r.points)));
+    w.append(li);
+  });
+  return w;
+}
+const shuffle=a=>a.slice().sort(()=>Math.random()-.5);
+const TAGS=["أ","ب","ج","د"];
+
+function quizShell(root, sec){
+  const panel=UM.el("div","panel"), bar=UM.el("div","bar");
+  const sc=stat(UM.t("score"),UM.num(0)), st=stat(UM.t("streak"),UM.num(0));
+  const tm=stat(UM.t("time"), UM.num(sec));
+  bar.append(sc.node, st.node, UM.el("div","grow"), tm.node);
+  const strand=UM.el("div","strand"), fill=UM.el("i"); strand.append(fill);
+  const body=UM.el("div","body");
+  panel.append(bar,strand,body); root.append(panel);
+  return { body, sc, st, tm, fill };
+}
+function resultScreen(ui, id, score, right, total, best, onAgain, extra){
+  const pct=Math.round(right/total*100);
+  const v=pct===100?UM.t("perfect"):pct>=75?UM.t("good"):pct>=50?UM.t("okay"):UM.t("weak");
+  if(pct>=75) UM.sfx.win();
+  ui.body.innerHTML="";
+  const res=UM.el("div","result");
+  res.append(UM.el("div","score",`${UM.num(score)}<small> ${UM.t("point")}</small>`),
+             UM.el("div","verdict",v),
+             UM.el("div","detail", extra || `${UM.num(right)} ${UM.t("of")} ${UM.num(total)} · ${UM.t("streak")} ${UM.num(best)}`));
+  ui.body.append(res);
+  return board(id,score).then(b=>{
+    ui.body.append(b);
+    const r=UM.el("div","row"); r.style.justifyContent="center";
+    const ag=UM.el("button","btn go",UM.t("again"));
+    ag.onclick=onAgain; r.append(ag); ui.body.append(r);
+  });
+}
+
+const QUICK = [
+  { q:"ما عاصمة السعودية؟", a:0, c:["الرياض","جدّة","الدمام","مكة"], w:"الرياض هي العاصمة الإدارية." },
+  { q:"كم ضلع للمثلث؟", a:2, c:["٢","٥","٣","٤"], w:"المثلث له ثلاثة أضلاع." },
+  { q:"أي كوكب أقرب للشمس؟", a:1, c:["الزهرة","عطارد","الأرض","المريخ"], w:"عطارد هو الأقرب." },
+  { q:"لغة HTML تُستخدم لـ", a:0, c:["بناء صفحات الويب","الرسم ثلاثي الأبعاد","قواعد البيانات","الصوت"], w:"HTML هي هيكل الصفحة." },
+  { q:"١ كيلومتر كم متر؟", a:3, c:["١٠","١٠٠","٥٠٠","١٠٠٠"], w:"الكيلومتر ألف متر." },
+  { q:"أين يقع نهر النيل؟", a:1, c:["آسيا","أفريقيا","أوروبا","أمريكا"], w:"النيل يجري في أفريقيا." },
+  { q:"ما ناتج ٧ × ٨؟", a:2, c:["٥٤","٤٨","٥٦","٦٤"], w:"٧ × ٨ = ٥٦." },
+  { q:"أي غاز نتنفسه أساساً؟", a:0, c:["الأكسجين","الهيليوم","النيون","الأوزون"], w:"الأكسجين ضروري للتنفس." },
+  { q:"كم يوم في السنة الكبيسة؟", a:1, c:["٣٦٤","٣٦٦","٣٦٥","٣٦٠"], w:"السنة الكبيسة ٣٦٦ يوماً." },
+  { q:"أول حرف في الأبجدية العربية؟", a:0, c:["أ","ب","ت","ث"], w:"الألف هو الأول." },
+  { q:"وحدة قياس التيار الكهربائي؟", a:2, c:["فولت","واط","أمبير","أوم"], w:"الأمبير يقيس شدة التيار." },
+  { q:"أكبر محيط على الأرض؟", a:3, c:["الأطلسي","الهندي","المتجمد","الهادئ"], w:"المحيط الهادئ هو الأكبر." }
+];
+const STEPS = [
+  { title:"صنع الشاي", steps:["سخّن الماء","ضع الشاي في الإبريق","اسكب الماء","انتظر دقيقتين","قدّم الكأس"] },
+  { title:"نشر فيديو", steps:["صوّر المقطع","راجع الجودة","أضف العنوان","ارفع الملف","انشر"] },
+  { title:"غسل اليدين", steps:["بلّل اليدين","ضع الصابون","افرك ٢٠ ثانية","اشطف","نشّف"] }
+];
+const TERMS = [
+  { t:"الخوارزمية", d:"خطوات مرتّبة لحل مسألة" },
+  { t:"المتغيّر", d:"مكان في الذاكرة يحمل قيمة" },
+  { t:"البتّ", d:"أصغر وحدة معلومات رقمية" },
+  { t:"المتصفح", d:"برنامج لعرض صفحات الويب" },
+  { t:"كلمة المرور", d:"سرّ يدخل به الحساب" },
+  { t:"السحابة", d:"خوادم بعيدة تخزّن ملفاتك" }
+];
+const VOCAB = [
+  { en:"river", ar:"نهر", wrong:["جبل","صحراء","غابة"] },
+  { en:"market", ar:"سوق", wrong:["مدرسة","مطار","مكتبة"] },
+  { en:"teacher", ar:"معلّم", wrong:["طالب","طبيب","طاهٍ"] },
+  { en:"window", ar:"نافذة", wrong:["باب","سقف","جدار"] },
+  { en:"morning", ar:"صباح", wrong:["ليل","ظهر","أمس"] },
+  { en:"friend", ar:"صديق", wrong:["عدو","غريب","جار"] },
+  { en:"book", ar:"كتاب", wrong:["قلم","ورقة","طاولة"] },
+  { en:"water", ar:"ماء", wrong:["نار","هواء","تراب"] },
+  { en:"city", ar:"مدينة", wrong:["قرية","جزيرة","وادي"] },
+  { en:"fast", ar:"سريع", wrong:["بطيء","ثقيل","هادئ"] }
+];
+const BLANKS = [
+  { s:"الماء يغلي عند ___ درجة.", a:"١٠٠", o:["٩٠","١٠٠","٨٠","١٢٠"] },
+  { s:"الأرض تدور حول ___.", a:"الشمس", o:["القمر","المريخ","الشمس","زحل"] },
+  { s:"في الأسبوع ___ أيام.", a:"سبعة", o:["ستة","سبعة","ثمانية","خمسة"] },
+  { s:"لون السماء في النهار عادةً ___.", a:"أزرق", o:["أخضر","أزرق","ذهبي","أسود"] },
+  { s:"نكتب الكود في ملف ثم نقوم بـ ___.", a:"التشغيل", o:["الطبخ","التشغيل","السفر","النوم"] },
+  { s:"أم توبا منصة لـ ___ والفيديو.", a:"المشاركة", o:["المشاركة","الطبخ","الطيران","الزراعة"] },
+  { s:"بعد الشتاء يأتي فصل ___.", a:"الربيع", o:["الصيف","الخريف","الربيع","الشتاء"] },
+  { s:"الهاتف يحتاج إلى ___ ليعمل.", a:"طاقة", o:["ماء","طاقة","هواء","ملح"] }
+];
+
+UM.register("quick-q", {
+  title:"سؤال سريع",
+  blurb:"عشرة أسئلة بوقت لكل سؤال. السرعة تضيف نقاط.",
+  mount(root){
+    const ROUNDS=10, QS=12;
+    let deck=shuffle(QUICK).slice(0,ROUNDS), i=0, score=0, streak=0, best=0, right=0, locked=false;
+    const ui=quizShell(root, QS);
+    const clock=UM.timer(QS, left=>{
+      ui.tm.set(UM.num(Math.max(left,0)));
+      ui.fill.style.width=((QS-left)/QS*100)+"%";
+      ui.fill.classList.toggle("tight",left<=4);
+      ui.tm.warn(left<=4);
+      if(left<=4&&left>0) UM.sfx.tick();
+    }, ()=>answer(-1));
+    function draw(){
+      locked=false;
+      const Q=deck[i];
+      ui.body.innerHTML="";
+      ui.body.append(UM.el("div","qnum", `${UM.t("question")} ${UM.num(i+1)} ${UM.t("of")} ${UM.num(ROUNDS)}`));
+      ui.body.append(UM.el("div","qtext", Q.q));
+      const list=UM.el("div","choices");
+      Q.c.forEach((text,k)=>{
+        const b=UM.el("button","choice"); b.dataset.k=k;
+        b.append(UM.el("span","tag",TAGS[k]), UM.el("span","",text));
+        b.onclick=()=>answer(k);
+        list.append(b);
+      });
+      ui.body.append(list);
+      clock.left=QS; clock.start();
+    }
+    function answer(pick){
+      if(locked) return;
+      locked=true; clock.stop();
+      const Q=deck[i], hit=pick===Q.a;
+      [...ui.body.querySelectorAll(".choice")].forEach(b=>{
+        b.disabled=true;
+        if(+b.dataset.k===Q.a) b.classList.add("right");
+        else if(+b.dataset.k===pick) b.classList.add("wrong");
+      });
+      if(hit){ right++; streak++; best=Math.max(best,streak); score+=70+Math.round(clock.left*3); UM.sfx.ok(); }
+      else { streak=0; UM.sfx.no(); }
+      ui.sc.set(UM.num(score)); ui.st.set(UM.num(streak));
+      const w=UM.el("div","why "+(hit?"ok":"no"));
+      w.append(UM.el("span","lead", pick===-1?UM.t("timeout"):hit?UM.t("correct"):UM.t("wrong")),
+               UM.el("span","", Q.w));
+      ui.body.append(w);
+      const row=UM.el("div","row");
+      const nx=UM.el("button","btn go", i+1<ROUNDS?UM.t("next"):UM.t("results"));
+      nx.onclick=()=>{ i+1<ROUNDS?(i++,draw()):finish(); };
+      row.append(nx); ui.body.append(row); nx.focus();
+    }
+    async function finish(){
+      clock.stop();
+      await resultScreen(ui,"quick-q",score,right,ROUNDS,best,()=>{
+        deck=shuffle(QUICK).slice(0,ROUNDS); i=0;score=0;streak=0;best=0;right=0;
+        ui.sc.set(UM.num(0)); ui.st.set(UM.num(0)); draw();
+      });
+    }
+    draw();
+    return ()=>clock.stop();
+  }
+});
+
+UM.register("order-steps", {
+  title:"ترتيب الخطوات",
+  blurb:"خطوات عملية. رتّبها بالضغط للتبديل ثم أكّد.",
+  mount(root){
+    const ROUNDS=STEPS.length;
+    let i=0, score=0, streak=0, best=0, right=0, items=[], sel=null, done=false;
+    const ui=quizShell(root,0);
+    const watch=UM.stopwatch(s=>ui.tm.set(UM.clock(s)));
+    ui.fill.style.width="0";
+
+    function ok(){ return items.every((s,idx)=>s===STEPS[i].steps[idx]); }
+    function paint(){
+      ui.body.innerHTML="";
+      ui.body.append(UM.el("div","qnum", `${UM.t("question")} ${UM.num(i+1)} ${UM.t("of")} ${UM.num(ROUNDS)}`));
+      ui.body.append(UM.el("div","qtext", STEPS[i].title));
+      ui.body.append(UM.el("div","qnum", UM.t("tapSwap")));
+      const list=UM.el("div","sortlist");
+      items.forEach((text,idx)=>{
+        const b=UM.el("button","step"); if(sel===idx) b.classList.add("sel");
+        b.append(UM.el("span","n",UM.num(idx+1)), UM.el("span","",text));
+        b.onclick=()=>tap(idx);
+        list.append(b);
+      });
+      ui.body.append(list);
+      const row=UM.el("div","row");
+      const c=UM.el("button","btn go",UM.t("confirm"));
+      c.onclick=confirm; row.append(c); ui.body.append(row);
+    }
+    function tap(idx){
+      if(done) return;
+      if(sel===null){ sel=idx; paint(); return; }
+      if(sel===idx){ sel=null; paint(); return; }
+      const t=items[sel]; items[sel]=items[idx]; items[idx]=t;
+      sel=null; UM.sfx.ok(); paint();
+    }
+    function confirm(){
+      if(done) return;
+      done=true;
+      const hit=ok();
+      if(hit){ right++; streak++; best=Math.max(best,streak); score+=130; UM.sfx.ok(); }
+      else { streak=0; UM.sfx.no(); }
+      ui.sc.set(UM.num(score)); ui.st.set(UM.num(streak));
+      const w=UM.el("div","why "+(hit?"ok":"no"));
+      w.append(UM.el("span","lead", hit?UM.t("correct"):UM.t("wrong")),
+               UM.el("span","", STEPS[i].steps.map((s,n)=>UM.num(n+1)+". "+s).join(" · ")));
+      ui.body.append(w);
+      const row=UM.el("div","row");
+      const nx=UM.el("button","btn go", i+1<ROUNDS?UM.t("next"):UM.t("results"));
+      nx.onclick=()=>{ i+1<ROUNDS?(i++,deal()):finish(); };
+      row.append(nx); ui.body.append(row); nx.focus();
+    }
+    function deal(){
+      done=false; sel=null;
+      items=shuffle(STEPS[i].steps);
+      if(ok()) items=[items[1],items[0],...items.slice(2)];
+      paint();
+    }
+    async function finish(){
+      watch.stop();
+      await resultScreen(ui,"order-steps",score,right,ROUNDS,best,()=>{
+        i=0;score=0;streak=0;best=0;right=0; ui.sc.set(UM.num(0)); ui.st.set(UM.num(0));
+        watch.stop(); watch.start(); deal();
+      }, `${UM.num(right)} ${UM.t("of")} ${UM.num(ROUNDS)} · ${UM.t("time")} ${UM.clock(watch.elapsed)}`);
+    }
+    watch.start(); deal();
+    return ()=>watch.stop();
+  }
+});
+
+UM.register("match-term", {
+  title:"وصّل المصطلح",
+  blurb:"اختَر مصطلحاً ثم تعريفه. أربعة أزواج في كل جولة.",
+  mount(root){
+    let pairs=[], leftSel=null, matched=new Set(), misses=0, done=false;
+    const ui=quizShell(root,0);
+    const watch=UM.stopwatch(s=>ui.tm.set(UM.clock(s)));
+    ui.fill.style.width="0";
+
+    function deal(){
+      pairs=shuffle(TERMS).slice(0,4);
+      leftSel=null; matched=new Set(); misses=0; done=false;
+      ui.sc.set(UM.num(0)); ui.st.set(UM.num(0));
+      paint();
+    }
+    function paint(){
+      ui.body.innerHTML="";
+      ui.body.append(UM.el("div","qnum", `${UM.t("left")} ${UM.num(4-matched.size)}`));
+      ui.body.append(UM.el("div","qtext","وصّل كل مصطلح بتعريفه"));
+      const grid=UM.el("div","matchgrid");
+      const colA=UM.el("div","choices");
+      const colB=UM.el("div","choices");
+      pairs.forEach((p,k)=>{
+        const a=UM.el("button","choice"+(matched.has(p.t)?" done":leftSel===p.t?" sel":""));
+        a.append(UM.el("span","tag",TAGS[k]), UM.el("span","",p.t));
+        if(!matched.has(p.t)) a.onclick=()=>{ leftSel=p.t; paint(); };
+        else a.disabled=true;
+        colA.append(a);
+      });
+      shuffle(pairs.slice()).forEach(p=>{
+        const b=UM.el("button","choice"+(matched.has(p.t)?" done":""));
+        b.append(UM.el("span","",p.d));
+        if(!matched.has(p.t)) b.onclick=()=>pickDef(p.t);
+        else b.disabled=true;
+        colB.append(b);
+      });
+      grid.append(colA,colB); ui.body.append(grid);
+    }
+    function pickDef(term){
+      if(done || leftSel===null) return;
+      if(leftSel===term){
+        matched.add(term); leftSel=null; UM.sfx.ok();
+        ui.sc.set(UM.num(matched.size*40));
+        if(matched.size===4) finish();
+        else paint();
+      } else {
+        misses++; ui.st.set(UM.num(misses)); ui.st.warn(misses>=3); UM.sfx.no(); leftSel=null; paint();
+      }
+    }
+    async function finish(){
+      if(done) return;
+      done=true; watch.stop(); UM.sfx.win();
+      const score=Math.max(80, 400 - watch.elapsed*4 - misses*30);
+      await resultScreen(ui,"match-term",score,4-Math.min(misses,4),4,4-misses,()=>{
+        watch.stop(); watch.start(); deal();
+      }, `${UM.t("mistakes")} ${UM.num(misses)} · ${UM.t("time")} ${UM.clock(watch.elapsed)}`);
+    }
+    watch.start(); deal();
+    return ()=>watch.stop();
+  }
+});
+
+UM.register("vocab", {
+  title:"تحدي المفردات",
+  blurb:"كلمة إنجليزية. اختَر معناها العربي.",
+  mount(root){
+    const ROUNDS=8, QS=12;
+    let deck=shuffle(VOCAB).slice(0,ROUNDS), i=0, score=0, streak=0, best=0, right=0, locked=false;
+    const ui=quizShell(root, QS);
+    const clock=UM.timer(QS, left=>{
+      ui.tm.set(UM.num(Math.max(left,0)));
+      ui.fill.style.width=((QS-left)/QS*100)+"%";
+      ui.fill.classList.toggle("tight",left<=4);
+      ui.tm.warn(left<=4);
+      if(left<=4&&left>0) UM.sfx.tick();
+    }, ()=>answer(""));
+    function draw(){
+      locked=false;
+      const V=deck[i];
+      ui.body.innerHTML="";
+      ui.body.append(UM.el("div","qnum", `${UM.t("question")} ${UM.num(i+1)} ${UM.t("of")} ${UM.num(ROUNDS)}`));
+      ui.body.append(UM.el("div","enword", V.en));
+      const opts=shuffle([V.ar,...V.wrong]);
+      const list=UM.el("div","choices");
+      opts.forEach((text,k)=>{
+        const b=UM.el("button","choice"); b.dataset.t=text;
+        b.append(UM.el("span","tag",TAGS[k]), UM.el("span","",text));
+        b.onclick=()=>answer(text);
+        list.append(b);
+      });
+      ui.body.append(list);
+      clock.left=QS; clock.start();
+    }
+    function answer(pick){
+      if(locked) return;
+      locked=true; clock.stop();
+      const V=deck[i], hit=pick===V.ar;
+      [...ui.body.querySelectorAll(".choice")].forEach(b=>{
+        b.disabled=true;
+        if(b.dataset.t===V.ar) b.classList.add("right");
+        else if(b.dataset.t===pick) b.classList.add("wrong");
+      });
+      if(hit){ right++; streak++; best=Math.max(best,streak); score+=75+Math.round(clock.left*2); UM.sfx.ok(); }
+      else { streak=0; UM.sfx.no(); }
+      ui.sc.set(UM.num(score)); ui.st.set(UM.num(streak));
+      const w=UM.el("div","why "+(hit?"ok":"no"));
+      w.append(UM.el("span","lead", !pick?UM.t("timeout"):hit?UM.t("correct"):UM.t("wrong")),
+               UM.el("span","", V.en+" = "+V.ar));
+      ui.body.append(w);
+      const row=UM.el("div","row");
+      const nx=UM.el("button","btn go", i+1<ROUNDS?UM.t("next"):UM.t("results"));
+      nx.onclick=()=>{ i+1<ROUNDS?(i++,draw()):finish(); };
+      row.append(nx); ui.body.append(row); nx.focus();
+    }
+    async function finish(){
+      clock.stop();
+      await resultScreen(ui,"vocab",score,right,ROUNDS,best,()=>{
+        deck=shuffle(VOCAB).slice(0,ROUNDS); i=0;score=0;streak=0;best=0;right=0;
+        ui.sc.set(UM.num(0)); ui.st.set(UM.num(0)); draw();
+      });
+    }
+    draw();
+    return ()=>clock.stop();
+  }
+});
+
+UM.register("fill-blank", {
+  title:"أكمل الجملة",
+  blurb:"جملة ناقصة. اختَر الكلمة المناسبة من أربع خيارات.",
+  mount(root){
+    const ROUNDS=8, QS=14;
+    let deck=shuffle(BLANKS).slice(0,ROUNDS), i=0, score=0, streak=0, best=0, right=0, locked=false;
+    const ui=quizShell(root, QS);
+    const clock=UM.timer(QS, left=>{
+      ui.tm.set(UM.num(Math.max(left,0)));
+      ui.fill.style.width=((QS-left)/QS*100)+"%";
+      ui.fill.classList.toggle("tight",left<=4);
+      ui.tm.warn(left<=4);
+      if(left<=4&&left>0) UM.sfx.tick();
+    }, ()=>answer(""));
+    function draw(){
+      locked=false;
+      const B=deck[i];
+      ui.body.innerHTML="";
+      ui.body.append(UM.el("div","qnum", `${UM.t("question")} ${UM.num(i+1)} ${UM.t("of")} ${UM.num(ROUNDS)}`));
+      ui.body.append(UM.el("div","qtext", B.s));
+      const list=UM.el("div","choices");
+      shuffle(B.o.slice()).forEach((text,k)=>{
+        const b=UM.el("button","choice"); b.dataset.t=text;
+        b.append(UM.el("span","tag",TAGS[k]), UM.el("span","",text));
+        b.onclick=()=>answer(text);
+        list.append(b);
+      });
+      ui.body.append(list);
+      clock.left=QS; clock.start();
+    }
+    function answer(pick){
+      if(locked) return;
+      locked=true; clock.stop();
+      const B=deck[i], hit=pick===B.a;
+      [...ui.body.querySelectorAll(".choice")].forEach(b=>{
+        b.disabled=true;
+        if(b.dataset.t===B.a) b.classList.add("right");
+        else if(b.dataset.t===pick) b.classList.add("wrong");
+      });
+      if(hit){ right++; streak++; best=Math.max(best,streak); score+=80+Math.round(clock.left*2); UM.sfx.ok(); }
+      else { streak=0; UM.sfx.no(); }
+      ui.sc.set(UM.num(score)); ui.st.set(UM.num(streak));
+      const w=UM.el("div","why "+(hit?"ok":"no"));
+      w.append(UM.el("span","lead", !pick?UM.t("timeout"):hit?UM.t("correct"):UM.t("wrong")),
+               UM.el("span","", B.s.replace("___", B.a)));
+      ui.body.append(w);
+      const row=UM.el("div","row");
+      const nx=UM.el("button","btn go", i+1<ROUNDS?UM.t("next"):UM.t("results"));
+      nx.onclick=()=>{ i+1<ROUNDS?(i++,draw()):finish(); };
+      row.append(nx); ui.body.append(row); nx.focus();
+    }
+    async function finish(){
+      clock.stop();
+      await resultScreen(ui,"fill-blank",score,right,ROUNDS,best,()=>{
+        deck=shuffle(BLANKS).slice(0,ROUNDS); i=0;score=0;streak=0;best=0;right=0;
+        ui.sc.set(UM.num(0)); ui.st.set(UM.num(0)); draw();
+      });
+    }
+    draw();
+    return ()=>clock.stop();
+  }
+});
+
+(() => {
+  const stage=document.getElementById("stage"), where=document.getElementById("where");
+  const tabs=[...document.querySelectorAll(".surf")];
+  let teardown=null;
+  function open(id){
+    if(teardown) teardown();
+    stage.innerHTML="";
+    const g=UM.get(id);
+    where.innerHTML=`<b>${g.title}</b> — ${g.blurb}`;
+    teardown=g.mount(stage)||null;
+    tabs.forEach(b=>b.setAttribute("aria-selected", b.dataset.g===id));
+  }
+  tabs.forEach(b=>b.onclick=()=>open(b.dataset.g));
+  open("quick-q");
+})();
+</script>
+</body>
+</html>

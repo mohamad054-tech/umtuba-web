@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>UMTUBA — ألعاب المتجر ٢</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --field:#0C2723; --surface:#14352F; --raise:#1B443C; --line:#255A50;
+  --ink:#EAF2EE; --muted:#8FB3AA; --gold:#F0A93B; --gold-dim:#9A6E22;
+  --clay:#D46A5E; --mint:#5FCBA4; --r:14px; --pad:clamp(14px,3.5vw,26px);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--field);color:var(--ink);
+  font-family:"IBM Plex Sans Arabic",system-ui,sans-serif;line-height:1.65;
+  -webkit-font-smoothing:antialiased;padding:var(--pad);display:flex;justify-content:center}
+.app{width:100%;max-width:760px}
+.masthead{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.mark{font-weight:700;font-size:clamp(21px,4.6vw,27px);letter-spacing:-.015em}
+.mark span{color:var(--gold)}
+.sub{color:var(--muted);font-size:14px;font-weight:300}
+.rule{height:1px;background:var(--line);margin:18px 0 20px}
+.surfaces{display:flex;gap:8px;flex-wrap:wrap}
+.surf{background:transparent;border:1px solid var(--line);color:var(--muted);font:inherit;
+  font-size:14px;font-weight:500;padding:8px 15px;border-radius:999px;cursor:pointer;
+  transition:color .15s,border-color .15s,background .15s}
+.surf:hover{color:var(--ink);border-color:var(--gold-dim)}
+.surf[aria-selected="true"]{background:var(--gold);border-color:var(--gold);color:#14261C;font-weight:600}
+.surf:focus-visible{outline:2px solid var(--mint);outline-offset:3px}
+.where{color:var(--muted);font-size:13px;font-weight:300;margin:12px 0 20px}
+.where b{color:var(--ink);font-weight:600}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.bar{display:flex;align-items:center;gap:14px;padding:13px 16px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.stat{display:flex;flex-direction:column;line-height:1.25}
+.stat .k{font-size:11px;color:var(--muted);font-weight:300}
+.stat .v{font-size:17px;font-weight:600;font-variant-numeric:tabular-nums}
+.stat .v.warn{color:var(--clay)}
+.grow{flex:1}
+.strand{height:3px;background:var(--raise);position:relative;overflow:hidden}
+.strand i{position:absolute;inset-block:0;inset-inline-start:0;background:var(--gold);width:0;transition:width .25s linear}
+.strand i.tight{background:var(--clay)}
+.body{padding:clamp(16px,4vw,24px)}
+button.btn{font:inherit;font-weight:600;font-size:15px;border-radius:10px;cursor:pointer;
+  padding:11px 20px;border:1px solid var(--line);background:var(--raise);color:var(--ink);
+  transition:background .15s,border-color .15s}
+button.btn:hover:not(:disabled){border-color:var(--gold-dim)}
+button.btn.go{background:var(--gold);border-color:var(--gold);color:#14261C}
+button.btn.go:hover:not(:disabled){background:#F6B64F}
+button.btn:focus-visible{outline:2px solid var(--mint);outline-offset:3px}
+button.btn:disabled{opacity:.4;cursor:not-allowed}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+.qnum{font-size:12px;color:var(--muted);font-weight:300;margin-bottom:8px}
+.qtext{font-size:clamp(16px,3.4vw,19px);font-weight:600;line-height:1.5;margin:4px 0 14px}
+.choices{display:flex;flex-direction:column;gap:9px}
+.choice{font:inherit;font-size:15px;text-align:start;cursor:pointer;background:var(--raise);
+  border:1px solid var(--line);color:var(--ink);border-radius:11px;padding:13px 15px;
+  display:flex;align-items:center;gap:12px}
+.choice:hover:not(:disabled){border-color:var(--gold-dim)}
+.choice:focus-visible{outline:2px solid var(--mint);outline-offset:2px}
+.choice .tag{width:26px;height:26px;flex:none;border-radius:7px;background:var(--surface);
+  border:1px solid var(--line);display:grid;place-items:center;font-size:13px;font-weight:600;color:var(--muted)}
+.choice.right{border-color:var(--mint);background:rgba(95,203,164,.13)}
+.choice.wrong{border-color:var(--clay);background:rgba(212,106,94,.13)}
+.choice:disabled{cursor:default}
+.why{margin-top:16px;padding:14px 16px;border-radius:11px;background:var(--field);
+  border:1px solid var(--line);font-size:14.5px;line-height:1.7}
+.why .lead{font-weight:600;display:block;margin-bottom:3px}
+.why.ok .lead{color:var(--mint)}
+.why.no .lead{color:var(--clay)}
+.pairgrid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+@media (max-width:420px){.pairgrid{grid-template-columns:1fr}}
+.prod{display:flex;gap:12px;align-items:center;background:var(--raise);
+  border:1px solid var(--line);border-radius:12px;padding:12px;text-align:start;font:inherit;color:var(--ink);cursor:pointer;width:100%}
+.prod:hover:not(:disabled){border-color:var(--gold-dim)}
+.prod:focus-visible{outline:2px solid var(--mint);outline-offset:2px}
+.prod.right{border-color:var(--mint);background:rgba(95,203,164,.13)}
+.prod.wrong{border-color:var(--clay);background:rgba(212,106,94,.13)}
+.prod.sel{border-color:var(--gold);background:rgba(240,169,59,.12)}
+.prod:disabled{cursor:default}
+.thumb{width:64px;height:64px;flex:none;border-radius:10px;overflow:hidden;background:var(--field)}
+.thumb svg{display:block;width:100%;height:100%}
+.pname{font-weight:600;font-size:15px}
+.pcat{color:var(--muted);font-size:13px;font-weight:300}
+.sortlist{display:flex;flex-direction:column;gap:8px}
+.sortlist .hint{color:var(--muted);font-size:13px;font-weight:300;margin-bottom:4px}
+.priceline{display:flex;align-items:baseline;gap:8px;margin-top:10px;font-variant-numeric:tabular-nums}
+.priceline .big{font-size:clamp(24px,6vw,32px);font-weight:700}
+.priceline .cur{font-size:13px;color:var(--muted)}
+.priceline .old{color:var(--muted);text-decoration:line-through;font-size:15px}
+.result{text-align:center;padding:24px 0 6px}
+.score{font-size:clamp(38px,10vw,56px);font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
+.score small{font-size:.42em;font-weight:400;color:var(--muted)}
+.verdict{font-size:18px;font-weight:600;margin-top:12px}
+.detail{color:var(--muted);font-size:14px;font-weight:300;margin-top:6px}
+.board-list{margin-top:20px;text-align:start;border-top:1px solid var(--line)}
+.board-list .li{display:flex;gap:12px;align-items:center;padding:10px 2px;border-bottom:1px solid var(--line);font-size:14px}
+.board-list .rk{width:22px;color:var(--muted);font-weight:600;font-variant-numeric:tabular-nums}
+.board-list .nm{flex:1}
+.board-list .pt{font-weight:600;font-variant-numeric:tabular-nums}
+.board-list .li.you,.board-list .li.you .rk{color:var(--gold)}
+.note{color:var(--muted);font-size:13px;font-weight:300;margin-top:26px;line-height:1.8}
+@media (prefers-reduced-motion:reduce){*{transition:none !important}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="masthead">
+    <div class="mark">UM<span>TUBA</span> — المتجر</div>
+    <div class="sub">ثلاث ألعاب أسعار على نفس المحرك</div>
+  </header>
+  <div class="rule"></div>
+  <div class="surfaces" role="tablist" aria-label="ألعاب المتجر">
+    <button class="surf" role="tab" aria-selected="true" data-g="cheaper">أي منتج أرخص</button>
+    <button class="surf" role="tab" aria-selected="false" data-g="sort-price">رتّب حسب السعر</button>
+    <button class="surf" role="tab" aria-selected="false" data-g="guess-discount">خمّن الخصم</button>
+  </div>
+  <p class="where" id="where"></p>
+  <main id="stage"></main>
+  <p class="note">أسعار تجريبية. الجوائز نقاط داخل اللعبة فقط — بدون كوبونات حقيقية.</p>
+</div>
+<script>
+"use strict";
+
+const UM = (() => {
+  const memory = new Map();
+  const store = {
+    async get(k){ return memory.has(k) ? memory.get(k) : null; },
+    async set(k,v){ memory.set(k,v); return v; }
+  };
+  const strings = {
+    ar:{
+      score:"النقاط", time:"الوقت", streak:"متتالية", mistakes:"أخطاء",
+      question:"سؤال", of:"من", start:"ابدأ", again:"العب مرة ثانية",
+      next:"التالي", results:"النتيجة", correct:"إجابة صحيحة",
+      wrong:"إجابة خاطئة", timeout:"انتهى الوقت", point:"نقطة",
+      leaders:"المتصدّرون", you:"أنت", hint:"تلميح", newGame:"لعبة جديدة",
+      solved:"انحلّت", perfect:"علامة كاملة", good:"شغل ممتاز",
+      okay:"نتيجة مقبولة", weak:"محتاج مراجعة", left:"باقي",
+      confirm:"تأكيد الترتيب", tapSwap:"اضغط منتجين للتبديل"
+    },
+    en:{
+      score:"Score", time:"Time", streak:"Streak", mistakes:"Mistakes",
+      question:"Question", of:"of", start:"Start", again:"Play again",
+      next:"Next", results:"Results", correct:"Correct",
+      wrong:"Incorrect", timeout:"Time's up", point:"pt",
+      leaders:"Leaderboard", you:"You", hint:"Hint", newGame:"New game",
+      solved:"Solved", perfect:"Perfect score", good:"Well done",
+      okay:"Decent result", weak:"Needs review", left:"left",
+      confirm:"Confirm order", tapSwap:"Tap two products to swap"
+    }
+  };
+  let lang = "ar";
+  const t = k => (strings[lang] && strings[lang][k]) || strings.ar[k] || k;
+  const rtl = () => ["ar","fa","ur","he"].includes(lang);
+  const num = n => lang === "ar" ? String(n).replace(/\d/g, d => "٠١٢٣٤٥٦٧٨٩"[d]) : String(n);
+  const clock = s => num(Math.floor(s/60)) + ":" + num(String(s%60).padStart(2,"0"));
+  const money = n => num(n.toLocaleString("en-US"));
+  let ac = null;
+  function tone(freq, ms, type="sine", vol=.06){
+    try{
+      ac = ac || new (window.AudioContext||window.webkitAudioContext)();
+      const o = ac.createOscillator(), g = ac.createGain();
+      o.type = type; o.frequency.value = freq;
+      g.gain.setValueAtTime(vol, ac.currentTime);
+      g.gain.exponentialRampToValueAtTime(.0001, ac.currentTime + ms/1000);
+      o.connect(g); g.connect(ac.destination);
+      o.start(); o.stop(ac.currentTime + ms/1000);
+    }catch(e){}
+  }
+  const sfx = {
+    ok:   () => { tone(660,90); setTimeout(()=>tone(880,130),75); },
+    no:   () => tone(180,200,"square",.05),
+    tick: () => tone(440,40,"triangle",.03),
+    win:  () => [0,110,220,380].forEach((d,i)=>setTimeout(()=>tone([523,659,784,1047][i],220),d))
+  };
+  async function submit(gameId, points){
+    const key = "lb:" + gameId;
+    const rows = (await store.get(key)) || seedBoard(gameId);
+    const mine = rows.find(r => r.me);
+    if (mine) mine.points = Math.max(mine.points, points);
+    else rows.push({ name: t("you"), points, me: true });
+    rows.sort((a,b) => b.points - a.points);
+    await store.set(key, rows);
+    return rows.slice(0, 5);
+  }
+  function seedBoard(){
+    return ["ليان","مهند","سلمى","يوسف","رنا"].map((n,i)=>({name:n,points:500-i*(35+i*8)}));
+  }
+  function timer(seconds, onTick, onEnd){
+    let left = seconds, id = null;
+    const step = () => { left--; onTick(left); if (left <= 0){ stop(); onEnd(); } };
+    const start = () => { stop(); onTick(left); id = setInterval(step, 1000); };
+    const stop  = () => { if (id) clearInterval(id); id = null; };
+    return { start, stop, get left(){ return left; }, set left(v){ left = v; } };
+  }
+  function stopwatch(onTick){
+    let s = 0, id = null;
+    return {
+      start(){ this.stop(); id = setInterval(()=>{ s++; onTick(s); },1000); },
+      stop(){ if(id) clearInterval(id); id = null; },
+      get elapsed(){ return s; }
+    };
+  }
+  function el(tag, cls, html){
+    const n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (html != null) n.innerHTML = html;
+    return n;
+  }
+  const registry = new Map();
+  return { store, t, num, clock, money, sfx, submit, timer, stopwatch, el,
+           register:(id,d)=>registry.set(id,d), get:id=>registry.get(id),
+           rtl, get lang(){ return lang; }, set lang(v){ lang = v; } };
+})();
+
+function stat(k,v){
+  const n=UM.el("div","stat");
+  n.append(UM.el("span","k",k),UM.el("span","v",v));
+  return { node:n, set:x=>n.querySelector(".v").textContent=x,
+           warn:on=>n.querySelector(".v").classList.toggle("warn",on) };
+}
+async function board(id,pts){
+  const rows=await UM.submit(id,pts), w=UM.el("div","board-list");
+  const h=UM.el("div","qnum",UM.t("leaders")); h.style.paddingTop="10px"; w.append(h);
+  rows.forEach((r,i)=>{
+    const li=UM.el("div","li"+(r.me?" you":""));
+    li.append(UM.el("span","rk",UM.num(i+1)),UM.el("span","nm",r.name),
+              UM.el("span","pt",UM.num(r.points)));
+    w.append(li);
+  });
+  return w;
+}
+const shuffle=a=>a.slice().sort(()=>Math.random()-.5);
+const TAGS=["أ","ب","ج","د"];
+
+function pic(kind){
+  const g="#F0A93B",s="#2C6257",d="#1A4038",m="#8FB3AA";
+  const art={
+    bag:`<path d="M18 26 h28 l5 34 h-38Z" fill="${s}"/><path d="M25 26 a7 7 0 0 1 14 0" stroke="${g}" stroke-width="2.4" fill="none"/>`,
+    phone:`<rect x="20" y="12" width="24" height="42" rx="4" fill="${s}"/><rect x="23" y="17" width="18" height="30" fill="${d}"/><circle cx="32" cy="51" r="1.8" fill="${g}"/>`,
+    cup:`<path d="M18 22 h26 l-3 30 h-20Z" fill="${s}"/><path d="M44 27 a6 6 0 0 1 0 12" stroke="${g}" stroke-width="2.4" fill="none"/><rect x="18" y="22" width="26" height="4" fill="${g}"/>`,
+    book:`<rect x="17" y="14" width="28" height="38" rx="2" fill="${s}"/><rect x="17" y="14" width="6" height="38" fill="${g}"/>`,
+    shoe:`<path d="M12 44 h30 l10 -8 v10 h-40Z" fill="${s}"/><path d="M12 44 h40 v3 h-40Z" fill="${g}"/>`,
+    lamp:`<path d="M20 20 h24 l-6 14 h-12Z" fill="${g}"/><rect x="31" y="34" width="2" height="18" fill="${s}"/><rect x="24" y="52" width="16" height="3" rx="1.5" fill="${s}"/>`,
+    watch:`<circle cx="32" cy="33" r="13" fill="${d}" stroke="${g}" stroke-width="2"/><path d="M32 33 v-6 M32 33 h5" stroke="${g}" stroke-width="1.8"/>`,
+    plant:`<path d="M24 52 h16 l-2 8 h-12Z" fill="${s}"/><path d="M32 52 v-16" stroke="${g}" stroke-width="2"/><ellipse cx="24" cy="34" rx="9" ry="5" fill="${s}"/>`
+  };
+  return `<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="صورة تجريبية"><rect width="64" height="64" fill="#14352F"/>${art[kind]||art.bag}</svg>`;
+}
+const PRODUCTS = [
+  { id:"bag", name:"حقيبة يومية", cat:"إكسسوار", kind:"bag", price:189 },
+  { id:"phone", name:"غطاء هاتف", cat:"إلكترونيات", kind:"phone", price:45 },
+  { id:"cup", name:"كوب حراري", cat:"منزل", kind:"cup", price:72 },
+  { id:"book", name:"دفتر ملاحظات", cat:"قرطاسية", kind:"book", price:28 },
+  { id:"shoe", name:"حذاء رياضي", cat:"ملابس", kind:"shoe", price:310 },
+  { id:"lamp", name:"مصباح مكتب", cat:"منزل", kind:"lamp", price:145 },
+  { id:"watch", name:"ساعة يد", cat:"إكسسوار", kind:"watch", price:420 },
+  { id:"plant", name:"نبتة صغيرة", cat:"منزل", kind:"plant", price:55 }
+];
+
+function quizShell(root, sec){
+  const panel=UM.el("div","panel"), bar=UM.el("div","bar");
+  const sc=stat(UM.t("score"),UM.num(0)), st=stat(UM.t("streak"),UM.num(0));
+  const tm=stat(UM.t("time"), UM.num(sec));
+  bar.append(sc.node, st.node, UM.el("div","grow"), tm.node);
+  const strand=UM.el("div","strand"), fill=UM.el("i"); strand.append(fill);
+  const body=UM.el("div","body");
+  panel.append(bar,strand,body); root.append(panel);
+  return { body, sc, st, tm, fill };
+}
+
+function prodBtn(p, showPrice){
+  const b=UM.el("button","prod");
+  const th=UM.el("div","thumb"); th.innerHTML=pic(p.kind);
+  const meta=UM.el("div","pmeta");
+  meta.append(UM.el("div","pname",p.name), UM.el("div","pcat",p.cat));
+  if(showPrice) meta.append(UM.el("div","pcat", UM.money(p.price)+" ر.س"));
+  b.append(th, meta);
+  return b;
+}
+
+UM.register("cheaper", {
+  title:"أي منتج أرخص",
+  blurb:"منتجان. اختَر الأرخص قبل ما يخلص الوقت.",
+  mount(root){
+    const ROUNDS=8, QS=12;
+    let i=0, score=0, streak=0, best=0, right=0, locked=false, cur=null;
+    const ui=quizShell(root, QS);
+    const clock=UM.timer(QS, left=>{
+      ui.tm.set(UM.num(Math.max(left,0)));
+      ui.fill.style.width=((QS-left)/QS*100)+"%";
+      ui.fill.classList.toggle("tight",left<=4);
+      ui.tm.warn(left<=4);
+      if(left<=4&&left>0) UM.sfx.tick();
+    }, ()=>answer(-1));
+
+    function draw(){
+      locked=false;
+      const [a,b]=shuffle(PRODUCTS).slice(0,2);
+      cur={ a, b, win: a.price<=b.price ? "A" : "B" };
+      ui.body.innerHTML="";
+      ui.body.append(UM.el("div","qnum", `${UM.t("question")} ${UM.num(i+1)} ${UM.t("of")} ${UM.num(ROUNDS)}`));
+      ui.body.append(UM.el("div","qtext","أي منتج أرخص؟"));
+      const grid=UM.el("div","pairgrid");
+      [["A",a],["B",b]].forEach(([side,p])=>{
+        const btn=prodBtn(p,true); btn.dataset.side=side;
+        btn.onclick=()=>answer(side);
+        grid.append(btn);
+      });
+      ui.body.append(grid);
+      clock.left=QS; clock.start();
+    }
+    function answer(pick){
+      if(locked) return;
+      locked=true; clock.stop();
+      const hit=pick===cur.win;
+      [...ui.body.querySelectorAll(".prod")].forEach(b=>{
+        b.disabled=true;
+        if(b.dataset.side===cur.win) b.classList.add("right");
+        else if(b.dataset.side===pick) b.classList.add("wrong");
+      });
+      if(hit){ right++; streak++; best=Math.max(best,streak); score+=70+Math.round(clock.left*3); UM.sfx.ok(); }
+      else { streak=0; UM.sfx.no(); }
+      ui.sc.set(UM.num(score)); ui.st.set(UM.num(streak));
+      const cheap=cur.win==="A"?cur.a:cur.b, dear=cur.win==="A"?cur.b:cur.a;
+      const w=UM.el("div","why "+(hit?"ok":"no"));
+      w.append(UM.el("span","lead", pick===-1?UM.t("timeout"):hit?UM.t("correct"):UM.t("wrong")),
+               UM.el("span","", `${cheap.name} ${UM.money(cheap.price)} · ${dear.name} ${UM.money(dear.price)}`));
+      ui.body.append(w);
+      const row=UM.el("div","row");
+      const nx=UM.el("button","btn go", i+1<ROUNDS?UM.t("next"):UM.t("results"));
+      nx.onclick=()=>{ i+1<ROUNDS?(i++,draw()):finish(); };
+      row.append(nx); ui.body.append(row); nx.focus();
+    }
+    async function finish(){
+      clock.stop();
+      const pct=Math.round(right/ROUNDS*100);
+      const v=pct===100?UM.t("perfect"):pct>=75?UM.t("good"):pct>=50?UM.t("okay"):UM.t("weak");
+      if(pct>=75) UM.sfx.win();
+      ui.body.innerHTML="";
+      const res=UM.el("div","result");
+      res.append(UM.el("div","score",`${UM.num(score)}<small> ${UM.t("point")}</small>`),
+                 UM.el("div","verdict",v),
+                 UM.el("div","detail",`${UM.num(right)} ${UM.t("of")} ${UM.num(ROUNDS)} · ${UM.t("streak")} ${UM.num(best)}`));
+      ui.body.append(res); ui.body.append(await board("cheaper",score));
+      const r=UM.el("div","row"); r.style.justifyContent="center";
+      const ag=UM.el("button","btn go",UM.t("again"));
+      ag.onclick=()=>{ i=0;score=0;streak=0;best=0;right=0; ui.sc.set(UM.num(0)); ui.st.set(UM.num(0)); draw(); };
+      r.append(ag); ui.body.append(r);
+    }
+    draw();
+    return ()=>clock.stop();
+  }
+});
+
+UM.register("sort-price", {
+  title:"رتّب حسب السعر",
+  blurb:"أربعة منتجات. رتّبها من الأرخص للأغلى بالضغط للتبديل.",
+  mount(root){
+    const ROUNDS=5;
+    let i=0, score=0, streak=0, best=0, right=0, items=[], sel=null, done=false;
+    const ui=quizShell(root, 0);
+    ui.tm.node.querySelector(".k").textContent=UM.t("of");
+    const watch=UM.stopwatch(s=>ui.tm.set(UM.clock(s)));
+    ui.fill.style.width="0";
+
+    function ordered(list){
+      return list.every((p,idx,arr)=> idx===0 || arr[idx-1].price<=p.price);
+    }
+    function paint(){
+      ui.body.innerHTML="";
+      ui.body.append(UM.el("div","qnum", `${UM.t("question")} ${UM.num(i+1)} ${UM.t("of")} ${UM.num(ROUNDS)}`));
+      ui.body.append(UM.el("div","qtext","من الأرخص إلى الأغلى"));
+      const list=UM.el("div","sortlist");
+      list.append(UM.el("div","hint", UM.t("tapSwap")));
+      items.forEach((p,idx)=>{
+        const b=prodBtn(p,true); b.dataset.i=idx;
+        if(sel===idx) b.classList.add("sel");
+        b.onclick=()=>tap(idx);
+        list.append(b);
+      });
+      ui.body.append(list);
+      const row=UM.el("div","row");
+      const ok=UM.el("button","btn go", UM.t("confirm"));
+      ok.onclick=confirm; row.append(ok); ui.body.append(row);
+    }
+    function tap(idx){
+      if(done) return;
+      if(sel===null){ sel=idx; paint(); return; }
+      if(sel===idx){ sel=null; paint(); return; }
+      const tmp=items[sel]; items[sel]=items[idx]; items[idx]=tmp;
+      sel=null; UM.sfx.ok(); paint();
+    }
+    function confirm(){
+      if(done) return;
+      const hit=ordered(items);
+      done=true;
+      [...ui.body.querySelectorAll(".prod")].forEach(b=>b.disabled=true);
+      if(hit){ right++; streak++; best=Math.max(best,streak); score+=120; UM.sfx.ok(); }
+      else { streak=0; UM.sfx.no(); }
+      ui.sc.set(UM.num(score)); ui.st.set(UM.num(streak));
+      const w=UM.el("div","why "+(hit?"ok":"no"));
+      const truth=items.slice().sort((a,b)=>a.price-b.price).map(p=>p.name).join(" ← ");
+      w.append(UM.el("span","lead", hit?UM.t("correct"):UM.t("wrong")),
+               UM.el("span","", "الترتيب الصح: "+truth));
+      ui.body.append(w);
+      const row=UM.el("div","row");
+      const nx=UM.el("button","btn go", i+1<ROUNDS?UM.t("next"):UM.t("results"));
+      nx.onclick=()=>{ i+1<ROUNDS?(i++,deal()):finish(); };
+      row.append(nx); ui.body.append(row); nx.focus();
+    }
+    function deal(){
+      done=false; sel=null;
+      items=shuffle(PRODUCTS).slice(0,4);
+      if(ordered(items)) items=[items[1],items[0],items[3],items[2]];
+      paint();
+    }
+    async function finish(){
+      watch.stop();
+      const pct=Math.round(right/ROUNDS*100);
+      const v=pct===100?UM.t("perfect"):pct>=60?UM.t("good"):pct>=40?UM.t("okay"):UM.t("weak");
+      if(pct>=60) UM.sfx.win();
+      ui.body.innerHTML="";
+      const res=UM.el("div","result");
+      res.append(UM.el("div","score",`${UM.num(score)}<small> ${UM.t("point")}</small>`),
+                 UM.el("div","verdict",v),
+                 UM.el("div","detail",`${UM.num(right)} ${UM.t("of")} ${UM.num(ROUNDS)} · ${UM.t("time")} ${UM.clock(watch.elapsed)}`));
+      ui.body.append(res); ui.body.append(await board("sort-price",score));
+      const r=UM.el("div","row"); r.style.justifyContent="center";
+      const ag=UM.el("button","btn go",UM.t("again"));
+      ag.onclick=()=>{ i=0;score=0;streak=0;best=0;right=0; ui.sc.set(UM.num(0)); ui.st.set(UM.num(0));
+        watch.stop(); watch.start(); deal(); };
+      r.append(ag); ui.body.append(r);
+    }
+    watch.start(); deal();
+    return ()=>watch.stop();
+  }
+});
+
+UM.register("guess-discount", {
+  title:"خمّن الخصم",
+  blurb:"سعر أصلي وسعر بعد التخفيض. كم نسبة الخصم؟",
+  mount(root){
+    const ROUNDS=8, QS=14;
+    let i=0, score=0, streak=0, best=0, right=0, locked=false, cur=null;
+    const ui=quizShell(root, QS);
+    const clock=UM.timer(QS, left=>{
+      ui.tm.set(UM.num(Math.max(left,0)));
+      ui.fill.style.width=((QS-left)/QS*100)+"%";
+      ui.fill.classList.toggle("tight",left<=4);
+      ui.tm.warn(left<=4);
+      if(left<=4&&left>0) UM.sfx.tick();
+    }, ()=>answer(-1));
+
+    function deal(){
+      const p=shuffle(PRODUCTS)[0];
+      const pct=[10,15,20,25,30,35,40,50][(Math.random()*8)|0];
+      const sale=Math.round(p.price*(100-pct)/100);
+      const opts=new Set([pct]);
+      while(opts.size<4){
+        const n=[5,10,15,20,25,30,35,40,45,50,60][(Math.random()*11)|0];
+        if(n!==pct) opts.add(n);
+      }
+      cur={ p, pct, sale, opts:shuffle([...opts]) };
+    }
+    function draw(){
+      locked=false; deal();
+      ui.body.innerHTML="";
+      ui.body.append(UM.el("div","qnum", `${UM.t("question")} ${UM.num(i+1)} ${UM.t("of")} ${UM.num(ROUNDS)}`));
+      const card=UM.el("div","prod"); card.style.cursor="default"; card.disabled=true;
+      const th=UM.el("div","thumb"); th.innerHTML=pic(cur.p.kind);
+      const meta=UM.el("div","pmeta");
+      meta.append(UM.el("div","pname",cur.p.name), UM.el("div","pcat",cur.p.cat));
+      card.append(th, meta); ui.body.append(card);
+      const prices=UM.el("div","priceline");
+      prices.append(UM.el("span","old", UM.money(cur.p.price)+" ر.س"),
+                    UM.el("span","big", UM.money(cur.sale)),
+                    UM.el("span","cur","ر.س"));
+      ui.body.append(prices);
+      ui.body.append(UM.el("div","qtext","كم نسبة الخصم؟"));
+      const list=UM.el("div","choices");
+      cur.opts.forEach((n,k)=>{
+        const b=UM.el("button","choice"); b.dataset.n=n;
+        b.append(UM.el("span","tag",TAGS[k]), UM.el("span","", UM.num(n)+"٪"));
+        b.onclick=()=>answer(n);
+        list.append(b);
+      });
+      ui.body.append(list);
+      clock.left=QS; clock.start();
+    }
+    function answer(pick){
+      if(locked) return;
+      locked=true; clock.stop();
+      const hit=pick===cur.pct;
+      [...ui.body.querySelectorAll(".choice")].forEach(b=>{
+        b.disabled=true;
+        if(+b.dataset.n===cur.pct) b.classList.add("right");
+        else if(+b.dataset.n===pick) b.classList.add("wrong");
+      });
+      if(hit){ right++; streak++; best=Math.max(best,streak); score+=80+Math.round(clock.left*2); UM.sfx.ok(); }
+      else { streak=0; UM.sfx.no(); }
+      ui.sc.set(UM.num(score)); ui.st.set(UM.num(streak));
+      const w=UM.el("div","why "+(hit?"ok":"no"));
+      w.append(UM.el("span","lead", pick===-1?UM.t("timeout"):hit?UM.t("correct"):UM.t("wrong")),
+               UM.el("span","", `${UM.money(cur.p.price)} ← ${UM.money(cur.sale)} = ${UM.num(cur.pct)}٪`));
+      ui.body.append(w);
+      const row=UM.el("div","row");
+      const nx=UM.el("button","btn go", i+1<ROUNDS?UM.t("next"):UM.t("results"));
+      nx.onclick=()=>{ i+1<ROUNDS?(i++,draw()):finish(); };
+      row.append(nx); ui.body.append(row); nx.focus();
+    }
+    async function finish(){
+      clock.stop();
+      const pct=Math.round(right/ROUNDS*100);
+      const v=pct===100?UM.t("perfect"):pct>=75?UM.t("good"):pct>=50?UM.t("okay"):UM.t("weak");
+      if(pct>=75) UM.sfx.win();
+      ui.body.innerHTML="";
+      const res=UM.el("div","result");
+      res.append(UM.el("div","score",`${UM.num(score)}<small> ${UM.t("point")}</small>`),
+                 UM.el("div","verdict",v),
+                 UM.el("div","detail",`${UM.num(right)} ${UM.t("of")} ${UM.num(ROUNDS)} · ${UM.t("streak")} ${UM.num(best)}`));
+      ui.body.append(res); ui.body.append(await board("guess-discount",score));
+      const r=UM.el("div","row"); r.style.justifyContent="center";
+      const ag=UM.el("button","btn go",UM.t("again"));
+      ag.onclick=()=>{ i=0;score=0;streak=0;best=0;right=0; ui.sc.set(UM.num(0)); ui.st.set(UM.num(0)); draw(); };
+      r.append(ag); ui.body.append(r);
+    }
+    draw();
+    return ()=>clock.stop();
+  }
+});
+
+(() => {
+  const stage=document.getElementById("stage"), where=document.getElementById("where");
+  const tabs=[...document.querySelectorAll(".surf")];
+  let teardown=null;
+  function open(id){
+    if(teardown) teardown();
+    stage.innerHTML="";
+    const g=UM.get(id);
+    where.innerHTML=`<b>${g.title}</b> — ${g.blurb}`;
+    teardown=g.mount(stage)||null;
+    tabs.forEach(b=>b.setAttribute("aria-selected", b.dataset.g===id));
+  }
+  tabs.forEach(b=>b.onclick=()=>open(b.dataset.g));
+  open("cheaper");
+})();
+</script>
+</body>
+</html>

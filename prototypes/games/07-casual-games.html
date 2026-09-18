@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>UMTUBA — ألعاب عامة</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --field:#0C2723; --surface:#14352F; --raise:#1B443C; --line:#255A50;
+  --ink:#EAF2EE; --muted:#8FB3AA; --gold:#F0A93B; --gold-dim:#9A6E22;
+  --clay:#D46A5E; --mint:#5FCBA4; --r:14px; --pad:clamp(14px,3.5vw,26px);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--field);color:var(--ink);
+  font-family:"IBM Plex Sans Arabic",system-ui,sans-serif;line-height:1.65;
+  -webkit-font-smoothing:antialiased;padding:var(--pad);display:flex;justify-content:center}
+.app{width:100%;max-width:760px}
+.masthead{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.mark{font-weight:700;font-size:clamp(21px,4.6vw,27px);letter-spacing:-.015em}
+.mark span{color:var(--gold)}
+.sub{color:var(--muted);font-size:14px;font-weight:300}
+.rule{height:1px;background:var(--line);margin:18px 0 16px}
+.surfaces{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.surf{background:transparent;border:1px solid var(--line);color:var(--muted);font:inherit;
+  font-size:13px;font-weight:500;padding:7px 13px;border-radius:999px;cursor:pointer}
+.surf:hover{color:var(--ink);border-color:var(--gold-dim)}
+.surf[aria-selected="true"]{background:var(--gold);border-color:var(--gold);color:#14261C;font-weight:600}
+.surf:focus-visible{outline:2px solid var(--mint);outline-offset:3px}
+.where{color:var(--muted);font-size:13px;font-weight:300;margin:8px 0 16px}
+.where b{color:var(--ink);font-weight:600}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.bar{display:flex;align-items:center;gap:14px;padding:13px 16px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.stat{display:flex;flex-direction:column;line-height:1.25}
+.stat .k{font-size:11px;color:var(--muted);font-weight:300}
+.stat .v{font-size:17px;font-weight:600;font-variant-numeric:tabular-nums}
+.stat .v.warn{color:var(--clay)}
+.grow{flex:1}
+.strand{height:3px;background:var(--raise);position:relative;overflow:hidden}
+.strand i{position:absolute;inset-block:0;inset-inline-start:0;background:var(--gold);width:0}
+.body{padding:clamp(14px,3.5vw,22px)}
+button.btn{font:inherit;font-weight:600;font-size:15px;border-radius:10px;cursor:pointer;
+  padding:11px 20px;border:1px solid var(--line);background:var(--raise);color:var(--ink)}
+button.btn:hover:not(:disabled){border-color:var(--gold-dim)}
+button.btn.go{background:var(--gold);border-color:var(--gold);color:#14261C}
+button.btn.go:hover:not(:disabled){background:#F6B64F}
+button.btn:focus-visible{outline:2px solid var(--mint);outline-offset:3px}
+button.btn:disabled{opacity:.4;cursor:not-allowed}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.qnum{font-size:12px;color:var(--muted);font-weight:300;margin-bottom:8px}
+.qtext{font-size:clamp(16px,3.4vw,19px);font-weight:600;line-height:1.5;margin-bottom:12px}
+.result{text-align:center;padding:24px 0 6px}
+.score{font-size:clamp(38px,10vw,56px);font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
+.score small{font-size:.42em;font-weight:400;color:var(--muted)}
+.verdict{font-size:18px;font-weight:600;margin-top:12px}
+.detail{color:var(--muted);font-size:14px;font-weight:300;margin-top:6px}
+.board-list{margin-top:20px;text-align:start;border-top:1px solid var(--line)}
+.board-list .li{display:flex;gap:12px;align-items:center;padding:10px 2px;border-bottom:1px solid var(--line);font-size:14px}
+.board-list .rk{width:22px;color:var(--muted);font-weight:600;font-variant-numeric:tabular-nums}
+.board-list .nm{flex:1}
+.board-list .pt{font-weight:600;font-variant-numeric:tabular-nums}
+.board-list .li.you,.board-list .li.you .rk{color:var(--gold)}
+
+/* solitaire */
+.klondike{display:grid;gap:8px}
+.krow{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.pile{min-height:44px;background:var(--field);border:1px dashed var(--line);border-radius:8px;position:relative}
+.pile.sel{border-color:var(--gold);border-style:solid}
+.card{width:100%;aspect-ratio:3/4;border-radius:7px;border:1px solid var(--line);
+  background:var(--raise);color:var(--ink);font-size:clamp(11px,2.8vw,14px);font-weight:700;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;
+  font-variant-numeric:tabular-nums;user-select:none}
+.card.red{color:var(--clay)}
+.card.back{background:var(--gold-dim);color:transparent}
+.card.ghost{opacity:0;pointer-events:none}
+.tableau .card{margin-top:-62%;position:relative}
+.tableau .card:first-child{margin-top:0}
+.tableau .pile{min-height:92px}
+
+/* 2048 */
+.g2048{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;max-width:360px;margin:0 auto}
+.t2048{aspect-ratio:1;border-radius:10px;background:var(--raise);border:1px solid var(--line);
+  display:grid;place-items:center;font-weight:700;font-size:clamp(16px,5vw,22px);font-variant-numeric:tabular-nums}
+.t2048.v2{color:var(--ink)}.t2048.v4{color:var(--mint)}.t2048.v8,.t2048.v16{color:var(--gold)}
+.t2048.v32,.t2048.v64{color:#14261C;background:var(--gold-dim);border-color:var(--gold-dim)}
+.t2048.v128,.t2048.v256,.t2048.v512,.t2048.v1024,.t2048.v2048{color:#14261C;background:var(--gold);border-color:var(--gold)}
+
+/* snake */
+.snake{display:grid;gap:2px;background:var(--line);border:2px solid var(--line);border-radius:8px;
+  max-width:360px;margin:0 auto;aspect-ratio:1}
+.scell{background:var(--raise)}
+.scell.s{background:var(--mint)}
+.scell.head{background:var(--gold)}
+.scell.food{background:var(--clay)}
+.dpad{display:grid;grid-template-columns:repeat(3,56px);gap:8px;justify-content:center;margin-top:14px}
+.dpad button{height:44px}
+
+/* shapes */
+.shapeg{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;max-width:400px;margin:0 auto}
+.scard{aspect-ratio:1;border:0;background:transparent;cursor:pointer;padding:0}
+.scard:focus-visible{outline:2px solid var(--mint);outline-offset:3px;border-radius:11px}
+.scard .inner{position:relative;width:100%;height:100%;transition:transform .35s;transform-style:preserve-3d}
+.scard.up .inner,.scard.done .inner{transform:rotateY(180deg)}
+.sface{position:absolute;inset:0;border-radius:11px;display:grid;place-items:center;backface-visibility:hidden;border:1px solid var(--line)}
+.sback{background:var(--raise)}
+.sback::after{content:"";width:14px;height:14px;border-radius:50%;border:2px solid var(--line)}
+.sfront{background:var(--surface);transform:rotateY(180deg)}
+.scard.done .sfront{border-color:var(--mint);background:rgba(95,203,164,.13)}
+.shape{width:42%;height:42%}
+.shape.circle{border-radius:50%}
+.shape.square{border-radius:4px}
+.shape.diamond{transform:rotate(45deg);border-radius:3px;width:34%;height:34%}
+.shape.tri{width:0;height:0;border-inline:12px solid transparent;border-bottom:22px solid currentColor;background:none}
+
+/* type race */
+.prompt{background:var(--field);border:1px solid var(--line);border-radius:11px;padding:14px 16px;
+  font-size:clamp(16px,3.6vw,20px);font-weight:600;line-height:1.8;margin-bottom:12px}
+.typein{width:100%;font:inherit;font-size:16px;background:var(--raise);border:1px solid var(--line);
+  color:var(--ink);border-radius:11px;padding:12px 14px}
+.typein:focus{outline:2px solid var(--mint);outline-offset:2px}
+
+/* hanoi */
+.hanoi{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;align-items:end;min-height:220px;margin-top:8px}
+.peg{background:var(--field);border:1px solid var(--line);border-radius:11px;min-height:200px;
+  display:flex;flex-direction:column-reverse;align-items:center;padding:10px 6px 16px;cursor:pointer;gap:4px;position:relative}
+.peg::before{content:"";position:absolute;bottom:16px;width:6px;height:70%;background:var(--line);border-radius:4px}
+.peg.sel{border-color:var(--gold)}
+.disc{height:18px;border-radius:9px;background:var(--gold);border:1px solid var(--gold-dim);
+  position:relative;z-index:1;color:#14261C;font-size:11px;font-weight:700;display:grid;place-items:center}
+
+/* uno */
+.unohand{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
+.ucard{width:52px;height:74px;border-radius:8px;border:1px solid var(--line);cursor:pointer;
+  display:grid;place-items:center;font-weight:700;font-size:16px;color:#14261C}
+.ucard:focus-visible{outline:2px solid var(--mint);outline-offset:2px}
+.ucard.red{background:var(--clay)}.ucard.gold{background:var(--gold)}
+.ucard.mint{background:var(--mint)}.ucard.ink{background:var(--muted)}
+.pilecard{width:64px;height:88px;border-radius:9px;margin:0 auto;display:grid;place-items:center;
+  font-weight:700;font-size:22px;color:#14261C;border:1px solid var(--line)}
+.note{color:var(--muted);font-size:13px;font-weight:300;margin-top:22px;line-height:1.8}
+@media (prefers-reduced-motion:reduce){*{transition:none !important}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="masthead">
+    <div class="mark">UM<span>TUBA</span> — عامة</div>
+    <div class="sub">سبع ألعاب على نفس المحرك</div>
+  </header>
+  <div class="rule"></div>
+  <div class="surfaces" role="tablist" aria-label="ألعاب عامة">
+    <button class="surf" role="tab" aria-selected="true" data-g="solitaire">سوليتير</button>
+    <button class="surf" role="tab" aria-selected="false" data-g="g2048">٢٠٤٨</button>
+    <button class="surf" role="tab" aria-selected="false" data-g="snake">ثعبان</button>
+    <button class="surf" role="tab" aria-selected="false" data-g="shapes">مطابقة الأشكال</button>
+    <button class="surf" role="tab" aria-selected="false" data-g="typerace">سباق الكتابة</button>
+    <button class="surf" role="tab" aria-selected="false" data-g="hanoi">برج هانوي</button>
+    <button class="surf" role="tab" aria-selected="false" data-g="uno">أونو مبسّطة</button>
+  </div>
+  <p class="where" id="where"></p>
+  <main id="stage"></main>
+  <p class="note">لمس وفأرة. ٢٠٤٨ يحترم اتجاه النص. سوليتير كوندike مبسّط: سحب ورقة واحدة.</p>
+</div>
+<script>
+"use strict";
+
+const UM = (() => {
+  const memory = new Map();
+  const store = {
+    async get(k){ return memory.has(k) ? memory.get(k) : null; },
+    async set(k,v){ memory.set(k,v); return v; }
+  };
+  const strings = {
+    ar:{
+      score:"النقاط", time:"الوقت", streak:"متتالية", mistakes:"أخطاء",
+      question:"سؤال", of:"من", start:"ابدأ", again:"العب مرة ثانية",
+      next:"التالي", results:"النتيجة", correct:"إجابة صحيحة",
+      wrong:"إجابة خاطئة", timeout:"انتهى الوقت", point:"نقطة",
+      leaders:"المتصدّرون", you:"أنت", hint:"تلميح", newGame:"لعبة جديدة",
+      solved:"انحلّت", perfect:"علامة كاملة", good:"شغل ممتاز",
+      okay:"نتيجة مقبولة", weak:"محتاج مراجعة", left:"باقي",
+      moves:"حركات", draw:"اسحب", youWin:"فزت", youLose:"انتهت",
+      discs:"أقراص", cpu:"الجهاز", play:"العب", typeHint:"اكتب النص فوق بالضبط"
+    },
+    en:{
+      score:"Score", time:"Time", streak:"Streak", mistakes:"Mistakes",
+      question:"Question", of:"of", start:"Start", again:"Play again",
+      next:"Next", results:"Results", correct:"Correct",
+      wrong:"Incorrect", timeout:"Time's up", point:"pt",
+      leaders:"Leaderboard", you:"You", hint:"Hint", newGame:"New game",
+      solved:"Solved", perfect:"Perfect score", good:"Well done",
+      okay:"Decent result", weak:"Needs review", left:"left",
+      moves:"Moves", draw:"Draw", youWin:"You win", youLose:"Game over",
+      discs:"Discs", cpu:"CPU", play:"Play", typeHint:"Type the text exactly"
+    }
+  };
+  let lang = "ar";
+  const t = k => (strings[lang] && strings[lang][k]) || strings.ar[k] || k;
+  const rtl = () => ["ar","fa","ur","he"].includes(lang);
+  const num = n => lang === "ar" ? String(n).replace(/\d/g, d => "٠١٢٣٤٥٦٧٨٩"[d]) : String(n);
+  const clock = s => num(Math.floor(s/60)) + ":" + num(String(s%60).padStart(2,"0"));
+  let ac = null;
+  function tone(freq, ms, type="sine", vol=.06){
+    try{
+      ac = ac || new (window.AudioContext||window.webkitAudioContext)();
+      const o = ac.createOscillator(), g = ac.createGain();
+      o.type = type; o.frequency.value = freq;
+      g.gain.setValueAtTime(vol, ac.currentTime);
+      g.gain.exponentialRampToValueAtTime(.0001, ac.currentTime + ms/1000);
+      o.connect(g); g.connect(ac.destination);
+      o.start(); o.stop(ac.currentTime + ms/1000);
+    }catch(e){}
+  }
+  const sfx = {
+    ok:   () => { tone(660,90); setTimeout(()=>tone(880,130),75); },
+    no:   () => tone(180,200,"square",.05),
+    tick: () => tone(440,40,"triangle",.03),
+    win:  () => [0,110,220,380].forEach((d,i)=>setTimeout(()=>tone([523,659,784,1047][i],220),d))
+  };
+  async function submit(gameId, points){
+    const key = "lb:" + gameId;
+    const rows = (await store.get(key)) || seedBoard();
+    const mine = rows.find(r => r.me);
+    if (mine) mine.points = Math.max(mine.points, points);
+    else rows.push({ name: t("you"), points, me: true });
+    rows.sort((a,b) => b.points - a.points);
+    await store.set(key, rows);
+    return rows.slice(0, 5);
+  }
+  function seedBoard(){
+    return ["ليان","مهند","سلمى","يوسف","رنا"].map((n,i)=>({name:n,points:620-i*(40+i*9)}));
+  }
+  function timer(seconds, onTick, onEnd){
+    let left = seconds, id = null;
+    const step = () => { left--; onTick(left); if (left <= 0){ stop(); onEnd(); } };
+    const start = () => { stop(); onTick(left); id = setInterval(step, 1000); };
+    const stop  = () => { if (id) clearInterval(id); id = null; };
+    return { start, stop, get left(){ return left; }, set left(v){ left = v; } };
+  }
+  function stopwatch(onTick){
+    let s = 0, id = null;
+    return {
+      start(){ this.stop(); id = setInterval(()=>{ s++; onTick(s); },1000); },
+      stop(){ if(id) clearInterval(id); id = null; },
+      get elapsed(){ return s; }
+    };
+  }
+  function el(tag, cls, html){
+    const n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (html != null) n.innerHTML = html;
+    return n;
+  }
+  const registry = new Map();
+  return { store, t, num, clock, sfx, submit, timer, stopwatch, el,
+           register:(id,d)=>registry.set(id,d), get:id=>registry.get(id),
+           rtl, get lang(){ return lang; }, set lang(v){ lang = v; } };
+})();
+
+function stat(k,v){
+  const n=UM.el("div","stat");
+  n.append(UM.el("span","k",k),UM.el("span","v",v));
+  return { node:n, set:x=>n.querySelector(".v").textContent=x,
+           warn:on=>n.querySelector(".v").classList.toggle("warn",on) };
+}
+async function board(id,pts){
+  const rows=await UM.submit(id,pts), w=UM.el("div","board-list");
+  const h=UM.el("div","qnum",UM.t("leaders")); h.style.paddingTop="10px"; w.append(h);
+  rows.forEach((r,i)=>{
+    const li=UM.el("div","li"+(r.me?" you":""));
+    li.append(UM.el("span","rk",UM.num(i+1)),UM.el("span","nm",r.name),
+              UM.el("span","pt",UM.num(r.points)));
+    w.append(li);
+  });
+  return w;
+}
+function shell(root){
+  const panel=UM.el("div","panel"), bar=UM.el("div","bar");
+  const sc=stat(UM.t("score"),UM.num(0)), mv=stat(UM.t("moves"),UM.num(0));
+  const tm=stat(UM.t("time"),UM.clock(0));
+  bar.append(sc.node, mv.node, UM.el("div","grow"), tm.node);
+  const body=UM.el("div","body");
+  panel.append(bar,UM.el("div","strand"),body); root.append(panel);
+  return { body, sc, mv, tm };
+}
+function showEnd(ui, id, pts, verdict, detail, onAgain){
+  ui.body.innerHTML="";
+  const res=UM.el("div","result");
+  res.append(UM.el("div","score",`${UM.num(pts)}<small> ${UM.t("point")}</small>`),
+             UM.el("div","verdict",verdict),
+             UM.el("div","detail",detail));
+  ui.body.append(res);
+  return board(id,pts).then(b=>{
+    ui.body.append(b);
+    const r=UM.el("div","row"); r.style.justifyContent="center";
+    const ag=UM.el("button","btn go",UM.t("again"));
+    ag.onclick=onAgain; r.append(ag); ui.body.append(r);
+  });
+}
+const shuffle=a=>a.slice().sort(()=>Math.random()-.5);
+
+/* ── سوليتير ── */
+UM.register("solitaire", {
+  title:"سوليتير",
+  blurb:"كوندايك: رتّب الأوراق تنازلياً بتناوب اللون، وابنِ الأساس من الآس.",
+  mount(root){
+    const SUITS=["♠","♥","♦","♣"];
+    const RED={1:1,2:1};
+    const RN=["","أ","٢","٣","٤","٥","٦","٧","٨","٩","١٠","ي","د","ك"];
+    let stock=[], waste=[], tab=[[],[],[],[],[],[],[]], found=[[],[],[],[]];
+    let sel=null, moves=0, done=false;
+    const ui=shell(root);
+    const watch=UM.stopwatch(s=>ui.tm.set(UM.clock(s)));
+
+    function deck(){
+      const d=[];
+      for(let s=0;s<4;s++) for(let r=1;r<=13;r++) d.push({s,r,up:false,id:s+"-"+r});
+      return shuffle(d);
+    }
+    function deal(){
+      const d=deck();
+      tab=[[],[],[],[],[],[],[]]; found=[[],[],[],[]]; waste=[]; sel=null; moves=0; done=false;
+      for(let c=0;c<7;c++) for(let n=0;n<=c;n++){ const card=d.pop(); card.up=n===c; tab[c].push(card); }
+      stock=d; ui.sc.set(UM.num(0)); ui.mv.set(UM.num(0));
+      watch.stop(); watch.start(); paint();
+    }
+    function color(c){ return RED[c.s] ? "red" : ""; }
+    function face(c){ return UM.num(RN[c.r])+" "+SUITS[c.s]; }
+    function canSeq(a,b){ return a.r===b.r+1 && !!RED[a.s]!==!!RED[b.s]; }
+    function canFound(c,f){
+      if(!f.length) return c.r===1;
+      const t=f[f.length-1]; return t.s===c.s && c.r===t.r+1;
+    }
+    function pileAt(kind,i){
+      if(kind==="t") return tab[i];
+      if(kind==="f") return found[i];
+      if(kind==="w") return waste;
+      return stock;
+    }
+    function tryMove(from, to){
+      if(from.kind==="s") return false;
+      const fp=pileAt(from.kind,from.i);
+      if(!fp.length) return false;
+      let take;
+      if(from.kind==="t"){
+        if(from.n==null || from.n<0) return false;
+        take=fp.slice(from.n);
+        if(!take[0].up) return false;
+        for(let k=1;k<take.length;k++) if(!canSeq(take[k-1],take[k])) return false;
+      } else {
+        take=[fp[fp.length-1]];
+        if(!take[0].up) return false;
+      }
+      if(to.kind==="f"){
+        if(take.length!==1 || !canFound(take[0], found[to.i])) return false;
+        fp.splice(fp.length-take.length);
+        found[to.i].push(take[0]);
+      } else if(to.kind==="t"){
+        const dest=tab[to.i];
+        if(dest.length){ if(!canSeq(dest[dest.length-1], take[0])) return false; }
+        else if(take[0].r!==13) return false;
+        fp.splice(fp.length-take.length);
+        dest.push(...take);
+      } else return false;
+      if(from.kind==="t" && fp.length && !fp[fp.length-1].up) fp[fp.length-1].up=true;
+      moves++; ui.mv.set(UM.num(moves));
+      ui.sc.set(UM.num(found.reduce((n,p)=>n+p.length,0)*15));
+      UM.sfx.ok();
+      return true;
+    }
+    function drawStock(){
+      if(done) return;
+      if(stock.length){ const c=stock.pop(); c.up=true; waste.push(c); }
+      else { stock=waste.reverse().map(c=>(c.up=false,c)); waste=[]; }
+      moves++; ui.mv.set(UM.num(moves)); paint();
+    }
+    function clickPile(kind,i,n){
+      if(done) return;
+      if(kind==="s"){ drawStock(); return; }
+      const loc={kind,i,n};
+      if(!sel){ sel=loc; paint(); return; }
+      if(sel.kind===kind && sel.i===i && sel.n===n){ sel=null; paint(); return; }
+      if(!tryMove(sel, loc)) UM.sfx.no();
+      sel=null;
+      if(found.every(f=>f.length===13)) win();
+      else paint();
+    }
+    function win(){
+      done=true; watch.stop(); UM.sfx.win();
+      const pts=Math.max(200, 1200-watch.elapsed-moves*2);
+      showEnd(ui,"solitaire",pts,UM.t("solved"),
+        `${UM.t("time")} ${UM.clock(watch.elapsed)} · ${UM.t("moves")} ${UM.num(moves)}`,
+        ()=>deal());
+    }
+    function cardEl(c, extra){
+      const b=UM.el("button","card "+(c.up?color(c):"back"));
+      b.textContent=c.up?face(c):"";
+      if(extra) extra(b);
+      return b;
+    }
+    function paint(){
+      ui.body.innerHTML="";
+      const wrap=UM.el("div","klondike");
+      const top=UM.el("div","krow");
+      const stockP=UM.el("div","pile");
+      if(stock.length){
+        const b=cardEl({up:false,s:0,r:1}); b.onclick=()=>clickPile("s",0);
+        stockP.append(b);
+      } else {
+        const b=UM.el("button","card ghost"); b.onclick=()=>clickPile("s",0); stockP.append(b);
+      }
+      const wasteP=UM.el("div","pile"+(sel&&sel.kind==="w"?" sel":""));
+      if(waste.length){
+        const b=cardEl(waste[waste.length-1]); b.onclick=()=>clickPile("w",0); wasteP.append(b);
+      }
+      top.append(stockP,wasteP,UM.el("div",""));
+      for(let i=0;i<4;i++){
+        const p=UM.el("div","pile"+(sel&&sel.kind==="f"&&sel.i===i?" sel":""));
+        if(found[i].length) p.append(cardEl(found[i][found[i].length-1]));
+        p.onclick=()=>clickPile("f",i);
+        top.append(p);
+      }
+      wrap.append(top);
+      const bot=UM.el("div","krow tableau");
+      for(let i=0;i<7;i++){
+        const p=UM.el("div","pile"+(sel&&sel.kind==="t"&&sel.i===i?" sel":""));
+        if(!tab[i].length){
+          p.onclick=()=>clickPile("t",i);
+        } else {
+          tab[i].forEach((c,n)=>{
+            const b=cardEl(c); b.onclick=e=>{ e.stopPropagation(); clickPile("t",i,n); };
+            p.append(b);
+          });
+        }
+        bot.append(p);
+      }
+      wrap.append(bot);
+      ui.body.append(wrap);
+      const row=UM.el("div","row");
+      const nw=UM.el("button","btn",UM.t("newGame"));
+      nw.onclick=deal; row.append(nw); ui.body.append(row);
+    }
+    deal();
+    return ()=>watch.stop();
+  }
+});
+
+/* ── ٢٠٤٨ ── */
+UM.register("g2048", {
+  title:"٢٠٤٨",
+  blurb:"ادمج البلاطات. الأسهم والتمرير. الاتجاه يحترم RTL.",
+  mount(root){
+    let grid, score=0, moves=0, done=false;
+    const ui=shell(root);
+    const watch=UM.stopwatch(s=>ui.tm.set(UM.clock(s)));
+    let sx=0,sy=0;
+
+    function empty(){ return Array.from({length:16},(_,i)=>i).filter(i=>!grid[i]); }
+    function spawn(){
+      const e=empty(); if(!e.length) return;
+      grid[e[(Math.random()*e.length)|0]] = Math.random()<0.9?2:4;
+    }
+    function reset(){
+      grid=Array(16).fill(0); score=0; moves=0; done=false;
+      spawn(); spawn();
+      ui.sc.set(UM.num(0)); ui.mv.set(UM.num(0));
+      watch.stop(); watch.start(); paint();
+    }
+    function line(dir){
+      const lines=[];
+      for(let i=0;i<4;i++){
+        const cells=[];
+        for(let j=0;j<4;j++){
+          const r=dir==="U"||dir==="D"?j:i;
+          const c=dir==="U"||dir==="D"?i:j;
+          cells.push(r*4+c);
+        }
+        if(dir==="D"||dir==="R") cells.reverse();
+        lines.push(cells);
+      }
+      return lines;
+    }
+    function slide(dir){
+      if(done) return;
+      let logical=dir;
+      if(UM.rtl() && (dir==="L"||dir==="R")) logical = dir==="L"?"R":"L";
+      let moved=false, gained=0;
+      line(logical).forEach(idx=>{
+        const vals=idx.map(i=>grid[i]).filter(v=>v);
+        for(let k=0;k<vals.length-1;k++){
+          if(vals[k]===vals[k+1]){ vals[k]*=2; gained+=vals[k]; vals.splice(k+1,1); }
+        }
+        while(vals.length<4) vals.push(0);
+        idx.forEach((i,n)=>{ if(grid[i]!==vals[n]) moved=true; grid[i]=vals[n]; });
+      });
+      if(!moved){ UM.sfx.no(); return; }
+      score+=gained; moves++; spawn();
+      ui.sc.set(UM.num(score)); ui.mv.set(UM.num(moves));
+      UM.sfx.ok(); paint();
+      if(grid.includes(2048)) end(true);
+      else if(!empty().length && !canMove()) end(false);
+    }
+    function canMove(){
+      for(let i=0;i<16;i++){
+        if(!grid[i]) return true;
+        const r=i>>2,c=i&3;
+        if(c<3 && grid[i]===grid[i+1]) return true;
+        if(r<3 && grid[i]===grid[i+4]) return true;
+      }
+      return false;
+    }
+    function end(win){
+      done=true; watch.stop(); if(win) UM.sfx.win();
+      showEnd(ui,"g2048",score, win?UM.t("youWin"):UM.t("youLose"),
+        `${UM.t("moves")} ${UM.num(moves)} · ${UM.t("time")} ${UM.clock(watch.elapsed)}`, reset);
+    }
+    function paint(){
+      ui.body.innerHTML="";
+      const g=UM.el("div","g2048");
+      grid.forEach(v=>{
+        const c=UM.el("div","t2048"+(v?" v"+v:""));
+        c.textContent=v?UM.num(v):"";
+        g.append(c);
+      });
+      ui.body.append(g);
+      const row=UM.el("div","row"); row.style.justifyContent="center";
+      [["→","R"],["←","L"],["↑","U"],["↓","D"]].forEach(([lab,d])=>{
+        const b=UM.el("button","btn",lab); b.onclick=()=>slide(d); row.append(b);
+      });
+      ui.body.append(row);
+    }
+    function keys(e){
+      const map={ArrowLeft:"L",ArrowRight:"R",ArrowUp:"U",ArrowDown:"D"};
+      if(map[e.key]){ e.preventDefault(); slide(map[e.key]); }
+    }
+    function tStart(e){ const t=e.changedTouches[0]; sx=t.clientX; sy=t.clientY; }
+    function tEnd(e){
+      const t=e.changedTouches[0], dx=t.clientX-sx, dy=t.clientY-sy;
+      if(Math.hypot(dx,dy)<28) return;
+      if(Math.abs(dx)>Math.abs(dy)) slide(dx>0?"R":"L");
+      else slide(dy>0?"D":"U");
+    }
+    document.addEventListener("keydown", keys);
+    ui.body.parentElement.addEventListener("touchstart", tStart, {passive:true});
+    ui.body.parentElement.addEventListener("touchend", tEnd, {passive:true});
+    reset();
+    return ()=>{
+      watch.stop();
+      document.removeEventListener("keydown", keys);
+    };
+  }
+});
+
+/* ── ثعبان ── */
+UM.register("snake", {
+  title:"ثعبان",
+  blurb:"كُل النقاط، لا تصدّم نفسك ولا الجدار. أسهم أو أزرار الاتجاه.",
+  mount(root){
+    const N=12;
+    let body, dir, next, food, score=0, tick=null, done=false;
+    const ui=shell(root);
+    const watch=UM.stopwatch(s=>ui.tm.set(UM.clock(s)));
+
+    function reset(){
+      body=[{x:3,y:6},{x:2,y:6},{x:1,y:6}];
+      dir={x:1,y:0}; next={x:1,y:0}; score=0; done=false;
+      place(); ui.sc.set(UM.num(0)); ui.mv.set(UM.num(body.length));
+      watch.stop(); watch.start(); paint();
+      if(tick) clearInterval(tick);
+      tick=setInterval(step, 160);
+    }
+    function place(){
+      const used=new Set(body.map(p=>p.x+","+p.y));
+      do { food={x:(Math.random()*N)|0,y:(Math.random()*N)|0}; }
+      while(used.has(food.x+","+food.y));
+    }
+    function setDir(x,y){
+      if(done) return;
+      if(dir.x===-x && dir.y===-y) return;
+      next={x,y};
+    }
+    function step(){
+      if(done) return;
+      dir=next;
+      const h={x:body[0].x+dir.x, y:body[0].y+dir.y};
+      if(h.x<0||h.y<0||h.x>=N||h.y>=N||body.some(p=>p.x===h.x&&p.y===h.y)){
+        end(); return;
+      }
+      body.unshift(h);
+      if(h.x===food.x && h.y===food.y){
+        score+=10; ui.sc.set(UM.num(score)); UM.sfx.ok(); place();
+      } else body.pop();
+      ui.mv.set(UM.num(body.length));
+      paint();
+    }
+    function end(){
+      done=true; if(tick) clearInterval(tick); watch.stop();
+      showEnd(ui,"snake",score,UM.t("youLose"),
+        `${UM.t("score")} ${UM.num(score)} · ${UM.t("time")} ${UM.clock(watch.elapsed)}`, reset);
+    }
+    function paint(){
+      if(done) return;
+      ui.body.innerHTML="";
+      const g=UM.el("div","snake");
+      g.style.gridTemplateColumns=`repeat(${N},1fr)`;
+      const head=body[0], set=new Set(body.map(p=>p.x+","+p.y));
+      for(let y=0;y<N;y++) for(let x=0;x<N;x++){
+        const c=UM.el("div","scell");
+        if(x===food.x&&y===food.y) c.classList.add("food");
+        else if(x===head.x&&y===head.y) c.classList.add("head");
+        else if(set.has(x+","+y)) c.classList.add("s");
+        g.append(c);
+      }
+      ui.body.append(g);
+      const pad=UM.el("div","dpad");
+      const btns=[
+        ["","",""],["↑",()=>setDir(0,-1),""],["","",""],
+        ["→",()=>setDir(UM.rtl()?-1:1,0),""],["","",""],["←",()=>setDir(UM.rtl()?1:-1,0),""],
+        ["","",""],["↓",()=>setDir(0,1),""],["","",""]
+      ];
+      // simpler 4 buttons
+      pad.innerHTML="";
+      [["→",()=>setDir(1,0)],["←",()=>setDir(-1,0)],["↑",()=>setDir(0,-1)],["↓",()=>setDir(0,1)]]
+        .forEach(([lab,fn])=>{
+          const b=UM.el("button","btn",lab); b.onclick=fn; pad.append(b);
+        });
+      pad.style.display="flex"; pad.style.justifyContent="center";
+      ui.body.append(pad);
+    }
+    function keys(e){
+      const m={ArrowRight:[1,0],ArrowLeft:[-1,0],ArrowUp:[0,-1],ArrowDown:[0,1]};
+      if(!m[e.key]) return;
+      e.preventDefault();
+      let [x,y]=m[e.key];
+      if(UM.rtl() && y===0) x=-x;
+      setDir(x,y);
+    }
+    document.addEventListener("keydown", keys);
+    reset();
+    return ()=>{ if(tick) clearInterval(tick); watch.stop(); document.removeEventListener("keydown", keys); };
+  }
+});
+
+/* ── مطابقة الأشكال ── */
+UM.register("shapes", {
+  title:"مطابقة الأشكال",
+  blurb:"اقلب زوجين متطابقين قبل انتهاء الوقت.",
+  mount(root){
+    const SHAPES=["circle","square","diamond","circle","square","diamond"];
+    const COLS=["#F0A93B","#5FCBA4","#D46A5E","#8FB3AA"];
+    const TOTAL=45;
+    let cards=[], open=[], matched=0, moves=0, done=false;
+    const ui=shell(root);
+    ui.tm.set(UM.clock(TOTAL));
+    const clock=UM.timer(TOTAL, left=>{
+      ui.tm.set(UM.clock(Math.max(left,0)));
+      ui.tm.warn(left<=8);
+      if(left<=5&&left>0) UM.sfx.tick();
+    }, ()=>end(false));
+
+    function deal(){
+      const pack=[];
+      SHAPES.forEach((sh,i)=>{
+        const col=COLS[i%COLS.length];
+        pack.push({sh,col,id:sh+"-"+col+"-a"}, {sh,col,id:sh+"-"+col+"-b"});
+      });
+      cards=shuffle(pack).map((c,i)=>({...c,i,up:false,done:false}));
+      open=[]; matched=0; moves=0; done=false;
+      ui.sc.set(UM.num(0)); ui.mv.set(UM.num(0));
+      clock.left=TOTAL; clock.start(); paint();
+    }
+    function flip(i){
+      if(done || cards[i].done || cards[i].up || open.length===2) return;
+      cards[i].up=true; open.push(i); paint();
+      if(open.length<2) return;
+      moves++; ui.mv.set(UM.num(moves));
+      const [a,b]=open;
+      if(cards[a].sh===cards[b].sh && cards[a].col===cards[b].col){
+        cards[a].done=cards[b].done=true; matched++; ui.sc.set(UM.num(matched*50)); UM.sfx.ok();
+        open=[]; 
+        if(matched===6) end(true);
+        else paint();
+      } else {
+        UM.sfx.no();
+        setTimeout(()=>{ cards[a].up=cards[b].up=false; open=[]; paint(); }, 520);
+      }
+    }
+    function end(win){
+      if(done) return;
+      done=true; clock.stop(); if(win) UM.sfx.win();
+      const pts=win? Math.max(120, 800-moves*12-(TOTAL-clock.left)*4) : matched*40;
+      showEnd(ui,"shapes",pts, win?UM.t("perfect"):UM.t("timeout"),
+        `${UM.t("moves")} ${UM.num(moves)}`, deal);
+    }
+    function paint(){
+      if(done) return;
+      ui.body.innerHTML="";
+      const g=UM.el("div","shapeg");
+      cards.forEach((c,i)=>{
+        const b=UM.el("button","scard"+(c.up||c.done?" up":"")+(c.done?" done":""));
+        const inner=UM.el("div","inner");
+        const back=UM.el("div","sface sback");
+        const front=UM.el("div","sface sfront");
+        const sh=UM.el("div","shape "+c.sh);
+        if(c.sh==="tri") sh.style.color=c.col;
+        else sh.style.background=c.col;
+        front.append(sh); inner.append(back,front); b.append(inner);
+        b.onclick=()=>flip(i);
+        g.append(b);
+      });
+      ui.body.append(g);
+    }
+    deal();
+    return ()=>clock.stop();
+  }
+});
+
+/* ── سباق الكتابة ── */
+UM.register("typerace", {
+  title:"سباق الكتابة",
+  blurb:"اكتب الجملة العربية كما هي، بأسرع ما يمكن وبدون أخطاء.",
+  mount(root){
+    const PH=[
+      "مرحباً بك في أم توبا",
+      "العلم نور والجهل ظلام",
+      "اكتب بسرعة ودقّة في نفس الوقت",
+      "الألعاب تعلّم الصبر والتركيز",
+      "كل حرف في مكانه الصحيح"
+    ];
+    let i=0, score=0, errs=0, done=false, text="";
+    const ui=shell(root);
+    const watch=UM.stopwatch(s=>ui.tm.set(UM.clock(s)));
+
+    function draw(){
+      done=false; text=PH[i]; errs=0;
+      ui.mv.set(UM.num(i+1)+" / "+UM.num(PH.length));
+      ui.body.innerHTML="";
+      ui.body.append(UM.el("div","qnum", UM.t("typeHint")));
+      ui.body.append(UM.el("div","prompt", text));
+      const inp=UM.el("input","typein");
+      inp.setAttribute("type","text");
+      inp.setAttribute("dir","rtl");
+      inp.setAttribute("autocomplete","off");
+      inp.setAttribute("autocorrect","off");
+      inp.oninput=()=>check(inp);
+      ui.body.append(inp);
+      setTimeout(()=>inp.focus(), 40);
+    }
+    function check(inp){
+      if(done) return;
+      const v=inp.value;
+      if(text.startsWith(v)){ /* ok */ }
+      else { errs++; ui.st && 0; UM.sfx.no(); }
+      if(v===text){
+        const bonus=Math.max(20, 160-watch.elapsed*2-errs*8);
+        score+=bonus; ui.sc.set(UM.num(score)); UM.sfx.ok();
+        i++;
+        if(i>=PH.length) finish();
+        else draw();
+      }
+    }
+    async function finish(){
+      if(done) return;
+      done=true; watch.stop(); UM.sfx.win();
+      await showEnd(ui,"typerace",score,UM.t("perfect"),
+        `${UM.t("mistakes")} ${UM.num(errs)} · ${UM.t("time")} ${UM.clock(watch.elapsed)}`,
+        ()=>{ i=0;score=0;errs=0; ui.sc.set(UM.num(0)); watch.stop(); watch.start(); draw(); });
+    }
+    watch.start(); draw();
+    return ()=>watch.stop();
+  }
+});
+
+/* ── برج هانوي ── */
+UM.register("hanoi", {
+  title:"برج هانوي",
+  blurb:"انقل البرج إلى العمود الأخير. قرص أكبر لا يعلو أصغر. من ٣ إلى ٥ أقراص.",
+  mount(root){
+    let n=3, pegs, sel=null, moves=0, done=false;
+    const ui=shell(root);
+    const watch=UM.stopwatch(s=>ui.tm.set(UM.clock(s)));
+
+    function reset(discs){
+      n=discs; pegs=[[],[],[]];
+      for(let i=n;i>=1;i--) pegs[0].push(i);
+      sel=null; moves=0; done=false;
+      ui.sc.set(UM.num(0)); ui.mv.set(UM.num(0));
+      watch.stop(); watch.start(); paint();
+    }
+    function tap(p){
+      if(done) return;
+      if(sel===null){
+        if(!pegs[p].length) return;
+        sel=p; paint(); return;
+      }
+      if(sel===p){ sel=null; paint(); return; }
+      const disk=pegs[sel][pegs[sel].length-1];
+      const dest=pegs[p][pegs[p].length-1];
+      if(dest && dest<disk){ UM.sfx.no(); sel=null; paint(); return; }
+      pegs[sel].pop(); pegs[p].push(disk);
+      moves++; sel=null; ui.mv.set(UM.num(moves)); UM.sfx.ok();
+      if(pegs[2].length===n) win();
+      else paint();
+    }
+    function win(){
+      done=true; watch.stop(); UM.sfx.win();
+      const min=(1<<n)-1;
+      const pts=Math.max(80, 400-(moves-min)*12-watch.elapsed);
+      ui.sc.set(UM.num(pts));
+      showEnd(ui,"hanoi",pts,UM.t("solved"),
+        `${UM.t("moves")} ${UM.num(moves)} · ${UM.t("discs")} ${UM.num(n)}`,
+        ()=>reset(n));
+    }
+    function paint(){
+      if(done) return;
+      ui.body.innerHTML="";
+      ui.body.append(UM.el("div","qnum", UM.t("discs")+" "+UM.num(n)));
+      const row=UM.el("div","row");
+      [3,4,5].forEach(d=>{
+        const b=UM.el("button","btn"+(d===n?" go":""), UM.num(d));
+        b.onclick=()=>reset(d); row.append(b);
+      });
+      ui.body.append(row);
+      const board=UM.el("div","hanoi");
+      pegs.forEach((stack,p)=>{
+        const peg=UM.el("div","peg"+(sel===p?" sel":""));
+        peg.onclick=()=>tap(p);
+        stack.forEach(sz=>{
+          const disc=UM.el("div","disc", UM.num(sz));
+          disc.style.width=(28+sz*14)+"%";
+          peg.append(disc);
+        });
+        board.append(peg);
+      });
+      ui.body.append(board);
+    }
+    reset(3);
+    return ()=>watch.stop();
+  }
+});
+
+/* ── أونو مبسّطة ── */
+UM.register("uno", {
+  title:"أونو مبسّطة",
+  blurb:"طابق اللون أو الرقم ضد الجهاز. +٢ وتخطّي وعكس.",
+  mount(root){
+    const COLORS=["red","gold","mint","ink"];
+    const VALS=["0","1","2","3","4","5","6","7","8","9","+2","⊘","⇄"];
+    let deck, pile, you, cpu, turn, done=false;
+    const ui=shell(root);
+    const watch=UM.stopwatch(s=>ui.tm.set(UM.clock(s)));
+
+    function makeDeck(){
+      const d=[];
+      COLORS.forEach(c=>VALS.forEach(v=>d.push({c,v})));
+      return shuffle(d.concat(d.slice()));
+    }
+    function take(n=1){
+      const out=[];
+      for(let i=0;i<n;i++){
+        if(!deck.length) deck=shuffle(pile.splice(0,pile.length-1));
+        if(deck.length) out.push(deck.pop());
+      }
+      return out;
+    }
+    function match(a,b){ return a.c===b.c || a.v===b.v; }
+    function reset(){
+      deck=makeDeck(); pile=[]; you=take(7); cpu=take(7);
+      pile.push(take(1)[0]); turn="you"; done=false;
+      ui.sc.set(UM.num(you.length)); ui.mv.set(UM.num(cpu.length));
+      watch.stop(); watch.start(); paint();
+    }
+    function playYou(i){
+      if(done || turn!=="you") return;
+      const card=you[i], top=pile[pile.length-1];
+      if(!match(card,top)){ UM.sfx.no(); return; }
+      you.splice(i,1); pile.push(card); UM.sfx.ok();
+      after(card,"you");
+    }
+    function drawYou(){
+      if(done || turn!=="you") return;
+      you.push(...take(1)); paint();
+      turn="cpu"; setTimeout(playCpu, 400);
+    }
+    function after(card, who){
+      if(who==="you" && !you.length) return win(true);
+      if(who==="cpu" && !cpu.length) return win(false);
+      if(card.v==="+2"){
+        if(who==="you") cpu.push(...take(2)); else you.push(...take(2));
+        turn=who; 
+        if(who==="cpu") setTimeout(playCpu, 400);
+        else paint();
+        return;
+      }
+      if(card.v==="⊘" || card.v==="⇄"){
+        turn=who;
+        if(who==="cpu") setTimeout(playCpu, 400);
+        else paint();
+        return;
+      }
+      turn = who==="you"?"cpu":"you";
+      if(turn==="cpu") setTimeout(playCpu, 450);
+      paint();
+    }
+    function playCpu(){
+      if(done || turn!=="cpu") return;
+      const top=pile[pile.length-1];
+      const idx=cpu.findIndex(c=>match(c,top));
+      if(idx<0){ cpu.push(...take(1)); turn="you"; paint(); return; }
+      const card=cpu.splice(idx,1)[0]; pile.push(card);
+      after(card,"cpu");
+    }
+    function win(ok){
+      done=true; watch.stop(); if(ok) UM.sfx.win();
+      const pts=ok? Math.max(80, 300-you.length*5-cpu.length*-8) : 20;
+      showEnd(ui,"uno", ok?Math.max(120, 280+cpu.length*15):30,
+        ok?UM.t("youWin"):UM.t("youLose"),
+        `${UM.t("cpu")} ${UM.num(cpu.length)} · ${UM.t("time")} ${UM.clock(watch.elapsed)}`,
+        reset);
+    }
+    function label(c){ return c.v==="⊘"?"∅":c.v==="⇄"?"⇄":c.v; }
+    function paint(){
+      if(done) return;
+      ui.sc.set(UM.num(you.length)); ui.mv.set(UM.num(cpu.length));
+      ui.body.innerHTML="";
+      ui.body.append(UM.el("div","qnum", `${UM.t("cpu")} ${UM.num(cpu.length)} · ${turn==="you"?UM.t("play"):UM.t("cpu")}`));
+      const top=pile[pile.length-1];
+      const pc=UM.el("div","pilecard "+top.c, label(top));
+      ui.body.append(pc);
+      const hand=UM.el("div","unohand");
+      you.forEach((c,i)=>{
+        const b=UM.el("button","ucard "+c.c, label(c));
+        b.onclick=()=>playYou(i);
+        hand.append(b);
+      });
+      ui.body.append(hand);
+      const row=UM.el("div","row");
+      const dr=UM.el("button","btn",UM.t("draw"));
+      dr.onclick=drawYou; row.append(dr); ui.body.append(row);
+    }
+    reset();
+    return ()=>watch.stop();
+  }
+});
+
+(() => {
+  const stage=document.getElementById("stage"), where=document.getElementById("where");
+  const tabs=[...document.querySelectorAll(".surf")];
+  let teardown=null;
+  function open(id){
+    if(teardown) teardown();
+    stage.innerHTML="";
+    const g=UM.get(id);
+    where.innerHTML=`<b>${g.title}</b> — ${g.blurb}`;
+    teardown=g.mount(stage)||null;
+    tabs.forEach(b=>b.setAttribute("aria-selected", b.dataset.g===id));
+  }
+  tabs.forEach(b=>b.onclick=()=>open(b.dataset.g));
+  open("solitaire");
+})();
+</script>
+</body>
+</html>
