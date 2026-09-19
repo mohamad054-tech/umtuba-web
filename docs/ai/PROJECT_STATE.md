@@ -1,5 +1,19 @@
 # UMTUBA Project State (AI Handoff)
 
+## LAST COMPLETED IN THIS WORKTREE (2026-09-19) — GAMES ARTWORK TILES V1
+
+**`FEAT_GAMES_ARTWORK_TILES_V1`**. STATUS = **COMPLETE**. 13 owner WebP tiles on `/games`. Pushed to `feat/games-v1` @ `e0bc1533`. Not deployed. No SQL. `release/v1` not pushed. Source: `C:\Users\1\Desktop\game-art`. Report: `docs/ai/CURSOR_REPORT.md`.
+
+```
+TASK_ID = FEAT_GAMES_ARTWORK_TILES_V1
+STATUS = COMPLETE
+BRANCH = feat/games-v1
+WORKTREE = C:\Users\1\Desktop\umtuba\worktrees\FEAT-GAMES-V1
+PUSHED = YES
+DEPLOYED = NO
+NEXT_ACTION = WAIT_FOR_OWNER_OR_NEXT_GAMES_TASK
+```
+
 ## LAST ASSIGNED TASK (2026-08-24) — LEARNING FINAL ENGINEERING GATES V1
 
 **`DESKTOP_UMTUBA_LEARNING_FINAL_ENGINEERING_GATES_V1`**. STATUS = **FINAL COMPLETE**. Isolated Learning productization worktree has a clean local commit. Production build PASS. Not pushed. Not deployed. `20260934` not applied. Mobile frozen.
