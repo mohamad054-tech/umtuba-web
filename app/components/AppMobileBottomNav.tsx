@@ -138,7 +138,8 @@ export default function AppMobileBottomNav() {
   return (
     <nav
       aria-label={t("nav.primaryMobile")}
-      className={`fixed inset-x-0 bottom-0 z-[70] border-t border-white/10 bg-[#050510]/95 backdrop-blur-xl ${MOBILE_BOTTOM_NAV_MAX_CLASS}`}
+      style={{ bottom: "var(--analytics-consent-banner-offset, 0px)" }}
+      className={`fixed inset-x-0 z-[70] border-t border-white/10 bg-[#050510]/95 backdrop-blur-xl ${MOBILE_BOTTOM_NAV_MAX_CLASS}`}
     >
       <ul className="mx-auto flex max-w-lg items-stretch justify-between gap-0.5 px-1 pt-1 pb-[max(0.35rem,env(safe-area-inset-bottom))]">
         {MOBILE_PRIMARY_NAV_ITEMS.map((item) => {

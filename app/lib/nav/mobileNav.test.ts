@@ -103,6 +103,9 @@ describe("desktop vs mobile nav contracts", () => {
     expect(MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS).toContain(
       "--app-mobile-bottom-nav-offset"
     );
+    expect(MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS).toContain(
+      "--analytics-consent-banner-offset"
+    );
   });
 });
 

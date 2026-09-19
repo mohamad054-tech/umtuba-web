@@ -1,59 +1,79 @@
 "use client";
 
 import Link from "next/link";
-import { useI18n } from "../i18n";
+import { useEffect, useRef } from "react";
+import { useI18n, useTranslation } from "../i18n";
 import type { AnalyticsConsent } from "../../../lib/analytics/consent";
-
-const COPY = {
-  en: {
-    body: "We use optional product analytics (PostHog, EU) to see how the site is used. We do not send your email, name, or the text you type. Analytics stays off until you accept.",
-    accept: "Accept analytics",
-    decline: "Decline",
-    privacy: "Privacy",
-  },
-  ar: {
-    body: "نستخدم تحليلات اختيارية للمنتج (PostHog في الاتحاد الأوروبي) لفهم استخدام الموقع. لا نرسل بريدك أو اسمك أو النص الذي تكتبه. تبقى التحليلات متوقفة حتى توافق.",
-    accept: "قبول التحليلات",
-    decline: "رفض",
-    privacy: "الخصوصية",
-  },
-} as const;
+import { ANALYTICS_CONSENT_BANNER_OFFSET_VAR } from "../../lib/nav/mobileNav";
 
 export default function AnalyticsConsentBanner({
   onChoice,
 }: {
   onChoice: (value: AnalyticsConsent) => void;
 }) {
-  const { locale } = useI18n();
-  const copy = locale === "ar" ? COPY.ar : COPY.en;
+  const { direction } = useI18n();
+  const { t } = useTranslation();
+  const rootRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const node = rootRef.current;
+    if (!node) return;
+    const el = node;
+
+    function publishHeight() {
+      const height = el.getBoundingClientRect().height;
+      document.body.setAttribute("data-analytics-consent-visible", "1");
+      document.body.style.setProperty(
+        ANALYTICS_CONSENT_BANNER_OFFSET_VAR,
+        `${Math.ceil(height)}px`
+      );
+    }
+
+    publishHeight();
+    const observer = new ResizeObserver(publishHeight);
+    observer.observe(el);
+    return () => {
+      observer.disconnect();
+      document.body.removeAttribute("data-analytics-consent-visible");
+      document.body.style.removeProperty(ANALYTICS_CONSENT_BANNER_OFFSET_VAR);
+    };
+  }, []);
 
   return (
     <div
+      ref={rootRef}
       role="dialog"
-      aria-label={copy.accept}
-      className="fixed inset-x-0 bottom-0 z-[80] border-t border-white/15 bg-[#0c1842]/95 p-4 text-white shadow-2xl backdrop-blur-md"
+      aria-label={t("analytics.consent.aria")}
+      data-analytics-consent-banner="true"
+      dir={direction}
+      className="fixed inset-x-0 bottom-0 z-[80] border-t border-white/15 bg-[#0c1842]/95 px-3 py-1.5 text-white shadow-2xl backdrop-blur-md pb-[max(0.4rem,env(safe-area-inset-bottom,0px))]"
     >
-      <div className="mx-auto flex max-w-4xl flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-sm leading-relaxed text-white/85">
-          {copy.body}{" "}
-          <Link href="/privacy" className="underline underline-offset-2 hover:text-white">
-            {copy.privacy}
+      <div className="mx-auto flex max-w-4xl items-center gap-2">
+        <p className="min-w-0 flex-1 truncate text-xs leading-5 text-white/85 sm:text-sm">
+          {t("analytics.consent.body")}{" "}
+          <Link
+            href="/privacy"
+            className="underline underline-offset-2 hover:text-white"
+          >
+            {t("analytics.consent.privacy")}
           </Link>
         </p>
-        <div className="flex shrink-0 gap-2">
+        <div className="flex shrink-0 gap-1.5">
           <button
             type="button"
-            className="rounded-full border border-white/20 px-4 py-2 text-sm font-semibold text-white/80"
+            data-analytics-consent="decline"
+            className="min-h-9 rounded-full border border-white/20 px-3 text-xs font-semibold text-white/80"
             onClick={() => onChoice("denied")}
           >
-            {copy.decline}
+            {t("analytics.consent.decline")}
           </button>
           <button
             type="button"
-            className="rounded-full bg-[#f0a93b] px-4 py-2 text-sm font-bold text-[#0c1842]"
+            data-analytics-consent="accept"
+            className="min-h-9 rounded-full bg-[#f0a93b] px-3 text-xs font-bold text-[#0c1842]"
             onClick={() => onChoice("accepted")}
           >
-            {copy.accept}
+            {t("analytics.consent.accept")}
           </button>
         </div>
       </div>

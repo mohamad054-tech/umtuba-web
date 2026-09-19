@@ -546,7 +546,7 @@ export default function WatchExperience({
       <div className="relative z-10 mx-auto flex w-full max-w-7xl justify-center px-0 md:px-8 md:pb-8 md:pt-0">
         <div
           ref={stageRef}
-          className="video-watch-stage relative h-[calc(100dvh-var(--app-mobile-bottom-nav-offset,0px))] w-full overflow-hidden bg-black md:mt-0 md:h-[calc(100dvh-6.5rem)] md:max-w-[510px] md:rounded-[36px] md:border md:border-white/10"
+          className="video-watch-stage relative h-[calc(100dvh-var(--app-mobile-bottom-nav-offset,0px)-var(--analytics-consent-banner-offset,0px))] w-full overflow-hidden bg-black md:mt-0 md:h-[calc(100dvh-6.5rem)] md:max-w-[510px] md:rounded-[36px] md:border md:border-white/10"
         >
           <VerticalVideoFeed
             videos={videos}

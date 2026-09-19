@@ -110,6 +110,12 @@ export const legalEnMessages = {
     "We record page views and named actions such as sign-up, login, video view/like/share, comments posted, posts published, games started or finished, store product views, course opens, searches (whether results were empty — not the search text), and reports submitted. After you sign in we identify you only by your account id. We do not send your email, name, phone number, or the text of posts, comments, or messages.",
   "legal.privacy.analytics.p3":
     "We keep the first advertising tags from your first visit (utm_source, utm_medium, utm_campaign) and the referring website, so we can later see which campaigns bring people who return. This wording is a draft for review and is not legal advice.",
+  "analytics.consent.body":
+    "Optional analytics (PostHog, EU). Off until you accept.",
+  "analytics.consent.accept": "Accept",
+  "analytics.consent.decline": "Decline",
+  "analytics.consent.privacy": "Privacy",
+  "analytics.consent.aria": "Analytics consent",
   "legal.privacy.location.title": "Location data",
   "legal.privacy.location.p1":
     "Location is optional. We do not track you continuously.",
@@ -595,6 +601,12 @@ export const legalArMessages: LegalMessages = {
     "نسجّل مشاهدات الصفحات وإجراءات مسمّاة مثل بدء/إتمام التسجيل، وتسجيل الدخول، ومشاهدة/إعجاب/مشاركة الفيديو، ونشر تعليق، ونشر منشور، وبدء/إنهاء لعبة، وعرض منتج في المتجر، وفتح دورة، وإجراء بحث (هل كانت النتائج فارغة فقط — دون نص البحث)، وإرسال بلاغ. بعد تسجيل الدخول نعرّفك بمعرّف الحساب فقط. لا نرسل بريدك أو اسمك أو هاتفك أو نص المنشورات أو التعليقات أو الرسائل.",
   "legal.privacy.analytics.p3":
     "نحتفظ بأول وسوم إعلانية من زيارتك الأولى (utm_source وutm_medium وutm_campaign) وبالموقع المُحيل، حتى نتمكن لاحقاً من معرفة أي الحملات تجلب أشخاصاً يعودون. هذه الصياغة مسودة للمراجعة وليست استشارة قانونية.",
+  "analytics.consent.body":
+    "تحليلات اختيارية (PostHog في الاتحاد الأوروبي). متوقفة حتى توافق.",
+  "analytics.consent.accept": "قبول",
+  "analytics.consent.decline": "رفض",
+  "analytics.consent.privacy": "الخصوصية",
+  "analytics.consent.aria": "موافقة التحليلات",
   "legal.privacy.location.title": "بيانات الموقع الجغرافي",
   "legal.privacy.location.p1":
     "الموقع اختياري. لا نتتبّعك بشكل مستمر.",

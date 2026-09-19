@@ -22,6 +22,8 @@ export const MOBILE_BOTTOM_NAV_BAR_REM = 3.75;
  * Use for page/composer offset: `pb-[var(--app-mobile-bottom-nav-offset)]`
  */
 export const MOBILE_BOTTOM_NAV_OFFSET_VAR = "--app-mobile-bottom-nav-offset";
+export const ANALYTICS_CONSENT_BANNER_OFFSET_VAR =
+  "--analytics-consent-banner-offset";
 
 export type MobilePrimaryNavId =
   | "home"
@@ -125,4 +127,4 @@ export function resolveMobileProfileHref(
 
 /** Tailwind-friendly padding utility for shells that sit above the bottom nav. */
 export const MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS =
-  "max-sm:pb-[var(--app-mobile-bottom-nav-offset,0px)]" as const;
+  "max-sm:pb-[calc(var(--app-mobile-bottom-nav-offset,0px)+var(--analytics-consent-banner-offset,0px))]" as const;

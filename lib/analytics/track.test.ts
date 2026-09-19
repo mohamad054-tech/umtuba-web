@@ -91,4 +91,15 @@ describe("PostHog env inlining contract", () => {
       expect(source).not.toMatch(/process\.env\s*\[/);
     }
   });
+
+  it("localises the consent banner through i18n keys", () => {
+    const banner = readFileSync(
+      join(process.cwd(), "app/components/analytics/AnalyticsConsentBanner.tsx"),
+      "utf8"
+    );
+    expect(banner).toMatch(/analytics\.consent\.body/);
+    expect(banner).toMatch(/useTranslation/);
+    expect(banner).toMatch(/dir=\{direction\}/);
+    expect(banner).not.toMatch(/const COPY/);
+  });
 });

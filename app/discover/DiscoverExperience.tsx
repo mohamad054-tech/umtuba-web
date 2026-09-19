@@ -319,7 +319,7 @@ export default function DiscoverExperience({
         */}
         <div className="flex flex-1 flex-col gap-3 md:flex-row md:items-stretch md:justify-center md:gap-6">
         <div className="relative mx-auto w-full max-w-[510px] shrink-0 xl:mx-0 xl:w-[510px]">
-          <div className="video-watch-stage relative z-10 h-[calc(100dvh-4rem-5.75rem-var(--app-mobile-bottom-nav-offset,0px))] w-full overflow-hidden bg-black md:h-[calc(100dvh-7.5rem-5.75rem)] md:rounded-[36px] md:border md:border-white/10">
+          <div className="video-watch-stage relative z-10 h-[calc(100dvh-4rem-5.75rem-var(--app-mobile-bottom-nav-offset,0px)-var(--analytics-consent-banner-offset,0px))] w-full overflow-hidden bg-black md:h-[calc(100dvh-7.5rem-5.75rem)] md:rounded-[36px] md:border md:border-white/10">
             <DiscoverFeed
               videos={videos}
               initialIndex={initialIndex}
