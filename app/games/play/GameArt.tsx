@@ -1,5 +1,9 @@
+import Image from "next/image";
 import type { JSX, ReactNode } from "react";
-import type { PlayableGameSlug } from "../../../lib/games/play/catalog";
+import {
+  gameArtworkSrc,
+  type PlayableGameSlug,
+} from "../../../lib/games/play/catalog";
 
 /** Original Umtuba tile marks. Geometric only — not derived from third-party art. */
 
@@ -496,7 +500,33 @@ const ART: Record<PlayableGameSlug, () => JSX.Element> = {
   uno: UnoArt,
 };
 
-export default function GameArt({ slug }: { slug: PlayableGameSlug }) {
+export default function GameArt({
+  slug,
+  alt = "",
+  priority = false,
+  loading = "lazy",
+}: {
+  slug: PlayableGameSlug;
+  alt?: string;
+  priority?: boolean;
+  loading?: "lazy" | "eager";
+}) {
+  const src = gameArtworkSrc(slug);
+  if (src) {
+    return (
+      <Image
+        src={src}
+        alt={alt}
+        width={512}
+        height={512}
+        sizes="(max-width: 719px) 50vw, (max-width: 1099px) 33vw, 25vw"
+        priority={priority}
+        loading={priority ? undefined : loading}
+        data-game-art={slug}
+        data-game-art-photo="true"
+      />
+    );
+  }
   const Art = ART[slug];
   return <Art />;
 }

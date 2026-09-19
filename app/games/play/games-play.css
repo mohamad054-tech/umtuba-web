@@ -95,10 +95,12 @@
   transition: transform 0.2s ease;
 }
 
-.um-play-card-art svg {
+.um-play-card-art svg,
+.um-play-card-art img {
   display: block;
   width: 100%;
   height: 100%;
+  object-fit: cover;
 }
 
 .um-play-card-copy {

@@ -85,3 +85,31 @@ export function getPlayableGame(slug: string): PlayableGame | null {
 export function gamesPlayPath(slug: PlayableGameSlug): string {
   return `/games/${slug}`;
 }
+
+/** Owner artwork tiles under /public/games/art/{slug}.webp */
+export const GAME_ARTWORK_SLUGS = [
+  "sudoku",
+  "snake",
+  "g2048",
+  "memory",
+  "xo",
+  "hanoi",
+  "solitaire",
+  "uno",
+  "wheel",
+  "shapes",
+  "typerace",
+  "hangword",
+  "guess-city",
+] as const satisfies readonly PlayableGameSlug[];
+
+export type GameArtworkSlug = (typeof GAME_ARTWORK_SLUGS)[number];
+
+export function hasGameArtwork(slug: PlayableGameSlug): slug is GameArtworkSlug {
+  return (GAME_ARTWORK_SLUGS as readonly string[]).includes(slug);
+}
+
+export function gameArtworkSrc(slug: PlayableGameSlug): `/games/art/${GameArtworkSlug}.webp` | null {
+  if (!hasGameArtwork(slug)) return null;
+  return `/games/art/${slug}.webp`;
+}

@@ -5,6 +5,7 @@ import { useSyncExternalStore } from "react";
 import { useI18n } from "../components/i18n";
 import {
   PLAYABLE_GAMES,
+  gameArtworkSrc,
   gamesPlayPath,
 } from "../../lib/games/play/catalog";
 import { formatPlayNumber } from "../../lib/games/play/engine";
@@ -40,8 +41,9 @@ export default function GamesCatalog() {
       <h1 className="mt-2 text-3xl font-black tracking-tight">{t("games.title")}</h1>
       <p className="mt-3 mb-6 text-sm leading-7 text-white/55">{t("games.subtitle")}</p>
       <ul className="um-play-catalog" data-catalog-grid="true">
-        {PLAYABLE_GAMES.map((game) => {
+        {PLAYABLE_GAMES.map((game, index) => {
           const best = bests[game.slug];
+          const photo = Boolean(gameArtworkSrc(game.slug));
           return (
             <li key={game.slug}>
               <Link
@@ -49,8 +51,17 @@ export default function GamesCatalog() {
                 className="um-play-card"
                 data-game-card={game.slug}
               >
-                <span className="um-play-card-art" aria-hidden="true" dir="ltr">
-                  <GameArt slug={game.slug} />
+                <span
+                  className="um-play-card-art"
+                  aria-hidden={photo ? undefined : true}
+                  dir="ltr"
+                >
+                  <GameArt
+                    slug={game.slug}
+                    alt={photo ? t(game.titleKey) : ""}
+                    priority={index < 4}
+                    loading={index < 8 ? "eager" : "lazy"}
+                  />
                 </span>
                 <span className="um-play-card-copy">
                   <h2>{t(game.titleKey)}</h2>

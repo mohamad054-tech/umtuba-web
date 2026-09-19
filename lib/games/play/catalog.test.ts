@@ -1,10 +1,12 @@
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { MESSAGE_CATALOGS } from "../../i18n/messages/catalogs";
 import { gamesArMessages, gamesEnMessages } from "../../i18n/messages/gamesCatalogs";
 import {
+  GAME_ARTWORK_SLUGS,
   PLAYABLE_GAME_SLUGS,
+  gameArtworkSrc,
   getPlayableGame,
   isPlayableGameSlug,
 } from "./catalog";
@@ -71,15 +73,22 @@ describe("playable games catalog", () => {
     expect(sitemap).not.toMatch(/gamesPlayPath/);
   });
 
-  it("uses original inline SVG tiles with no third-party artwork", () => {
+  it("keeps SVG marks for games without owner artwork and maps 13 local WebP tiles", () => {
     const art = readFileSync(join(ROOT, "app/games/play/GameArt.tsx"), "utf8");
-    const withoutXmlns = art.replaceAll('xmlns="http://www.w3.org/2000/svg"', "");
-    expect(withoutXmlns).not.toMatch(/https?:\/\//);
-    expect(art).not.toMatch(/<image\b/);
-    expect(art).not.toMatch(/xlink:href|href=["']data:/);
     expect(art).not.toMatch(/unsplash|shutterstock|midjourney|dall-e|openai|stable diffusion/i);
+    expect(GAME_ARTWORK_SLUGS).toHaveLength(13);
     for (const slug of PLAYABLE_GAME_SLUGS) {
-      expect(art).toMatch(new RegExp(`["']?${slug}["']?:`));
+      const src = gameArtworkSrc(slug);
+      if (GAME_ARTWORK_SLUGS.includes(slug as (typeof GAME_ARTWORK_SLUGS)[number])) {
+        expect(src).toBe(`/games/art/${slug}.webp`);
+        const file = join(ROOT, "public", "games", "art", `${slug}.webp`);
+        expect(existsSync(file)).toBe(true);
+        expect(statSync(file).size).toBeGreaterThan(0);
+        expect(statSync(file).size).toBeLessThan(100 * 1024);
+      } else {
+        expect(src).toBeNull();
+        expect(art).toMatch(new RegExp(`["']?${slug}["']?:`));
+      }
     }
   });
 });
