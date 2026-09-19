@@ -6,7 +6,6 @@ import {
   isAnalyticsConfigured,
   POSTHOG_EU_UI_HOST,
   readPosthogHost,
-  readPosthogKey,
 } from "./config";
 import { analyticsAllowed } from "./consent";
 import { captureFirstTouch, firstTouchPersonProperties } from "./firstTouch";
@@ -27,8 +26,11 @@ export async function initAnalytics(): Promise<PostHog | null> {
   initStarted = true;
 
   const posthog = (await import("posthog-js")).default;
-  const key = readPosthogKey();
-  const host = readPosthogHost();
+  // Literals required — Next inlines NEXT_PUBLIC_* only from this form.
+  const key = process.env.NEXT_PUBLIC_POSTHOG_KEY?.trim() ?? "";
+  const host =
+    process.env.NEXT_PUBLIC_POSTHOG_HOST?.trim() || readPosthogHost();
+  if (!key) return null;
   const touch = captureFirstTouch();
 
   posthog.init(key, {

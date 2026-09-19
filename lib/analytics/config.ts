@@ -12,19 +12,37 @@ export const POSTHOG_EU_CONNECT_ORIGINS = [
   POSTHOG_EU_ASSETS_ORIGIN,
 ] as const;
 
-type EnvLike = Record<string, string | undefined>;
+let missingKeyWarned = false;
 
-export function readPosthogKey(env: EnvLike = process.env): string {
-  return env[POSTHOG_KEY_ENV]?.trim() ?? "";
+/**
+ * Next.js only inlines NEXT_PUBLIC_* when the identifier is a literal
+ * (`process.env.NEXT_PUBLIC_POSTHOG_KEY`). A computed key is undefined
+ * in the browser bundle.
+ */
+export function readPosthogKey(): string {
+  return process.env.NEXT_PUBLIC_POSTHOG_KEY?.trim() ?? "";
 }
 
-export function readPosthogHost(env: EnvLike = process.env): string {
-  const raw = env[POSTHOG_HOST_ENV]?.trim();
-  return raw || DEFAULT_POSTHOG_HOST;
+export function readPosthogHost(): string {
+  return process.env.NEXT_PUBLIC_POSTHOG_HOST?.trim() || DEFAULT_POSTHOG_HOST;
 }
 
-export function isAnalyticsConfigured(env: EnvLike = process.env): boolean {
-  return Boolean(readPosthogKey(env));
+export function isAnalyticsConfigured(): boolean {
+  const configured = Boolean(readPosthogKey());
+  if (!configured) {
+    warnMissingPosthogKeyOnce();
+  }
+  return configured;
+}
+
+function warnMissingPosthogKeyOnce(): void {
+  if (missingKeyWarned) return;
+  if (process.env.NODE_ENV !== "development") return;
+  if (typeof window === "undefined") return;
+  missingKeyWarned = true;
+  console.warn(
+    "PostHog analytics is disabled: NEXT_PUBLIC_POSTHOG_KEY is missing. Set it in .env.local."
+  );
 }
 
 export function isAdminPath(pathname: string): boolean {
