@@ -169,4 +169,6 @@ export async function signOutAfterPasswordReset(): Promise<void> {
       )
     );
   }
+  const { resetUser } = await import("../analytics/track");
+  resetUser();
 }

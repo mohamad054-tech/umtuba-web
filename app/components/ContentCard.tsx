@@ -22,6 +22,7 @@ import {
 import CommentsPanel from "./social/CommentsPanel";
 import ShareMenu from "./social/ShareMenu";
 import OwnerContentDeleteControl from "./social/OwnerContentDeleteControl";
+import { ANALYTICS_EVENTS, track } from "../../lib/analytics/track";
 import OnDemandSignedVideo from "./video/OnDemandSignedVideo";
 
 type ContentCardProps = {
@@ -80,6 +81,12 @@ export default function ContentCard({
         void recordViewAction(post.id, viewerKey).then((result) => {
           if (result.ok) {
             onPostChange?.(post.id, { views: result.views });
+            if (post.type === "video") {
+              track(ANALYTICS_EVENTS.videoView, {
+                post_id: post.id,
+                surface: "feed",
+              });
+            }
           }
         });
       },
@@ -91,7 +98,7 @@ export default function ContentCard({
     return () => {
       observer.disconnect();
     };
-  }, [onPostChange, post.id]);
+  }, [onPostChange, post.id, post.type]);
 
   function showHint(message: string) {
     setHint(message);
@@ -139,6 +146,7 @@ export default function ContentCard({
     if (result.ok) {
       onPostChange?.(post.id, { shares: result.shares });
     }
+    track(ANALYTICS_EVENTS.videoShare, { post_id: post.id, surface: "feed" });
   }
 
   async function handleShareButtonClick() {
@@ -202,6 +210,9 @@ export default function ContentCard({
     }
 
     onPostChange?.(post.id, { likedByMe: result.liked, likes: result.likes });
+    if (result.liked) {
+      track(ANALYTICS_EVENTS.videoLike, { post_id: post.id });
+    }
     setLikePending(false);
   }
 

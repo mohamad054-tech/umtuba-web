@@ -1,6 +1,11 @@
 "use client";
 
 import { recordViewAction } from "../../actions/socialInteractions";
+import {
+  ANALYTICS_EVENTS,
+  track,
+  type AnalyticsEventMap,
+} from "../../../lib/analytics/track";
 import { getOrCreateViewerKey } from "../social/shareAndViews";
 
 export type RecordFeedViewResult =
@@ -13,7 +18,8 @@ export type RecordFeedViewResult =
  */
 export async function recordFeedViewOnce(
   postId: number,
-  sessionSeen: Set<number>
+  sessionSeen: Set<number>,
+  surface: AnalyticsEventMap["video_view"]["surface"] = "discover"
 ): Promise<RecordFeedViewResult> {
   if (!Number.isInteger(postId) || postId <= 0) {
     return { ok: false };
@@ -29,6 +35,8 @@ export async function recordFeedViewOnce(
     sessionSeen.delete(postId);
     return { ok: false };
   }
+
+  track(ANALYTICS_EVENTS.videoView, { post_id: postId, surface });
 
   return {
     ok: true,

@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
+import { ANALYTICS_EVENTS, track } from "../../../../../lib/analytics/track";
 import { addToCartAction } from "../../../../actions/storeCart";
 import ProductCard from "../../../../components/store/ProductCard";
 import PlaceholderPanel from "../../../../components/store/PlaceholderPanel";
@@ -37,6 +38,13 @@ export default function ProductDetailClient({
 }: ProductDetailClientProps) {
   const { t } = useTranslation();
   const router = useRouter();
+
+  useEffect(() => {
+    track(ANALYTICS_EVENTS.storeProductViewed, {
+      product_id: detail.product.id,
+    });
+  }, [detail.product.id]);
+
   const [variantId, setVariantId] = useState(
     detail.variants[0]?.variant.id ?? ""
   );

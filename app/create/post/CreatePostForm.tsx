@@ -13,6 +13,7 @@ import {
   createPost,
   uploadPostImage,
 } from "../../../lib/supabase/posts";
+import { ANALYTICS_EVENTS, track } from "../../../lib/analytics/track";
 import { APP_ROUTES } from "../../lib/nav";
 
 type CreatePostFormProps = {
@@ -180,6 +181,7 @@ export default function CreatePostForm({
       }
 
       await createPost(trimmedContent, imageUrl);
+      track(ANALYTICS_EVENTS.postPublished, { kind: "text" });
 
       window.dispatchEvent(new Event("umtuba:post-created"));
 

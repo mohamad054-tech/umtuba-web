@@ -1,6 +1,7 @@
 "use client";
 
 import type { JSX } from "react";
+import { GameAnalyticsScope } from "../../../lib/analytics/gameScope";
 import type { PlayableGameSlug } from "../../../lib/games/play/catalog";
 import "./games-play.css";
 import {
@@ -72,8 +73,10 @@ const PLAY: Record<PlayableGameSlug, () => JSX.Element> = {
 export default function GamePlayClient({ slug }: { slug: PlayableGameSlug }) {
   const Play = PLAY[slug];
   return (
-    <div className="um-play-root">
-      <Play />
-    </div>
+    <GameAnalyticsScope slug={slug}>
+      <div className="um-play-root">
+        <Play />
+      </div>
+    </GameAnalyticsScope>
   );
 }

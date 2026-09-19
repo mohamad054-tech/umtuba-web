@@ -35,6 +35,8 @@ describe("cspPolicy origins", () => {
       "https://proj.livekit.cloud",
       "wss://proj.livekit.cloud",
       "https://tiles.openfreemap.org",
+      "https://eu.i.posthog.com",
+      "https://eu-assets.i.posthog.com",
     ]);
     expect(origins.font).toEqual(["https://tiles.openfreemap.org"]);
   });
@@ -46,7 +48,11 @@ describe("cspPolicy origins", () => {
       collectCspExternalOrigins({
         NEXT_PUBLIC_SUPABASE_URL: "ftp://example.supabase.co",
       }).connect
-    ).toEqual(["https://tiles.openfreemap.org"]);
+    ).toEqual([
+      "https://tiles.openfreemap.org",
+      "https://eu.i.posthog.com",
+      "https://eu-assets.i.posthog.com",
+    ]);
   });
 });
 
@@ -68,12 +74,12 @@ describe("buildCspReportOnlyValue", () => {
     expect(value).not.toContain("unsafe-eval");
     expect(value).toContain("style-src 'self' 'unsafe-inline'");
     expect(value).toContain(
-      "img-src 'self' blob: data: https://example.supabase.co https://tiles.openfreemap.org"
+      "img-src 'self' blob: data: https://example.supabase.co https://tiles.openfreemap.org https://eu.i.posthog.com https://eu-assets.i.posthog.com"
     );
     expect(value).toContain("media-src 'self' blob: https://example.supabase.co");
     expect(value).toContain("font-src 'self' https://tiles.openfreemap.org");
     expect(value).toContain(
-      "connect-src 'self' https://example.supabase.co wss://example.supabase.co https://proj.livekit.cloud wss://proj.livekit.cloud https://tiles.openfreemap.org"
+      "connect-src 'self' https://example.supabase.co wss://example.supabase.co https://proj.livekit.cloud wss://proj.livekit.cloud https://tiles.openfreemap.org https://eu.i.posthog.com https://eu-assets.i.posthog.com"
     );
     expect(value).toContain("worker-src 'self' blob:");
     expect(value).toContain("object-src 'none'");

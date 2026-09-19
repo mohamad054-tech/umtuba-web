@@ -8,6 +8,7 @@ import {
 } from "./validation";
 import { toAuthUserFacingMessage } from "./authMessages";
 import type { User } from "@supabase/supabase-js";
+import { resetUser } from "../analytics/track";
 
 export type UserProfile = {
   id: string;
@@ -185,6 +186,7 @@ export async function signOut() {
   if (error) {
     throw new Error(toAuthUserFacingMessage(error, "Unable to sign out."));
   }
+  resetUser();
 }
 
 export async function getAuthenticatedUser() {

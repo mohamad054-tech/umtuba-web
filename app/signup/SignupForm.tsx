@@ -12,6 +12,7 @@ import {
 import { useTranslation } from "../components/i18n";
 import { APP_ROUTES, buildCreatorProfileHref } from "../lib/nav";
 import { toAuthUserFacingMessage } from "../../lib/supabase/authMessages";
+import { ANALYTICS_EVENTS, identifyUser, track } from "../../lib/analytics/track";
 import { signUpWithEmail } from "../../lib/supabase/auth";
 import { claimPendingReferralAction } from "../actions/referral";
 import { normalizeReferralCode } from "../../lib/referral/config";
@@ -121,6 +122,7 @@ export default function SignupForm({
       return;
     }
     setFormError("");
+    track(ANALYTICS_EVENTS.signUpStarted);
     setStep(2);
   }
 
@@ -155,7 +157,7 @@ export default function SignupForm({
     const cleanedUsername = normalizeUsername(username);
 
     try {
-      await signUpWithEmail({
+      const { user } = await signUpWithEmail({
         email,
         password,
         fullName,
@@ -163,6 +165,8 @@ export default function SignupForm({
         referralCode,
         nextPath,
       });
+      identifyUser(user.id);
+      track(ANALYTICS_EVENTS.signUpCompleted);
 
       // Immediate-session claim (idempotent with DB trigger + later login/callback).
       try {
@@ -183,6 +187,7 @@ export default function SignupForm({
       );
 
       if (message.toLowerCase().includes("check your email")) {
+        track(ANALYTICS_EVENTS.signUpCompleted);
         // Cookie + auth metadata keep attribution for confirm → callback/login claim.
         setPendingEmailConfirm(true);
         setFormError("");

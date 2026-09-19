@@ -7,6 +7,7 @@ import {
   reportUgcContentAction,
   reportUgcUserAction,
 } from "../../actions/ugcReport";
+import { ANALYTICS_EVENTS, track } from "../../../lib/analytics/track";
 import { useTranslation } from "../i18n";
 import { useDialogA11y } from "../../lib/product/useDialogA11y";
 import { APP_ROUTES } from "../../lib/nav";
@@ -117,6 +118,7 @@ export default function UgcReportControl({
     setDone(true);
     setOpen(false);
     onOpenChange?.(false);
+    track(ANALYTICS_EVENTS.reportSubmitted, { kind: target.kind });
   }
 
   function closeDialog() {

@@ -21,6 +21,7 @@ import {
   type SharePostOutcome,
   type ShareTarget,
 } from "../../lib/social/shareAndViews";
+import { ANALYTICS_EVENTS, track } from "../../../lib/analytics/track";
 import { sanitizeUserFacingMessage } from "../../lib/product/userFacingMessage";
 import type { DiscoverStats } from "../types";
 
@@ -205,6 +206,7 @@ export default function DiscoverActionRail({
     if (result.ok) {
       onStatsChange?.({ shares: result.shares });
     }
+    track(ANALYTICS_EVENTS.videoShare, { post_id: postId, surface: "discover" });
   }
 
   async function handleShareButtonClick() {
@@ -268,6 +270,9 @@ export default function DiscoverActionRail({
 
     onFlagsChange?.({ likedByMe: result.liked });
     onStatsChange?.({ likes: result.likes });
+    if (result.liked) {
+      track(ANALYTICS_EVENTS.videoLike, { post_id: postId });
+    }
     setLikePending(false);
   }
 

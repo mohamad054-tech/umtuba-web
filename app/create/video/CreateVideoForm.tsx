@@ -15,6 +15,7 @@ import MediaPipelineStatusBadge from "../../components/media/MediaPipelineStatus
 import MediaProcessingProgress from "../../components/media/MediaProcessingProgress";
 import MediaUploadProgress from "../../components/media/MediaUploadProgress";
 import ProductLoadingState from "../../components/product/ProductLoadingState";
+import { ANALYTICS_EVENTS, track } from "../../../lib/analytics/track";
 import { sanitizeUserFacingMessage } from "../../lib/product/userFacingMessage";
 import { getAuthenticatedUser } from "../../../lib/supabase/auth";
 import {
@@ -406,6 +407,7 @@ export default function CreateVideoForm() {
       setErrorMessage("");
       setUploadPercent(0);
 
+      track(ANALYTICS_EVENTS.postPublished, { kind: "video" });
       window.dispatchEvent(new Event("umtuba:post-created"));
 
       window.setTimeout(() => {

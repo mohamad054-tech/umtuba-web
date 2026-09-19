@@ -13,6 +13,7 @@ import { APP_ROUTES } from "../lib/nav";
 import { sanitizeUserFacingMessage } from "../lib/product/userFacingMessage";
 import { claimPendingReferralAction } from "../actions/referral";
 import { toAuthUserFacingMessage } from "../../lib/supabase/authMessages";
+import { ANALYTICS_EVENTS, identifyUser, track } from "../../lib/analytics/track";
 import { signInWithEmail } from "../../lib/supabase/auth";
 import { assignAfterAuthSuccess } from "../../lib/supabase/authNavigation";
 import { FORGOT_PASSWORD_PATH } from "../../lib/supabase/passwordReset";
@@ -70,7 +71,9 @@ function LoginForm() {
     setFormError("");
 
     try {
-      await signInWithEmail(email, password);
+      const { user } = await signInWithEmail(email, password);
+      identifyUser(user.id);
+      track(ANALYTICS_EVENTS.login);
 
       // Idempotent referral claim — never blocks login on failure.
       try {

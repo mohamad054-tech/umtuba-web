@@ -19,6 +19,7 @@ export async function proxy(request: NextRequest) {
       NEXT_PUBLIC_LIVEKIT_URL: process.env.NEXT_PUBLIC_LIVEKIT_URL,
       LIVEKIT_URL: process.env.LIVEKIT_URL,
       NEXT_PUBLIC_MAP_STYLE_URL: process.env.NEXT_PUBLIC_MAP_STYLE_URL,
+      NEXT_PUBLIC_POSTHOG_HOST: process.env.NEXT_PUBLIC_POSTHOG_HOST,
     },
   });
   const requestHeaders = new Headers(request.headers);

@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { buildSiteGraphJsonLd } from "../lib/site/jsonLd";
 import { buildRootMetadata } from "../lib/site/metadata";
 import { resolveRequestLocale } from "../lib/i18n/server";
+import PostHogProvider from "./components/analytics/PostHogProvider";
 import AppChrome from "./components/AppChrome";
 import BrandJsonLd from "./components/brand/BrandJsonLd";
 import JsonLd from "./components/JsonLd";
@@ -47,6 +48,7 @@ export default async function RootLayout({
         <I18nProvider locale={locale}>
           <AppMotionRoot>
             <ExactContextResume />
+            <PostHogProvider />
             <AppChrome>{children}</AppChrome>
           </AppMotionRoot>
         </I18nProvider>

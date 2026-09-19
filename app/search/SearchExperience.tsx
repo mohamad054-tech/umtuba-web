@@ -30,6 +30,7 @@ import type { TranslationKey } from "../../lib/i18n/messages/types";
 import { SEARCH_ERRORS, searchUserMessage } from "../../lib/search/errors";
 import { buildSearchHref } from "../../lib/search/contracts";
 import SearchShell from "./components/SearchShell";
+import { ANALYTICS_EVENTS, track } from "../../lib/analytics/track";
 import { useTranslation } from "../components/i18n";
 
 type SearchExperienceProps = {
@@ -138,6 +139,9 @@ export default function SearchExperience({
 
         setResult(res.result);
         setLoading(false);
+        track(ANALYTICS_EVENTS.searchPerformed, {
+          empty: res.result.totalCount === 0,
+        });
         if (remember) {
           void loadRecent();
         }

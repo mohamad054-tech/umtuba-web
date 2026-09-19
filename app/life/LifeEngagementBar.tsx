@@ -20,6 +20,7 @@ import {
   type SharePostOutcome,
   type ShareTarget,
 } from "../lib/social/shareAndViews";
+import { ANALYTICS_EVENTS, track } from "../../lib/analytics/track";
 import type { LifePost } from "./lib/lifePosts";
 
 function subscribeToNoop() {
@@ -125,6 +126,7 @@ export default function LifeEngagementBar({
     if (result.ok) {
       onChange(post.id, { shares: result.shares });
     }
+    track(ANALYTICS_EVENTS.videoShare, { post_id: post.id, surface: "life" });
   }
 
   async function handleLike() {
@@ -150,6 +152,9 @@ export default function LifeEngagementBar({
       return;
     }
     onChange(post.id, { likedByMe: result.liked, likes: result.likes });
+    if (result.liked) {
+      track(ANALYTICS_EVENTS.videoLike, { post_id: post.id });
+    }
     setLikePending(false);
   }
 

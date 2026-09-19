@@ -103,6 +103,13 @@ export const legalEnMessages = {
   "legal.privacy.basis.r7c2": "Legal obligation",
   "legal.privacy.basis.withdraw":
     "You may withdraw consent at any time. Withdrawal does not affect processing carried out before withdrawal.",
+  "legal.privacy.analytics.title": "Product analytics (draft)",
+  "legal.privacy.analytics.p1":
+    "If you accept optional analytics, we send usage events to PostHog, a product-analytics service hosted in the European Union (eu.i.posthog.com). Analytics stays off until you accept. If your browser sends a Do Not Track signal, we do not turn analytics on.",
+  "legal.privacy.analytics.p2":
+    "We record page views and named actions such as sign-up, login, video view/like/share, comments posted, posts published, games started or finished, store product views, course opens, searches (whether results were empty — not the search text), and reports submitted. After you sign in we identify you only by your account id. We do not send your email, name, phone number, or the text of posts, comments, or messages.",
+  "legal.privacy.analytics.p3":
+    "We keep the first advertising tags from your first visit (utm_source, utm_medium, utm_campaign) and the referring website, so we can later see which campaigns bring people who return. This wording is a draft for review and is not legal advice.",
   "legal.privacy.location.title": "Location data",
   "legal.privacy.location.p1":
     "Location is optional. We do not track you continuously.",
@@ -581,6 +588,13 @@ export const legalArMessages: LegalMessages = {
   "legal.privacy.basis.r7c2": "الالتزام القانوني",
   "legal.privacy.basis.withdraw":
     "يمكنك سحب موافقتك في أي وقت. السحب لا يؤثر على المعالجة التي تمّت قبله.",
+  "legal.privacy.analytics.title": "تحليلات المنتج (مسودة)",
+  "legal.privacy.analytics.p1":
+    "إذا وافقت على التحليلات الاختيارية، نرسل أحداث الاستخدام إلى PostHog، وهي خدمة تحليلات للمنتج مستضافة في الاتحاد الأوروبي (eu.i.posthog.com). تبقى التحليلات متوقفة حتى توافق. وإذا أرسل متصفحك إشارة «عدم التتبع» (Do Not Track)، لا نُفعّل التحليلات.",
+  "legal.privacy.analytics.p2":
+    "نسجّل مشاهدات الصفحات وإجراءات مسمّاة مثل بدء/إتمام التسجيل، وتسجيل الدخول، ومشاهدة/إعجاب/مشاركة الفيديو، ونشر تعليق، ونشر منشور، وبدء/إنهاء لعبة، وعرض منتج في المتجر، وفتح دورة، وإجراء بحث (هل كانت النتائج فارغة فقط — دون نص البحث)، وإرسال بلاغ. بعد تسجيل الدخول نعرّفك بمعرّف الحساب فقط. لا نرسل بريدك أو اسمك أو هاتفك أو نص المنشورات أو التعليقات أو الرسائل.",
+  "legal.privacy.analytics.p3":
+    "نحتفظ بأول وسوم إعلانية من زيارتك الأولى (utm_source وutm_medium وutm_campaign) وبالموقع المُحيل، حتى نتمكن لاحقاً من معرفة أي الحملات تجلب أشخاصاً يعودون. هذه الصياغة مسودة للمراجعة وليست استشارة قانونية.",
   "legal.privacy.location.title": "بيانات الموقع الجغرافي",
   "legal.privacy.location.p1":
     "الموقع اختياري. لا نتتبّعك بشكل مستمر.",

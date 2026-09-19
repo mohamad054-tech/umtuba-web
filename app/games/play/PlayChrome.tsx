@@ -1,14 +1,20 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import { ANALYTICS_EVENTS, track } from "../../../lib/analytics/track";
+import { useGameAnalyticsSlug } from "../../../lib/analytics/gameScope";
 import { useI18n } from "../../components/i18n";
 import type { TranslationKey } from "../../../lib/i18n/messages/types";
 
 export function usePlayHelp() {
   const [helpOpen, setHelpOpen] = useState(true);
   const [ready, setReady] = useState(false);
+  const slug = useGameAnalyticsSlug();
 
   const dismissHelp = () => {
+    if (!ready && slug) {
+      track(ANALYTICS_EVENTS.gameStarted, { slug });
+    }
     setHelpOpen(false);
     setReady(true);
   };
@@ -124,6 +130,15 @@ export function PlayResult({
   onAgain: () => void;
 }) {
   const { t, locale } = useI18n();
+  const slug = useGameAnalyticsSlug();
+  const sent = useRef(false);
+
+  useEffect(() => {
+    if (!slug || sent.current) return;
+    sent.current = true;
+    track(ANALYTICS_EVENTS.gameFinished, { slug, score });
+  }, [slug, score]);
+
   return (
     <div className="um-play-result" data-game-result="true">
       <div className="um-play-score">

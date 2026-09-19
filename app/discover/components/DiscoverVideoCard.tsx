@@ -102,7 +102,7 @@ export default function DiscoverVideoCard({
       return;
     }
 
-    void recordFeedViewOnce(postId, viewsSet).then((result) => {
+    void recordFeedViewOnce(postId, viewsSet, "discover").then((result) => {
       if (result.ok && result.counted) {
         onStatsChange?.({ views: result.views });
       }

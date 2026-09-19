@@ -1,4 +1,5 @@
 import { redirect, notFound } from "next/navigation";
+import TrackOnce from "../../../components/analytics/TrackOnce";
 import LearningShell from "../../../components/learning/LearningShell";
 import CourseOutline from "../../../components/learning/CourseOutline";
 import { createTranslator } from "../../../../lib/i18n";
@@ -45,6 +46,10 @@ export default async function LearningCoursePage({ params }: PageProps) {
       backHref={LEARNING_LEARNER_ROUTES.hub}
       backLabel={t("learning.course.myLearning")}
     >
+      <TrackOnce
+        event="learning_course_opened"
+        properties={{ course_id: courseId }}
+      />
       <CourseOutline outline={outline.data} />
     </LearningShell>
   );

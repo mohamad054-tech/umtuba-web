@@ -12,6 +12,7 @@ export type CspPolicyEnv = {
   NEXT_PUBLIC_LIVEKIT_URL?: string;
   LIVEKIT_URL?: string;
   NEXT_PUBLIC_MAP_STYLE_URL?: string;
+  NEXT_PUBLIC_POSTHOG_HOST?: string;
 };
 
 export function createCspNonce(): string {
@@ -89,6 +90,12 @@ function uniqueOrigins(values: Array<string | null | undefined>): string[] {
 /** OpenFreeMap tiles / glyphs / sprites. No API key. */
 export const OPENFREEMAP_CSP_ORIGIN = "https://tiles.openfreemap.org";
 
+/** PostHog EU ingest + static assets. */
+export const POSTHOG_EU_CSP_ORIGINS = [
+  "https://eu.i.posthog.com",
+  "https://eu-assets.i.posthog.com",
+] as const;
+
 function mapStyleOverrideOrigin(raw: string | undefined): string | null {
   return publicHttpOriginFromUrl(raw);
 }
@@ -113,11 +120,15 @@ export function collectCspExternalOrigins(env: CspPolicyEnv): {
     livekitWs,
   ]);
   const mapOrigins = uniqueOrigins([OPENFREEMAP_CSP_ORIGIN, mapStyleOrigin]);
+  const posthogOrigins = uniqueOrigins([
+    ...POSTHOG_EU_CSP_ORIGINS,
+    publicHttpOriginFromUrl(env.NEXT_PUBLIC_POSTHOG_HOST || "https://eu.i.posthog.com"),
+  ]);
 
   return {
-    connect: uniqueOrigins([...supabaseAndLivekit, ...mapOrigins]),
+    connect: uniqueOrigins([...supabaseAndLivekit, ...mapOrigins, ...posthogOrigins]),
     media: uniqueOrigins([supabaseHttp]),
-    img: uniqueOrigins([supabaseHttp, ...mapOrigins]),
+    img: uniqueOrigins([supabaseHttp, ...mapOrigins, ...posthogOrigins]),
     font: mapOrigins,
   };
 }

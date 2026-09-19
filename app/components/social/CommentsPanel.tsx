@@ -17,6 +17,7 @@ import {
   readCommentDraft,
   writeCommentDraft,
 } from "../../lib/social/commentDraft";
+import { ANALYTICS_EVENTS, track } from "../../../lib/analytics/track";
 import { useDialogA11y } from "../../lib/product/useDialogA11y";
 import { sanitizeUserFacingMessage } from "../../lib/product/userFacingMessage";
 
@@ -180,6 +181,7 @@ export default function CommentsPanel({
     clearCommentDraft(postId);
     setComments((current) => [result.comment, ...(current ?? [])]);
     onCountChange?.(result.comments);
+    track(ANALYTICS_EVENTS.commentPosted, { post_id: postId });
     setIsSubmitting(false);
   }
 

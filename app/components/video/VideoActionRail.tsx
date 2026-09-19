@@ -27,6 +27,7 @@ import {
   type SharePostOutcome,
   type ShareTarget,
 } from "../../lib/social/shareAndViews";
+import { ANALYTICS_EVENTS, track } from "../../../lib/analytics/track";
 import { sanitizeUserFacingMessage } from "../../lib/product/userFacingMessage";
 import type { DiscoverStats } from "../../discover/types";
 import { allowWatchPrototypePanels } from "../../lib/product/surfaceGates";
@@ -179,6 +180,7 @@ export default function VideoActionRail({
 
     const result = await recordShareAction(postId, getOrCreateViewerKey());
     if (result.ok) onStatsChange?.({ shares: result.shares });
+    track(ANALYTICS_EVENTS.videoShare, { post_id: postId, surface: "watch" });
   }
 
   async function handleShareButtonClick() {
@@ -239,6 +241,9 @@ export default function VideoActionRail({
     }
     onFlagsChange?.({ likedByMe: result.liked });
     onStatsChange?.({ likes: result.likes });
+    if (result.liked) {
+      track(ANALYTICS_EVENTS.videoLike, { post_id: postId });
+    }
     setLikePending(false);
   }
 
