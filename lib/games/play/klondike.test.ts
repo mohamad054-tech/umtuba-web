@@ -3,9 +3,11 @@ import { shuffled } from "./engine";
 import {
   createKlondikeDeck,
   dealKlondike,
+  dealKlondikeDragRun,
   dealKlondikeLegalOpen,
   dealKlondikeLongPile,
   klondikeAllCards,
+  klondikeLegalDests,
   klondikeDraw,
   klondikeFoundationCanPlace,
   klondikeRankLabel,
@@ -81,6 +83,26 @@ describe("klondike rules", () => {
     );
     expect(illegal.ok).toBe(false);
     expect(illegal.next.tableau[0]?.[0]?.id).toBe("H-6");
+  });
+
+  it("lists legal drop targets for a dragged card", () => {
+    const state = dealKlondikeLegalOpen();
+    const dests = klondikeLegalDests(state, { zone: "tableau", pile: 0, index: 0 });
+    expect(dests).toContainEqual({ zone: "tableau", pile: 1 });
+    expect(dests.some((dest) => dest.zone === "foundation")).toBe(false);
+  });
+
+  it("moves a three-card run onto a legal tableau", () => {
+    const state = dealKlondikeDragRun();
+    expect(state.tableau[2]?.map((card) => card.id)).toEqual(["C-8", "H-7", "C-6"]);
+    const attempt = klondikeTryMove(
+      state,
+      { zone: "tableau", pile: 2, index: 0 },
+      { zone: "tableau", pile: 3 }
+    );
+    expect(attempt.ok).toBe(true);
+    expect(attempt.next.tableau[3]?.map((card) => card.id)).toEqual(["H-9", "C-8", "H-7", "C-6"]);
+    expect(new Set(klondikeAllCards(attempt.next).map((card) => card.id)).size).toBe(52);
   });
 
   it("seeds a 13-card face-up pile without losing cards", () => {

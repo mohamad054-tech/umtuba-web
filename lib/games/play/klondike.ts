@@ -212,6 +212,61 @@ function removeSelection(state: KlondikeState, sel: KlondikeSel): KlondikeState 
   return next;
 }
 
+export function klondikeLegalDests(state: KlondikeState, sel: KlondikeSel): KlondikeDest[] {
+  const dests: KlondikeDest[] = [];
+  for (let pile = 0; pile < 7; pile += 1) {
+    if (klondikeTryMove(state, sel, { zone: "tableau", pile }).ok) {
+      dests.push({ zone: "tableau", pile });
+    }
+  }
+  for (let pile = 0; pile < 4; pile += 1) {
+    if (klondikeTryMove(state, sel, { zone: "foundation", pile }).ok) {
+      dests.push({ zone: "foundation", pile });
+    }
+  }
+  return dests;
+}
+
+export function destsMatch(a: KlondikeDest | null, b: KlondikeDest | null) {
+  return Boolean(a && b && a.zone === b.zone && a.pile === b.pile);
+}
+
+/** 3-card face-up run (8♣-7♥-6♣) that can drop on 9♥. */
+export function dealKlondikeDragRun(): KlondikeState {
+  const reserved = new Set(["C-8", "H-7", "C-6", "H-9"]);
+  const leftover = createKlondikeDeck()
+    .filter((card) => !reserved.has(card.id))
+    .map((card) => ({ ...card, up: false }));
+  const next = () => leftover.pop()!;
+  const run: KlondikeCard[] = [
+    { id: "C-8", suit: "C", rank: 8, up: true },
+    { id: "H-7", suit: "H", rank: 7, up: true },
+    { id: "C-6", suit: "C", rank: 6, up: true },
+  ];
+  const nineHeart: KlondikeCard = { id: "H-9", suit: "H", rank: 9, up: true };
+  const tableau: KlondikeCard[][] = [
+    [next()],
+    [next(), next()],
+    run,
+    [nineHeart],
+    [next(), next(), next()],
+    [next(), next(), next(), next()],
+    [next(), next(), next(), next(), next()],
+  ];
+  for (const [index, pile] of tableau.entries()) {
+    if (index === 2 || index === 3) continue;
+    for (let i = 0; i < pile.length; i += 1) {
+      pile[i] = { ...pile[i]!, up: i === pile.length - 1 };
+    }
+  }
+  return {
+    tableau,
+    foundations: [[], [], [], []],
+    stock: leftover,
+    waste: [],
+  };
+}
+
 export function klondikeTryMove(
   state: KlondikeState,
   sel: KlondikeSel,

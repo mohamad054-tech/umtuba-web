@@ -999,6 +999,10 @@ body:has(.um-game-fit) {
   min-width: 0;
   box-sizing: border-box;
   overflow: hidden;
+  touch-action: none;
+  overscroll-behavior: none;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .um-klondike-row {
@@ -1040,6 +1044,7 @@ body:has(.um-game-fit) {
 .um-kcard {
   display: block;
   position: relative;
+  touch-action: none;
   width: var(--um-k-card-w, 100%);
   max-width: 100%;
   height: var(--um-k-card-h, auto);
@@ -1104,6 +1109,47 @@ body:has(.um-game-fit) {
   outline: 2px solid var(--um-gold);
   outline-offset: 0;
   z-index: 3;
+}
+
+.um-kcard.placeholder {
+  opacity: 0.32;
+  pointer-events: none;
+}
+
+.um-ktableau.drop-ok,
+.um-kslot.drop-ok {
+  outline: 2px solid var(--um-mint);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+.um-ktableau.drop-hover,
+.um-kslot.drop-hover {
+  outline-color: var(--um-gold);
+}
+
+.um-kdrag-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  pointer-events: none;
+}
+
+.um-kdrag-ghost {
+  position: fixed;
+  left: 0;
+  top: 0;
+  transform-origin: top left;
+  filter: drop-shadow(0 10px 16px rgba(5, 5, 16, 0.55));
+  pointer-events: none;
+}
+
+.um-kdrag-ghost .um-kcard {
+  transform: scale(1.04);
+}
+
+.um-kdrag-ghost.return {
+  transition: transform 0.18s ease;
 }
 
 .um-kcard.back {
@@ -1226,6 +1272,12 @@ body:has(.um-game-fit) {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .um-kdrag-ghost.return,
+  .um-kdrag-ghost .um-kcard {
+    transition: none !important;
+    transform: none !important;
+  }
+
   .um-play-card,
   .um-play-card-art {
     transition: none;
