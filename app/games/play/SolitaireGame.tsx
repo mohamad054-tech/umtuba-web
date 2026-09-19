@@ -32,7 +32,7 @@ import {
   type KlondikeSel,
   type KlondikeState,
 } from "../../../lib/games/play/klondike";
-import { klondikePileMetrics } from "../../../lib/games/play/klondikeLayout";
+import { klondikeColumnGap, klondikePileMetrics } from "../../../lib/games/play/klondikeLayout";
 import { writeBestIfHigher } from "../../../lib/games/play/scores";
 import {
   PlayHowTo,
@@ -223,9 +223,10 @@ export default function SolitaireGame() {
     observer.observe(node);
     boardObserver.current = observer;
   }, []);
+  const colGap = klondikeColumnGap(boardBox.w);
   const layout = useMemo(
-    () => klondikePileMetrics(state.tableau, boardBox.w, boardBox.h),
-    [state.tableau, boardBox.w, boardBox.h]
+    () => klondikePileMetrics(state.tableau, boardBox.w, boardBox.h, 7, colGap),
+    [state.tableau, boardBox.w, boardBox.h, colGap]
   );
 
   const deal = () => {
@@ -444,6 +445,7 @@ export default function SolitaireGame() {
     ["--um-k-card-h" as string]: `${layout.cardH}px`,
     ["--um-k-peek-up" as string]: `${layout.peekUp}px`,
     ["--um-k-peek-down" as string]: `${layout.peekDown}px`,
+    ["--um-k-col-gap" as string]: `${layout.colGap}px`,
   };
   const dropClass = (dest: KlondikeDest) => {
     if (!drag) return "";
@@ -480,7 +482,9 @@ export default function SolitaireGame() {
             data-klondike-board="true"
             data-last-move={lastMove}
             data-k-dragging={drag ? "true" : "false"}
+            data-k-card-w={layout.cardW.toFixed(2)}
             data-k-card-h={layout.cardH.toFixed(2)}
+            data-k-col-gap={layout.colGap.toFixed(2)}
             data-k-peek-up={layout.peekUp.toFixed(2)}
             data-k-peek-down={layout.peekDown.toFixed(2)}
           >

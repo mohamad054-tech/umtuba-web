@@ -1,24 +1,29 @@
 .um-games-shell,
 .um-play-root {
-  --um-night-black: #050510;
-  --um-night-navy: #0a1028;
-  --um-night-blue: #141e45;
-  --um-night-purple: #1b1438;
+  --um-night-black: #060512;
+  --um-night-navy: #0c1842;
+  --um-night-blue: #2a45b8;
+  --um-night-purple: #5a2494;
   --um-play-bg:
     radial-gradient(
-      120% 90% at 8% -8%,
-      color-mix(in srgb, var(--um-night-purple) 86%, transparent) 0%,
-      transparent 54%
+      130% 100% at 4% -12%,
+      color-mix(in srgb, var(--um-night-purple) 88%, white 8%) 0%,
+      transparent 58%
     ),
     radial-gradient(
-      85% 70% at 104% 4%,
-      color-mix(in srgb, var(--um-night-blue) 72%, transparent) 0%,
-      transparent 50%
+      100% 85% at 108% -4%,
+      color-mix(in srgb, var(--um-night-blue) 86%, white 6%) 0%,
+      transparent 56%
+    ),
+    radial-gradient(
+      90% 60% at 48% 112%,
+      color-mix(in srgb, var(--um-night-purple) 62%, transparent) 0%,
+      transparent 58%
     ),
     linear-gradient(
       168deg,
       var(--um-night-navy) 0%,
-      var(--um-night-black) 46%,
+      color-mix(in srgb, var(--um-night-blue) 38%, var(--um-night-black)) 44%,
       var(--um-night-purple) 100%
     );
   --um-field: var(--um-night-navy);
@@ -1007,8 +1012,10 @@ body:has(.um-game-fit) {
 
 .um-klondike-row {
   display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
-  gap: clamp(2px, 0.6vw, 8px);
+  grid-template-columns: repeat(7, minmax(0, var(--um-k-card-w, 1fr)));
+  gap: var(--um-k-col-gap, 3px);
+  justify-content: center;
+  justify-items: center;
   align-items: start;
   width: 100%;
   min-width: 0;

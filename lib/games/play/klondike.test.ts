@@ -14,7 +14,12 @@ import {
   klondikeTableauCanPlace,
   klondikeTryMove,
 } from "./klondike";
-import { KLONDIKE_PEEK_UP_MIN, klondikePileMetrics } from "./klondikeLayout";
+import {
+  KLONDIKE_PEEK_UP_MIN,
+  KLONDIKE_TARGET_PILE,
+  klondikeColumnGap,
+  klondikePileMetrics,
+} from "./klondikeLayout";
 
 describe("klondike rules", () => {
   it("prints only Latin poker ranks", () => {
@@ -114,6 +119,23 @@ describe("klondike rules", () => {
 });
 
 describe("klondike layout", () => {
+  it("sizes typical piles larger than a compressed 19-card pile", () => {
+    const typical = klondikePileMetrics(
+      [Array.from({ length: 7 }, () => ({ up: true }))],
+      980,
+      420
+    );
+    const long = klondikePileMetrics(
+      [Array.from({ length: 19 }, () => ({ up: true }))],
+      980,
+      420
+    );
+    expect(typical.cardH).toBeGreaterThan(long.cardH);
+    expect(typical.colGap).toBeLessThanOrEqual(6);
+    expect(klondikeColumnGap(390)).toBe(3);
+    expect(KLONDIKE_TARGET_PILE).toBe(13);
+  });
+
   it("keeps a 19-card pile inside the board at 25% minimum peek", () => {
     const piles = [Array.from({ length: 19 }, () => ({ up: true }))];
     const layout = klondikePileMetrics(piles, 980, 420);
