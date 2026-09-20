@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useCallback, useRef, useState, useMemo } from "react";
+import { useCallback, useLayoutEffect, useRef, useState, useMemo } from "react";
 import { loadDiscoverFeedPageAction } from "../actions/loadDiscoverFeed";
 import StartDirectMessageButton from "../components/messaging/StartDirectMessageButton";
 import CommentsPanel from "../components/social/CommentsPanel";
@@ -28,6 +28,8 @@ import DiscoverFeed from "./components/DiscoverFeed";
 import DiscoverShell from "./components/DiscoverShell";
 import type { DiscoverStats, DiscoverVideo } from "./types";
 import { extractHashtagsFromCaption } from "../../lib/supabase/updateOwnPostCaption";
+import { composeFeedWithWatchHide } from "../../lib/video/watchHidePolicy";
+import { readLocalWatchHideEntries } from "../../lib/video/watchHideStorage";
 
 type DiscoverExperienceProps = {
   videos: DiscoverVideo[];
@@ -59,6 +61,37 @@ export default function DiscoverExperience({
   nextCursorRef.current = nextCursor;
   // Fixed from the page session — do not re-fetch (avoids flash + identity skew).
   const viewerId = initialViewerId;
+  const guestWatchedRef = useRef(readLocalWatchHideEntries());
+
+  useLayoutEffect(() => {
+    const guest = readLocalWatchHideEntries();
+    guestWatchedRef.current = guest;
+    if (guest.length === 0) {
+      return;
+    }
+    const keepPostId = postParam ? Number(postParam) : null;
+    setVideos((current) =>
+      composeFeedWithWatchHide(current, (video) => Number(video.id), guest, {
+        keepPostId:
+          keepPostId && Number.isInteger(keepPostId) && keepPostId > 0
+            ? keepPostId
+            : null,
+      })
+    );
+    void loadDiscoverFeedPageAction({
+      guestWatched: guest,
+      focusPostId:
+        keepPostId && Number.isInteger(keepPostId) && keepPostId > 0
+          ? keepPostId
+          : null,
+    }).then((result) => {
+      if (!result.ok) {
+        return;
+      }
+      setVideos(result.videos);
+      setNextCursor(result.nextCursor);
+    });
+  }, [postParam]);
 
   const initialIndex = useMemo(() => {
     const byPost = findIndexByPostId(videos, postParam);
@@ -232,7 +265,10 @@ export default function DiscoverExperience({
     setLoadMoreError(null);
 
     try {
-      const result = await loadDiscoverFeedPageAction({ cursor });
+      const result = await loadDiscoverFeedPageAction({
+        cursor,
+        guestWatched: guestWatchedRef.current,
+      });
       if (!result.ok) {
         setLoadMoreError(FEED_LOAD_MORE_ERROR_MESSAGE);
         setLoadMoreEpoch((epoch) => epoch + 1);

@@ -12,6 +12,8 @@ import {
   mergeWatchProgress,
   type WatchSessionSnapshot,
 } from "../../lib/video/recordWatchSignal";
+import { createConsecutiveWatchTracker } from "../../../lib/video/watchHidePolicy";
+import { rememberQualifiedWatch } from "../../../lib/video/rememberQualifiedWatch";
 import type { DiscoverStats, DiscoverVideo } from "../types";
 import { HomeCircularArc } from "../../components/home/circularArc";
 import { shouldMountHomeCircularArc } from "../../components/home/circularArc/homeCircularArcFlags";
@@ -65,6 +67,7 @@ export default function DiscoverVideoCard({
   const showLeftActionRail = shouldMountHomeCircularArc();
   const sessionRef = useRef<WatchSessionSnapshot | null>(null);
   const wasActiveRef = useRef(false);
+  const hideTrackerRef = useRef(createConsecutiveWatchTracker({ onQualified: () => {} }));
   const chromeRef = useRef<HTMLDivElement | null>(null);
   const rightRailRef = useRef<HTMLDivElement | null>(null);
   const leftRailRef = useRef<HTMLDivElement | null>(null);
@@ -141,9 +144,26 @@ export default function DiscoverVideoCard({
     };
   }, []);
 
+  useEffect(() => {
+    hideTrackerRef.current = createConsecutiveWatchTracker({
+      onQualified: () => {
+        if (Number.isInteger(postId) && postId > 0) {
+          void rememberQualifiedWatch(postId);
+        }
+      },
+    });
+  }, [postId]);
+
+  useEffect(() => {
+    if (!active) {
+      hideTrackerRef.current.reset();
+    }
+  }, [active]);
+
   function handleWatchProgress(event: WatchProgressEvent) {
     if (!sessionRef.current) return;
     sessionRef.current = mergeWatchProgress(sessionRef.current, event);
+    hideTrackerRef.current.ingest(event.currentTimeMs, active);
   }
 
   function handleFlagsChange(flags: {

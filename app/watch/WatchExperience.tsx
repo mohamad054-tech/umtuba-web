@@ -4,6 +4,7 @@ import Link from "next/link";
 import {
   useCallback,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useReducer,
   useRef,
@@ -50,6 +51,8 @@ import {
 } from "../../lib/world/exactContext";
 import { findWatchVideoIndex, localizedVideoTitle } from "./lib/mapWatchVideo";
 import type { WatchVideo } from "./types";
+import { composeFeedWithWatchHide } from "../../lib/video/watchHidePolicy";
+import { readLocalWatchHideEntries } from "../../lib/video/watchHideStorage";
 
 const PRODUCTION_WATCH_PANELS = new Set<Exclude<WatchPanelId, null>>([
   "comments",
@@ -137,6 +140,45 @@ export default function WatchExperience({
   const [forcePause, setForcePause] = useState(false);
   const [journeyVideo, setJourneyVideo] = useState<WatchVideo | null>(null);
   const [demoFallback] = useState(usedDemoFallback);
+  const guestWatchedRef = useRef(readLocalWatchHideEntries());
+
+  useLayoutEffect(() => {
+    if (demoFallback) {
+      return;
+    }
+    const guest = readLocalWatchHideEntries();
+    guestWatchedRef.current = guest;
+    if (guest.length === 0) {
+      return;
+    }
+    const keepPostId = focusKey ? Number(focusKey) : null;
+    setVideos((current) =>
+      composeFeedWithWatchHide(
+        current,
+        (video) => video.postId ?? Number(video.id),
+        guest,
+        {
+          keepPostId:
+            keepPostId && Number.isInteger(keepPostId) && keepPostId > 0
+              ? keepPostId
+              : null,
+        }
+      )
+    );
+    void loadWatchFeedPageAction({
+      guestWatched: guest,
+      focusPostId:
+        keepPostId && Number.isInteger(keepPostId) && keepPostId > 0
+          ? keepPostId
+          : null,
+    }).then((result) => {
+      if (!result.ok) {
+        return;
+      }
+      setVideos(result.videos);
+      setNextCursor(result.nextCursor);
+    });
+  }, [demoFallback, focusKey]);
   const [playbackTimeMs, setPlaybackTimeMs] = useState(0);
   const [restoreVideoState, setRestoreVideoState] = useState<{
     videoId: string;
@@ -403,7 +445,10 @@ export default function WatchExperience({
     setLoadMoreError(null);
 
     try {
-      const result = await loadWatchFeedPageAction({ cursor });
+      const result = await loadWatchFeedPageAction({
+        cursor,
+        guestWatched: guestWatchedRef.current,
+      });
       if (!result.ok) {
         setLoadMoreError(FEED_LOAD_MORE_ERROR_MESSAGE);
         setLoadMoreEpoch((epoch) => epoch + 1);

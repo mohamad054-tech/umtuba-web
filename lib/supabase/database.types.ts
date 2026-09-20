@@ -83,6 +83,12 @@ export type PostViewRow = {
   last_viewed_at: string;
 };
 
+export type PostWatchCompletionRow = {
+  user_id: string;
+  post_id: number;
+  watched_at: string;
+};
+
 export type ConversationRow = {
   id: string;
   kind: "direct" | "group" | "channel" | "phone";
@@ -407,6 +413,18 @@ export type Database = {
         };
         Relationships: [];
       };
+      post_watch_completions: {
+        Row: PostWatchCompletionRow;
+        Insert: {
+          user_id: string;
+          post_id: number;
+          watched_at?: string;
+        };
+        Update: {
+          watched_at?: string;
+        };
+        Relationships: [];
+      };
       post_views: {
         Row: PostViewRow;
         Insert: {
@@ -718,6 +736,10 @@ export type Database = {
       record_post_view: {
         Args: { p_post_id: number; p_viewer_key?: string | null };
         Returns: { counted: boolean; views: number };
+      };
+      record_post_watch_completion: {
+        Args: { p_post_id: number };
+        Returns: { ok: boolean; postId: number };
       };
       record_watch_signal: {
         Args: {

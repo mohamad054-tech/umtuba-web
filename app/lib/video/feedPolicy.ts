@@ -10,6 +10,12 @@
  *   only when counted.
  * - Demo / non-supabase items never call the RPC.
  *
+ * 14-day hide after a qualified watch (Home + /watch):
+ * - Separate table `post_watch_completions` + guest localStorage.
+ * - A video is hidden for 14 days only after 5 consecutive seconds of play.
+ * - Fast skip does not qualify. Does not change posts.views / record_post_view.
+ * - If unwatched videos drop below 10, the feed backfills oldest watched rows.
+ *
  * Watch-signal telemetry (Recommendation Infrastructure V1):
  * - Separate from view counting. Records watch_duration_ms, watch_percent,
  *   completed, rewatch_count, like/save/share/comment/follow_after_watch,
@@ -22,6 +28,9 @@
  */
 
 export const FEED_VIEW_DEDUPE_WINDOW_HOURS = 6;
+
+/** Re-export hide-window so feed contracts stay in one file. */
+export { WATCH_HIDE_WINDOW_DAYS } from "../../../lib/video/watchHidePolicy";
 
 /** Initial page size for Discover and Watch real feeds. */
 export const VIDEO_FEED_PAGE_SIZE = 12;

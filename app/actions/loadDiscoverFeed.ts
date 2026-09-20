@@ -5,6 +5,7 @@ import {
   loadCanonicalVideoFeedPage,
 } from "../../lib/supabase/videoPostsServer";
 import type { DiscoverVideo } from "../discover/types";
+import type { WatchHideEntry } from "../../lib/video/watchHidePolicy";
 
 export type LoadDiscoverFeedResult =
   | {
@@ -19,12 +20,14 @@ export async function loadDiscoverFeedPageAction(input?: {
   cursor?: string | null;
   limit?: number;
   focusPostId?: number | null;
+  guestWatched?: WatchHideEntry[] | null;
 }): Promise<LoadDiscoverFeedResult> {
   const result = await loadCanonicalVideoFeedPage({
     cursor: input?.cursor,
     limit: input?.limit,
     focusPostId: input?.focusPostId,
     signPolicy: "first-active",
+    guestWatched: input?.guestWatched,
   });
 
   if (!result.ok) {

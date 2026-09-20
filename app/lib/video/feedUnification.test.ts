@@ -42,6 +42,10 @@ describe("canonical video feed architecture", () => {
   it("shares view recording helper and documents 6h server window", () => {
     expect(FEED_VIEW_DEDUPE_WINDOW_HOURS).toBe(6);
     expect(VIDEO_FEED_PAGE_SIZE).toBe(12);
+    expect(read("lib/video/watchHidePolicy.ts")).toMatch(/QUALIFIED_WATCH_MS = 5_000/);
+    expect(read("lib/video/rememberQualifiedWatch.ts")).not.toMatch(
+      /recordViewAction/
+    );
     const helper = read("app/lib/video/recordFeedView.ts");
     const discoverCard = read("app/discover/components/DiscoverVideoCard.tsx");
     const watchExp = read("app/watch/WatchExperience.tsx");

@@ -41,6 +41,13 @@ import {
   type VideoPostRow,
 } from "./videoPosts";
 import { isPubliclyVisibleMedia } from "../media/pipelineTypes";
+import { loadRecentWatchCompletions } from "./watchCompletions";
+import {
+  MIN_UNWATCHED_FEED,
+  recentHiddenPostIds,
+  sanitizeWatchHideEntries,
+  type WatchHideEntry,
+} from "../video/watchHidePolicy";
 
 export type DiscoverVideosResult =
   | {
@@ -84,6 +91,7 @@ export async function loadCanonicalVideoFeedPage(input?: {
   limit?: number;
   focusPostId?: number | null;
   signPolicy?: WatchSignPolicy;
+  guestWatched?: WatchHideEntry[] | null;
 }): Promise<
   | { ok: true; page: CanonicalVideoFeedPage }
   | { ok: false; message: string }
@@ -96,8 +104,23 @@ export async function loadCanonicalVideoFeedPage(input?: {
       VIDEO_FEED_PAGE_MAX
     );
     const cursor = decodeWatchFeedCursor(input?.cursor ?? null);
+    const hideEntries = sanitizeWatchHideEntries([
+      ...(input?.guestWatched ?? []),
+      ...(await loadRecentWatchCompletions(supabase, user?.id)),
+    ]);
+    const hiddenIds = recentHiddenPostIds(hideEntries);
+    const keepPostId =
+      input?.focusPostId && input.focusPostId > 0 ? input.focusPostId : null;
+    const fetchLimit = Math.min(
+      limit + 1 + Math.min(hiddenIds.size, 40),
+      80
+    );
 
-    const buildFeedQuery = (columns: string) => {
+    const buildFeedQuery = (
+      columns: string,
+      pageCursor: { createdAt: string; id: number } | null,
+      take: number
+    ) => {
       let query = supabase
         .from("posts")
         .select(postsSelectVisible(columns))
@@ -106,22 +129,26 @@ export async function loadCanonicalVideoFeedPage(input?: {
         .not("video_path", "is", null)
         .order("created_at", { ascending: false })
         .order("id", { ascending: false })
-        .limit(limit + 1);
-      if (cursor) {
+        .limit(take);
+      if (pageCursor) {
         query = query.or(
-          `and(created_at.eq.${cursor.createdAt},id.lt.${cursor.id}),created_at.lt.${cursor.createdAt}`
+          `and(created_at.eq.${pageCursor.createdAt},id.lt.${pageCursor.id}),created_at.lt.${pageCursor.createdAt}`
         );
       }
       return applyViewerVisibility(query, user?.id);
     };
 
-    let { data, error } = await buildFeedQuery(postColumns);
+    let { data, error } = await buildFeedQuery(postColumns, cursor, fetchLimit);
     let useArticleColumn = true;
 
     // Home feed stays up before articles migration is applied (Git-only until GO).
     if (error && isMissingArticleIdColumnError(error)) {
       useArticleColumn = false;
-      ({ data, error } = await buildFeedQuery(postColumnsWithoutArticle));
+      ({ data, error } = await buildFeedQuery(
+        postColumnsWithoutArticle,
+        cursor,
+        fetchLimit
+      ));
     }
 
     if (error) {
@@ -163,8 +190,62 @@ export async function loadCanonicalVideoFeedPage(input?: {
       }
     }
 
-    const hasMore = rows.length > limit;
-    const pageRows = hasMore ? rows.slice(0, limit) : rows;
+    const isHidden = (id: number) => hiddenIds.has(id) && id !== keepPostId;
+    const rawHadMore = rows.length >= fetchLimit;
+    let visibleRows = rows.filter((row) => !isHidden(row.id));
+
+    if (visibleRows.length <= limit && rawHadMore) {
+      const lastRaw = rows[rows.length - 1];
+      const extraSelect = useArticleColumn
+        ? postColumns
+        : postColumnsWithoutArticle;
+      const extra = await buildFeedQuery(extraSelect, {
+        createdAt: lastRaw.created_at,
+        id: lastRaw.id,
+      }, fetchLimit);
+      if (!extra.error && extra.data) {
+        const extraRows = extra.data as unknown as VideoPostRow[];
+        const seen = new Set(visibleRows.map((row) => row.id));
+        for (const row of extraRows) {
+          if (!isHidden(row.id) && !seen.has(row.id)) {
+            visibleRows.push(row);
+            seen.add(row.id);
+          }
+        }
+      }
+    }
+
+    if (!cursor && visibleRows.length < MIN_UNWATCHED_FEED) {
+      const already = new Set(visibleRows.map((row) => row.id));
+      const backfillIds = hideEntries
+        .filter((entry) => entry.postId !== keepPostId && !already.has(entry.postId))
+        .sort((a, b) => a.watchedAt - b.watchedAt)
+        .map((entry) => entry.postId)
+        .slice(0, MIN_UNWATCHED_FEED - visibleRows.length);
+      if (backfillIds.length > 0) {
+        const backfillSelect = useArticleColumn
+          ? postColumns
+          : postColumnsWithoutArticle;
+        const { data: backfillData } = await applyViewerVisibility(
+          supabase
+            .from("posts")
+            .select(postsSelectVisible(backfillSelect))
+            .in("id", backfillIds)
+            .eq("post_type", "video")
+            .eq("media_status", "ready")
+            .not("video_path", "is", null),
+          user?.id
+        );
+        const order = new Map(backfillIds.map((id, index) => [id, index]));
+        const backfillRows = ((backfillData ?? []) as unknown as VideoPostRow[])
+          .filter((row) => isPostVisibleToViewer(row, user?.id))
+          .sort((a, b) => (order.get(a.id) ?? 0) - (order.get(b.id) ?? 0));
+        visibleRows = [...visibleRows, ...backfillRows];
+      }
+    }
+
+    const hasMore = visibleRows.length > limit || rawHadMore;
+    const pageRows = visibleRows.length > limit ? visibleRows.slice(0, limit) : visibleRows;
     const focusIndex = (() => {
       if (input?.focusPostId && input.focusPostId > 0) {
         const found = pageRows.findIndex((row) => row.id === input.focusPostId);
@@ -224,10 +305,12 @@ export async function loadCanonicalVideoFeedPage(input?: {
       followingSet
     );
 
-    const lastRow = pageRows[pageRows.length - 1];
+    const lastFreshOnPage = [...pageRows]
+      .reverse()
+      .find((row) => !isHidden(row.id));
     const nextCursor =
-      hasMore && lastRow
-        ? { createdAt: lastRow.created_at, id: lastRow.id }
+      hasMore && lastFreshOnPage
+        ? { createdAt: lastFreshOnPage.created_at, id: lastFreshOnPage.id }
         : null;
 
     return {
@@ -249,11 +332,13 @@ export async function loadCanonicalVideoFeedPage(input?: {
 export async function getDiscoverVideosServer(input?: {
   focusPostId?: number | null;
   limit?: number;
+  guestWatched?: WatchHideEntry[] | null;
 }): Promise<DiscoverVideosResult> {
   const result = await loadCanonicalVideoFeedPage({
     focusPostId: input?.focusPostId,
     limit: input?.limit ?? VIDEO_FEED_PAGE_SIZE,
     signPolicy: "first-active",
+    guestWatched: input?.guestWatched,
   });
 
   if (!result.ok) {
@@ -277,12 +362,14 @@ export async function getWatchVideosPageServer(input?: {
   cursor?: string | null;
   limit?: number;
   focusPostId?: number | null;
+  guestWatched?: WatchHideEntry[] | null;
 }): Promise<WatchVideosPageResult> {
   const result = await loadCanonicalVideoFeedPage({
     cursor: input?.cursor,
     limit: input?.limit ?? WATCH_FEED_PAGE_SIZE,
     focusPostId: input?.focusPostId,
     signPolicy: "active-window",
+    guestWatched: input?.guestWatched,
   });
 
   if (!result.ok) {

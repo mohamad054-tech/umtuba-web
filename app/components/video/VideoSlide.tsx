@@ -10,6 +10,8 @@ import {
   mergeWatchProgress,
   type WatchSessionSnapshot,
 } from "../../lib/video/recordWatchSignal";
+import { createConsecutiveWatchTracker } from "../../../lib/video/watchHidePolicy";
+import { rememberQualifiedWatch } from "../../../lib/video/rememberQualifiedWatch";
 import {
   playbackStatusAfterRemintFailure,
   shouldAutoRemintPlayback,
@@ -76,6 +78,7 @@ export default function VideoSlide({
   const [retrying, setRetrying] = useState(false);
   const sessionRef = useRef<WatchSessionSnapshot | null>(null);
   const wasActiveRef = useRef(false);
+  const hideTrackerRef = useRef(createConsecutiveWatchTracker({ onQualified: () => {} }));
   const autoRemintAttemptedRef = useRef(false);
   const lastReportedTimeRef = useRef(-1);
   const onPlaybackTimeRef = useRef(onPlaybackTime);
@@ -85,6 +88,22 @@ export default function VideoSlide({
     autoRemintAttemptedRef.current = false;
     setPlaybackStatus("ok");
   }, [video.id]);
+
+  useEffect(() => {
+    hideTrackerRef.current = createConsecutiveWatchTracker({
+      onQualified: () => {
+        if (video.postId) {
+          void rememberQualifiedWatch(video.postId);
+        }
+      },
+    });
+  }, [video.postId]);
+
+  useEffect(() => {
+    if (!active) {
+      hideTrackerRef.current.reset();
+    }
+  }, [active]);
 
   async function handleRetryPlayback() {
     if (!video.postId || retrying) return;
@@ -152,6 +171,7 @@ export default function VideoSlide({
     if (sessionRef.current) {
       sessionRef.current = mergeWatchProgress(sessionRef.current, event);
     }
+    hideTrackerRef.current.ingest(event.currentTimeMs, active);
 
     if (!active || !onPlaybackTimeRef.current) {
       return;

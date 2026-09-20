@@ -6,6 +6,7 @@ import {
   refreshWatchPlaybackUrlServer,
 } from "../../lib/supabase/videoPostsServer";
 import type { WatchVideo } from "../watch/types";
+import type { WatchHideEntry } from "../../lib/video/watchHidePolicy";
 
 export type LoadWatchFeedResult =
   | {
@@ -20,11 +21,13 @@ export async function loadWatchFeedPageAction(input?: {
   cursor?: string | null;
   limit?: number;
   focusPostId?: number | null;
+  guestWatched?: WatchHideEntry[] | null;
 }): Promise<LoadWatchFeedResult> {
   const result = await getWatchVideosPageServer({
     cursor: input?.cursor,
     limit: input?.limit,
     focusPostId: input?.focusPostId,
+    guestWatched: input?.guestWatched,
   });
 
   if (!result.ok) {
