@@ -72,6 +72,17 @@ describe("social engagement harden contracts", () => {
     );
   });
 
+  it("save failure hints stay on the rail instead of sitting off-screen", () => {
+    const discover = read("app/discover/components/DiscoverActionRail.tsx");
+    const watch = read("app/components/video/VideoActionRail.tsx");
+    expect(discover).not.toMatch(/-left-40/);
+    expect(watch).not.toMatch(/-left-40/);
+    expect(discover).toMatch(/bottom-full end-0/);
+    expect(watch).toMatch(/bottom-full end-0/);
+    expect(discover).toMatch(/role="status"/);
+    expect(watch).toMatch(/role="status"/);
+  });
+
   it("share menu portals with viewport collision and does not clip actions", () => {
     const menu = read("app/components/social/ShareMenu.tsx");
     expect(menu).toMatch(/placeShareMenu/);

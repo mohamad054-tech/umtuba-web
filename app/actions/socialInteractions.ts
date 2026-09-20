@@ -97,7 +97,7 @@ export async function toggleSaveAction(
   if (!user) {
     return {
       ok: false,
-      message: "Please sign in to save posts.",
+      message: "Please sign in to save this video.",
       requiresAuth: true,
     };
   }

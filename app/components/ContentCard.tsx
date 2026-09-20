@@ -102,7 +102,7 @@ export default function ContentCard({
 
   function showHint(message: string) {
     setHint(message);
-    window.setTimeout(() => setHint(null), 2200);
+    window.setTimeout(() => setHint(null), 4500);
   }
 
   function showCopiedSuccess() {
@@ -310,8 +310,10 @@ export default function ContentCard({
       <div className="border-t border-white/10 p-5">
         {hint ? (
           <p
-            className={`mb-3 text-xs font-bold ${
-              linkCopied ? "text-emerald-300" : "text-white/60"
+            className={`mb-3 rounded-xl border px-3 py-2 text-xs font-bold ${
+              linkCopied
+                ? "border-emerald-300/40 bg-emerald-400/15 text-emerald-300"
+                : "border-white/20 bg-black/70 text-white"
             }`}
             role="status"
           >
