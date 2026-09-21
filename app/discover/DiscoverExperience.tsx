@@ -4,17 +4,14 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useLayoutEffect, useRef, useState, useMemo } from "react";
 import { loadDiscoverFeedPageAction } from "../actions/loadDiscoverFeed";
-import StartDirectMessageButton from "../components/messaging/StartDirectMessageButton";
 import CommentsPanel from "../components/social/CommentsPanel";
 import ProductEmptyState from "../components/product/ProductEmptyState";
 import ProductErrorState from "../components/product/ProductErrorState";
 import {
   APP_ROUTES,
-  buildCreatorProfileHref,
   buildHomeCityFocusHref,
   findIndexByCity,
   findIndexByPostId,
-  isUuid,
 } from "../lib/nav";
 import {
   appendUniqueById,
@@ -333,28 +330,15 @@ export default function DiscoverExperience({
   }
 
   const exploreHref = buildHomeCityFocusHref(activeVideo.location.city);
-  const profileHref = buildCreatorProfileHref({
-    username: activeVideo.creator.username,
-    articleId: activeVideo.articleId,
-  });
   const activePostId = Number(activeVideo.id);
-  const peerUserId = activeVideo.creator.id;
-  // Hide only for missing/non-UUID peer or self. Signed-out (viewerId null) may message.
-  const canMessageAside =
-    isUuid(peerUserId) && viewerId !== peerUserId;
   const commentsReturnPath = `${APP_ROUTES.home}?post=${activeVideo.id}`;
 
   return (
     <DiscoverShell>
       <div className="flex flex-1 flex-col gap-3">
         <StoryRail viewerId={viewerId} />
-        {/*
-          Home Assembly V1 — page row only.
-          < xl: Stage centered alone (mx-auto).
-          xl+: center the sealed group [Stage 510][gap][Aside 280]; no Stage mx-auto.
-        */}
-        <div className="flex flex-1 flex-col gap-3 md:flex-row md:items-stretch md:justify-center md:gap-6">
-        <div className="relative mx-auto w-full max-w-[510px] shrink-0 xl:mx-0 xl:w-[510px]">
+        <div className="flex flex-1 flex-col gap-3 md:flex-row md:items-stretch md:justify-center">
+        <div className="relative mx-auto w-full max-w-[510px] shrink-0">
           <div className="video-watch-stage relative z-10 h-[calc(100dvh-4rem-5.75rem-var(--app-mobile-bottom-nav-offset,0px)-var(--analytics-consent-banner-offset,0px))] w-full overflow-hidden bg-black md:h-[calc(100dvh-7.5rem-5.75rem)] md:rounded-[36px] md:border md:border-white/10">
             <DiscoverFeed
               videos={videos}
@@ -429,63 +413,9 @@ export default function DiscoverExperience({
             ) : null}
           </div>
         </div>
-
-        <aside className="hidden w-[280px] shrink-0 flex-col justify-center gap-4 xl:flex">
-          <div className="rounded-[28px] border border-white/10 bg-white/[0.04] p-5 backdrop-blur-xl">
-            <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-blue-300/80">
-              {t("home.nowPlaying")}
-            </p>
-            <h2 className="mt-2 text-xl font-black tracking-tight">
-              {activeVideo.location.city}
-            </h2>
-            <p className="mt-1 text-sm text-white/55">
-              {activeVideo.location.country}
-            </p>
-            <p className="mt-4 text-sm leading-6 text-white/70">
-              {t("home.asideHint")}
-            </p>
-            <Link
-              href={exploreHref}
-              className="watch-focus-ring mt-5 inline-flex rounded-full border border-sky-400/30 bg-sky-500/15 px-4 py-2 text-xs font-black uppercase tracking-[0.16em] text-sky-50 transition hover:bg-sky-500/25"
-            >
-              {t("home.exploreCity")}
-            </Link>
-          </div>
-
-          <div className="rounded-[28px] border border-white/10 bg-white/[0.04] p-5 backdrop-blur-xl">
-            <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-sky-300/80">
-              {t("home.creator")}
-            </p>
-            <Link
-              href={profileHref}
-              className="mt-2 flex items-center gap-3 rounded-2xl transition hover:bg-white/[0.03]"
-            >
-              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-white/15 bg-gradient-to-br from-blue-400/40 to-indigo-600/50 text-sm font-black">
-                {activeVideo.creator.avatar}
-              </span>
-              <span className="min-w-0">
-                <span className="block truncate text-lg font-black">
-                  {activeVideo.creator.username}
-                </span>
-                <span className="mt-0.5 block truncate text-sm text-white/55">
-                  {activeVideo.creator.name}
-                </span>
-              </span>
-            </Link>
-            <div className="mt-4 empty:mt-0 empty:hidden">
-              <StartDirectMessageButton
-                peerUserId={peerUserId ?? ""}
-                peerName={activeVideo.creator.name}
-                label={t("home.message")}
-                hidden={!canMessageAside}
-                className="watch-focus-ring w-full rounded-full border border-white/15 bg-white/5 px-4 py-2.5 text-sm font-bold text-white/85 transition hover:bg-white/10 hover:text-white disabled:cursor-wait disabled:opacity-60"
-              />
-            </div>
-          </div>
-        </aside>
         </div>
 
-        <div className="flex justify-center px-4 pb-4 xl:hidden">
+        <div className="flex justify-center px-4 pb-4">
           <Link
             href={exploreHref}
             className="watch-focus-ring rounded-full border border-sky-400/30 bg-sky-500/15 px-4 py-2 text-xs font-black uppercase tracking-[0.16em] text-sky-50 transition hover:bg-sky-500/25"
