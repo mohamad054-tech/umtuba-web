@@ -56,14 +56,15 @@ describe("Arabic leak + Watch autoplay closeout keys", () => {
     expect(translate("en", "video.untitled")).toBe("Untitled video");
   });
 
-  it("wires Home aside, Story rail, and Watch overlay to i18n keys", () => {
-    const aside = readRepo("app/discover/DiscoverExperience.tsx");
+  it("wires Home explore, Story rail, and Watch overlay to i18n keys", () => {
+    const home = readRepo("app/discover/DiscoverExperience.tsx");
     const rail = readRepo("app/stories/components/StoryRail.tsx");
     const overlay = readRepo("app/components/video/VideoOverlay.tsx");
     const message = readRepo("app/components/messaging/StartDirectMessageButton.tsx");
 
-    expect(aside).toMatch(/t\("home.nowPlaying"\)/);
-    expect(aside).not.toMatch(/Now playing/);
+    expect(home).toMatch(/t\("home.exploreCity"\)/);
+    expect(home).not.toMatch(/Now playing/);
+    expect(home).not.toMatch(/<aside/);
     expect(rail).toMatch(/t\("stories.add"\)/);
     expect(rail).not.toMatch(/>\s*Add Story\s*</);
     expect(overlay).toMatch(/t\("watch.aiSummary"\)/);
