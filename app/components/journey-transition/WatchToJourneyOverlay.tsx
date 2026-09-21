@@ -7,7 +7,6 @@ type WatchToJourneyOverlayProps = {
   phase: JourneyTransitionPhase;
   reducedMotion: boolean;
   videoTitle: string;
-  cityLabel: string;
 };
 
 export default function WatchToJourneyOverlay({
@@ -15,7 +14,6 @@ export default function WatchToJourneyOverlay({
   phase,
   reducedMotion,
   videoTitle,
-  cityLabel,
 }: WatchToJourneyOverlayProps) {
   if (!active || phase === "idle" || phase === "complete") {
     return null;
@@ -64,7 +62,7 @@ export default function WatchToJourneyOverlay({
         </p>
         <h2 className="mt-3 text-2xl font-black tracking-tight">{videoTitle}</h2>
         <p className="mt-3 text-sm text-white/60">
-          Leaving Watch · Opening the globe near {cityLabel}
+          Leaving Watch · Opening the globe
         </p>
         <div className="mt-6 h-1 overflow-hidden rounded-full bg-white/10">
           <div
