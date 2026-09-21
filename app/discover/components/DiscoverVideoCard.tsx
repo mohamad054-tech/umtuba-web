@@ -20,7 +20,6 @@ import { shouldMountHomeCircularArc } from "../../components/home/circularArc/ho
 import DiscoverActionRail from "./DiscoverActionRail";
 import DiscoverCaption from "./DiscoverCaption";
 import DiscoverCreatorInfo from "./DiscoverCreatorInfo";
-import DiscoverLocationBanner from "./DiscoverLocationBanner";
 import DiscoverNativeVideo from "./DiscoverNativeVideo";
 
 type DiscoverVideoCardProps = {
@@ -218,13 +217,6 @@ export default function DiscoverVideoCard({
         onEnded={onEnded}
       />
 
-      {active ? (
-        <DiscoverLocationBanner
-          key={video.id}
-          location={video.location}
-        />
-      ) : null}
-
       <div className="pointer-events-none absolute inset-x-0 bottom-14 top-0 z-20 flex flex-col justify-end">
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[55%] bg-gradient-to-t from-black/85 via-black/45 to-transparent" />
 
@@ -252,7 +244,6 @@ export default function DiscoverVideoCard({
             <div className="pointer-events-auto">
               <DiscoverCreatorInfo
                 creator={video.creator}
-                location={video.location}
                 viewerId={viewerId}
                 postId={video.id}
                 articleId={video.articleId}

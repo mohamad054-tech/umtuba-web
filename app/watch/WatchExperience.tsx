@@ -543,7 +543,7 @@ export default function WatchExperience({
 
         <p className="hidden max-w-md truncate text-sm text-white/50 md:block">
           {activeVideo
-            ? `${activeVideo.location.city} · ${localizedVideoTitle(activeVideo.title, t("video.untitled"))}`
+            ? localizedVideoTitle(activeVideo.title, t("video.untitled"))
             : t("watch.discoverWorld")}
         </p>
 
