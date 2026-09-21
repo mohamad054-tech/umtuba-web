@@ -87,15 +87,58 @@ function asBoolean(value: unknown, fallback = false): boolean {
 }
 
 function asNumber(value: unknown, fallback = 0): number {
-  return typeof value === "number" && Number.isFinite(value) ? value : fallback;
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return value;
+  }
+
+  if (typeof value === "string" && value.trim() !== "") {
+    const parsed = Number(value);
+    if (Number.isFinite(parsed)) {
+      return parsed;
+    }
+  }
+
+  return fallback;
 }
 
-function parseRpcJson(data: unknown): RpcJson {
-  if (!data || typeof data !== "object" || Array.isArray(data)) {
+/** PostgREST sometimes wraps a jsonb object in a one-element array. */
+export function parseSocialRpcJson(data: unknown): RpcJson {
+  if (Array.isArray(data)) {
+    return parseSocialRpcJson(data[0]);
+  }
+
+  if (!data || typeof data !== "object") {
     return null;
   }
 
   return data as Record<string, unknown>;
+}
+
+function parseRpcJson(data: unknown): RpcJson {
+  return parseSocialRpcJson(data);
+}
+
+export function mapToggleSaveRpcError(
+  message: string
+): ActionResult<never> {
+  const lower = (message || "").toLowerCase();
+
+  if (lower.includes("authentication required")) {
+    return {
+      ok: false,
+      message: "Please sign in to save this video.",
+      requiresAuth: true,
+    };
+  }
+
+  if (lower.includes("post not found")) {
+    return { ok: false, message: "This video cannot be saved." };
+  }
+
+  return {
+    ok: false,
+    message: "Unable to save this video. Please try again.",
+  };
 }
 
 export function validateCommentBody(body: string): ActionResult<{ body: string }> {
@@ -221,27 +264,13 @@ export async function togglePostSave(
 
   if (error) {
     console.error("toggle_post_save failed:", error);
-    const message = (error.message || "").toLowerCase();
-
-    if (message.includes("authentication required")) {
-      return {
-        ok: false,
-        message: "Please sign in to save posts.",
-        requiresAuth: true,
-      };
-    }
-
-    if (message.includes("post not found")) {
-      return { ok: false, message: "Post not found." };
-    }
-
-    return { ok: false, message: "Unable to update save. Please try again." };
+    return mapToggleSaveRpcError(error.message || "");
   }
 
   const payload = parseRpcJson(data);
 
   if (!payload) {
-    return { ok: false, message: "Unable to update save. Please try again." };
+    return mapToggleSaveRpcError("Unable to save this video. Please try again.");
   }
 
   return {

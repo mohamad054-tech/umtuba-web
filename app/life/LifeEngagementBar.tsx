@@ -206,7 +206,10 @@ export default function LifeEngagementBar({
   return (
     <div className="relative">
       {hint ? (
-        <p className="mb-3 text-xs font-bold text-white/60" role="status">
+        <p
+          className="mb-3 rounded-xl border border-white/20 bg-black/70 px-3 py-2 text-xs font-bold text-white"
+          role="status"
+        >
           {hint}
         </p>
       ) : null}

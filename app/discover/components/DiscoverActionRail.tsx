@@ -142,7 +142,7 @@ export default function DiscoverActionRail({
     };
   }, []);
 
-  function showHint(message: string) {
+  function showHint(message: string, ms = 4500) {
     setHint(sanitizeUserFacingMessage(message, "Something went wrong."));
 
     if (hintTimerRef.current != null) {
@@ -151,12 +151,12 @@ export default function DiscoverActionRail({
 
     hintTimerRef.current = window.setTimeout(() => {
       setHint(null);
-    }, 2200);
+    }, ms);
   }
 
   function showCopiedSuccess() {
     setLinkCopied(true);
-    showHint("Link copied");
+    showHint("Link copied", 2200);
 
     if (copiedTimerRef.current != null) {
       window.clearTimeout(copiedTimerRef.current);
@@ -281,6 +281,11 @@ export default function DiscoverActionRail({
       return;
     }
 
+    if (!Number.isInteger(postId) || postId <= 0) {
+      showHint("Unable to save this video.");
+      return;
+    }
+
     const previousSaved = savedByMe;
     const previousSaves = stats.saves;
     const nextSaved = !previousSaved;
@@ -315,10 +320,10 @@ export default function DiscoverActionRail({
     <div className="relative flex flex-col items-center gap-4 pb-1">
       {hint ? (
         <p
-          className={`pointer-events-none absolute -left-40 top-0 max-w-[9.5rem] rounded-full border px-2.5 py-1 text-[10px] font-bold backdrop-blur-xl ${
+          className={`pointer-events-none absolute bottom-full end-0 z-20 mb-2 w-max max-w-[min(11rem,calc(100vw-1.5rem))] rounded-xl border px-2.5 py-1.5 text-start text-[11px] font-bold leading-snug backdrop-blur-xl ${
             linkCopied
               ? "border-emerald-300/40 bg-emerald-400/15 text-emerald-100"
-              : "border-white/15 bg-black/55 text-white/80"
+              : "border-white/20 bg-black/80 text-white"
           }`}
           role="status"
         >
