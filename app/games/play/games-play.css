@@ -756,32 +756,37 @@ body:has(.um-game-fit) {
   gap: 8px;
   max-width: 320px;
   margin-inline: auto;
+  padding: 10px;
 }
 
 .um-play-xo button {
   aspect-ratio: 1;
-  border-radius: 12px;
-  border: 1px solid var(--um-line);
-  background: var(--um-raise);
-  color: var(--um-ink);
+  border-radius: 16px;
+  border: 0;
+  background: rgba(6, 5, 18, 0.28);
+  color: #f7f4ea;
   font: inherit;
   font-size: clamp(28px, 8vw, 40px);
   font-weight: 800;
   min-height: 72px;
   cursor: pointer;
+  box-shadow: inset 0 0 14px rgba(6, 5, 18, 0.35);
 }
 
 .um-play-xo button.x {
-  color: var(--um-gold);
+  color: #ffe7a3;
+  text-shadow: 0 0 12px rgba(240, 169, 59, 0.9);
 }
 
 .um-play-xo button.o {
-  color: var(--um-mint);
+  color: #7ed9b8;
+  text-shadow: 0 0 12px rgba(61, 255, 200, 0.85);
 }
 
 .um-play-xo button.win {
-  border-color: var(--um-gold);
-  box-shadow: inset 0 0 0 2px var(--um-gold);
+  box-shadow:
+    0 0 16px rgba(240, 169, 59, 0.75),
+    inset 0 0 12px rgba(240, 169, 59, 0.35);
 }
 
 .um-play-turn {
