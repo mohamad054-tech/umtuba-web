@@ -30,6 +30,7 @@ import {
 } from "../../../lib/games/play/engine";
 import { writeBestIfHigher } from "../../../lib/games/play/scores";
 import type { PlayableGameSlug } from "../../../lib/games/play/catalog";
+import { ColorCard } from "./ColorCards";
 import {
   PlayHowTo,
   PlayPanel,
@@ -820,6 +821,28 @@ export function ShapesGame() {
   );
 }
 
+function refillDeck(deck: UnoCard[], pile: UnoCard[]): { deck: UnoCard[]; pile: UnoCard[] } {
+  if (deck.length > 0 || pile.length < 2) return { deck, pile };
+  const top = pile[pile.length - 1]!;
+  return { deck: shuffled(pile.slice(0, -1)), pile: [top] };
+}
+
+function drawCards(deck: UnoCard[], pile: UnoCard[], n: number) {
+  let nextDeck = deck;
+  let nextPile = pile;
+  const drawn: UnoCard[] = [];
+  for (let i = 0; i < n; i += 1) {
+    const refilled = refillDeck(nextDeck, nextPile);
+    nextDeck = refilled.deck;
+    nextPile = refilled.pile;
+    const card = nextDeck[nextDeck.length - 1];
+    if (!card) break;
+    drawn.push(card);
+    nextDeck = nextDeck.slice(0, -1);
+  }
+  return { drawn, deck: nextDeck, pile: nextPile };
+}
+
 export function UnoGame() {
   const { t, locale } = useI18n();
   const help = usePlayHelp();
@@ -851,16 +874,6 @@ export function UnoGame() {
 
   const begin = () => { if (!help.ready) deal(); help.dismissHelp(); };
 
-  const take = (from: UnoCard[], n = 1): [UnoCard[], UnoCard[]] => {
-    const nextDeck = [...from];
-    const out: UnoCard[] = [];
-    for (let i = 0; i < n; i += 1) {
-      const card = nextDeck.pop();
-      if (card) out.push(card);
-    }
-    return [out, nextDeck];
-  };
-
   const playYou = (index: number) => {
     if (turn !== "you" || done) return;
     const card = you[index];
@@ -876,9 +889,10 @@ export function UnoGame() {
 
   const drawYou = () => {
     if (turn !== "you" || done) return;
-    const [drawn, next] = take(deck, 1);
-    setYou((cur) => [...cur, ...drawn]);
-    setDeck(next);
+    const taken = drawCards(deck, pile, 1);
+    setYou((cur) => [...cur, ...taken.drawn]);
+    setDeck(taken.deck);
+    setPile(taken.pile);
     setTurn("cpu");
   };
 
@@ -889,9 +903,10 @@ export function UnoGame() {
     const timer = window.setTimeout(() => {
       const idx = unoCpuIndex(cpu, top);
       if (idx < 0) {
-        const [drawn, next] = take(deck, 1);
-        setCpu((cur) => [...cur, ...drawn]);
-        setDeck(next);
+        const taken = drawCards(deck, pile, 1);
+        setCpu((cur) => [...cur, ...taken.drawn]);
+        setDeck(taken.deck);
+        setPile(taken.pile);
         setTurn("you");
         return;
       }
@@ -901,7 +916,7 @@ export function UnoGame() {
       setPile((cur) => [...cur, card]);
       if (!nextCpu.length) { setDone("lose"); return; }
       setTurn("you");
-    }, 350);
+    }, 450);
     return () => window.clearTimeout(timer);
   }, [turn, cpu, deck, pile, done]);
 
@@ -918,16 +933,40 @@ export function UnoGame() {
 
   return (
     <Shell slug="uno" howTo={["games.uno.howTo1", "games.uno.howTo2", "games.uno.howTo3"]} stats={<PlayStat label={t("games.cpu")} value={formatPlayNumber(locale, cpu.length)} />} ready={help.ready} helpOpen={help.helpOpen} onToggleHelp={help.toggleHelp} begin={begin}>
-      <p className="um-play-qnum">{top ? `${top.c} ${top.v}` : ""}</p>
-      <div className="um-play-unohand" dir="ltr">
-        {you.map((card, index) => (
-          <button key={`${card.c}-${card.v}-${index}`} type="button" className={`um-play-ucard ${card.c}`} data-play-item="true" onClick={() => playYou(index)}>
-            {card.v}
+      <div className="um-color-table" dir="ltr">
+        <div className="um-color-cpu" aria-label={t("games.cpu")}>
+          {cpu.map((card, index) => (
+            <ColorCard key={`${card.c}-${card.v}-${index}`} faceDown />
+          ))}
+        </div>
+        <p className="um-color-turn">{turn === "you" ? t("games.yourTurn") : t("games.cpuTurn")}</p>
+        <div className="um-color-piles">
+          <button type="button" className="um-color-pile" data-play-item="true" onClick={drawYou} disabled={turn !== "you"}>
+            <ColorCard faceDown />
+            <span className="um-color-pile-label">{t("games.drawCard")} · {formatPlayNumber(locale, deck.length)}</span>
           </button>
-        ))}
-      </div>
-      <div className="um-play-row">
-        <button type="button" className="um-play-btn" data-play-item="true" onClick={drawYou}>{t("games.drawCard")}</button>
+          <div className="um-color-pile">
+            {top ? <ColorCard card={top} /> : <ColorCard faceDown />}
+            <span className="um-color-pile-label">{t("games.waste")}</span>
+          </div>
+        </div>
+        <div className="um-color-hand">
+          {you.map((card, index) => {
+            const legal = top ? unoMatch(card, top) : false;
+            return (
+              <button
+                key={`${card.c}-${card.v}-${index}`}
+                type="button"
+                className="um-color-play"
+                data-play-item="true"
+                disabled={turn !== "you" || !legal}
+                onClick={() => playYou(index)}
+              >
+                <ColorCard card={card} />
+              </button>
+            );
+          })}
+        </div>
       </div>
     </Shell>
   );
