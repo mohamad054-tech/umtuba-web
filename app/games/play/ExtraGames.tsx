@@ -32,7 +32,8 @@ import {
   wheelStopAngle,
   type UnoCard,
 } from "../../../lib/games/play/engine";
-import { writeBestIfHigher } from "../../../lib/games/play/scores";
+import { readBest, writeBestIfHigher } from "../../../lib/games/play/scores";
+import { useBoardScrollLock } from "./boardPointer";
 import type { PlayableGameSlug } from "../../../lib/games/play/catalog";
 import { ColorCard } from "./ColorCards";
 import ProductMark from "./ProductMark";
@@ -530,13 +531,16 @@ export function WheelGame() {
   const help = usePlayHelp();
   const sfx = useMemo(() => createPlaySfx(), []);
   const angleRef = useRef(0);
+  const stageRef = useRef<HTMLDivElement>(null);
   const [angle, setAngle] = useState(0);
   const [total, setTotal] = useState(0);
   const [spins, setSpins] = useState(0);
   const [busy, setBusy] = useState(false);
   const [won, setWon] = useState<number | null>(null);
+  const [floor, setFloor] = useState(0);
+  useBoardScrollLock(stageRef, help.ready);
 
-  const begin = () => { if (!help.ready) { setTotal(0); setSpins(0); setWon(null); } help.dismissHelp(); };
+  const begin = () => { if (!help.ready) { setFloor(readBest("wheel")); setTotal(0); setSpins(0); setWon(null); } help.dismissHelp(); };
   const spin = () => {
     if (busy) return;
     setBusy(true);
@@ -561,9 +565,21 @@ export function WheelGame() {
 
   return (
     <Shell slug="wheel" howTo={["games.wheel.howTo1", "games.wheel.howTo2", "games.wheel.howTo3"]} stats={<PlayStat label={t("games.score")} value={formatPlayNumber(locale, total)} />} ready={help.ready} helpOpen={help.helpOpen} onToggleHelp={help.toggleHelp} begin={begin}>
-      <div className="um-play-wheel-stage" dir="ltr">
+      <div ref={stageRef} className="um-play-wheel-stage um-lit-board" dir="ltr">
         <div className="um-play-wheel-pointer" aria-hidden="true" />
-        <div className="um-play-wheel" data-play-item="true" style={{ transform: `rotate(${angle}deg)` }}>
+        <div
+          className="um-play-wheel"
+          data-play-item="true"
+          style={{ transform: `rotate(${angle}deg)` }}
+          onPointerDown={(event) => {
+            if (!event.isPrimary || busy) return;
+            event.currentTarget.setPointerCapture(event.pointerId);
+          }}
+          onPointerUp={(event) => {
+            if (!event.isPrimary) return;
+            spin();
+          }}
+        >
           {WHEEL_SLICES.map((value, index) => (
             <span
               key={`${value}-${index}`}
@@ -576,7 +592,7 @@ export function WheelGame() {
           ))}
         </div>
       </div>
-      <p className="um-play-wheel-won" dir="ltr">
+      <p className={`um-play-wheel-won${won != null && total > floor ? " um-play-best" : won != null ? " um-play-celebrate" : ""}`} dir="ltr">
         {won == null ? "\u00a0" : t("games.wheel.won", { values: { value: `${formatPlayNumber(locale, won)}%` } })}
       </p>
       <div className="um-play-row" style={{ justifyContent: "center" }}>

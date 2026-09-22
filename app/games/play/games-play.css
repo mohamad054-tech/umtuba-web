@@ -1101,9 +1101,12 @@ body:has(.um-game-fit) {
 
 .um-play-wheel-stage {
   position: relative;
-  width: min(240px, 72vw);
-  height: min(240px, 72vw);
+  width: min(280px, 86vw);
+  height: min(280px, 86vw);
   margin: 16px auto 8px;
+  display: grid;
+  place-items: center;
+  padding: 22px;
 }
 
 .um-play-wheel-pointer {
@@ -1116,8 +1119,8 @@ body:has(.um-game-fit) {
   transform: translateX(-50%);
   border-left: 11px solid transparent;
   border-right: 11px solid transparent;
-  border-top: 20px solid #f7f4ea;
-  filter: drop-shadow(0 2px 0 rgba(0, 0, 0, 0.45));
+  border-top: 20px solid #ffe7a3;
+  filter: drop-shadow(0 0 6px rgba(240, 169, 59, 0.85));
   pointer-events: none;
 }
 
@@ -1125,7 +1128,7 @@ body:has(.um-game-fit) {
   width: 100%;
   height: 100%;
   border-radius: 50%;
-  border: 6px solid #f7f4ea;
+  border: 6px solid #f0a93b;
   background:
     conic-gradient(
       #d46a5e 0 60deg,
@@ -1136,8 +1139,12 @@ body:has(.um-game-fit) {
       #c46b9a 300deg 360deg
     );
   position: relative;
+  cursor: pointer;
+  touch-action: none;
   transition: transform 2.6s cubic-bezier(0.12, 0.72, 0.08, 1);
-  box-shadow: inset 0 0 0 10px rgba(6, 5, 18, 0.18);
+  box-shadow:
+    0 0 24px rgba(240, 169, 59, 0.45),
+    inset 0 0 0 10px rgba(6, 5, 18, 0.22);
 }
 
 .um-play-wheel::after {
@@ -1149,8 +1156,8 @@ body:has(.um-game-fit) {
   height: 28px;
   margin: -14px 0 0 -14px;
   border-radius: 50%;
-  background: #f7f4ea;
-  box-shadow: 0 0 0 4px rgba(6, 5, 18, 0.25);
+  background: radial-gradient(circle at 30% 30%, #ffe7a3, #f0a93b 60%, #b56a12);
+  box-shadow: 0 0 12px rgba(240, 169, 59, 0.7);
 }
 
 .um-play-slice {
