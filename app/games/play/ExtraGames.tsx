@@ -503,9 +503,14 @@ export function PriceGame() {
   return (
     <Shell slug="price" howTo={["games.price.howTo1", "games.price.howTo2", "games.price.howTo3"]} stats={<PlayStat label={t("games.score")} value={formatPlayNumber(locale, score)} />} ready={help.ready} helpOpen={help.helpOpen} onToggleHelp={help.toggleHelp} begin={begin}>
       {item ? (
-        <div className="um-play-quiz">
+        <div className="um-play-quiz" dir="ltr">
+          <p className="um-play-note">{t("games.madeUpPrices")}</p>
+          <ProductMark kind={item.k} />
           <p className="um-play-qtext">{item.n}</p>
-          <p className="um-play-priceline">{formatPlayNumber(locale, guess)}</p>
+          <p className="um-play-priceline" dir="ltr">
+            {formatPlayNumber(locale, guess)}
+            {locked ? ` / ${formatPlayNumber(locale, item.p)}` : ""}
+          </p>
           <input className="um-play-slider" type="range" min={min} max={max} step={5} value={guess} data-play-item="true" disabled={locked} onChange={(e) => setGuess(Number(e.target.value))} />
           <div className="um-play-row">
             {!locked ? (

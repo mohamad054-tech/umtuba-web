@@ -912,6 +912,12 @@ body:has(.um-game-fit) {
   height: 56px;
 }
 
+.um-play-quiz .um-product-mark {
+  width: 96px;
+  height: 96px;
+  margin: 0 auto;
+}
+
 .um-product-copy {
   display: grid;
   gap: 2px;
