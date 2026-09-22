@@ -210,18 +210,18 @@ export const FLAGS = [
 ] as const;
 
 export const DIST_CITIES = [
-  { id: "riyadh", city: "الرياض", country: "السعودية" },
-  { id: "jeddah", city: "جدّة", country: "السعودية" },
-  { id: "cairo", city: "القاهرة", country: "مصر" },
-  { id: "alexandria", city: "الإسكندرية", country: "مصر" },
-  { id: "amman", city: "عمّان", country: "الأردن" },
-  { id: "beirut", city: "بيروت", country: "لبنان" },
-  { id: "dubai", city: "دبي", country: "الإمارات" },
-  { id: "istanbul", city: "إسطنبول", country: "تركيا" },
-  { id: "paris", city: "باريس", country: "فرنسا" },
-  { id: "tokyo", city: "طوكيو", country: "اليابان" },
-  { id: "berlin", city: "برلين", country: "ألمانيا" },
-  { id: "rome", city: "روما", country: "إيطاليا" },
+  { id: "riyadh", city: "الرياض", country: "السعودية", iso: "sa", lat: 24.714, lng: 46.675 },
+  { id: "jeddah", city: "جدّة", country: "السعودية", iso: "sa", lat: 21.543, lng: 39.173 },
+  { id: "cairo", city: "القاهرة", country: "مصر", iso: "eg", lat: 30.044, lng: 31.236 },
+  { id: "alexandria", city: "الإسكندرية", country: "مصر", iso: "eg", lat: 31.2, lng: 29.919 },
+  { id: "amman", city: "عمّان", country: "الأردن", iso: "jo", lat: 31.945, lng: 35.928 },
+  { id: "beirut", city: "بيروت", country: "لبنان", iso: "lb", lat: 33.894, lng: 35.502 },
+  { id: "dubai", city: "دبي", country: "الإمارات", iso: "ae", lat: 25.205, lng: 55.271 },
+  { id: "istanbul", city: "إسطنبول", country: "تركيا", iso: "tr", lat: 41.008, lng: 28.978 },
+  { id: "paris", city: "باريس", country: "فرنسا", iso: "fr", lat: 48.857, lng: 2.352 },
+  { id: "tokyo", city: "طوكيو", country: "اليابان", iso: "jp", lat: 35.676, lng: 139.65 },
+  { id: "berlin", city: "برلين", country: "ألمانيا", iso: "de", lat: 52.52, lng: 13.405 },
+  { id: "rome", city: "روما", country: "إيطاليا", iso: "it", lat: 41.903, lng: 12.496 },
 ];
 
 const DIST: Record<string, number> = {

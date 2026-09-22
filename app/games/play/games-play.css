@@ -829,6 +829,54 @@ body:has(.um-game-fit) {
   gap: 10px;
 }
 
+.um-place-card {
+  display: grid;
+  gap: 8px;
+  width: 100%;
+  min-height: 44px;
+  padding: 10px;
+  border-radius: 14px;
+  border: 1px solid var(--um-line);
+  background: color-mix(in srgb, var(--um-field) 88%, transparent);
+  color: inherit;
+  text-align: start;
+}
+
+.um-place-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.um-place-face {
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  min-width: 0;
+}
+
+.um-place-flag {
+  font-size: 28px;
+  line-height: 1;
+}
+
+.um-place-name {
+  font-weight: 800;
+  font-size: 14px;
+}
+
+.um-place-country {
+  font-size: 12px;
+  opacity: 0.75;
+}
+
+.um-place-sketch,
+.um-place-shape {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
 .um-play-sort,
 .um-play-shelf {
   display: grid;

@@ -1,5 +1,6 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useI18n } from "../../components/i18n";
 import type { TranslationKey } from "../../../lib/i18n/messages/types";
@@ -34,6 +35,7 @@ import {
 import { writeBestIfHigher } from "../../../lib/games/play/scores";
 import type { PlayableGameSlug } from "../../../lib/games/play/catalog";
 import { ColorCard } from "./ColorCards";
+import { CityFace, PairSketch, flagEmoji } from "./PlaceCard";
 import {
   PlayHowTo,
   PlayPanel,
@@ -41,6 +43,11 @@ import {
   PlayStat,
   usePlayHelp,
 } from "./PlayChrome";
+
+const GameMap = dynamic(() => import("./GameMap"), {
+  ssr: false,
+  loading: () => <div className="um-play-gamemap" dir="ltr" />,
+});
 
 function Shell({
   howTo,
@@ -104,7 +111,7 @@ export function FartherPairGame() {
     });
   };
 
-  const label = (id: string) => DIST_CITIES.find((city) => city.id === id)?.city ?? id;
+  const label = (id: string) => DIST_CITIES.find((city) => city.id === id);
 
   const begin = () => {
     if (!help.ready) {
@@ -143,8 +150,21 @@ export function FartherPairGame() {
     <Shell slug="farther-pair" howTo={["games.farther-pair.howTo1", "games.farther-pair.howTo2", "games.farther-pair.howTo3"]} stats={<PlayStat label={t("games.score")} value={formatPlayNumber(locale, score)} />} ready={help.ready} helpOpen={help.helpOpen} onToggleHelp={help.toggleHelp} begin={begin}>
       {pair ? (
         <div className="um-play-pairgrid" dir="ltr">
-          <button type="button" className="um-play-pair" data-play-item="true" onClick={() => pick("L")}>{label(pair.a)} — {label(pair.b)}</button>
-          <button type="button" className="um-play-pair" data-play-item="true" onClick={() => pick("R")}>{label(pair.c)} — {label(pair.d)}</button>
+          {(["L", "R"] as const).map((side) => {
+            const left = side === "L";
+            const first = label(left ? pair.a : pair.c);
+            const second = label(left ? pair.b : pair.d);
+            if (!first || !second) return null;
+            return (
+              <button key={side} type="button" className="um-place-card" data-play-item="true" onClick={() => pick(side)}>
+                <span className="um-place-row">
+                  <CityFace flag={flagEmoji(first.iso)} name={first.city} country={first.country} />
+                  <CityFace flag={flagEmoji(second.iso)} name={second.city} country={second.country} />
+                </span>
+                <PairSketch a={first} b={second} />
+              </button>
+            );
+          })}
         </div>
       ) : null}
     </Shell>
@@ -644,14 +664,18 @@ export function CollectorGame() {
 
   return (
     <Shell slug="collector" howTo={["games.collector.howTo1", "games.collector.howTo2", "games.collector.howTo3"]} stats={<PlayStat label={t("games.collected")} value={`${formatPlayNumber(locale, got.length)} / ${formatPlayNumber(locale, WORLD_CITIES.length)}`} />} ready={help.ready} helpOpen={help.helpOpen} onToggleHelp={help.toggleHelp} begin={begin}>
-      <p className="um-play-qtext">{current?.city}</p>
-      <div className="um-play-pins" dir="ltr">
-        {WORLD_CITIES.map((city) => (
-          <button key={city.id} type="button" className={`um-play-pin${got.includes(city.id) ? " on" : ""}`} data-play-item="true" onClick={() => drop(city.id)}>
-            {got.includes(city.id) ? city.city : "•"}
-          </button>
-        ))}
-      </div>
+      <p className="um-play-qtext">{current ? `${current.city} · ${current.country}` : ""}</p>
+      <GameMap
+        pins={WORLD_CITIES.map((city) => ({
+          id: city.id,
+          lng: city.lng,
+          lat: city.lat,
+          state: got.includes(city.id) ? "got" : "idle",
+        }))}
+        fit="all"
+        interactive
+        onPick={drop}
+      />
     </Shell>
   );
 }
