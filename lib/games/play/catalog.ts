@@ -59,7 +59,7 @@ export const PLAYABLE_GAMES: readonly PlayableGame[] = [
   { slug: "hangword", titleKey: "games.hangword.title", blurbKey: "games.hangword.blurb", arabicContent: true },
   { slug: "flag-guess", titleKey: "games.flag-guess.title", blurbKey: "games.flag-guess.blurb", demoData: true },
   { slug: "farther-pair", titleKey: "games.farther-pair.title", blurbKey: "games.farther-pair.blurb" },
-  { slug: "larger-country", titleKey: "games.larger-country.title", blurbKey: "games.larger-country.blurb", demoData: true },
+  { slug: "larger-country", titleKey: "games.larger-country.title", blurbKey: "games.larger-country.blurb" },
   { slug: "cheaper", titleKey: "games.cheaper.title", blurbKey: "games.cheaper.blurb", demoData: true },
   { slug: "sort-price", titleKey: "games.sort-price.title", blurbKey: "games.sort-price.blurb", demoData: true },
   { slug: "guess-discount", titleKey: "games.guess-discount.title", blurbKey: "games.guess-discount.blurb", demoData: true },

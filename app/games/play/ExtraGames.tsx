@@ -35,7 +35,8 @@ import {
 import { writeBestIfHigher } from "../../../lib/games/play/scores";
 import type { PlayableGameSlug } from "../../../lib/games/play/catalog";
 import { ColorCard } from "./ColorCards";
-import { CityFace, PairSketch, flagEmoji } from "./PlaceCard";
+import ProductMark from "./ProductMark";
+import { CityFace, CountryShape, PairSketch, flagEmoji } from "./PlaceCard";
 import {
   PlayHowTo,
   PlayPanel,
@@ -205,8 +206,12 @@ export function LargerCountryGame() {
     <Shell slug="larger-country" howTo={["games.larger-country.howTo1", "games.larger-country.howTo2", "games.larger-country.howTo3"]} stats={<PlayStat label={t("games.score")} value={formatPlayNumber(locale, score)} />} ready={help.ready} helpOpen={help.helpOpen} onToggleHelp={help.toggleHelp} begin={begin}>
       {pair ? (
         <div className="um-play-pairgrid" dir="ltr">
-          <button type="button" className="um-play-pair" data-play-item="true" onClick={() => pick(0)}>{pair[0].name}</button>
-          <button type="button" className="um-play-pair" data-play-item="true" onClick={() => pick(1)}>{pair[1].name}</button>
+          {pair.map((country, index) => (
+            <button key={country.id} type="button" className="um-place-card" data-play-item="true" onClick={() => pick(index as 0 | 1)}>
+              <CityFace flag={flagEmoji(country.id)} name={country.name} country="" />
+              <CountryShape id={country.id} />
+            </button>
+          ))}
         </div>
       ) : null}
     </Shell>
@@ -616,10 +621,15 @@ export function BasketGame() {
 
   return (
     <Shell slug="basket" howTo={["games.basket.howTo1", "games.basket.howTo2", "games.basket.howTo3"]} stats={<PlayStat label={t("games.score")} value={`${formatPlayNumber(locale, sum)} / ${formatPlayNumber(locale, cap)}`} />} ready={help.ready} helpOpen={help.helpOpen} onToggleHelp={help.toggleHelp} begin={begin}>
+      <p className="um-play-note">{t("games.madeUpPrices")}</p>
       <div className="um-play-shelf">
         {BASKET_ITEMS.map((item, idx) => (
-          <button key={`${item.n}-${idx}`} type="button" className={`um-play-step${picked.includes(idx) ? " sel" : ""}`} data-play-item="true" onClick={() => toggle(idx)}>
-            {item.n} · {item.p}
+          <button key={`${item.n}-${idx}`} type="button" className={`um-product-card${picked.includes(idx) ? " sel" : ""}`} data-play-item="true" onClick={() => toggle(idx)}>
+            <ProductMark kind={item.k} />
+            <span className="um-product-copy">
+              <span className="um-place-name">{item.n}</span>
+              <span className="um-place-country" dir="ltr">{formatPlayNumber(locale, item.p)}</span>
+            </span>
           </button>
         ))}
       </div>

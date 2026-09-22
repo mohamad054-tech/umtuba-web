@@ -49,7 +49,7 @@ export function CityFace({
         {flag}
       </span>
       <span className="um-place-name">{name}</span>
-      <span className="um-place-country">{country}</span>
+      {country ? <span className="um-place-country">{country}</span> : null}
     </span>
   );
 }

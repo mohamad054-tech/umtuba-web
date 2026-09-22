@@ -1724,6 +1724,7 @@ export type GamesMessages = {
   "games.uno.howTo2": string;
   "games.uno.howTo3": string;
   "games.wheel.won": string;
+  "games.madeUpPrices": string;
 };
 
 export type TranslationKey = keyof FoundationMessages;
