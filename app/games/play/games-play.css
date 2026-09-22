@@ -477,51 +477,113 @@ body:has(.um-game-fit) {
   margin: 14px auto 0;
 }
 
-.um-play-g2048 {
+.um-lit-board {
+  border-radius: 18px;
+  background:
+    radial-gradient(ellipse at 50% 100%, rgba(240, 169, 59, 0.22), transparent 58%),
+    linear-gradient(165deg, #0b1230, #1a1460 58%, #5a2494);
+  box-shadow:
+    0 18px 40px rgba(6, 5, 18, 0.45),
+    inset 0 0 36px rgba(240, 169, 59, 0.14);
+  touch-action: none;
+  overscroll-behavior: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.um-g2048 {
+  position: relative;
+  width: min(360px, 100%);
+  aspect-ratio: 1;
+  margin-inline: auto;
+  padding: 8px;
+}
+
+.um-g2048-pits {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 8px;
-  max-width: 360px;
-  margin-inline: auto;
-  touch-action: none;
+  height: 100%;
 }
 
-.um-play-t2048 {
-  aspect-ratio: 1;
-  border-radius: 10px;
-  background: var(--um-raise);
-  border: 1px solid var(--um-line);
+.um-g2048-pits span {
+  border-radius: 14px;
+  background: rgba(6, 5, 18, 0.28);
+  box-shadow: inset 0 0 12px rgba(6, 5, 18, 0.35);
+}
+
+.um-g2048-tile {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  width: calc((100% - 16px - 24px) / 4);
+  height: calc((100% - 16px - 24px) / 4);
   display: grid;
   place-items: center;
+  border-radius: 14px;
+  color: #14261c;
   font-weight: 800;
-  font-size: clamp(16px, 5vw, 22px);
+  font-size: clamp(16px, 5vw, 24px);
   font-variant-numeric: tabular-nums;
+  background: radial-gradient(circle at 32% 28%, #ffe7a3, #f0a93b 46%, #c8871a);
+  box-shadow:
+    0 8px 16px rgba(6, 5, 18, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.55);
+  transform: translate(calc(var(--c) * (100% + 8px)), calc(var(--r) * (100% + 8px)));
+  transition: transform 140ms ease-out;
 }
 
-.um-play-t2048.v2 {
-  color: var(--um-ink);
+.um-g2048-tile.v2,
+.um-g2048-tile.v4 {
+  background: radial-gradient(circle at 32% 28%, #f7fffc, #7ed9b8 50%, #2a8f72);
 }
-.um-play-t2048.v4 {
-  color: var(--um-mint);
+
+.um-g2048-tile.born {
+  animation: um-tile-pop 160ms ease-out;
 }
-.um-play-t2048.v8,
-.um-play-t2048.v16 {
-  color: var(--um-gold);
+
+.um-g2048-pop {
+  position: absolute;
+  top: 18%;
+  left: 0;
+  right: 0;
+  text-align: center;
+  color: #ffe7a3;
+  font-weight: 800;
+  font-size: 22px;
+  text-shadow: 0 0 12px rgba(240, 169, 59, 0.8);
+  pointer-events: none;
+  animation: um-g2048-float 500ms ease-out;
 }
-.um-play-t2048.v32,
-.um-play-t2048.v64 {
-  color: #14261c;
-  background: var(--um-gold-dim);
-  border-color: var(--um-gold-dim);
+
+@keyframes um-tile-pop {
+  from {
+    transform: translate(calc(var(--c) * (100% + 8px)), calc(var(--r) * (100% + 8px))) scale(0.72);
+  }
+  to {
+    transform: translate(calc(var(--c) * (100% + 8px)), calc(var(--r) * (100% + 8px))) scale(1);
+  }
 }
-.um-play-t2048.v128,
-.um-play-t2048.v256,
-.um-play-t2048.v512,
-.um-play-t2048.v1024,
-.um-play-t2048.v2048 {
-  color: #14261c;
-  background: var(--um-gold);
-  border-color: var(--um-gold);
+
+@keyframes um-g2048-float {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(-6px);
+  }
+}
+
+.um-play-celebrate,
+.um-play-best {
+  animation: um-snake-pop 480ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.um-play-best {
+  animation-name: um-snake-best;
 }
 
 .um-snake-stage {
