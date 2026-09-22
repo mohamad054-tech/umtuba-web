@@ -51,7 +51,7 @@ export const PLAYABLE_GAMES: readonly PlayableGame[] = [
   { slug: "hanoi", titleKey: "games.hanoi.title", blurbKey: "games.hanoi.blurb" },
   { slug: "lesson-quiz", titleKey: "games.lesson-quiz.title", blurbKey: "games.lesson-quiz.blurb", arabicContent: true },
   { slug: "guess-city", titleKey: "games.guess-city.title", blurbKey: "games.guess-city.blurb" },
-  { slug: "landmark", titleKey: "games.landmark.title", blurbKey: "games.landmark.blurb", demoData: true },
+  { slug: "landmark", titleKey: "games.landmark.title", blurbKey: "games.landmark.blurb", arabicContent: true },
   { slug: "collector", titleKey: "games.collector.title", blurbKey: "games.collector.blurb", demoData: true },
   { slug: "price", titleKey: "games.price.title", blurbKey: "games.price.blurb", demoData: true },
   { slug: "wheel", titleKey: "games.wheel.title", blurbKey: "games.wheel.blurb", demoData: true },

@@ -15,8 +15,8 @@ import {
   type QuizItem,
 } from "../../../lib/games/play/banks";
 import FlagMark from "./FlagMark";
+import LandmarkDraw from "./LandmarkDraw";
 import QuizPlay from "./QuizPlay";
-import SceneMark from "./SceneMark";
 
 const GameMap = dynamic(() => import("./GameMap"), {
   ssr: false,
@@ -48,7 +48,7 @@ function landmarkQuiz(): QuizItem[] {
       .map((item) => item.name);
     const choices = shuffled([mark.name, ...wrong]);
     return {
-      prompt: mark.scene,
+      prompt: mark.id,
       choices,
       correct: choices.indexOf(mark.name),
       why: mark.fact,
@@ -211,8 +211,8 @@ export function LandmarkGame() {
       load={landmarkQuiz}
       seconds={12}
       extra={(item) => (
-        <div className="um-play-scene" data-play-item="true">
-          <SceneMark kind={item.prompt} />
+        <div className="um-play-scene" data-play-item="true" dir="ltr">
+          <LandmarkDraw id={item.prompt} />
         </div>
       )}
       hidePrompt
