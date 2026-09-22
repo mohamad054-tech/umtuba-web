@@ -10,7 +10,8 @@ import {
   shuffled,
   verdictFromScore,
 } from "../../../lib/games/play/engine";
-import { writeBestIfHigher } from "../../../lib/games/play/scores";
+import { writeBestIfHigher, readBest } from "../../../lib/games/play/scores";
+import { useBoardScrollLock } from "./boardPointer";
 import {
   PlayHowTo,
   PlayPanel,
@@ -44,7 +45,9 @@ export default function MemoryGame() {
   const [done, setDone] = useState(false);
   const [score, setScore] = useState(0);
   const openRef = useRef<number[]>([]);
+  const boardRef = useRef<HTMLDivElement | null>(null);
   const watchRef = useRef(createPlayStopwatch(setElapsed));
+  const [isBest, setIsBest] = useState(false);
 
   const begin = () => {
     if (!ready || cards.length === 0) setCards(deal());
@@ -61,6 +64,7 @@ export default function MemoryGame() {
     setLock(false);
     setDone(false);
     setScore(0);
+    setIsBest(false);
     keepReadyOnReplay();
     watchRef.current.start();
   };
@@ -72,6 +76,8 @@ export default function MemoryGame() {
       watchRef.current.stop();
     };
   }, [ready]);
+
+  useBoardScrollLock(boardRef, ready && !done);
 
   const flip = (index: number) => {
     const card = cards[index];
@@ -102,8 +108,10 @@ export default function MemoryGame() {
         setLock(false);
         if (nextFound === 8) {
           const seconds = watchRef.current.stop();
+          const previous = readBest("memory") ?? 0;
           const pts = Math.max(120, 1000 - (moves + 1 - 8) * 35 - seconds * 4);
           setScore(pts);
+          setIsBest(pts > previous);
           writeBestIfHigher("memory", pts);
           setDone(true);
           sfx.win();
@@ -139,12 +147,18 @@ export default function MemoryGame() {
         cta="gotIt"
         onDismiss={dismissHelp}
       />
-      <PlayResult
+      <div className={isBest ? "um-play-best" : "um-play-celebrate"}>
+        <PlayResult
           score={score}
           verdictKey={verdictFromScore("moves", moves)}
-          detail={`${formatPlayNumber(locale, moves)} ${t("games.moves")} · ${formatPlayClock(elapsed)}`}
+          detail={
+            isBest
+              ? t("games.localBest", { values: { score: formatPlayNumber(locale, score) } })
+              : `${formatPlayNumber(locale, moves)} ${t("games.moves")} · ${formatPlayClock(elapsed)}`
+          }
           onAgain={restart}
         />
+      </div>
       </PlayPanel>
     );
   }
@@ -171,7 +185,7 @@ export default function MemoryGame() {
         onDismiss={begin}
       />
       {cards.length > 0 ? (
-        <div className="um-play-memgrid um-play-board" dir="ltr" data-mem-board="true">
+        <div ref={boardRef} className="um-play-memgrid um-play-board um-lit-board" dir="ltr" data-mem-board="true">
           {cards.map((card, index) => (
             <button
               key={card.id}

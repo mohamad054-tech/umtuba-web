@@ -673,6 +673,7 @@ body:has(.um-game-fit) {
   max-width: 400px;
   min-height: 240px;
   margin-inline: auto;
+  padding: 10px;
   perspective: 800px;
 }
 
@@ -713,29 +714,35 @@ body:has(.um-game-fit) {
 .um-play-mem-face {
   position: absolute;
   inset: 0;
-  border-radius: 11px;
+  border-radius: 14px;
   display: grid;
   place-items: center;
   backface-visibility: hidden;
-  border: 1px solid var(--um-line);
+  border: 0;
 }
 
 .um-play-mem-back {
-  background: var(--um-raise);
+  background: radial-gradient(circle at 32% 28%, #ffe7a3, #f0a93b 42%, #9a6e22);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    0 8px 16px rgba(6, 5, 18, 0.28);
 }
 
 .um-play-mem-back::after {
   content: "";
-  width: 14px;
-  height: 14px;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
-  border: 2px solid var(--um-line);
+  background: radial-gradient(circle at 35% 35%, #f7fffc, #7ed9b8 55%, #1d6b56);
+  box-shadow: 0 0 12px rgba(61, 255, 200, 0.75);
 }
 
 .um-play-mem-front {
-  background: var(--um-surface);
+  background: radial-gradient(circle at 50% 40%, #f7f4ea, #d7ecdf);
+  border: 1px solid rgba(240, 169, 59, 0.7);
   transform: rotateY(180deg);
   font-size: clamp(22px, 6vw, 28px);
+  box-shadow: inset 0 0 16px rgba(240, 169, 59, 0.25);
 }
 
 .um-play-mem-card.done .um-play-mem-front {

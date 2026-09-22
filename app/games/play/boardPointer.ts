@@ -94,3 +94,19 @@ export function useBoardPointer(
     };
   }, [active, ref]);
 }
+
+/** Stops the page from scrolling while a finger is on a board of buttons. */
+export function useBoardScrollLock(
+  ref: { current: HTMLElement | null },
+  active: boolean
+) {
+  useEffect(() => {
+    const element = ref.current;
+    if (!element || !active) return;
+    const block = (event: Event) => {
+      event.preventDefault();
+    };
+    element.addEventListener("touchmove", block, { passive: false });
+    return () => element.removeEventListener("touchmove", block);
+  }, [active, ref]);
+}
