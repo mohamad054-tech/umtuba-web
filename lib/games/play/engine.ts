@@ -286,6 +286,48 @@ export function snakeDirAngle(direction: Dir4): number {
   return -Math.PI / 2;
 }
 
+export function snakeDirsOpposite(a: Dir4, b: Dir4): boolean {
+  return (
+    (a === "left" && b === "right") ||
+    (a === "right" && b === "left") ||
+    (a === "up" && b === "down") ||
+    (a === "down" && b === "up")
+  );
+}
+
+/** Larger axis wins. A tap beside the head and a short swipe both use this. */
+export function snakeDirFromDelta(dx: number, dy: number): Dir4 | null {
+  if (dx === 0 && dy === 0) return null;
+  if (Math.abs(dx) >= Math.abs(dy)) return dx > 0 ? "right" : dx < 0 ? "left" : dy > 0 ? "down" : "up";
+  return dy > 0 ? "down" : "up";
+}
+
+export type SnakeTurnQueue = {
+  dir: Dir4;
+  pending: Dir4;
+  extra: Dir4 | null;
+};
+
+/**
+ * Accepts the next turn immediately, plus one extra turn so a fast second
+ * swipe is kept. A turn straight back into the body is ignored.
+ */
+export function queueSnakeTurn(queue: SnakeTurnQueue, next: Dir4): SnakeTurnQueue {
+  const facing = queue.extra ?? queue.pending;
+  if (next === facing || snakeDirsOpposite(facing, next)) return queue;
+  if (queue.extra == null && queue.pending === queue.dir) {
+    return { ...queue, pending: next };
+  }
+  if (queue.extra == null) return { ...queue, extra: next };
+  return queue;
+}
+
+export function consumeSnakeTurn(queue: SnakeTurnQueue): SnakeTurnQueue {
+  const dir = queue.pending;
+  if (queue.extra) return { dir, pending: queue.extra, extra: null };
+  return { dir, pending: dir, extra: null };
+}
+
 /**
  * Head eases toward the next cell and the tail eases off the last cell,
  * so the tube slides instead of jumping. A turn still follows the cells.

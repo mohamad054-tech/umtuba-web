@@ -6,6 +6,9 @@ import {
   hanoiCanPlace,
   merge2048Line,
   move2048,
+  consumeSnakeTurn,
+  queueSnakeTurn,
+  snakeDirFromDelta,
   snakeTickMs,
   snakeVisualChain,
   SNAKE_TICK_MIN_MS,
@@ -71,6 +74,20 @@ describe("play engine", () => {
     const bite = snakeVisualChain(body, "right", 1, true);
     expect(bite[0]).toEqual({ x: 9, y: 8 });
     expect(bite[bite.length - 1]).toEqual(body[2]);
+  });
+
+  it("keeps one extra snake turn and refuses a reverse", () => {
+    const straight = { dir: "right" as const, pending: "right" as const, extra: null };
+    const up = queueSnakeTurn(straight, "up");
+    expect(up).toEqual({ dir: "right", pending: "up", extra: null });
+    expect(queueSnakeTurn(up, "down")).toEqual(up);
+    const corner = queueSnakeTurn(up, "left");
+    expect(corner).toEqual({ dir: "right", pending: "up", extra: "left" });
+    expect(queueSnakeTurn(corner, "down")).toEqual(corner);
+    expect(consumeSnakeTurn(corner)).toEqual({ dir: "up", pending: "left", extra: null });
+    expect(snakeDirFromDelta(4, 1)).toBe("right");
+    expect(snakeDirFromDelta(-2, -9)).toBe("up");
+    expect(snakeDirFromDelta(0, 0)).toBeNull();
   });
 
   it("detects a win on every row, column, and diagonal without flipping indices", () => {

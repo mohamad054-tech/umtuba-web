@@ -1,13 +1,16 @@
 "use client";
 
-import { useEffect, useRef, useState, useSyncExternalStore, type PointerEvent as ReactPointerEvent } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { useI18n } from "../../components/i18n";
 import {
   createPlaySfx,
+  consumeSnakeTurn,
   formatPlayNumber,
   prefersReducedMotion,
+  queueSnakeTurn,
   SNAKE_SIZE,
   snakeDirAngle,
+  snakeDirFromDelta,
   snakeHeading,
   snakeKey,
   snakeTickMs,
@@ -57,6 +60,7 @@ type Sim = {
   body: SnakePoint[];
   dir: Dir4;
   pending: Dir4;
+  extra: Dir4 | null;
   food: SnakePoint;
   score: number;
   bestAtStart: number;
@@ -89,13 +93,20 @@ function keyToDir(key: string): Dir4 | null {
   return null;
 }
 
-function opposite(a: Dir4, b: Dir4): boolean {
-  return (
-    (a === "left" && b === "right") ||
-    (a === "right" && b === "left") ||
-    (a === "up" && b === "down") ||
-    (a === "down" && b === "up")
+const SWIPE_PX = 10;
+
+function applyTurn(sim: Sim, next: Dir4) {
+  if (sim.dead) return;
+  const queued = queueSnakeTurn(
+    { dir: sim.dir, pending: sim.pending, extra: sim.extra },
+    next
   );
+  if (queued.pending === sim.pending && queued.extra === sim.extra) return;
+  sim.pending = queued.pending;
+  sim.extra = queued.extra;
+  const tick = snakeTickMs(sim.score, prefersReducedMotion());
+  const soon = Math.max(0, tick - 16);
+  if (sim.acc < soon) sim.acc = soon;
 }
 
 function sampleChain(points: SnakePoint[], steps: number): SnakePoint[] {
@@ -134,6 +145,7 @@ function freshSim(): Sim {
     body: START.map((point) => ({ ...point })),
     dir: "right",
     pending: "right",
+    extra: null,
     food: { x: 11, y: 8 },
     score: 0,
     bestAtStart: 0,
@@ -154,7 +166,6 @@ export default function SnakeGame() {
   const sfx = useRef(createPlaySfx());
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const simRef = useRef<Sim>(freshSim());
-  const touchRef = useRef<{ x: number; y: number } | null>(null);
   const [score, setScore] = useState(0);
   const [dead, setDead] = useState(false);
   const [isBest, setIsBest] = useState(false);
@@ -162,8 +173,7 @@ export default function SnakeGame() {
   const muted = useSyncExternalStore(subscribeGameMuted, readGameMuted, () => false);
 
   const turn = (next: Dir4) => {
-    const sim = simRef.current;
-    if (!opposite(sim.dir, next)) sim.pending = next;
+    applyTurn(simRef.current, next);
   };
 
   const reset = () => {
@@ -328,8 +338,8 @@ export default function SnakeGame() {
 
         const head = pixels[0]!;
         sim.angle = reduced
-          ? snakeDirAngle(sim.dir)
-          : lerpAngle(sim.angle, snakeDirAngle(sim.dir), 0.2);
+          ? snakeDirAngle(sim.pending)
+          : lerpAngle(sim.angle, snakeDirAngle(sim.pending), 0.55);
         const fx = Math.cos(sim.angle);
         const fy = Math.sin(sim.angle);
         const px = -fy;
@@ -410,7 +420,15 @@ export default function SnakeGame() {
         const tick = snakeTickMs(sim.score, reduced);
         if (sim.acc >= tick) {
           sim.acc = reduced ? 0 : sim.acc - tick;
-          sim.dir = sim.pending;
+          const turned = consumeSnakeTurn({
+            dir: sim.dir,
+            pending: sim.pending,
+            extra: sim.extra,
+          });
+          sim.dir = turned.dir;
+          sim.pending = turned.pending;
+          sim.extra = turned.extra;
+          if (sim.pending !== sim.dir && sim.acc < tick - 16) sim.acc = Math.max(0, tick - 16);
           const stepped = stepSnake(sim.body, sim.dir, sim.food);
           if (stepped.dead) {
             sim.dead = true;
@@ -504,21 +522,88 @@ export default function SnakeGame() {
     };
   }, [dead, help.ready]);
 
-  const onPointerDown = (event: ReactPointerEvent<HTMLCanvasElement>) => {
-    if (!help.ready) return;
-    touchRef.current = { x: event.clientX, y: event.clientY };
-  };
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas || !help.ready || dead) return;
+    let start: { x: number; y: number } | null = null;
+    let dragged = false;
 
-  const onPointerUp = (event: ReactPointerEvent<HTMLCanvasElement>) => {
-    const start = touchRef.current;
-    touchRef.current = null;
-    if (!help.ready || !start) return;
-    const dx = event.clientX - start.x;
-    const dy = event.clientY - start.y;
-    if (Math.max(Math.abs(dx), Math.abs(dy)) < 24) return;
-    if (Math.abs(dx) > Math.abs(dy)) turn(dx > 0 ? "right" : "left");
-    else turn(dy > 0 ? "down" : "up");
-  };
+    const block = (event: Event) => {
+      event.preventDefault();
+    };
+
+    const onDown = (event: PointerEvent) => {
+      if (!event.isPrimary) return;
+      start = { x: event.clientX, y: event.clientY };
+      dragged = false;
+      try {
+        canvas.setPointerCapture(event.pointerId);
+      } catch {
+        /* the pointer can end before capture */
+      }
+      event.preventDefault();
+    };
+
+    const onMove = (event: PointerEvent) => {
+      if (!start || !event.isPrimary) return;
+      event.preventDefault();
+      const dx = event.clientX - start.x;
+      const dy = event.clientY - start.y;
+      if (Math.hypot(dx, dy) < SWIPE_PX) return;
+      const next = snakeDirFromDelta(dx, dy);
+      if (!next) return;
+      dragged = true;
+      applyTurn(simRef.current, next);
+      start = { x: event.clientX, y: event.clientY };
+    };
+
+    const onUp = (event: PointerEvent) => {
+      if (!start) return;
+      event.preventDefault();
+      const origin = start;
+      const didDrag = dragged;
+      start = null;
+      dragged = false;
+      if (didDrag) return;
+      const dx = event.clientX - origin.x;
+      const dy = event.clientY - origin.y;
+      if (Math.hypot(dx, dy) >= SWIPE_PX) {
+        const swiped = snakeDirFromDelta(dx, dy);
+        if (swiped) applyTurn(simRef.current, swiped);
+        return;
+      }
+      const head = simRef.current.body[0];
+      if (!head) return;
+      const rect = canvas.getBoundingClientRect();
+      const cell = rect.width / SNAKE_SIZE;
+      const headX = rect.left + (head.x + 0.5) * cell;
+      const headY = rect.top + (head.y + 0.5) * cell;
+      const next = snakeDirFromDelta(event.clientX - headX, event.clientY - headY);
+      if (next) applyTurn(simRef.current, next);
+    };
+
+    const onCancel = () => {
+      start = null;
+      dragged = false;
+    };
+
+    canvas.addEventListener("pointerdown", onDown, { passive: false });
+    canvas.addEventListener("pointermove", onMove, { passive: false });
+    canvas.addEventListener("pointerup", onUp, { passive: false });
+    canvas.addEventListener("pointercancel", onCancel, { passive: false });
+    canvas.addEventListener("touchstart", block, { passive: false });
+    canvas.addEventListener("touchmove", block, { passive: false });
+    canvas.addEventListener("gesturestart", block);
+    return () => {
+      canvas.removeEventListener("pointerdown", onDown);
+      canvas.removeEventListener("pointermove", onMove);
+      canvas.removeEventListener("pointerup", onUp);
+      canvas.removeEventListener("pointercancel", onCancel);
+      canvas.removeEventListener("touchstart", block);
+      canvas.removeEventListener("touchmove", block);
+      canvas.removeEventListener("gesturestart", block);
+    };
+  }, [dead, help.ready]);
 
   if (dead) {
     return (
@@ -583,8 +668,6 @@ export default function SnakeGame() {
             data-board-dir="ltr"
             role="img"
             aria-label={t("games.snake.title")}
-            onPointerDown={onPointerDown}
-            onPointerUp={onPointerUp}
           />
           {paused ? <p className="um-snake-pause">{t("games.paused")}</p> : null}
           <div className="um-play-dpad" dir="ltr">

@@ -540,6 +540,10 @@ body:has(.um-game-fit) {
     0 18px 40px rgba(6, 5, 18, 0.45),
     inset 0 0 42px rgba(240, 169, 59, 0.16);
   touch-action: none;
+  overscroll-behavior: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 
 .um-snake-pause {
