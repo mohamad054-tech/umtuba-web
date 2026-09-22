@@ -10,8 +10,9 @@ import {
   formatPlayNumber,
   verdictFromScore,
 } from "../../../lib/games/play/engine";
-import { writeBestIfHigher } from "../../../lib/games/play/scores";
+import { readBest, writeBestIfHigher } from "../../../lib/games/play/scores";
 import type { PlayableGameSlug } from "../../../lib/games/play/catalog";
+import { useBoardScrollLock } from "./boardPointer";
 import {
   PlayHowTo,
   PlayPanel,
@@ -47,9 +48,13 @@ export default function QuizPlay({ slug, howTo, load, seconds, extra, hidePrompt
   const clockRef = useRef(
     createPlayCountdown(seconds, setLeft, () => setTimedOut(true))
   );
+  const boardRef = useRef<HTMLDivElement>(null);
+  const [floor, setFloor] = useState(0);
+  useBoardScrollLock(boardRef, ready && !done);
 
   const begin = () => {
     if (!ready) {
+      setFloor(readBest(slug));
       setDeck(load());
       setIndex(0);
       setScore(0);
@@ -65,6 +70,7 @@ export default function QuizPlay({ slug, howTo, load, seconds, extra, hidePrompt
 
   const restart = () => {
     clockRef.current.stop();
+    setFloor(readBest(slug));
     setDeck(load());
     setIndex(0);
     setScore(0);
@@ -79,18 +85,23 @@ export default function QuizPlay({ slug, howTo, load, seconds, extra, hidePrompt
 
   useEffect(() => {
     if (!ready || done || deck.length === 0 || pick != null) return;
-    clockRef.current.start(seconds);
+    const clock = clockRef.current;
+    clock.start(seconds);
     return () => {
-      clockRef.current.stop();
+      clock.stop();
     };
   }, [ready, done, deck, index, pick, seconds]);
 
   useEffect(() => {
     if (!timedOut || pick != null) return;
-    setPick(-1);
-    clockRef.current.stop();
-    setStreak(0);
-    sfx.no();
+    const clock = clockRef.current;
+    const id = window.setTimeout(() => {
+      setPick(-1);
+      clock.stop();
+      setStreak(0);
+      sfx.no();
+    }, 0);
+    return () => window.clearTimeout(id);
   }, [timedOut, pick, sfx]);
 
   const item = deck[index];
@@ -137,6 +148,7 @@ export default function QuizPlay({ slug, howTo, load, seconds, extra, hidePrompt
         <PlayResult
           score={score}
           verdictKey={verdictFromScore("high", score)}
+          isBest={score > floor}
           detail={`${formatPlayNumber(locale, right)} ${t("games.of")} ${formatPlayNumber(locale, deck.length)} · ${t("games.streak")} ${formatPlayNumber(locale, best)}`}
           onAgain={restart}
         />
@@ -163,7 +175,7 @@ export default function QuizPlay({ slug, howTo, load, seconds, extra, hidePrompt
         onDismiss={begin}
       />
       {ready && item ? (
-        <div className="um-play-quiz" dir="ltr">
+        <div ref={boardRef} className={`um-play-quiz um-lit-board${pick === item.correct ? " um-play-celebrate" : ""}`} dir="ltr">
           <p className="um-play-qnum">
             {t("games.question")} {formatPlayNumber(locale, index + 1)} {t("games.of")}{" "}
             {formatPlayNumber(locale, deck.length)}
