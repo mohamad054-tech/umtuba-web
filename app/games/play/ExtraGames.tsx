@@ -832,10 +832,13 @@ export function ShapesGame() {
   const help = usePlayHelp();
   const sfx = useMemo(() => createPlaySfx(), []);
   type Card = { sh: string; col: string; up: boolean; done: boolean };
+  const boardRef = useRef<HTMLDivElement>(null);
   const [cards, setCards] = useState<Card[]>([]);
   const [open, setOpen] = useState<number[]>([]);
   const [score, setScore] = useState(0);
   const [done, setDone] = useState(false);
+  const [floor, setFloor] = useState(0);
+  useBoardScrollLock(boardRef, help.ready && !done);
 
   const deal = () => {
     const shapes = ["circle", "square", "diamond"];
@@ -848,6 +851,7 @@ export function ShapesGame() {
     setOpen([]);
     setScore(0);
     setDone(false);
+    setFloor(readBest("shapes"));
   };
 
   const begin = () => { if (!help.ready) deal(); help.dismissHelp(); };
@@ -882,19 +886,22 @@ export function ShapesGame() {
   if (done) {
     return (
       <PlayPanel stats={<PlayStat label={t("games.score")} value={formatPlayNumber(locale, score)} />}>
-        <PlayResult score={score} verdictKey={verdictFromScore("high", score)} detail={t("games.shapes.title")} onAgain={() => { deal(); help.keepReadyOnReplay(); }} />
+        <PlayResult score={score} verdictKey={verdictFromScore("high", score)} isBest={score > floor} detail={t("games.shapes.title")} onAgain={() => { deal(); help.keepReadyOnReplay(); }} />
       </PlayPanel>
     );
   }
 
   return (
     <Shell slug="shapes" howTo={["games.shapes.howTo1", "games.shapes.howTo2", "games.shapes.howTo3"]} stats={<PlayStat label={t("games.score")} value={formatPlayNumber(locale, score)} />} ready={help.ready} helpOpen={help.helpOpen} onToggleHelp={help.toggleHelp} begin={begin}>
-      <div className="um-play-shapeg" dir="ltr">
-        {cards.map((card, index) => (
-          <button key={index} type="button" className={`um-play-scard${card.up || card.done ? " up" : ""}`} data-play-item="true" onClick={() => flip(index)}>
-            <span className={`um-play-shape ${card.sh}`} style={{ background: card.up || card.done ? card.col : "#1a2140" }} />
-          </button>
-        ))}
+      <div ref={boardRef} className="um-play-shapeg um-lit-board" dir="ltr">
+        {cards.map((card, index) => {
+          const face = card.up || card.done;
+          return (
+            <button key={index} type="button" className={`um-play-scard${face ? " up" : ""}`} data-play-item="true" onClick={() => flip(index)}>
+              {face ? <span className={`um-play-shape ${card.sh}`} style={{ background: card.col }} /> : <span className="um-play-shape-gem" aria-hidden="true" />}
+            </button>
+          );
+        })}
       </div>
     </Shell>
   );
