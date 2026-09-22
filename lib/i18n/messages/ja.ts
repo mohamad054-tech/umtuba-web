@@ -1,8 +1,10 @@
-import { gamesEnMessages } from "./gamesCatalogs";
+import { gamesJaMessages } from "./gamesLocaleCatalogs";
 import { legalEnMessages } from "./legalCatalogs";
 import { moderationEnMessages } from "./moderationCatalogs";
 import { storeJaMessages } from "./storeCatalogs";
 import { teacherEnMessages } from "./teacherCatalogs";
+import { teacherJaPartial } from "./teacherLocaleCatalogs";
+import { uiParityJaMessages } from "./uiParityCatalogs";
 import { learningHubJaMessages } from "./learningHubCatalogs";
 import type { FoundationMessages } from "./types";
 
@@ -13,7 +15,7 @@ export const jaMessages: FoundationMessages = {
   ...legalEnMessages,
   ...moderationEnMessages,
   ...learningHubJaMessages,
-  ...gamesEnMessages,
+  ...gamesJaMessages,
   "languages.ar": "アラビア語",
   "languages.en": "英語",
   "languages.fr": "フランス語",
@@ -818,7 +820,7 @@ export const jaMessages: FoundationMessages = {
   "card.badge.draft": "下書き",
   "card.badge.premium": "有料",
   "card.badge.pinned": "固定",
-  "video.views.label": "{count} views",
+  "video.views.label": "{count} 回視聴",
   "create.title": "作成",
   "create.subtitle": "公開するものを選ぶ",
   "create.backHome": "ホームに戻る",
@@ -833,4 +835,6 @@ export const jaMessages: FoundationMessages = {
   "learning.visual.liveBanner": "UMTUBA Learning — 本番カタログとルート。",
   "teacher.become.cta": "講師になる",
   "teacher.public.title": "講師",
+  ...teacherJaPartial,
+  ...uiParityJaMessages,
 };

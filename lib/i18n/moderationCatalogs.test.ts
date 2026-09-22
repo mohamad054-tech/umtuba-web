@@ -16,13 +16,25 @@ describe("moderation i18n catalogs", () => {
     expect(moderationEnMessages["report.button"]).toBe("Report");
   });
 
-  it("places English placeholders on the other 11 locales", () => {
+  it("translates report and video more menus on every locale", () => {
+    const mustDiffer = keys.filter(
+      (key) =>
+        key.startsWith("video.more.") ||
+        key === "report.button" ||
+        key === "report.submit" ||
+        key.startsWith("report.title.") ||
+        key.startsWith("report.error.")
+    );
+    expect(mustDiffer.length).toBeGreaterThan(0);
     for (const locale of SUPPORTED_LOCALES) {
-      if (locale === "en" || locale === "ar") continue;
-      for (const key of keys) {
-        expect(
-          MESSAGE_CATALOGS[locale][key as keyof typeof moderationEnMessages]
-        ).toBe(moderationEnMessages[key as keyof typeof moderationEnMessages]);
+      if (locale === "en") continue;
+      for (const key of mustDiffer) {
+        const value =
+          MESSAGE_CATALOGS[locale][key as keyof typeof moderationEnMessages];
+        expect(value.trim().length, `${locale} ${key}`).toBeGreaterThan(0);
+        expect(value, `${locale} ${key}`).not.toBe(
+          moderationEnMessages[key as keyof typeof moderationEnMessages]
+        );
       }
     }
   });

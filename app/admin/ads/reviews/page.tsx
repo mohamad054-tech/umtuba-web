@@ -3,7 +3,7 @@ import AdminAdsShell, { FlashMessages, StatusChip } from "../AdminAdsShell";
 import { requireAdminAdsSession } from "../requireAdminAds";
 
 export const metadata = {
-  title: "Review Audit | UMTUBA Admin",
+  title: "Review Audit",
 };
 
 type PageProps = {

@@ -40,7 +40,7 @@ type EditPageProps = {
 };
 
 export const metadata = {
-  title: "Edit Product | UMTUBA",
+  title: "Edit Product",
 };
 
 export default async function EditSellerProductPage({

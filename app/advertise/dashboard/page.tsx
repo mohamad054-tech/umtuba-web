@@ -10,7 +10,7 @@ import { createClient, getServerUser } from "../../../lib/supabase/server";
 import AdvertiseShell from "../AdvertiseShell";
 
 export const metadata = {
-  title: "Advertise Dashboard | UMTUBA",
+  title: "Advertise Dashboard",
 };
 
 type PageProps = {

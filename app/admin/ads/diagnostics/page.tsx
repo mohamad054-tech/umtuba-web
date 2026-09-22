@@ -10,7 +10,7 @@ import { requireAdminAdsSession } from "../requireAdminAds";
 import DiagnosticReportPanel from "./DiagnosticReportPanel";
 
 export const metadata = {
-  title: "Ads Diagnostics | UMTUBA",
+  title: "Ads Diagnostics",
 };
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;

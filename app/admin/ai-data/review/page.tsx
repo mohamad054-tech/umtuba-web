@@ -2,7 +2,7 @@ import { getAiDataWorkflowService } from "../../../../lib/aiDataPlatform";
 import AiDataPlatformShell from "../AiDataPlatformShell";
 import { requireAiDataPlatformAdmin } from "../requireAiDataPlatformAdmin";
 
-export const metadata = { title: "AI Data Review | UMTUBA" };
+export const metadata = { title: "AI Data Review" };
 
 function DatasetList({
   title,

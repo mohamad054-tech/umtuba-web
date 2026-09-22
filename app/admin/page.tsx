@@ -7,7 +7,7 @@ import AdminHubShell from "./AdminHubShell";
 import { requirePlatformAdminPage } from "./requirePlatformAdminPage";
 
 export const metadata = {
-  title: "Admin | UMTUBA",
+  title: "Admin",
 };
 
 export const dynamic = "force-dynamic";

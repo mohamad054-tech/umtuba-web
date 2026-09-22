@@ -9,7 +9,7 @@ import ProductReviewActions from "../ProductReviewActions";
 import { requireAdminStoreSession } from "../requireAdminStore";
 
 export const metadata = {
-  title: "Product Review | UMTUBA Admin",
+  title: "Product Review",
 };
 
 type PageProps = {

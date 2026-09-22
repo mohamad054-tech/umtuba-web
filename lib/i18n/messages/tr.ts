@@ -1,8 +1,10 @@
-import { gamesEnMessages } from "./gamesCatalogs";
+import { gamesTrMessages } from "./gamesLocaleCatalogs";
 import { legalEnMessages } from "./legalCatalogs";
 import { moderationEnMessages } from "./moderationCatalogs";
 import { storeTrMessages } from "./storeCatalogs";
 import { teacherEnMessages } from "./teacherCatalogs";
+import { teacherTrPartial } from "./teacherLocaleCatalogs";
+import { uiParityTrMessages } from "./uiParityCatalogs";
 import { learningHubTrMessages } from "./learningHubCatalogs";
 import type { FoundationMessages } from "./types";
 
@@ -13,7 +15,7 @@ export const trMessages: FoundationMessages = {
   ...legalEnMessages,
   ...moderationEnMessages,
   ...learningHubTrMessages,
-  ...gamesEnMessages,
+  ...gamesTrMessages,
   "languages.ar": "Arapça",
   "languages.en": "İngilizce",
   "languages.fr": "Fransızca",
@@ -819,7 +821,7 @@ export const trMessages: FoundationMessages = {
   "card.badge.draft": "Taslak",
   "card.badge.premium": "Ücretli",
   "card.badge.pinned": "Sabitlendi",
-  "video.views.label": "{count} views",
+  "video.views.label": "{count} görüntüleme",
   "create.title": "Oluştur",
   "create.subtitle": "Yayımlanacak içeriği seçin",
   "create.backHome": "Ana sayfaya dön",
@@ -834,4 +836,6 @@ export const trMessages: FoundationMessages = {
   "learning.visual.liveBanner": "UMTUBA Learning — canlı ürün kataloğu ve rotalar.",
   "teacher.become.cta": "Öğretmen olun",
   "teacher.public.title": "Öğretmen",
+  ...teacherTrPartial,
+  ...uiParityTrMessages,
 };

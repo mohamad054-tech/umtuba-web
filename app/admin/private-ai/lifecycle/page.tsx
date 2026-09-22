@@ -7,7 +7,7 @@ import PrivateAiShell from "../PrivateAiShell";
 import { requirePrivateAiAdmin } from "../requirePrivateAiAdmin";
 import { transitionPrivateAiLifecycleAction } from "./actions";
 
-export const metadata = { title: "Private AI Lifecycle | UMTUBA" };
+export const metadata = { title: "Private AI Lifecycle" };
 
 export default async function PrivateAiLifecyclePage({
   searchParams,

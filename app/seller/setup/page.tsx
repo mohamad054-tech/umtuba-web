@@ -8,7 +8,7 @@ import { getLatestSellerApplication } from "../../../lib/store/sellerApplication
 import StoreSetupWizard from "./StoreSetupWizard";
 
 export const metadata = {
-  title: "Store Setup | UMTUBA",
+  title: "Store Setup",
 };
 
 type SetupPageProps = {

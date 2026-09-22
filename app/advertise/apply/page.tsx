@@ -6,7 +6,7 @@ import { listMyAdvertiserAccounts } from "../../../lib/ads/advertiserAccounts";
 import AdvertiseShell from "../AdvertiseShell";
 
 export const metadata = {
-  title: "Apply to Advertise | UMTUBA",
+  title: "Apply to Advertise",
 };
 
 type ApplyPageProps = {

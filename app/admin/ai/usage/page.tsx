@@ -14,7 +14,7 @@ import {
 import { APP_ROUTES } from "../../../lib/nav";
 
 export const metadata = {
-  title: "AI Usage & Quotas | UMTUBA",
+  title: "AI Usage & Quotas",
 };
 
 const PATH = "/admin/ai/usage";

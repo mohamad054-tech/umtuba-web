@@ -1,8 +1,10 @@
-import { gamesEnMessages } from "./gamesCatalogs";
+import { gamesKoMessages } from "./gamesLocaleCatalogs";
 import { legalEnMessages } from "./legalCatalogs";
 import { moderationEnMessages } from "./moderationCatalogs";
 import { storeKoMessages } from "./storeCatalogs";
 import { teacherEnMessages } from "./teacherCatalogs";
+import { teacherKoPartial } from "./teacherLocaleCatalogs";
+import { uiParityKoMessages } from "./uiParityCatalogs";
 import { learningHubKoMessages } from "./learningHubCatalogs";
 import type { FoundationMessages } from "./types";
 
@@ -13,7 +15,7 @@ export const koMessages: FoundationMessages = {
   ...legalEnMessages,
   ...moderationEnMessages,
   ...learningHubKoMessages,
-  ...gamesEnMessages,
+  ...gamesKoMessages,
   "languages.ar": "아랍어",
   "languages.en": "영어",
   "languages.fr": "프랑스어",
@@ -818,7 +820,7 @@ export const koMessages: FoundationMessages = {
   "card.badge.draft": "초안",
   "card.badge.premium": "유료",
   "card.badge.pinned": "고정됨",
-  "video.views.label": "{count} views",
+  "video.views.label": "{count}회 시청",
   "create.title": "만들기",
   "create.subtitle": "게시할 내용을 선택하세요",
   "create.backHome": "홈으로",
@@ -833,4 +835,6 @@ export const koMessages: FoundationMessages = {
   "learning.visual.liveBanner": "UMTUBA Learning — 라이브 제품 카탈로그와 경로.",
   "teacher.become.cta": "강사 되기",
   "teacher.public.title": "강사",
+  ...teacherKoPartial,
+  ...uiParityKoMessages,
 };

@@ -11,7 +11,7 @@ import TranslationStudioShell, {
 } from "../TranslationStudioShell";
 
 export const metadata = {
-  title: "Publish queue · Translation Studio | UMTUBA",
+  title: "Publish queue · Translation Studio",
 };
 
 export default async function TranslationStudioPublishPage() {

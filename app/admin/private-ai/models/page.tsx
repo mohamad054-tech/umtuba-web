@@ -2,7 +2,7 @@ import { getPrivateAiService } from "../../../../lib/privateAi";
 import PrivateAiShell from "../PrivateAiShell";
 import { requirePrivateAiAdmin } from "../requirePrivateAiAdmin";
 
-export const metadata = { title: "Private Models | UMTUBA" };
+export const metadata = { title: "Private Models" };
 
 export default async function PrivateAiModelsPage() {
   await requirePrivateAiAdmin();

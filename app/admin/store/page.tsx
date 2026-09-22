@@ -7,7 +7,7 @@ import AdminStoreShell from "./AdminStoreShell";
 import { requireAdminStoreSession } from "./requireAdminStore";
 
 export const metadata = {
-  title: "Store Admin | UMTUBA",
+  title: "Store Admin",
 };
 
 export default async function AdminStoreOverviewPage() {

@@ -13,7 +13,7 @@ import ModerationShell, { FlashMessages, StatusChip } from "./ModerationShell";
 import ReportReviewActions from "./ReportReviewActions";
 
 export const metadata = {
-  title: "Moderation | UMTUBA Admin",
+  title: "Moderation",
 };
 
 export const dynamic = "force-dynamic";

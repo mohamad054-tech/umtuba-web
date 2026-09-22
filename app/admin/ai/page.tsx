@@ -10,7 +10,7 @@ import { createClient, getServerUser } from "../../../lib/supabase/server";
 import { APP_ROUTES } from "../../lib/nav";
 
 export const metadata = {
-  title: "AI Platform Diagnostics | UMTUBA",
+  title: "AI Platform Diagnostics",
 };
 
 const ADMIN_AI_PATH = "/admin/ai";

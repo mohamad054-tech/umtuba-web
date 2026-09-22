@@ -11,7 +11,7 @@ import { getOwnedOrMemberStore } from "../../../../lib/store/sellerStore";
 import type { OrderStatus } from "../../../../lib/store/types";
 
 export const metadata = {
-  title: "Store Orders | UMTUBA Seller",
+  title: "Store Orders",
 };
 
 type PageProps = {

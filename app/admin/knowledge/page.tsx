@@ -3,7 +3,7 @@ import KnowledgeAcquisitionShell from "./KnowledgeAcquisitionShell";
 import { requireKnowledgeAcquisitionAdmin } from "./requireKnowledgeAcquisitionAdmin";
 
 export const metadata = {
-  title: "Knowledge Acquisition | UMTUBA",
+  title: "Knowledge Acquisition",
 };
 
 export default async function KnowledgeAcquisitionOverviewPage() {

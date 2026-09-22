@@ -8,7 +8,7 @@ import { createClient, getServerUser } from "../../../lib/supabase/server";
 import AdvertiseShell from "../AdvertiseShell";
 
 export const metadata = {
-  title: "Campaigns | UMTUBA Ads",
+  title: "Campaigns",
 };
 
 export default async function AdvertiseCampaignsPage() {

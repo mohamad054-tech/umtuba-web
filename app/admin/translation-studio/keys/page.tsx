@@ -10,7 +10,7 @@ import TranslationStudioShell, {
 } from "../TranslationStudioShell";
 
 export const metadata = {
-  title: "Keys · Translation Studio | UMTUBA",
+  title: "Keys · Translation Studio",
 };
 
 type PageProps = {

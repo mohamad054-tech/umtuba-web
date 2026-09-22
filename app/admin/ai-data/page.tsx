@@ -6,7 +6,7 @@ import AiDataPlatformShell from "./AiDataPlatformShell";
 import { requireAiDataPlatformAdmin } from "./requireAiDataPlatformAdmin";
 
 export const metadata = {
-  title: "AI Data Platform | UMTUBA",
+  title: "AI Data Platform",
 };
 
 export default async function AiDataPlatformOverviewPage() {

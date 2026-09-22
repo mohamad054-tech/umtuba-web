@@ -18,7 +18,7 @@ import ReviewActionForms, { ReviewTimeline } from "../ReviewActionForms";
 import { requireAdminAdsSession } from "../requireAdminAds";
 
 export const metadata = {
-  title: "Campaign Review | UMTUBA Admin",
+  title: "Campaign Review",
 };
 
 type PageProps = {

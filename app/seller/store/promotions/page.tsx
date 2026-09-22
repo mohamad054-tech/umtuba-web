@@ -18,7 +18,7 @@ import { getOwnedOrMemberStore } from "../../../../lib/store/sellerStore";
 import { createClient, getServerUser } from "../../../../lib/supabase/server";
 
 export const metadata = {
-  title: "Promotions | UMTUBA Seller",
+  title: "Promotions",
 };
 
 export default async function SellerStorePromotionsPage() {

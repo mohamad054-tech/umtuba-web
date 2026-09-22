@@ -167,7 +167,7 @@ describe("video SEO V1", () => {
     );
     const meta = buildWatchPostMetadata(emptyNoThumb);
     expect(meta.robots).toMatchObject({ index: false, follow: false });
-    expect(meta.title).toBe("Ada (@ada) on UMTUBA");
+    expect(meta.title).toEqual({ absolute: "Ada (@ada) on UMTUBA" });
     expect(String(meta.description)).toMatch(/Ada \(@ada\)/);
     expect(
       truthfulVideoDescription({

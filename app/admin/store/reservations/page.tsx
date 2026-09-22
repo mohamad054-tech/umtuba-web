@@ -10,7 +10,7 @@ import { requireAdminStoreSession } from "../requireAdminStore";
 import PendingSubmitButton from "../PendingSubmitButton";
 
 export const metadata = {
-  title: "Store reservations | UMTUBA Admin",
+  title: "Store reservations",
 };
 
 type PageProps = {

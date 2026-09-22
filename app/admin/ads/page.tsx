@@ -5,7 +5,7 @@ import AdminAdsShell from "./AdminAdsShell";
 import { requireAdminAdsSession } from "./requireAdminAds";
 
 export const metadata = {
-  title: "Ads Admin | UMTUBA",
+  title: "Ads Admin",
 };
 
 export default async function AdminAdsOverviewPage() {

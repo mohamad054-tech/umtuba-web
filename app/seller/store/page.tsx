@@ -47,7 +47,7 @@ import {
 import { updateStoreAction } from "../../actions/storeCatalog";
 
 export const metadata = {
-  title: "Seller Store | UMTUBA",
+  title: "Seller Store",
 };
 
 type PageProps = {

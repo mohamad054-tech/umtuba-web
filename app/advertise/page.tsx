@@ -3,7 +3,7 @@ import { APP_ROUTES } from "../lib/nav";
 import AdvertiseShell from "./AdvertiseShell";
 
 export const metadata = {
-  title: "Advertise on UMTUBA | UMTUBA",
+  title: { absolute: "Advertise on UMTUBA" },
 };
 
 export default function AdvertiseLandingPage() {

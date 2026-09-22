@@ -5,7 +5,7 @@ import {
 } from "../../../../lib/sandbox/learningPartners/copy";
 
 export const metadata = {
-  title: "Learning Partner Marketplace (SANDBOX) | UMTUBA",
+  title: "Learning Partner Marketplace (SANDBOX)",
   robots: { index: false, follow: false },
 };
 

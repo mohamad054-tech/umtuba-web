@@ -8,7 +8,7 @@ import { createClient, getServerUser } from "../../../../lib/supabase/server";
 import { getBuyerOrderDetail } from "../../../../lib/store/orders";
 
 export const metadata = {
-  title: "Order detail | UMTUBA Store",
+  title: "Order detail",
 };
 
 type PageProps = {

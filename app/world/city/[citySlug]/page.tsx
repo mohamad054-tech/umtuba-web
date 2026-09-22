@@ -37,7 +37,7 @@ export const dynamic = "force-dynamic";
 export async function generateMetadata({ params }: Props) {
   const { citySlug } = await params;
   return {
-    title: `${citySlug.replace(/-/g, " ")} | UMTUBA World`,
+    title: `${citySlug.replace(/-/g, " ")}`,
     robots: { index: false, follow: false },
   };
 }

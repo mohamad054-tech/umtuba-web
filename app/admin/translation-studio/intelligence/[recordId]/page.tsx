@@ -9,7 +9,7 @@ import { requireTranslationStudioAdmin } from "../../requireTranslationStudioAdm
 import TranslationStudioShell from "../../TranslationStudioShell";
 
 export const metadata = {
-  title: "Intelligence record · Translation Studio | UMTUBA",
+  title: "Intelligence record · Translation Studio",
 };
 
 type PageProps = {

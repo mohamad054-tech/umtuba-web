@@ -1,8 +1,10 @@
-import { gamesEnMessages } from "./gamesCatalogs";
+import { gamesIdMessages } from "./gamesLocaleCatalogs";
 import { legalEnMessages } from "./legalCatalogs";
 import { moderationEnMessages } from "./moderationCatalogs";
 import { storeIdMessages } from "./storeCatalogs";
 import { teacherEnMessages } from "./teacherCatalogs";
+import { teacherIdPartial } from "./teacherLocaleCatalogs";
+import { uiParityIdMessages } from "./uiParityCatalogs";
 import { learningHubIdMessages } from "./learningHubCatalogs";
 import type { FoundationMessages } from "./types";
 
@@ -13,7 +15,7 @@ export const idMessages: FoundationMessages = {
   ...legalEnMessages,
   ...moderationEnMessages,
   ...learningHubIdMessages,
-  ...gamesEnMessages,
+  ...gamesIdMessages,
   "languages.ar": "Arab",
   "languages.en": "Inggris",
   "languages.fr": "Prancis",
@@ -819,7 +821,7 @@ export const idMessages: FoundationMessages = {
   "card.badge.draft": "Draf",
   "card.badge.premium": "Berbayar",
   "card.badge.pinned": "Disematkan",
-  "video.views.label": "{count} views",
+  "video.views.label": "{count} tayangan",
   "create.title": "Buat",
   "create.subtitle": "Pilih yang ingin diterbitkan",
   "create.backHome": "Kembali ke Beranda",
@@ -834,4 +836,6 @@ export const idMessages: FoundationMessages = {
   "learning.visual.liveBanner": "UMTUBA Learning — katalog produk dan rute live.",
   "teacher.become.cta": "Jadi pengajar",
   "teacher.public.title": "Pengajar",
+  ...teacherIdPartial,
+  ...uiParityIdMessages,
 };

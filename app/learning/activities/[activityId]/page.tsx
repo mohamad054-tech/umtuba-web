@@ -20,7 +20,7 @@ type PageProps = {
 export async function generateMetadata({ params }: PageProps) {
   const { activityId } = await Promise.resolve(params);
   void activityId;
-  return { title: `Activity · Learning | UMTUBA` };
+  return { title: "Activity · Learning" };
 }
 
 export default async function LearningActivityPage({

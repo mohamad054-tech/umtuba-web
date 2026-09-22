@@ -56,10 +56,12 @@ describe("playable games catalog", () => {
   it("writes Arabic and English games chrome and keeps the play page noindex", () => {
     expect(gamesArMessages["games.title"]).toBe("الألعاب");
     expect(gamesEnMessages["games.title"]).toBe("Games");
-    expect(MESSAGE_CATALOGS.fr["games.title"]).toBe(gamesEnMessages["games.title"]);
-    expect(MESSAGE_CATALOGS.es["games.play"]).toBe(gamesEnMessages["games.play"]);
-    expect(MESSAGE_CATALOGS.de["games.newGame"]).toBe(gamesEnMessages["games.newGame"]);
-    expect(MESSAGE_CATALOGS.pt["games.localBest"]).toBe(
+    expect(MESSAGE_CATALOGS.fr["games.title"]).toBe("Jeux");
+    expect(MESSAGE_CATALOGS.es["games.play"]).toBe("Jugar");
+    expect(MESSAGE_CATALOGS.de["games.newGame"]).not.toBe(
+      gamesEnMessages["games.newGame"]
+    );
+    expect(MESSAGE_CATALOGS.pt["games.localBest"]).not.toBe(
       gamesEnMessages["games.localBest"]
     );
     const page = readFileSync(join(ROOT, "app/games/page.tsx"), "utf8");

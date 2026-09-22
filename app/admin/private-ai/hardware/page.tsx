@@ -2,7 +2,7 @@ import { getPrivateAiService } from "../../../../lib/privateAi";
 import PrivateAiShell from "../PrivateAiShell";
 import { requirePrivateAiAdmin } from "../requirePrivateAiAdmin";
 
-export const metadata = { title: "Hardware Contracts | UMTUBA" };
+export const metadata = { title: "Hardware Contracts" };
 
 export default async function PrivateAiHardwarePage() {
   await requirePrivateAiAdmin();

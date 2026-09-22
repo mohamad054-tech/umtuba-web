@@ -12,7 +12,7 @@ import { canManageCatalog, canViewStore } from "../../../../../lib/store/permiss
 import { getOwnedOrMemberStore } from "../../../../../lib/store/sellerStore";
 
 export const metadata = {
-  title: "Marketplace product | Seller Store | UMTUBA",
+  title: "Marketplace product | Seller Store",
 };
 
 type PageProps = {

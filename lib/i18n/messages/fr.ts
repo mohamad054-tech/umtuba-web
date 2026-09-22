@@ -1,6 +1,9 @@
 import { enMessages } from "./en";
+import { gamesFrMessages } from "./gamesLocaleCatalogs";
 import { legalEnMessages } from "./legalCatalogs";
 import { storeFrMessages } from "./storeCatalogs";
+import { teacherFrPartial } from "./teacherLocaleCatalogs";
+import { uiParityFrMessages } from "./uiParityCatalogs";
 import { learningHubFrMessages } from "./learningHubCatalogs";
 import type { FoundationMessages } from "./types";
 
@@ -93,7 +96,7 @@ export const frMessages: FoundationMessages = {
   "auth.shell.panelTitle": "Créer. Découvrir. Grandir.",
   "auth.shell.panelBody":
     "Rejoignez UMTUBA pour des vidéos, la découverte en direct et des créateurs du monde entier.",
-  "world.eyebrow": "UMTUBA World",
+  "world.eyebrow": "Monde UMTUBA",
   "world.navTitle": "Découverte du monde",
   "world.navSubtitleLive": "Lieux et destinations",
   "world.navSubtitleHold": "Pas encore en ligne",
@@ -895,4 +898,8 @@ export const frMessages: FoundationMessages = {
   "learning.visual.liveBanner": "UMTUBA Learning — catalogue produit et parcours en ligne.",
   "teacher.become.cta": "Devenir enseignant",
   "teacher.public.title": "Enseignant",
+  "video.views.label": "{count} vues",
+  ...teacherFrPartial,
+  ...gamesFrMessages,
+  ...uiParityFrMessages,
 };

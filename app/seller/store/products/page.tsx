@@ -13,7 +13,7 @@ import {
 import type { SellerCatalogListItem } from "../../../../lib/store/sellerCatalogPresentation";
 
 export const metadata = {
-  title: "Seller Products | UMTUBA",
+  title: "Seller Products",
 };
 
 export default async function SellerProductsPage() {

@@ -12,7 +12,7 @@ import {
 import { getOwnedOrMemberStore } from "../../../../lib/store/sellerStore";
 
 export const metadata = {
-  title: "Store Inventory | UMTUBA Seller",
+  title: "Store Inventory",
 };
 
 type PageProps = {

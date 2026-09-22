@@ -16,7 +16,7 @@ import { getOwnedOrMemberStore } from "../../../../lib/store/sellerStore";
 import { createClient, getServerUser } from "../../../../lib/supabase/server";
 
 export const metadata = {
-  title: "Analytics | UMTUBA Seller",
+  title: "Analytics",
 };
 
 type PageProps = {

@@ -6,7 +6,7 @@ import TranslationStudioShell, {
 } from "../TranslationStudioShell";
 
 export const metadata = {
-  title: "Namespaces · Translation Studio | UMTUBA",
+  title: "Namespaces · Translation Studio",
 };
 
 export default async function TranslationStudioNamespacesPage() {

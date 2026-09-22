@@ -2,7 +2,7 @@ import { getAiDataWorkflowService } from "../../../../lib/aiDataPlatform";
 import AiDataPlatformShell from "../AiDataPlatformShell";
 import { requireAiDataPlatformAdmin } from "../requireAiDataPlatformAdmin";
 
-export const metadata = { title: "AI Data Audit Trail | UMTUBA" };
+export const metadata = { title: "AI Data Audit Trail" };
 
 export default async function AiDataAuditPage() {
   await requireAiDataPlatformAdmin();

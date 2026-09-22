@@ -15,7 +15,7 @@ type Props = {
 };
 
 export const metadata = {
-  title: "World Search | UMTUBA",
+  title: "World Search",
   robots: { index: false, follow: false },
 };
 export const dynamic = "force-dynamic";

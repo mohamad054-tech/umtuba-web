@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { APP_ROUTES } from "../../lib/nav";
 
 export const metadata = {
-  title: "Apply to Sell | UMTUBA",
+  title: "Apply to Sell",
 };
 
 /**

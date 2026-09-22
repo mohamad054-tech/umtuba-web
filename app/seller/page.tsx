@@ -12,7 +12,7 @@ import {
 import { SELLER_LIFECYCLE_STATES } from "../../lib/store/commerceReadiness";
 
 export const metadata = {
-  title: "Seller | UMTUBA",
+  title: "Seller",
 };
 
 const STATUS_COPY: Record<string, { title: string; body: string }> = {

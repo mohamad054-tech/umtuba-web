@@ -1,8 +1,10 @@
-import { gamesEnMessages } from "./gamesCatalogs";
+import { gamesZhCNMessages } from "./gamesLocaleCatalogs";
 import { legalEnMessages } from "./legalCatalogs";
 import { moderationEnMessages } from "./moderationCatalogs";
 import { storeZhCNMessages } from "./storeCatalogs";
 import { teacherEnMessages } from "./teacherCatalogs";
+import { teacherZhCNPartial } from "./teacherLocaleCatalogs";
+import { uiParityZhCNMessages } from "./uiParityCatalogs";
 import { learningHubZhCNMessages } from "./learningHubCatalogs";
 import type { FoundationMessages } from "./types";
 
@@ -13,7 +15,7 @@ export const zhCNMessages: FoundationMessages = {
   ...legalEnMessages,
   ...moderationEnMessages,
   ...learningHubZhCNMessages,
-  ...gamesEnMessages,
+  ...gamesZhCNMessages,
   "languages.ar": "阿拉伯语",
   "languages.en": "英语",
   "languages.fr": "法语",
@@ -813,7 +815,7 @@ export const zhCNMessages: FoundationMessages = {
   "card.badge.draft": "草稿",
   "card.badge.premium": "付费",
   "card.badge.pinned": "已置顶",
-  "video.views.label": "{count} views",
+  "video.views.label": "{count} 次观看",
   "create.title": "创作",
   "create.subtitle": "选择要发布的内容",
   "create.backHome": "返回首页",
@@ -828,4 +830,6 @@ export const zhCNMessages: FoundationMessages = {
   "learning.visual.liveBanner": "UMTUBA Learning — 线上产品目录与路径。",
   "teacher.become.cta": "成为讲师",
   "teacher.public.title": "讲师",
+  ...teacherZhCNPartial,
+  ...uiParityZhCNMessages,
 };

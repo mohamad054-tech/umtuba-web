@@ -12,7 +12,7 @@ import TranslationStudioShell, {
 } from "../TranslationStudioShell";
 
 export const metadata = {
-  title: "Review queue · Translation Studio | UMTUBA",
+  title: "Review queue · Translation Studio",
 };
 
 type PageProps = {

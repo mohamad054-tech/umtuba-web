@@ -6,7 +6,7 @@ import SellerReviewActions from "../SellerReviewActions";
 import { requireAdminStoreSession } from "../requireAdminStore";
 
 export const metadata = {
-  title: "Seller Applications | UMTUBA Admin",
+  title: "Seller Applications",
 };
 
 type PageProps = {

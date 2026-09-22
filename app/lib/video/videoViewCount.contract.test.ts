@@ -92,7 +92,7 @@ describe("video view count — UI", () => {
 });
 
 describe("video view count — i18n", () => {
-  it("writes en and ar labels; other locales fall back to English", () => {
+  it("localizes the view-count label in every locale", () => {
     expect(translate("en", "video.views.label", { values: { count: "0" } })).toBe(
       "0 views"
     );
@@ -102,24 +102,14 @@ describe("video view count — i18n", () => {
     expect(MESSAGE_CATALOGS.en["video.views.label"]).toBe("{count} views");
     expect(MESSAGE_CATALOGS.ar["video.views.label"]).toBe("{count} مشاهدة");
 
-    const fallbackLocales = SUPPORTED_LOCALES.filter(
+    const otherLocales = SUPPORTED_LOCALES.filter(
       (locale) => locale !== "en" && locale !== "ar"
     );
-    expect(fallbackLocales).toEqual([
-      "fr",
-      "es",
-      "de",
-      "pt",
-      "id",
-      "hi",
-      "ru",
-      "tr",
-      "zh-CN",
-      "ja",
-      "ko",
-    ]);
-    for (const locale of fallbackLocales) {
-      expect(MESSAGE_CATALOGS[locale]["video.views.label"]).toBe("{count} views");
+    for (const locale of otherLocales) {
+      expect(MESSAGE_CATALOGS[locale]["video.views.label"]).toContain("{count}");
+      expect(MESSAGE_CATALOGS[locale]["video.views.label"]).not.toBe(
+        "{count} views"
+      );
     }
   });
 });

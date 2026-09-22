@@ -17,7 +17,7 @@ type PageProps = {
 export async function generateMetadata({ params }: PageProps) {
   const { attemptId } = await Promise.resolve(params);
   void attemptId;
-  return { title: `Attempt · Learning | UMTUBA` };
+  return { title: "Attempt · Learning" };
 }
 
 export default async function LearningAttemptPage({ params }: PageProps) {

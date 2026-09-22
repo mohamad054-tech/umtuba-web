@@ -1,8 +1,10 @@
-import { gamesEnMessages } from "./gamesCatalogs";
+import { gamesRuMessages } from "./gamesLocaleCatalogs";
 import { legalEnMessages } from "./legalCatalogs";
 import { moderationEnMessages } from "./moderationCatalogs";
 import { storeRuMessages } from "./storeCatalogs";
 import { teacherEnMessages } from "./teacherCatalogs";
+import { teacherRuPartial } from "./teacherLocaleCatalogs";
+import { uiParityRuMessages } from "./uiParityCatalogs";
 import { learningHubRuMessages } from "./learningHubCatalogs";
 import type { FoundationMessages } from "./types";
 
@@ -13,7 +15,7 @@ export const ruMessages: FoundationMessages = {
   ...legalEnMessages,
   ...moderationEnMessages,
   ...learningHubRuMessages,
-  ...gamesEnMessages,
+  ...gamesRuMessages,
   "languages.ar": "Арабский",
   "languages.en": "Английский",
   "languages.fr": "Французский",
@@ -819,7 +821,7 @@ export const ruMessages: FoundationMessages = {
   "card.badge.draft": "Черновик",
   "card.badge.premium": "Платное",
   "card.badge.pinned": "Закреплено",
-  "video.views.label": "{count} views",
+  "video.views.label": "{count} просмотров",
   "create.title": "Создать",
   "create.subtitle": "Выберите, что опубликовать",
   "create.backHome": "На главную",
@@ -834,4 +836,6 @@ export const ruMessages: FoundationMessages = {
   "learning.visual.liveBanner": "UMTUBA Learning — живой каталог и маршруты продукта.",
   "teacher.become.cta": "Стать преподавателем",
   "teacher.public.title": "Преподаватель",
+  ...teacherRuPartial,
+  ...uiParityRuMessages,
 };

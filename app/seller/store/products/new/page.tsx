@@ -10,7 +10,7 @@ import { createDraftProductAction } from "../../../../actions/storeCatalog";
 import { canManageCatalog } from "../../../../../lib/store/permissions";
 
 export const metadata = {
-  title: "New Product | UMTUBA",
+  title: "New Product",
 };
 
 type PageProps = {

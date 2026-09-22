@@ -1,8 +1,10 @@
-import { gamesEnMessages } from "./gamesCatalogs";
+import { gamesHiMessages } from "./gamesLocaleCatalogs";
 import { legalEnMessages } from "./legalCatalogs";
 import { moderationEnMessages } from "./moderationCatalogs";
 import { storeHiMessages } from "./storeCatalogs";
 import { teacherEnMessages } from "./teacherCatalogs";
+import { teacherHiPartial } from "./teacherLocaleCatalogs";
+import { uiParityHiMessages } from "./uiParityCatalogs";
 import { learningHubHiMessages } from "./learningHubCatalogs";
 import type { FoundationMessages } from "./types";
 
@@ -13,7 +15,7 @@ export const hiMessages: FoundationMessages = {
   ...legalEnMessages,
   ...moderationEnMessages,
   ...learningHubHiMessages,
-  ...gamesEnMessages,
+  ...gamesHiMessages,
   "languages.ar": "अरबी",
   "languages.en": "अंग्रेज़ी",
   "languages.fr": "फ़्रेंच",
@@ -819,7 +821,7 @@ export const hiMessages: FoundationMessages = {
   "card.badge.draft": "मसौदा",
   "card.badge.premium": "पेड",
   "card.badge.pinned": "पिन किया",
-  "video.views.label": "{count} views",
+  "video.views.label": "{count} बार देखा गया",
   "create.title": "बनाएँ",
   "create.subtitle": "प्रकाशित करने के लिए चुनें",
   "create.backHome": "होम पर वापस",
@@ -834,4 +836,6 @@ export const hiMessages: FoundationMessages = {
   "learning.visual.liveBanner": "UMTUBA Learning — लाइव उत्पाद कैटलॉग और रूट।",
   "teacher.become.cta": "शिक्षक बनें",
   "teacher.public.title": "शिक्षक",
+  ...teacherHiPartial,
+  ...uiParityHiMessages,
 };

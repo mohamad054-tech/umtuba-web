@@ -11,6 +11,7 @@ import type { AppLocale } from "../i18n/locales";
 import { buildHreflangLanguages } from "./hreflang";
 import { ogLocaleFor } from "./ogLocale";
 import { getSiteUrl } from "./siteUrl";
+import { resolveMetadataTitle } from "./titleBrand";
 
 const OG_IMAGE_PATH = "/opengraph-image.png";
 const OG_WIDTH = 1200;
@@ -81,8 +82,12 @@ export function buildPageMetadata(input: BuildPageMetadataInput): Metadata {
   const includeHreflang =
     input.hreflang ?? index === "index";
 
+  const title = resolveMetadataTitle(input.title);
+  const titleText =
+    typeof title === "string" ? `${title} | ${BRAND.name}` : title.absolute;
+
   return {
-    title: input.title,
+    title,
     description: input.description,
     alternates: {
       canonical: path,
@@ -96,13 +101,13 @@ export function buildPageMetadata(input: BuildPageMetadataInput): Metadata {
       locale: input.locale ? ogLocaleFor(input.locale) : "en_US",
       url: path,
       siteName: BRAND.name,
-      title: input.title,
+      title: titleText,
       description: input.description,
       images: [image],
     },
     twitter: {
       card: "summary_large_image",
-      title: input.title,
+      title: titleText,
       description: input.description,
       images: [
         {

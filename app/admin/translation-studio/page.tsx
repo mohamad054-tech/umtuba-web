@@ -13,7 +13,7 @@ import TranslationStudioShell, {
 } from "./TranslationStudioShell";
 
 export const metadata = {
-  title: "Translation Studio | UMTUBA",
+  title: "Translation Studio",
 };
 
 export default async function TranslationStudioOverviewPage() {

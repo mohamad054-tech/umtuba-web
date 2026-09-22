@@ -2,7 +2,7 @@ import { getAiDataPlatformService } from "../../../../lib/aiDataPlatform";
 import AiDataPlatformShell from "../AiDataPlatformShell";
 import { requireAiDataPlatformAdmin } from "../requireAiDataPlatformAdmin";
 
-export const metadata = { title: "AI Datasets | UMTUBA" };
+export const metadata = { title: "AI Datasets" };
 
 export default async function AiDatasetsPage() {
   await requireAiDataPlatformAdmin();

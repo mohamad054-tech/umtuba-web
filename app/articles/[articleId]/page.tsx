@@ -30,9 +30,9 @@ export async function generateMetadata({ params }: PageProps) {
   const supabase = await createClient();
   const loaded = await getPublishedArticle(supabase, articleId);
   if (!loaded.ok) {
-    return { title: "Article · UMTUBA" };
+    return { title: "Article" };
   }
-  return { title: `${loaded.data.title} · UMTUBA` };
+  return { title: loaded.data.title };
 }
 
 export default async function ArticlePage({ params, searchParams }: PageProps) {

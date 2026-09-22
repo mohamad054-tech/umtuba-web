@@ -3,7 +3,7 @@ import { requireTranslationStudioAdmin } from "../requireTranslationStudioAdmin"
 import TranslationStudioShell from "../TranslationStudioShell";
 
 export const metadata = {
-  title: "Languages · Translation Studio | UMTUBA",
+  title: "Languages · Translation Studio",
 };
 
 export default async function TranslationStudioLanguagesPage() {
