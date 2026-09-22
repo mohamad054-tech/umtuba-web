@@ -416,45 +416,48 @@ body:has(.um-game-fit) {
 .um-play-sudoku {
   display: grid;
   grid-template-columns: repeat(9, minmax(0, 1fr));
-  gap: 2px;
+  gap: 3px;
   max-width: 360px;
   margin-inline: auto;
-  background: var(--um-line);
-  border: 2px solid var(--um-line);
-  border-radius: 10px;
+  padding: 8px;
+  border-radius: 18px;
   overflow: hidden;
 }
 
 .um-play-sudoku button {
   aspect-ratio: 1;
   border: 0;
-  background: var(--um-raise);
-  color: var(--um-ink);
+  border-radius: 6px;
+  background: rgba(6, 5, 18, 0.28);
+  color: #f7f4ea;
   font: inherit;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
-  min-height: 34px;
+  min-height: 28px;
   cursor: pointer;
+  box-shadow: inset 0 0 8px rgba(6, 5, 18, 0.25);
 }
 
 .um-play-sudoku button:nth-child(9n + 3),
 .um-play-sudoku button:nth-child(9n + 6) {
-  border-inline-end: 2px solid var(--um-gold-dim);
+  border-inline-end: 2px solid rgba(240, 169, 59, 0.45);
 }
 
 .um-play-sudoku button:nth-child(n + 19):nth-child(-n + 27),
 .um-play-sudoku button:nth-child(n + 46):nth-child(-n + 54) {
-  border-bottom: 2px solid var(--um-gold-dim);
+  border-bottom: 2px solid rgba(240, 169, 59, 0.45);
 }
 
 .um-play-sudoku button.given {
-  background: var(--um-field);
-  color: var(--um-muted);
+  background: transparent;
+  color: #ffe7a3;
 }
 
 .um-play-sudoku button.sel {
-  outline: 2px solid var(--um-gold);
-  outline-offset: -2px;
+  outline: 0;
+  box-shadow:
+    0 0 0 2px #f0a93b,
+    0 0 12px rgba(240, 169, 59, 0.55);
 }
 
 .um-play-sudoku button.err {
@@ -802,12 +805,13 @@ body:has(.um-game-fit) {
   align-items: end;
   min-height: 220px;
   margin-top: 8px;
+  padding: 12px 8px;
 }
 
 .um-play-peg {
-  background: var(--um-field);
-  border: 1px solid var(--um-line);
-  border-radius: 11px;
+  background: transparent;
+  border: 0;
+  border-radius: 16px;
   min-height: 200px;
   display: flex;
   flex-direction: column-reverse;
@@ -817,34 +821,39 @@ body:has(.um-game-fit) {
   gap: 4px;
   position: relative;
   min-width: 0;
+  touch-action: none;
 }
 
 .um-play-peg::before {
   content: "";
   position: absolute;
-  bottom: 16px;
-  width: 6px;
-  height: 70%;
-  background: var(--um-line);
-  border-radius: 4px;
+  bottom: 18px;
+  width: 8px;
+  height: 68%;
+  border-radius: 6px;
+  background: linear-gradient(#ffe7a3, #c8871a);
+  box-shadow: 0 0 10px rgba(240, 169, 59, 0.45);
 }
 
 .um-play-peg.sel {
-  border-color: var(--um-gold);
+  box-shadow: inset 0 0 0 2px rgba(240, 169, 59, 0.8);
 }
 
 .um-play-disc {
-  height: 18px;
-  border-radius: 9px;
-  background: var(--um-gold);
-  border: 1px solid var(--um-gold-dim);
+  height: 22px;
+  border-radius: 11px;
+  background: radial-gradient(circle at 30% 30%, #ffe7a3, #f0a93b 55%, #9a6e22);
+  border: 0;
   position: relative;
   z-index: 1;
   color: #14261c;
-  font-size: 11px;
-  font-weight: 700;
+  font-size: 12px;
+  font-weight: 800;
   display: grid;
   place-items: center;
+  box-shadow:
+    0 6px 10px rgba(6, 5, 18, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
 .um-play-quiz {
