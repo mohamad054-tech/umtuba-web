@@ -540,7 +540,7 @@ export function WheelGame() {
   const [floor, setFloor] = useState(0);
   useBoardScrollLock(stageRef, help.ready);
 
-  const begin = () => { if (!help.ready) { setFloor(readBest("wheel")); setTotal(0); setSpins(0); setWon(null); } help.dismissHelp(); };
+  const begin = () => { if (!help.ready) { setFloor(readBest("wheel") ?? 0); setTotal(0); setSpins(0); setWon(null); } help.dismissHelp(); };
   const spin = () => {
     if (busy) return;
     setBusy(true);
@@ -730,7 +730,7 @@ export function HangwordGame() {
 
   const begin = () => {
     if (!help.ready) {
-      setFloor(readBest("hangword"));
+      setFloor(readBest("hangword") ?? 0);
       setDeck(shuffled(HANG_WORDS).slice(0, 4));
       setI(0); setFound([]); setUsed([]); setLives(6); setScore(0); setSolved(0); setDone(false);
     }
@@ -765,7 +765,9 @@ export function HangwordGame() {
   if (done) {
     return (
       <PlayPanel stats={<PlayStat label={t("games.score")} value={formatPlayNumber(locale, score)} />}>
-        <PlayResult score={score} verdictKey={verdictFromScore("high", score)} isBest={score > floor} detail={`${formatPlayNumber(locale, solved)} ${t("games.of")} 4`} onAgain={() => { setDeck(shuffled(HANG_WORDS).slice(0, 4)); setI(0); setFound([]); setUsed([]); setLives(6); setScore(0); setSolved(0); setDone(false); help.keepReadyOnReplay(); }} />
+        <div className={score > floor ? "um-play-best" : undefined}>
+          <PlayResult score={score} verdictKey={verdictFromScore("high", score)} detail={score > floor ? t("games.localBest", { values: { score: formatPlayNumber(locale, score) } }) : `${formatPlayNumber(locale, solved)} ${t("games.of")} 4`} onAgain={() => { setDeck(shuffled(HANG_WORDS).slice(0, 4)); setI(0); setFound([]); setUsed([]); setLives(6); setScore(0); setSolved(0); setDone(false); help.keepReadyOnReplay(); }} />
+        </div>
       </PlayPanel>
     );
   }
@@ -855,7 +857,7 @@ export function ShapesGame() {
     setOpen([]);
     setScore(0);
     setDone(false);
-    setFloor(readBest("shapes"));
+    setFloor(readBest("shapes") ?? 0);
   };
 
   const begin = () => { if (!help.ready) deal(); help.dismissHelp(); };
@@ -890,7 +892,9 @@ export function ShapesGame() {
   if (done) {
     return (
       <PlayPanel stats={<PlayStat label={t("games.score")} value={formatPlayNumber(locale, score)} />}>
-        <PlayResult score={score} verdictKey={verdictFromScore("high", score)} isBest={score > floor} detail={t("games.shapes.title")} onAgain={() => { deal(); help.keepReadyOnReplay(); }} />
+        <div className={score > floor ? "um-play-best" : undefined}>
+          <PlayResult score={score} verdictKey={verdictFromScore("high", score)} detail={score > floor ? t("games.localBest", { values: { score: formatPlayNumber(locale, score) } }) : t("games.shapes.title")} onAgain={() => { deal(); help.keepReadyOnReplay(); }} />
+        </div>
       </PlayPanel>
     );
   }
@@ -966,7 +970,7 @@ export function UnoGame() {
     setDeck(d.slice(15));
     setTurn("you");
     setDone(null);
-    setFloor(readBest("uno"));
+    setFloor(readBest("uno") ?? 0);
   };
 
   const begin = () => { if (!help.ready) deal(); help.dismissHelp(); };
@@ -1021,7 +1025,9 @@ export function UnoGame() {
     const pts = done === "win" ? 200 : 30;
     return (
       <PlayPanel stats={<PlayStat label={t("games.score")} value={formatPlayNumber(locale, pts)} />}>
-        <PlayResult score={pts} verdictKey={done === "win" ? "games.youWin" : "games.youLose"} isBest={pts > floor} detail={t("games.uno.title")} onAgain={() => { deal(); help.keepReadyOnReplay(); }} />
+        <div className={pts > floor ? "um-play-best" : undefined}>
+          <PlayResult score={pts} verdictKey={done === "win" ? "games.youWin" : "games.youLose"} detail={pts > floor ? t("games.localBest", { values: { score: formatPlayNumber(locale, pts) } }) : t("games.uno.title")} onAgain={() => { deal(); help.keepReadyOnReplay(); }} />
+        </div>
       </PlayPanel>
     );
   }

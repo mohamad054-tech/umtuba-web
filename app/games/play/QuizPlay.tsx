@@ -54,7 +54,7 @@ export default function QuizPlay({ slug, howTo, load, seconds, extra, hidePrompt
 
   const begin = () => {
     if (!ready) {
-      setFloor(readBest(slug));
+      setFloor(readBest(slug) ?? 0);
       setDeck(load());
       setIndex(0);
       setScore(0);
@@ -70,7 +70,7 @@ export default function QuizPlay({ slug, howTo, load, seconds, extra, hidePrompt
 
   const restart = () => {
     clockRef.current.stop();
-    setFloor(readBest(slug));
+    setFloor(readBest(slug) ?? 0);
     setDeck(load());
     setIndex(0);
     setScore(0);
@@ -145,13 +145,18 @@ export default function QuizPlay({ slug, howTo, load, seconds, extra, hidePrompt
         onToggleHelp={toggleHelp}
       >
         <PlayHowTo open={helpOpen} lines={howTo.map((key) => t(key))} cta="gotIt" onDismiss={dismissHelp} />
-        <PlayResult
-          score={score}
-          verdictKey={verdictFromScore("high", score)}
-          isBest={score > floor}
-          detail={`${formatPlayNumber(locale, right)} ${t("games.of")} ${formatPlayNumber(locale, deck.length)} · ${t("games.streak")} ${formatPlayNumber(locale, best)}`}
-          onAgain={restart}
-        />
+        <div className={score > floor ? "um-play-best" : "um-play-celebrate"}>
+          <PlayResult
+            score={score}
+            verdictKey={verdictFromScore("high", score)}
+            detail={
+              score > floor
+                ? t("games.localBest", { values: { score: formatPlayNumber(locale, score) } })
+                : `${formatPlayNumber(locale, right)} ${t("games.of")} ${formatPlayNumber(locale, deck.length)} · ${t("games.streak")} ${formatPlayNumber(locale, best)}`
+            }
+            onAgain={restart}
+          />
+        </div>
       </PlayPanel>
     );
   }
