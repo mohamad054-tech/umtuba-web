@@ -943,6 +943,12 @@ export function UnoGame() {
   const [deck, setDeck] = useState<UnoCard[]>([]);
   const [turn, setTurn] = useState<"you" | "cpu">("you");
   const [done, setDone] = useState<"win" | "lose" | null>(null);
+  const [floor, setFloor] = useState(0);
+  const tableRef = useRef<HTMLDivElement>(null);
+  const pileRef = useRef<HTMLDivElement>(null);
+  const dragRef = useRef<{ id: number; x: number; y: number } | null>(null);
+  const skipClick = useRef(false);
+  useBoardScrollLock(tableRef, help.ready && !done);
 
   const makeDeck = () => {
     const colors: UnoCard["c"][] = ["red", "gold", "mint", "ink"];
@@ -960,6 +966,7 @@ export function UnoGame() {
     setDeck(d.slice(15));
     setTurn("you");
     setDone(null);
+    setFloor(readBest("uno"));
   };
 
   const begin = () => { if (!help.ready) deal(); help.dismissHelp(); };
@@ -1014,7 +1021,7 @@ export function UnoGame() {
     const pts = done === "win" ? 200 : 30;
     return (
       <PlayPanel stats={<PlayStat label={t("games.score")} value={formatPlayNumber(locale, pts)} />}>
-        <PlayResult score={pts} verdictKey={done === "win" ? "games.youWin" : "games.youLose"} detail={t("games.uno.title")} onAgain={() => { deal(); help.keepReadyOnReplay(); }} />
+        <PlayResult score={pts} verdictKey={done === "win" ? "games.youWin" : "games.youLose"} isBest={pts > floor} detail={t("games.uno.title")} onAgain={() => { deal(); help.keepReadyOnReplay(); }} />
       </PlayPanel>
     );
   }
@@ -1023,7 +1030,7 @@ export function UnoGame() {
 
   return (
     <Shell slug="uno" howTo={["games.uno.howTo1", "games.uno.howTo2", "games.uno.howTo3"]} stats={<PlayStat label={t("games.cpu")} value={formatPlayNumber(locale, cpu.length)} />} ready={help.ready} helpOpen={help.helpOpen} onToggleHelp={help.toggleHelp} begin={begin}>
-      <div className="um-color-table" dir="ltr">
+      <div ref={tableRef} className="um-color-table um-lit-board" dir="ltr">
         <div className="um-color-cpu" aria-label={t("games.cpu")}>
           {cpu.map((card, index) => (
             <ColorCard key={`${card.c}-${card.v}-${index}`} faceDown />
@@ -1035,7 +1042,7 @@ export function UnoGame() {
             <ColorCard faceDown />
             <span className="um-color-pile-label">{t("games.drawCard")} · {formatPlayNumber(locale, deck.length)}</span>
           </button>
-          <div className="um-color-pile">
+          <div ref={pileRef} className="um-color-pile" data-uno-discard="true">
             {top ? <ColorCard card={top} /> : <ColorCard faceDown />}
             <span className="um-color-pile-label">{t("games.waste")}</span>
           </div>
@@ -1050,7 +1057,28 @@ export function UnoGame() {
                 className="um-color-play"
                 data-play-item="true"
                 disabled={turn !== "you" || !legal}
-                onClick={() => playYou(index)}
+                onPointerDown={(event) => {
+                  if (!event.isPrimary || turn !== "you" || !legal) return;
+                  dragRef.current = { id: index, x: event.clientX, y: event.clientY };
+                  event.currentTarget.setPointerCapture(event.pointerId);
+                }}
+                onPointerUp={(event) => {
+                  const start = dragRef.current;
+                  dragRef.current = null;
+                  if (!start || start.id !== index) return;
+                  if (Math.hypot(event.clientX - start.x, event.clientY - start.y) < 10) return;
+                  skipClick.current = true;
+                  const pile = pileRef.current;
+                  const hit = document.elementFromPoint(event.clientX, event.clientY);
+                  if (pile && hit && pile.contains(hit)) playYou(index);
+                }}
+                onClick={() => {
+                  if (skipClick.current) {
+                    skipClick.current = false;
+                    return;
+                  }
+                  playYou(index);
+                }}
               >
                 <ColorCard card={card} />
               </button>
