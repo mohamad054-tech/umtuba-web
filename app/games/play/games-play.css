@@ -847,30 +847,80 @@ body:has(.um-game-fit) {
   accent-color: var(--um-gold);
 }
 
-.um-play-wheel {
+.um-play-wheel-stage {
+  position: relative;
   width: min(240px, 72vw);
   height: min(240px, 72vw);
-  margin: 8px auto;
+  margin: 16px auto 8px;
+}
+
+.um-play-wheel-pointer {
+  position: absolute;
+  z-index: 2;
+  top: -2px;
+  left: 50%;
+  width: 0;
+  height: 0;
+  transform: translateX(-50%);
+  border-left: 11px solid transparent;
+  border-right: 11px solid transparent;
+  border-top: 20px solid #f7f4ea;
+  filter: drop-shadow(0 2px 0 rgba(0, 0, 0, 0.45));
+  pointer-events: none;
+}
+
+.um-play-wheel {
+  width: 100%;
+  height: 100%;
   border-radius: 50%;
+  border: 6px solid #f7f4ea;
   background:
     conic-gradient(
       #d46a5e 0 60deg,
       #f0a93b 60deg 120deg,
       #7ed9b8 120deg 180deg,
-      #343c6a 180deg 240deg,
-      #9a6e22 240deg 300deg,
-      #1a2140 300deg 360deg
+      #6ea8ff 180deg 240deg,
+      #e7d7a1 240deg 300deg,
+      #c46b9a 300deg 360deg
     );
-  display: grid;
-  place-items: center;
-  transition: transform 0.9s ease;
+  position: relative;
+  transition: transform 2.6s cubic-bezier(0.12, 0.72, 0.08, 1);
+  box-shadow: inset 0 0 0 10px rgba(6, 5, 18, 0.18);
+}
+
+.um-play-wheel::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 28px;
+  height: 28px;
+  margin: -14px 0 0 -14px;
+  border-radius: 50%;
+  background: #f7f4ea;
+  box-shadow: 0 0 0 4px rgba(6, 5, 18, 0.25);
 }
 
 .um-play-slice {
   position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
+  left: 50%;
+  top: 50%;
+  width: 42px;
+  margin-left: -21px;
+  margin-top: -10px;
+  font-size: 15px;
+  font-weight: 900;
+  line-height: 1;
+  text-align: center;
+  color: #142018;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+
+.um-play-wheel-won {
+  margin: 8px 0 0;
+  text-align: center;
+  font-size: 1.35rem;
+  font-weight: 900;
 }
 
 .um-play-flagbox,

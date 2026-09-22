@@ -1723,6 +1723,7 @@ export type GamesMessages = {
   "games.uno.howTo1": string;
   "games.uno.howTo2": string;
   "games.uno.howTo3": string;
+  "games.wheel.won": string;
 };
 
 export type TranslationKey = keyof FoundationMessages;

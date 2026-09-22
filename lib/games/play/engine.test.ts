@@ -15,6 +15,8 @@ import {
   xoCpuMove,
   xoHumanCenterThenBlock,
   unoCpuIndex,
+  wheelIndexAt,
+  wheelStopAngle,
   xoWinner,
   type UnoCard,
   type XoMark,
@@ -117,6 +119,16 @@ describe("play engine", () => {
     expect(hanoiCanPlace(3, 2)).toBe(true);
     expect(hanoiCanPlace(1, 2)).toBe(false);
     expect(hanoiCanPlace(undefined, 3)).toBe(true);
+  });
+
+  it("stops the wheel on the chosen slice under the pointer", () => {
+    const count = 6;
+    for (let index = 0; index < count; index += 1) {
+      const angle = wheelStopAngle(40, index, count, 5);
+      expect(wheelIndexAt(angle, count)).toBe(index);
+      expect(angle).toBeGreaterThan(40);
+    }
+    expect(wheelIndexAt(wheelStopAngle(0, 0, count, 0), count)).toBe(0);
   });
 
   it("picks a beatable Uno CPU move", () => {

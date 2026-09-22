@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useI18n } from "../../components/i18n";
 import type { TranslationKey } from "../../../lib/i18n/messages/types";
 import {
@@ -22,10 +22,13 @@ import {
 import {
   createPlaySfx,
   formatPlayNumber,
+  prefersReducedMotion,
   shuffled,
   unoCpuIndex,
   unoMatch,
   verdictFromScore,
+  wheelIndexAt,
+  wheelStopAngle,
   type UnoCard,
 } from "../../../lib/games/play/engine";
 import { writeBestIfHigher } from "../../../lib/games/play/scores";
@@ -496,35 +499,56 @@ export function WheelGame() {
   const { t, locale } = useI18n();
   const help = usePlayHelp();
   const sfx = useMemo(() => createPlaySfx(), []);
+  const angleRef = useRef(0);
   const [angle, setAngle] = useState(0);
   const [total, setTotal] = useState(0);
   const [spins, setSpins] = useState(0);
   const [busy, setBusy] = useState(false);
+  const [won, setWon] = useState<number | null>(null);
 
-  const begin = () => { if (!help.ready) { setTotal(0); setSpins(0); } help.dismissHelp(); };
+  const begin = () => { if (!help.ready) { setTotal(0); setSpins(0); setWon(null); } help.dismissHelp(); };
   const spin = () => {
     if (busy) return;
     setBusy(true);
+    setWon(null);
     const pick = Math.floor(Math.random() * WHEEL_SLICES.length);
-    const step = 360 / WHEEL_SLICES.length;
-    setAngle(360 * 5 - (pick * step + step / 2));
+    const reduced = prefersReducedMotion();
+    const next = wheelStopAngle(angleRef.current, pick, WHEEL_SLICES.length, reduced ? 0 : 5);
+    angleRef.current = next;
+    setAngle(next);
     window.setTimeout(() => {
-      const val = WHEEL_SLICES[pick] ?? 5;
+      const index = wheelIndexAt(next, WHEEL_SLICES.length);
+      const val = WHEEL_SLICES[index] ?? WHEEL_SLICES[pick] ?? 5;
       setSpins((n) => n + 1);
       setTotal((n) => n + val);
+      setWon(val);
       writeBestIfHigher("wheel", total + val);
       sfx.win();
       setBusy(false);
-    }, 900);
+    }, reduced ? 40 : 2600);
   };
+  const step = 360 / WHEEL_SLICES.length;
 
   return (
     <Shell slug="wheel" howTo={["games.wheel.howTo1", "games.wheel.howTo2", "games.wheel.howTo3"]} stats={<PlayStat label={t("games.score")} value={formatPlayNumber(locale, total)} />} ready={help.ready} helpOpen={help.helpOpen} onToggleHelp={help.toggleHelp} begin={begin}>
-      <div className="um-play-wheel" dir="ltr" data-play-item="true" style={{ transform: `rotate(${angle}deg)` }}>
-        {WHEEL_SLICES.map((value, index) => (
-          <span key={`${value}-${index}`} className="um-play-slice">{value}%</span>
-        ))}
+      <div className="um-play-wheel-stage" dir="ltr">
+        <div className="um-play-wheel-pointer" aria-hidden="true" />
+        <div className="um-play-wheel" data-play-item="true" style={{ transform: `rotate(${angle}deg)` }}>
+          {WHEEL_SLICES.map((value, index) => (
+            <span
+              key={`${value}-${index}`}
+              className="um-play-slice"
+              dir="ltr"
+              style={{ transform: `rotate(${index * step + step / 2}deg) translateY(-78px)` }}
+            >
+              {value}%
+            </span>
+          ))}
+        </div>
       </div>
+      <p className="um-play-wheel-won" dir="ltr">
+        {won == null ? "\u00a0" : t("games.wheel.won", { values: { value: `${formatPlayNumber(locale, won)}%` } })}
+      </p>
       <div className="um-play-row" style={{ justifyContent: "center" }}>
         <button type="button" className="um-play-btn go" data-play-item="true" onClick={spin} disabled={busy}>{t("games.spin")}</button>
       </div>

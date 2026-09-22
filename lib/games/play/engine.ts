@@ -495,3 +495,29 @@ export function unoCpuIndex(
   const color = legal.find((index) => hand[index]?.c === top.c);
   return color ?? legal[0] ?? -1;
 }
+
+/** Extra full turns, then stop so slice `index` sits under a top pointer. */
+export function wheelStopAngle(
+  current: number,
+  index: number,
+  count: number,
+  extraTurns = 5
+): number {
+  if (count <= 0) return current;
+  const slice = 360 / count;
+  const center = index * slice + slice / 2;
+  const norm = ((current % 360) + 360) % 360;
+  const target = (360 - center) % 360;
+  let delta = target - norm;
+  if (delta < 0) delta += 360;
+  return current + delta + 360 * extraTurns;
+}
+
+/** Which slice is under a pointer fixed at the top after `angle` degrees of clockwise rotation. */
+export function wheelIndexAt(angle: number, count: number): number {
+  if (count <= 0) return 0;
+  const slice = 360 / count;
+  const norm = ((angle % 360) + 360) % 360;
+  const pointerOffset = (360 - norm) % 360;
+  return Math.floor(pointerOffset / slice) % count;
+}
