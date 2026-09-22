@@ -3,6 +3,8 @@
  * No inline scripts, no Google Fonts, no cloud scores.
  */
 
+import { readGameMuted } from "./theme";
+
 export const PLAY_FIELD = "#0A1028";
 export const PLAY_SURFACE = "#12182F";
 export const PLAY_RAISE = "#1A2140";
@@ -97,6 +99,7 @@ export function createPlaySfx() {
 
   const tone = (frequency: number, ms: number, type: OscillatorType = "sine") => {
     try {
+      if (readGameMuted()) return;
       const ctx = getContext();
       if (!ctx) return;
       const osc = ctx.createOscillator();
@@ -267,6 +270,47 @@ export type SnakePoint = { x: number; y: number };
 
 export function snakeKey(point: SnakePoint): string {
   return `${point.x},${point.y}`;
+}
+
+export function snakeHeading(direction: Dir4): SnakePoint {
+  if (direction === "left") return { x: -1, y: 0 };
+  if (direction === "right") return { x: 1, y: 0 };
+  if (direction === "up") return { x: 0, y: -1 };
+  return { x: 0, y: 1 };
+}
+
+export function snakeDirAngle(direction: Dir4): number {
+  if (direction === "right") return 0;
+  if (direction === "down") return Math.PI / 2;
+  if (direction === "left") return Math.PI;
+  return -Math.PI / 2;
+}
+
+/**
+ * Head eases toward the next cell and the tail eases off the last cell,
+ * so the tube slides instead of jumping. A turn still follows the cells.
+ * While eating, the tail stays put so the snake grows.
+ */
+export function snakeVisualChain(
+  body: readonly SnakePoint[],
+  direction: Dir4,
+  progress: number,
+  eating = false
+): SnakePoint[] {
+  const head = body[0] ?? { x: 8, y: 8 };
+  const step = Math.min(1, Math.max(0, progress));
+  const rest = body.map((point) => ({ x: point.x, y: point.y }));
+  if (step < 0.001) return rest;
+  const heading = snakeHeading(direction);
+  const ahead = { x: head.x + heading.x * step, y: head.y + heading.y * step };
+  if (eating || rest.length < 2) return [ahead, ...rest];
+  const tail = rest[rest.length - 1]!;
+  const before = rest[rest.length - 2]!;
+  const tip = {
+    x: tail.x + (before.x - tail.x) * step,
+    y: tail.y + (before.y - tail.y) * step,
+  };
+  return [ahead, ...rest.slice(0, -1), tip];
 }
 
 export function stepSnake(

@@ -524,31 +524,68 @@ body:has(.um-game-fit) {
   border-color: var(--um-gold);
 }
 
-.um-play-snake {
-  display: grid;
-  gap: 2px;
-  background: var(--um-line);
-  border: 2px solid var(--um-line);
-  border-radius: 8px;
+.um-snake-stage {
+  position: relative;
   max-width: 360px;
   margin-inline: auto;
+}
+
+.um-snake-canvas {
+  display: block;
+  width: 100%;
   aspect-ratio: 1;
+  border-radius: 18px;
+  background: #0b1230;
+  box-shadow:
+    0 18px 40px rgba(6, 5, 18, 0.45),
+    inset 0 0 42px rgba(240, 169, 59, 0.16);
+  touch-action: none;
 }
 
-.um-play-scell {
-  background: var(--um-raise);
+.um-snake-pause {
+  position: absolute;
+  top: 18%;
+  left: 12%;
+  right: 12%;
+  margin: 0;
+  text-align: center;
+  color: #f7f4ea;
+  font-weight: 700;
+  text-shadow: 0 0 12px rgba(240, 169, 59, 0.65);
 }
 
-.um-play-scell.s {
-  background: var(--um-mint);
+.um-snake-over,
+.um-snake-best {
+  animation: um-snake-pop 480ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-.um-play-scell.head {
-  background: var(--um-gold);
+.um-snake-best {
+  animation-name: um-snake-best;
 }
 
-.um-play-scell.food {
-  background: var(--um-clay);
+@keyframes um-snake-pop {
+  from {
+    transform: scale(0.92);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+@keyframes um-snake-best {
+  0% {
+    transform: scale(0.86);
+    filter: brightness(1.45);
+  }
+  60% {
+    transform: scale(1.04);
+  }
+  100% {
+    transform: none;
+    filter: none;
+  }
 }
 
 .um-play-dpad {

@@ -56,7 +56,7 @@ export const gamesEnMessages: GamesMessages = {
   "games.g2048.howTo3": "Each merge adds that value to your score.",
   "games.snake.title": "Snake",
   "games.snake.blurb": "Eat, grow, and stay off the walls.",
-  "games.snake.howTo1": "Eat the red square. Do not hit a wall or yourself.",
+  "games.snake.howTo1": "Eat the glowing fruit. Do not hit a wall or yourself.",
   "games.snake.howTo2": "Arrow keys, WASD, swipe, or the pad. Right always means the physical right of the screen.",
   "games.snake.howTo3": "+10 per food. The snake starts slow and speeds up as you score.",
   "games.memory.title": "Memory",
@@ -220,6 +220,8 @@ export const gamesEnMessages: GamesMessages = {
   "games.uno.howTo1": "Play a card that matches the color or the number on the discard pile.",
   "games.uno.howTo2": "The face-down pile is the draw pile. Tap it if you cannot play. The opponent plays after you.",
   "games.uno.howTo3": "Empty your hand first.",
+  "games.mute": "Mute",
+  "games.unmute": "Sound",
 };
 
 export const gamesArMessages: GamesMessages = {
@@ -278,7 +280,7 @@ export const gamesArMessages: GamesMessages = {
   "games.g2048.howTo3": "كل دمج يضيف قيمته إلى نقاطك.",
   "games.snake.title": "الثعبان",
   "games.snake.blurb": "كُل وانمُ ولا تصطدم بالجدار.",
-  "games.snake.howTo1": "كُل المربع الأحمر. لا تصطدم بجدار أو بنفسك.",
+  "games.snake.howTo1": "كُل الثمرة المضيئة. لا تصطدم بجدار أو بنفسك.",
   "games.snake.howTo2": "الأسهم أو WASD أو السحب أو الأزرار. اليمين يعني يمين الشاشة دائمًا.",
   "games.snake.howTo3": "+١٠ لكل طعام. الثعبان يبدأ بطيئًا ويتسارع مع النقاط.",
   "games.memory.title": "الذاكرة",
@@ -442,4 +444,6 @@ export const gamesArMessages: GamesMessages = {
   "games.uno.howTo1": "العب بطاقة تطابق لون البطاقة المكشوفة أو رقمها.",
   "games.uno.howTo2": "الكومة المقلوبة هي كومة السحب. المسها إذا لم تستطع اللعب. الخصم يلعب بعدك.",
   "games.uno.howTo3": "من يفرغ يده أولاً يفوز.",
+  "games.mute": "كتم الصوت",
+  "games.unmute": "تشغيل الصوت",
 };

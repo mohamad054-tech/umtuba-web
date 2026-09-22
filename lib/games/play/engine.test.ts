@@ -7,6 +7,7 @@ import {
   merge2048Line,
   move2048,
   snakeTickMs,
+  snakeVisualChain,
   SNAKE_TICK_MIN_MS,
   SNAKE_TICK_START_MS,
   sudokuIsSolved,
@@ -54,6 +55,22 @@ describe("play engine", () => {
     expect(snakeTickMs(40)).toBe(SNAKE_TICK_START_MS - 4 * 12);
     expect(snakeTickMs(200)).toBe(SNAKE_TICK_MIN_MS);
     expect(snakeTickMs(0, true)).toBeGreaterThan(snakeTickMs(0));
+  });
+
+  it("eases the snake head forward without cutting the corner", () => {
+    const body = [
+      { x: 8, y: 8 },
+      { x: 7, y: 8 },
+      { x: 6, y: 8 },
+    ];
+    expect(snakeVisualChain(body, "right", 0)).toEqual(body);
+    const mid = snakeVisualChain(body, "right", 0.5);
+    expect(mid[0]).toEqual({ x: 8.5, y: 8 });
+    expect(mid[1]).toEqual(body[0]);
+    expect(mid[mid.length - 1]).toEqual({ x: 6.5, y: 8 });
+    const bite = snakeVisualChain(body, "right", 1, true);
+    expect(bite[0]).toEqual({ x: 9, y: 8 });
+    expect(bite[bite.length - 1]).toEqual(body[2]);
   });
 
   it("detects a win on every row, column, and diagonal without flipping indices", () => {
