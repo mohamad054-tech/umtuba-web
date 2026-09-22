@@ -1254,24 +1254,39 @@ body:has(.um-game-fit) {
 }
 
 .um-play-slot {
-  min-width: 22px;
+  min-width: 28px;
+  min-height: 36px;
   text-align: center;
+  color: #ffe7a3;
+  border-bottom: 3px solid rgba(240, 169, 59, 0.85);
+  text-shadow: 0 0 10px rgba(240, 169, 59, 0.45);
 }
 
 .um-play-letters {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
+  justify-content: center;
+  padding: 12px;
 }
 
 .um-play-ltr {
-  min-width: 36px;
-  min-height: 36px;
-  border-radius: 10px;
-  border: 1px solid var(--um-line);
-  background: var(--um-raise);
-  color: inherit;
+  min-width: 40px;
+  min-height: 40px;
+  border-radius: 12px;
+  border: 0;
+  background: radial-gradient(circle at 32% 28%, #ffe7a3, #f0a93b 48%, #9a6e22);
+  color: #14261c;
   font: inherit;
+  font-weight: 800;
+  box-shadow: 0 6px 12px rgba(6, 5, 18, 0.28);
+  touch-action: manipulation;
+  cursor: pointer;
+}
+
+.um-play-ltr:disabled {
+  opacity: 0.35;
+  box-shadow: none;
 }
 
 .um-play-typein {

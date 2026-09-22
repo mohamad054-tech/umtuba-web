@@ -724,9 +724,13 @@ export function HangwordGame() {
   const [solved, setSolved] = useState(0);
   const [done, setDone] = useState(false);
   const word = deck[i];
+  const boardRef = useRef<HTMLDivElement>(null);
+  const [floor, setFloor] = useState(0);
+  useBoardScrollLock(boardRef, help.ready && !done);
 
   const begin = () => {
     if (!help.ready) {
+      setFloor(readBest("hangword"));
       setDeck(shuffled(HANG_WORDS).slice(0, 4));
       setI(0); setFound([]); setUsed([]); setLives(6); setScore(0); setSolved(0); setDone(false);
     }
@@ -761,7 +765,7 @@ export function HangwordGame() {
   if (done) {
     return (
       <PlayPanel stats={<PlayStat label={t("games.score")} value={formatPlayNumber(locale, score)} />}>
-        <PlayResult score={score} verdictKey={verdictFromScore("high", score)} detail={`${formatPlayNumber(locale, solved)} ${t("games.of")} 4`} onAgain={() => { setDeck(shuffled(HANG_WORDS).slice(0, 4)); setI(0); setFound([]); setUsed([]); setLives(6); setScore(0); setSolved(0); setDone(false); help.keepReadyOnReplay(); }} />
+        <PlayResult score={score} verdictKey={verdictFromScore("high", score)} isBest={score > floor} detail={`${formatPlayNumber(locale, solved)} ${t("games.of")} 4`} onAgain={() => { setDeck(shuffled(HANG_WORDS).slice(0, 4)); setI(0); setFound([]); setUsed([]); setLives(6); setScore(0); setSolved(0); setDone(false); help.keepReadyOnReplay(); }} />
       </PlayPanel>
     );
   }
@@ -773,10 +777,10 @@ export function HangwordGame() {
           <p className="um-play-qnum">{word.h}</p>
           <div className="um-play-word">
             {[...word.w].map((ch, idx) => (
-              <span key={`${ch}-${idx}`} className="um-play-slot">{found.includes(normArabicLetter(ch)) ? ch : "_"}</span>
+              <span key={`${ch}-${idx}`} className="um-play-slot">{found.includes(normArabicLetter(ch)) ? ch : ""}</span>
             ))}
           </div>
-          <div className="um-play-letters">
+          <div ref={boardRef} className="um-play-letters um-lit-board">
             {ARABIC_LETTERS.map((ch) => (
               <button key={ch} type="button" className="um-play-ltr" data-play-item="true" disabled={used.includes(ch)} onClick={() => guess(ch)}>
                 {ch}
