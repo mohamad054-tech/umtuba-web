@@ -12,7 +12,8 @@ import {
   SUDOKU_PUZZLES,
   verdictFromScore,
 } from "../../../lib/games/play/engine";
-import { writeBestIfHigher } from "../../../lib/games/play/scores";
+import { writeBestIfHigher, readBest } from "../../../lib/games/play/scores";
+import { useBoardScrollLock } from "./boardPointer";
 import {
   PlayHowTo,
   PlayPanel,
@@ -46,6 +47,8 @@ export default function SudokuGame() {
   const [done, setDone] = useState(false);
   const [score, setScore] = useState(0);
   const watchRef = useRef(createPlayStopwatch(setElapsed));
+  const boardRef = useRef<HTMLDivElement | null>(null);
+  const [isBest, setIsBest] = useState(false);
 
   const given = useMemo(
     () => Array.from({ length: 81 }, (_, i) => sudokuCell(pack.puzzle, i) !== 0),
@@ -63,6 +66,7 @@ export default function SudokuGame() {
     setHints(0);
     setDone(false);
     setScore(0);
+    setIsBest(false);
     watchRef.current.stop();
     watchRef.current = createPlayStopwatch(setElapsed);
     if (ready) watchRef.current.start();
@@ -77,12 +81,16 @@ export default function SudokuGame() {
     };
   }, [ready]);
 
+  useBoardScrollLock(boardRef, ready && !done);
+
   const finish = useCallback(
     (nextBoard: number[]) => {
       if (!sudokuIsSolved(nextBoard, pack.solution)) return;
       const seconds = watchRef.current.stop();
+      const previous = readBest("sudoku") ?? 0;
       const pts = Math.max(120, 900 - seconds * 4 - hints * 80);
       setScore(pts);
+      setIsBest(pts > previous);
       writeBestIfHigher("sudoku", pts);
       setDone(true);
       sfx.win();
@@ -191,12 +199,18 @@ export default function SudokuGame() {
           cta="gotIt"
           onDismiss={dismissHelp}
         />
-        <PlayResult
-          score={score}
-          verdictKey={verdictFromScore("high", score)}
-          detail={`${t("games.solved")} · ${formatPlayClock(elapsed)}`}
-          onAgain={startFresh}
-        />
+        <div className={isBest ? "um-play-best" : "um-play-celebrate"}>
+          <PlayResult
+            score={score}
+            verdictKey={verdictFromScore("high", score)}
+            detail={
+              isBest
+                ? t("games.localBest", { values: { score: formatPlayNumber(locale, score) } })
+                : `${t("games.solved")} · ${formatPlayClock(elapsed)}`
+            }
+            onAgain={startFresh}
+          />
+        </div>
       </PlayPanel>
     );
   }
@@ -218,7 +232,13 @@ export default function SudokuGame() {
         cta={ready ? "gotIt" : "start"}
         onDismiss={dismissHelp}
       />
-      <div className="um-play-sudoku um-play-board" dir="ltr" role="grid" aria-label={t("games.sudoku.title")}>
+      <div
+        ref={boardRef}
+        className="um-play-sudoku um-play-board um-lit-board"
+        dir="ltr"
+        role="grid"
+        aria-label={t("games.sudoku.title")}
+      >
         {board.map((value, index) => (
           <button
             key={index}
