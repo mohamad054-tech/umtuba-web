@@ -924,11 +924,38 @@ body:has(.um-game-fit) {
 }
 
 .um-play-flagbox,
-.um-play-scene {
+.um-play-scene,
+.um-play-gamemap {
   min-height: 88px;
   border-radius: var(--um-r);
   overflow: hidden;
   background: var(--um-field);
+}
+
+.um-play-gamemap {
+  position: relative;
+  height: 220px;
+  min-height: 220px;
+  direction: ltr;
+}
+
+.um-play-gamemap-canvas {
+  position: absolute;
+  inset: 0;
+}
+
+.um-play-mappin {
+  width: 36px;
+  height: 36px;
+  border: 3px solid #f7f4ea;
+  border-radius: 50%;
+  background: #67e8f9;
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.4);
+  padding: 0;
+}
+
+.um-play-mappin.got {
+  background: #f0a93b;
 }
 
 .um-play-flagbox svg,

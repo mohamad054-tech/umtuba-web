@@ -1,5 +1,6 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { shuffled } from "../../../lib/games/play/engine";
 import {
   BLANKS,
@@ -17,18 +18,24 @@ import FlagMark from "./FlagMark";
 import QuizPlay from "./QuizPlay";
 import SceneMark from "./SceneMark";
 
+const GameMap = dynamic(() => import("./GameMap"), {
+  ssr: false,
+  loading: () => <div className="um-play-gamemap" dir="ltr" />,
+});
+
 function cityQuiz(): QuizItem[] {
   return shuffled(WORLD_CITIES)
     .slice(0, 6)
     .map((city) => {
+      const label = `${city.city} · ${city.country}`;
       const wrong = shuffled(WORLD_CITIES.filter((item) => item.id !== city.id))
         .slice(0, 3)
         .map((item) => `${item.city} · ${item.country}`);
-      const choices = shuffled([`${city.city} · ${city.country}`, ...wrong]);
+      const choices = shuffled([label, ...wrong]);
       return {
-        prompt: city.scene,
+        prompt: city.id,
         choices,
-        correct: choices.indexOf(`${city.city} · ${city.country}`),
+        correct: choices.indexOf(label),
         why: `${city.city} — ${city.country}. ${city.hint}`,
       };
     });
@@ -176,12 +183,21 @@ export function GuessCityGame() {
       slug="guess-city"
       howTo={["games.guess-city.howTo1", "games.guess-city.howTo2", "games.guess-city.howTo3"]}
       load={cityQuiz}
-      seconds={15}
-      extra={(item) => (
-        <div className="um-play-scene" data-play-item="true">
-          <SceneMark kind={item.prompt} />
-        </div>
-      )}
+      seconds={18}
+      extra={(item) => {
+        const city = WORLD_CITIES.find((entry) => entry.id === item.prompt);
+        if (!city) return null;
+        return (
+          <GameMap
+            pins={[{ id: city.id, lng: city.lng, lat: city.lat }]}
+            focusId={city.id}
+            zoom={5}
+            hideLabels
+            fit="point"
+            interactive
+          />
+        );
+      }}
       hidePrompt
     />
   );

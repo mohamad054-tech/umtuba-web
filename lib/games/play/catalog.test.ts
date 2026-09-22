@@ -50,7 +50,7 @@ describe("playable games catalog", () => {
     expect(isPlayableGameSlug("quick-q")).toBe(true);
     expect(getPlayableGame("missing")).toBeNull();
     expect(getPlayableGame("quick-q")?.arabicContent).toBe(true);
-    expect(getPlayableGame("guess-city")?.demoData).toBe(true);
+    expect(getPlayableGame("price")?.demoData).toBe(true);
   });
 
   it("writes Arabic and English games chrome and keeps the play page noindex", () => {
