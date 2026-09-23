@@ -1,6 +1,12 @@
 import type { GamesMessages } from "./types";
 
-export const gamesFrMessages: GamesMessages = {
+/** Locale catalogs keep the release translations. New game phrases are overlaid separately. */
+type TranslatedGamesMessages = Omit<
+  GamesMessages,
+  "games.wheel.won" | "games.madeUpPrices" | "games.mute" | "games.unmute"
+>;
+
+export const gamesFrMessages: TranslatedGamesMessages = {
   "games.title": "Jeux",
   "games.subtitle":
     "Des parties courtes sur cet appareil. Votre meilleur score reste dans ce navigateur.",
@@ -220,7 +226,7 @@ export const gamesFrMessages: GamesMessages = {
   "games.uno.howTo3": "Videz votre main en premier.",
 };
 
-export const gamesEsMessages: GamesMessages = {
+export const gamesEsMessages: TranslatedGamesMessages = {
   "games.title": "Juegos",
   "games.subtitle":
     "Partidas cortas en este dispositivo. Tu mejor puntuación se queda en este navegador.",
@@ -440,7 +446,7 @@ export const gamesEsMessages: GamesMessages = {
   "games.uno.howTo3": "Vacía tu mano primero.",
 };
 
-export const gamesDeMessages: GamesMessages = {
+export const gamesDeMessages: TranslatedGamesMessages = {
   "games.title": "Spiele",
   "games.subtitle":
     "Kurze Spiele auf diesem Gerät. Ihr Bestwert bleibt in diesem Browser.",
@@ -660,7 +666,7 @@ export const gamesDeMessages: GamesMessages = {
   "games.uno.howTo3": "Leeren Sie zuerst Ihre Hand.",
 };
 
-export const gamesPtMessages: GamesMessages = {
+export const gamesPtMessages: TranslatedGamesMessages = {
   "games.title": "Jogos",
   "games.subtitle":
     "Partidas curtas neste aparelho. Sua melhor pontuação fica neste navegador.",
@@ -880,7 +886,7 @@ export const gamesPtMessages: GamesMessages = {
   "games.uno.howTo3": "Esvazie a mão primeiro.",
 };
 
-export const gamesIdMessages: GamesMessages = {
+export const gamesIdMessages: TranslatedGamesMessages = {
   "games.title": "Game",
   "games.subtitle":
     "Game singkat di perangkat ini. Skor terbaik Anda tetap di browser ini.",
@@ -1100,7 +1106,7 @@ export const gamesIdMessages: GamesMessages = {
   "games.uno.howTo3": "Kosongkan tangan Anda lebih dulu.",
 };
 
-export const gamesHiMessages: GamesMessages = {
+export const gamesHiMessages: TranslatedGamesMessages = {
   "games.title": "गेम",
   "games.subtitle":
     "इस डिवाइस पर छोटे गेम। आपका सर्वश्रेष्ठ स्कोर इसी ब्राउज़र में रहता है।",
@@ -1320,7 +1326,7 @@ export const gamesHiMessages: GamesMessages = {
   "games.uno.howTo3": "पहले अपना हाथ खाली करें।",
 };
 
-export const gamesRuMessages: GamesMessages = {
+export const gamesRuMessages: TranslatedGamesMessages = {
   "games.title": "Игры",
   "games.subtitle":
     "Короткие игры на этом устройстве. Лучший результат остаётся в этом браузере.",
@@ -1540,7 +1546,7 @@ export const gamesRuMessages: GamesMessages = {
   "games.uno.howTo3": "Первым опустошите руку.",
 };
 
-export const gamesTrMessages: GamesMessages = {
+export const gamesTrMessages: TranslatedGamesMessages = {
   "games.title": "Oyunlar",
   "games.subtitle":
     "Bu cihazda kısa oyunlar. En iyi skorunuz bu tarayıcıda kalır.",
@@ -1760,7 +1766,7 @@ export const gamesTrMessages: GamesMessages = {
   "games.uno.howTo3": "Elinizi önce boşaltın.",
 };
 
-export const gamesZhCNMessages: GamesMessages = {
+export const gamesZhCNMessages: TranslatedGamesMessages = {
   "games.title": "游戏",
   "games.subtitle": "在此设备上玩短局。最佳成绩保存在本浏览器中。",
   "games.catalogEyebrow": "开始玩",
@@ -1979,7 +1985,7 @@ export const gamesZhCNMessages: GamesMessages = {
   "games.uno.howTo3": "先把手牌打完。",
 };
 
-export const gamesJaMessages: GamesMessages = {
+export const gamesJaMessages: TranslatedGamesMessages = {
   "games.title": "ゲーム",
   "games.subtitle": "この端末で短く遊べます。ベストスコアはこのブラウザに残ります。",
   "games.catalogEyebrow": "プレイ",
@@ -2198,7 +2204,7 @@ export const gamesJaMessages: GamesMessages = {
   "games.uno.howTo3": "先に手札を空にする。",
 };
 
-export const gamesKoMessages: GamesMessages = {
+export const gamesKoMessages: TranslatedGamesMessages = {
   "games.title": "게임",
   "games.subtitle": "이 기기에서 짧게 플레이하세요. 최고 점수는 이 브라우저에 남습니다.",
   "games.catalogEyebrow": "플레이",

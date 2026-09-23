@@ -120,6 +120,7 @@ describe("route robots / sitemap policy", () => {
           path.startsWith("/city") ||
           path.startsWith("/live/media-lab") ||
           path.startsWith("/sandbox") ||
+          path.startsWith("/hifz") ||
           path.startsWith("/store/demo-preview") ||
           path.startsWith("/store/cart") ||
           path.startsWith("/store/checkout") ||
