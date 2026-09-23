@@ -10,3 +10,8 @@
     transform: translateX(4px);
   }
 }
+
+.hifz-word-active {
+  color: #ffe9a8;
+  text-shadow: 0 0 12px rgba(232, 200, 122, 0.55);
+}

@@ -15,6 +15,9 @@ export type HifzSurahPayload = {
 
 export type HifzModeId =
   | "learn"
+  | "listen"
+  | "listenRepeat"
+  | "tilawaLink"
   | "fading"
   | "letters"
   | "linking"
