@@ -1,55 +1,45 @@
-# Cursor Report — feat/quran-hifz-v1 (سماء الحفظ)
+# Cursor Report — feat/quran-hifz-v1 (Husary listen & repeat)
 
 ## Summary
 
-Hidden calm Quran memorization prototype **سماء الحفظ** for Surah Ash-Shams (91) only, at `/hifz/shams`. Branched from `origin/release/v1` @ `aa2f3ae5`. Six modes (تعلّم، تلاشٍ، الحروف الأولى، الوصل، الترتيب، السماء), Amiri Quran (SIL OFL), WebP art for ayat 1–6, localStorage-only sky progress, `noindex` + robots disallow `/hifz`. No nav/sitemap links. No Supabase. No merge/deploy/PR.
+Added calm **listen / listen-and-repeat / tilawa-link** audio to the hidden Ash-Shams prototype at `/hifz/shams`. Streams Sheikh Mahmoud Khalil Al-Husary **murattal** ayah-by-ayah (+ basmala) from the Quranicaudio EveryAyah mirror URLs exposed by Quran.com — **no audio binaries in the repo**. Word-by-word highlight included (Quran.com Husary murattal segments align 15/15 with local Uthmani tokens). Existing text modes unchanged. noindex / not linked. No Supabase. No merge/deploy/PR.
 
 ```
-TASK_ID = FEAT_QURAN_HIFZ_V1
+TASK_ID = FEAT_QURAN_HIFZ_AUDIO_V1
 BRANCH = feat/quran-hifz-v1
-BASE = origin/release/v1 @ aa2f3ae5a970902f0284e2faebd126a263b87bb7
+BASE = origin/feat/quran-hifz-v1 @ c01fdfc085119f389af1a72ed1b5d6fc7e5309f7
+RELEASE_ANCESTOR = origin/release/v1 @ aa2f3ae5 (ancestor of feature tip; feature already ahead — no FF needed)
 ```
 
-### Quran text provenance (critical)
+### Audio provenance & permission
 
-- **Primary download:** Quran.com API v4 Uthmani  
-  `https://api.quran.com/api/v4/quran/verses/uthmani?chapter_number=91`  
-  Stored in `data/hifz/ash-shams-91.uthmani.json` (15 ayat).
-- **Secondary cross-check:** Tanzil.net Uthmani txt-2  
-  `https://tanzil.net/pub/download/index.php?quranType=uthmani&outType=txt-2&agree=true`
-- **Word-by-word match:** **yes (100%)** for ayah bodies. Tanzil ayah 1 includes a leading basmala (4 tokens) before the ayah body; after suffix-match removal of that prefix, bodies matched. Ayat 2–15 exact.
-- **Ayah count:** 15 on both sources before use.
+- **Source name:** Quran.com / Quran Foundation (CDN: mirrors.quranicaudio.com EveryAyah Husary set)
+- **Reciter:** Mahmoud Khalil Al-Husary, murattal (`recitation_id` 6). Muallim also listed as id 12 — not used in UI.
+- **Terms URL:** https://api-docs.quran.com/legal/developer-terms/
+- **Quote (permission):** “QF grants Developer a … license to access and use the APIs solely to develop and operate Applications that provide beneficial Quranic experiences to end users.” / “Developer may display QF Content to end users within the Application, provided that: … QF Content is not sold, sublicensed, or redistributed.” Free/paid apps allowed when content is only part of the end-user experience.
+- **Audio URL pattern:** `https://mirrors.quranicaudio.com/everyayah/Husary_128kbps/091{AAA}.mp3`
+  Basmala: `…/bismillah.mp3` (same bytes as `001001.mp3`; **not** `091001.mp3`)
+- **16 files checked:** **yes** — HTTP 200, `audio/mpeg`, MP3 headers; ayah 1 ≠ basmala; mapping 91:1–15 correct.
+- **Word timings:** **yes** — from `chapter_recitations/6/91?segments=true`; segment counts match Uthmani whitespace tokens for all 15 ayat → word highlight **included**.
 
-### Font
+### Modes added (Arabic labels)
 
-- Amiri Quran Regular from Google Fonts OFL tree  
-  `https://raw.githubusercontent.com/google/fonts/main/ofl/amiriquran/AmiriQuran-Regular.ttf`  
-  + `OFL.txt` in `public/fonts/amiri-quran/` (SIL Open Font License).
-
-### Images
-
-- Source folder: `C:\Users\Giga store\Desktop\quran-art` (6 ChatGPT-named PNGs, ordered by mtime → shams-1…6). OneDrive path not found.
-- Output: `public/hifz/shams/shams-1.webp` … `shams-6.webp` — all ≤800px and **under 150 KB** (6/6).
+- الاستماع — listen (tap ayah / controls)
+- التكرار — listen & repeat (1/3/5/7, default 3; silent pause ≈ ayah + a little; words fade per round)
+- وصل التلاوة — audio link of ayah N then N+1 (distinct from text «الوصل»)
+- Learn mode gains an **استمع** step into listen
 
 ## Exact files changed
 
-- `app/hifz/layout.tsx`
-- `app/hifz/shams/page.tsx`
 - `app/hifz/shams/HifzShamsExperience.tsx`
+- `app/hifz/shams/useHusaryPlayer.ts` (new)
 - `app/hifz/shams/hifz-shams.css`
-- `data/hifz/ash-shams-91.uthmani.json`
-- `data/hifz/SOURCES.md`
+- `lib/hifz/audio.ts` (new)
+- `lib/hifz/audio.test.ts` (new)
+- `lib/hifz/husaryTimings.ts` (new)
 - `lib/hifz/types.ts`
-- `lib/hifz/tokenize.ts`
-- `lib/hifz/ashShamsData.ts`
-- `lib/hifz/linking.ts`
-- `lib/hifz/progress.ts`
-- `lib/hifz/ashShamsData.test.ts`
-- `lib/site/indexing.ts` (`/hifz` in `ROBOTS_DISALLOW_PATHS`)
-- `vitest.config.ts` (include `lib/hifz/**/*.test.ts`)
-- `public/fonts/amiri-quran/AmiriQuran-Regular.ttf`
-- `public/fonts/amiri-quran/OFL.txt`
-- `public/hifz/shams/shams-1.webp` … `shams-6.webp`
+- `data/hifz/ash-shams-91.husary-timings.json` (new — timing metadata only)
+- `data/hifz/SOURCES.md`
 - `docs/ai/CURSOR_REPORT.md` (this report)
 
 Not committed: `docs/ai/IOS_STATUS_AR.md`, `.local/`, `tmp/`, `worktrees/`.
@@ -60,35 +50,35 @@ none
 
 ## Security review
 
-- Hidden route: page metadata `noindex`/`nofollow`; `/hifz` added to robots disallow; not in sitemap static routes; not linked from home/games nav (HTTP spot-check).
-- Progress only in `localStorage` (`hifz:shams:v1`) — no server, no Supabase, no accounts.
-- Quran text only from downloaded verified sources; load refuses data without `crossCheckWordByWord100Percent`.
-- No secrets committed. Font OFL license file shipped with the font.
+- Still hidden: `noindex`, robots disallow `/hifz`, not in nav/sitemap.
+- Audio streamed on demand (`preload="none"`); no audio binaries committed.
+- Quran text unchanged (downloaded Uthmani only); basmala shown as UI label «البسملة» without inventing Quran words.
+- Media Session + `playsInline` HTML audio for mobile background where the browser allows; no promise beyond standard approach.
+- No secrets; no Supabase; localStorage progress unchanged.
+- Attribution shown for Husary / Quran.com.
 
 ## Tests
 
-- `npx vitest run lib/hifz` — **9 passed**
-- `npx vitest run lib/site/googleSeo.test.ts` — **11 passed** (with hifz disallow)
+- `npx vitest run lib/hifz` — **15 passed** (9 prior + 6 audio/timings)
 
 ## TypeScript
 
-- `npx tsc --noEmit` — **pass** (after production build regenerated `.next` types; earlier stale `.next` cache had unrelated broken validators)
-- `npm run build` TypeScript phase — **pass**
+- `npx tsc --noEmit` — **pass**
 
 ## Build
 
-- `npm run build` — **pass**; route `/hifz/shams` present in output
+- `npm run build` — **pass**; route `/hifz/shams` present
 
 ## git diff --check
 
-- **pass** (no whitespace errors)
+- **pass** (trailing whitespace cleaned)
 
 ## git status --short
 
-(after commit; see final push notes)
+- Clean feature commit on `feat/quran-hifz-v1` after push (see SHA below). Unrelated untracked left out: `.local/`, `tmp/`, `docs/ai/IOS_STATUS_AR.md`, `worktrees/`.
 
 ## Open issues
 
-- Browser MCP (`cursor-ide-browser`) could not open a tab (“No browser tab available”); verified instead via HTTP 200 + RTL/Arabic markers on `/hifz/shams`, and confirmed `/` and `/games` do not link `/hifz`.
-- Image sources were not named `shams-1`…`shams-6`; used mtime order of the six Desktop `quran-art` PNGs.
-- Prototype covers Surah 91 only by design.
+- Lock-screen / background playback depends on the mobile browser; implemented via HTML `<audio>` + Media Session, not guaranteed on every OS.
+- Quran.com public API lists Husary as `Husary_64kbps`; UI streams the same reciter’s `Husary_128kbps` mirror paths (verified HTTP 200) for clearer audio.
+- Browser MCP (`cursor-ide-browser`) could not open a tab in this environment. Verified instead via: HTTP 200 for `/hifz/shams` with mode labels الاستماع / التكرار / وصل التلاوة / existing modes present; audio URLs not in first paint (lazy); all 16 stream URLs previously HEAD/GET verified.

@@ -25,3 +25,17 @@ must never type, recall, or invent Quran text.
 - Ayah count: **15** (both sources)
 - Word-by-word cross-check: **100% match** (ayah bodies)
 - `crossCheckWordByWord100Percent: true` in the JSON
+
+## Reciter audio (stream only — not stored in repo)
+
+- **Reciter:** Sheikh Mahmoud Khalil Al-Husary, murattal (مرتّل)
+- **Also available:** Al-Mushaf Al-Muallim (`recitation_id` 12 on Quran.com) — not used in the UI; murattal is the default.
+- **Discovery API:** `https://api.quran.com/api/v4/recitations/6/by_chapter/91`
+- **Stream CDN pattern (Quranicaudio EveryAyah mirror):**
+  `https://mirrors.quranicaudio.com/everyayah/Husary_128kbps/091{AAA}.mp3`
+  Basmala: `…/bismillah.mp3` (same bytes as `001001.mp3`; distinct from `091001.mp3`)
+- **Word timings:** `https://api.quran.com/api/v4/chapter_recitations/6/91?segments=true`
+  Stored as metadata only in `ash-shams-91.husary-timings.json` (no audio binaries).
+- **Terms:** Quran Foundation Developer Terms —
+  `https://api-docs.quran.com/legal/developer-terms/`
+  Allows displaying QF Content (including audio) inside an Application’s end-user experience; do not sell/sublicense/redistribute raw content as a dataset. Prefer streaming; do not commit audio files.

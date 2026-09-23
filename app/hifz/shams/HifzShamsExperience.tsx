@@ -12,6 +12,13 @@ import {
   type PointerEvent as ReactPointerEvent,
 } from "react";
 import { ayahImageSrc, getAshShamsAyat } from "../../../lib/hifz/ashShamsData";
+import {
+  HUSARY_AUDIO_ATTRIBUTION,
+  repeatWordOpacity,
+  REPEAT_COUNT_OPTIONS,
+  type HifzAudioClipId,
+  type RepeatCount,
+} from "../../../lib/hifz/audio";
 import { buildLinkingPrompt } from "../../../lib/hifz/linking";
 import {
   isStarDimmed,
@@ -24,6 +31,7 @@ import {
   tokenizeAyah,
 } from "../../../lib/hifz/tokenize";
 import type { HifzLocalProgress, HifzModeId } from "../../../lib/hifz/types";
+import { useHusaryPlayer } from "./useHusaryPlayer";
 
 const amiriQuran = localFont({
   src: "../../../public/fonts/amiri-quran/AmiriQuran-Regular.ttf",
@@ -33,6 +41,9 @@ const amiriQuran = localFont({
 
 const MODES: Array<{ id: HifzModeId; label: string }> = [
   { id: "learn", label: "تعلّم" },
+  { id: "listen", label: "الاستماع" },
+  { id: "listenRepeat", label: "التكرار" },
+  { id: "tilawaLink", label: "وصل التلاوة" },
   { id: "fading", label: "تلاشٍ" },
   { id: "letters", label: "الحروف الأولى" },
   { id: "linking", label: "الوصل" },
@@ -63,10 +74,15 @@ function clampAyah(n: number): number {
   return Math.min(15, Math.max(1, n));
 }
 
+function isAudioMode(mode: HifzModeId): boolean {
+  return mode === "listen" || mode === "listenRepeat" || mode === "tilawaLink";
+}
+
 export default function HifzShamsExperience() {
   const ayat = useMemo(() => getAshShamsAyat(), []);
   const [mode, setMode] = useState<HifzModeId>("learn");
   const [ayahIndex, setAyahIndex] = useState(1);
+  const [showBasmala, setShowBasmala] = useState(false);
   const [fadeStep, setFadeStep] = useState(0);
   const [revealedWords, setRevealedWords] = useState<Set<number>>(() => new Set());
   const [linkPromptIndex, setLinkPromptIndex] = useState(1);
@@ -78,6 +94,8 @@ export default function HifzShamsExperience() {
   const [progress, setProgress] = useState<HifzLocalProgress | null>(null);
   const [fadeVisible, setFadeVisible] = useState(true);
   const touchRef = useRef<{ x: number; y: number } | null>(null);
+
+  const player = useHusaryPlayer();
 
   useEffect(() => {
     setProgress(readProgress());
@@ -93,18 +111,31 @@ export default function HifzShamsExperience() {
     softMasteryVibrate();
   }, []);
 
-  const goAyah = useCallback(
-    (next: number) => {
-      setFadeVisible(false);
-      window.setTimeout(() => {
-        setAyahIndex(clampAyah(next));
-        setFadeStep(0);
-        setRevealedWords(new Set());
-        setFadeVisible(true);
-      }, 180);
-    },
-    [],
-  );
+  const goAyah = useCallback((next: number) => {
+    setFadeVisible(false);
+    setShowBasmala(false);
+    window.setTimeout(() => {
+      setAyahIndex(clampAyah(next));
+      setFadeStep(0);
+      setRevealedWords(new Set());
+      setFadeVisible(true);
+    }, 180);
+  }, []);
+
+  // Sync displayed ayah with player when audio advances
+  useEffect(() => {
+    const clip = player.activeClip;
+    if (clip == null) return;
+    if (clip === "basmala") {
+      setShowBasmala(true);
+      return;
+    }
+    setShowBasmala(false);
+    if (clip !== ayahIndex) {
+      setAyahIndex(clip);
+      setFadeVisible(true);
+    }
+  }, [player.activeClip, ayahIndex]);
 
   const onPointerDown = (e: ReactPointerEvent) => {
     touchRef.current = { x: e.clientX, y: e.clientY };
@@ -114,11 +145,12 @@ export default function HifzShamsExperience() {
     const start = touchRef.current;
     touchRef.current = null;
     if (!start) return;
-    if (mode !== "learn" && mode !== "fading" && mode !== "letters") return;
+    if (mode !== "learn" && mode !== "fading" && mode !== "letters" && !isAudioMode(mode)) {
+      return;
+    }
     const dx = e.clientX - start.x;
     const dy = e.clientY - start.y;
     if (Math.abs(dx) < 48 || Math.abs(dx) < Math.abs(dy)) return;
-    // RTL: swipe right → previous, swipe left → next (finger direction)
     if (dx > 0) goAyah(ayahIndex - 1);
     else goAyah(ayahIndex + 1);
   };
@@ -141,6 +173,13 @@ export default function HifzShamsExperience() {
     if (mode === "letters") setRevealedWords(new Set());
   }, [mode, ayahIndex]);
 
+  useEffect(() => {
+    if (!isAudioMode(mode)) {
+      player.stop();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- stop only on mode leave
+  }, [mode]);
+
   const linkingPrompt = useMemo(() => {
     if (mode !== "linking") return null;
     return buildLinkingPrompt(ayat, linkPromptIndex);
@@ -148,8 +187,7 @@ export default function HifzShamsExperience() {
 
   const revealWord = (idx: number) => {
     setRevealedWords((prev) => {
-      const next = new Set(prev);
-      next.add(idx);
+      const next = setCopy(prev, idx);
       if (next.size === words.length) {
         window.setTimeout(() => recordMastery(ayahIndex), 0);
       }
@@ -158,7 +196,13 @@ export default function HifzShamsExperience() {
   };
 
   const wordOpacity = (idx: number): number => {
-    if (mode === "learn") return 1;
+    if (mode === "listenRepeat" && (player.playing || player.inRepeatSilence)) {
+      return repeatWordOpacity(
+        player.repeatIndex,
+        player.repeatCount,
+      );
+    }
+    if (mode === "learn" || isAudioMode(mode)) return 1;
     if (mode === "letters") {
       return revealedWords.has(idx) ? 1 : 0.22;
     }
@@ -207,7 +251,28 @@ export default function HifzShamsExperience() {
     }
   };
 
+  const startClip: HifzAudioClipId = showBasmala ? "basmala" : ayahIndex;
+
+  const playCurrent = () => {
+    if (mode === "listenRepeat") {
+      player.start("repeat", typeof startClip === "number" ? startClip : 1);
+    } else if (mode === "tilawaLink") {
+      player.start("tilawaLink", startClip === "basmala" ? "basmala" : ayahIndex);
+    } else {
+      player.start("single", startClip);
+    }
+  };
+
+  const playWholeSurah = () => {
+    player.start("surah", "basmala");
+  };
+
   const skyStars = progress?.stars ?? {};
+  const showAyahPane =
+    mode === "learn" ||
+    mode === "fading" ||
+    mode === "letters" ||
+    isAudioMode(mode);
 
   return (
     <div
@@ -221,6 +286,13 @@ export default function HifzShamsExperience() {
       onPointerDown={onPointerDown}
       onPointerUp={onPointerUp}
     >
+      <audio
+        ref={player.bindAudio}
+        playsInline
+        preload="none"
+        className="hidden"
+      />
+
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 opacity-40"
@@ -256,6 +328,7 @@ export default function HifzShamsExperience() {
                 setMode(m.id);
                 setFadeStep(0);
                 setRevealedWords(new Set());
+                setShowBasmala(false);
                 if (m.id === "linking") {
                   setLinkPromptIndex(1);
                   setLinkDone(false);
@@ -279,7 +352,7 @@ export default function HifzShamsExperience() {
       </nav>
 
       <main className="relative z-10 flex min-h-0 flex-1 flex-col px-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
-        {(mode === "learn" || mode === "fading" || mode === "letters") && (
+        {showAyahPane && (
           <div
             className={`mx-auto flex w-full max-w-lg flex-1 flex-col transition-opacity duration-300 ${
               fadeVisible ? "opacity-100" : "opacity-0"
@@ -290,7 +363,7 @@ export default function HifzShamsExperience() {
                 className="relative aspect-square w-full max-w-[min(100%,280px)] overflow-hidden rounded-[28px] border border-white/10 bg-[#080816]/70 transition-opacity duration-700"
                 style={{ opacity: imageOpacity }}
               >
-                {imageSrc ? (
+                {imageSrc && !showBasmala ? (
                   <Image
                     src={imageSrc}
                     alt=""
@@ -310,46 +383,143 @@ export default function HifzShamsExperience() {
                 )}
               </div>
 
-              <div
-                className={`${amiriQuran.className} px-2 text-center text-[1.55rem] leading-[2.35] text-[#f7efd8] sm:text-[1.75rem]`}
-              >
-                {words.map((word, idx) => {
-                  const showLettersOnly =
-                    mode === "letters" && !revealedWords.has(idx);
-                  const opaque = wordOpacity(idx);
-                  const hiddenFaded =
-                    mode === "fading" && fadeStep >= 1 && !revealedWords.has(idx);
-                  return (
-                    <button
-                      key={`${ayahIndex}-${idx}`}
-                      type="button"
-                      disabled={mode === "learn"}
-                      onClick={() => {
-                        if (mode === "fading" || mode === "letters") {
-                          revealWord(idx);
-                        }
-                      }}
-                      className={`mx-0.5 inline-block rounded-md px-0.5 align-baseline transition-opacity duration-700 ${
-                        mode === "learn" ? "cursor-default" : "cursor-pointer"
-                      } ${hiddenFaded ? "hover:opacity-40" : ""}`}
-                      style={{ opacity: opaque } satisfies CSSProperties}
-                      aria-label={
-                        showLettersOnly
-                          ? `كشف كلمة ${idx + 1}`
-                          : undefined
-                      }
-                    >
-                      {showLettersOnly ? firstLetterOfToken(word) : word}
-                    </button>
-                  );
-                })}
-                <span className="ms-2 inline-block align-baseline font-sans text-base text-[#e8c87a]/80">
-                  ﴿{ayahIndex}﴾
-                </span>
-              </div>
+              {showBasmala ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (isAudioMode(mode)) player.start("single", "basmala");
+                  }}
+                  className="text-center text-xl text-[#e8c87a]/90"
+                >
+                  البسملة
+                </button>
+              ) : (
+                <div
+                  className={`${amiriQuran.className} px-2 text-center text-[1.55rem] leading-[2.35] text-[#f7efd8] sm:text-[1.75rem] ${
+                    isAudioMode(mode) ? "cursor-pointer" : ""
+                  }`}
+                  onClick={() => {
+                    if (!isAudioMode(mode)) return;
+                    if (mode === "listenRepeat") player.start("repeat", ayahIndex);
+                    else if (mode === "tilawaLink") {
+                      player.start("tilawaLink", ayahIndex);
+                    } else player.start("single", ayahIndex);
+                  }}
+                  onKeyDown={(e) => {
+                    if (!isAudioMode(mode)) return;
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      if (mode === "listenRepeat") player.start("repeat", ayahIndex);
+                      else if (mode === "tilawaLink") {
+                        player.start("tilawaLink", ayahIndex);
+                      } else player.start("single", ayahIndex);
+                    }
+                  }}
+                  role={isAudioMode(mode) ? "button" : undefined}
+                  tabIndex={isAudioMode(mode) ? 0 : undefined}
+                >
+                  {words.map((word, idx) => {
+                    const showLettersOnly =
+                      mode === "letters" && !revealedWords.has(idx);
+                    const opaque = wordOpacity(idx);
+                    const hiddenFaded =
+                      mode === "fading" && fadeStep >= 1 && !revealedWords.has(idx);
+                    const listeningHighlight =
+                      isAudioMode(mode) &&
+                      player.activeClip === ayahIndex &&
+                      player.activeWord === idx &&
+                      (player.playing || player.paused);
+                    if (mode === "fading" || mode === "letters") {
+                      return (
+                        <button
+                          key={`${ayahIndex}-${idx}`}
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            revealWord(idx);
+                          }}
+                          className={`mx-0.5 inline-block rounded-md px-0.5 align-baseline transition-opacity duration-700 cursor-pointer ${
+                            hiddenFaded ? "hover:opacity-40" : ""
+                          }`}
+                          style={{ opacity: opaque } satisfies CSSProperties}
+                          aria-label={
+                            showLettersOnly
+                              ? `كشف كلمة ${idx + 1}`
+                              : undefined
+                          }
+                        >
+                          {showLettersOnly ? firstLetterOfToken(word) : word}
+                        </button>
+                      );
+                    }
+                    return (
+                      <span
+                        key={`${ayahIndex}-${idx}`}
+                        className={`mx-0.5 inline-block rounded-md px-0.5 align-baseline transition duration-500 ${
+                          listeningHighlight ? "hifz-word-active" : ""
+                        }`}
+                        style={{ opacity: opaque } satisfies CSSProperties}
+                      >
+                        {word}
+                      </span>
+                    );
+                  })}
+                  <span className="ms-2 inline-block align-baseline font-sans text-base text-[#e8c87a]/80">
+                    ﴿{ayahIndex}﴾
+                  </span>
+                </div>
+              )}
             </div>
 
-            <div className="mt-4 flex items-center justify-between gap-3">
+            {(mode === "learn" || isAudioMode(mode)) && (
+              <AudioBar
+                mode={mode}
+                playing={player.playing}
+                paused={player.paused}
+                inSilence={player.inRepeatSilence}
+                loading={player.loadState === "loading"}
+                error={player.audioError}
+                repeatCount={player.repeatCount}
+                onRepeatCount={(n) => player.setRepeatCount(n)}
+                onPlay={playCurrent}
+                onPauseToggle={player.togglePause}
+                onStop={player.stop}
+                onPrev={() => {
+                  if (showBasmala) {
+                    setShowBasmala(false);
+                    return;
+                  }
+                  if (ayahIndex <= 1) {
+                    setShowBasmala(true);
+                    player.stop();
+                    return;
+                  }
+                  goAyah(ayahIndex - 1);
+                  player.stop();
+                }}
+                onNext={() => {
+                  if (showBasmala) {
+                    setShowBasmala(false);
+                    goAyah(1);
+                    player.stop();
+                    return;
+                  }
+                  goAyah(ayahIndex + 1);
+                  player.stop();
+                }}
+                onSurah={playWholeSurah}
+                onListenFromLearn={() => {
+                  setMode("listen");
+                  window.setTimeout(() => player.start("single", ayahIndex), 0);
+                }}
+                onBasmala={() => {
+                  setShowBasmala(true);
+                  player.start("single", "basmala");
+                }}
+              />
+            )}
+
+            <div className="mt-3 flex items-center justify-between gap-3">
               <button
                 type="button"
                 onClick={() => goAyah(ayahIndex + 1)}
@@ -358,18 +528,40 @@ export default function HifzShamsExperience() {
               >
                 التالية
               </button>
-              <span className="text-xs text-white/40">
-                {ayahIndex} / 15
-              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  if (isAudioMode(mode) || mode === "learn") {
+                    setShowBasmala(false);
+                    if (mode === "listen" || mode === "learn") {
+                      player.start("single", ayahIndex);
+                    } else if (mode === "listenRepeat") {
+                      player.start("repeat", ayahIndex);
+                    } else if (mode === "tilawaLink") {
+                      player.start("tilawaLink", ayahIndex);
+                    }
+                  }
+                }}
+                className={`${amiriQuran.className} max-w-[55%] truncate text-xs text-white/40 underline-offset-4 ${
+                  isAudioMode(mode) ? "hover:text-[#e8c87a]/80 hover:underline" : ""
+                }`}
+                title={isAudioMode(mode) ? "استمع لهذه الآية" : undefined}
+              >
+                {showBasmala ? "البسملة" : `${ayahIndex} / 15`}
+              </button>
               <button
                 type="button"
                 onClick={() => goAyah(ayahIndex - 1)}
-                disabled={ayahIndex <= 1}
+                disabled={ayahIndex <= 1 && !showBasmala}
                 className="rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm text-white/80 disabled:opacity-30"
               >
                 السابقة
               </button>
             </div>
+
+            <p className="mt-2 text-center text-[10px] leading-relaxed text-white/30">
+              {HUSARY_AUDIO_ATTRIBUTION}
+            </p>
           </div>
         )}
 
@@ -500,9 +692,10 @@ export default function HifzShamsExperience() {
                         ? "rgba(232,200,122,0.28)"
                         : "rgba(232,200,122,0.95)"
                       : "rgba(255,255,255,0.12)",
-                    boxShadow: known && !dim
-                      ? "0 0 14px rgba(232,200,122,0.7)"
-                      : "none",
+                    boxShadow:
+                      known && !dim
+                        ? "0 0 14px rgba(232,200,122,0.7)"
+                        : "none",
                   }}
                   aria-label={`نجمة الآية ${n}`}
                 />
@@ -511,7 +704,170 @@ export default function HifzShamsExperience() {
           </div>
         )}
       </main>
+    </div>
+  );
+}
 
+function setCopy(prev: Set<number>, idx: number): Set<number> {
+  const next = new Set(prev);
+  next.add(idx);
+  return next;
+}
+
+type AudioBarProps = {
+  mode: HifzModeId;
+  playing: boolean;
+  paused: boolean;
+  inSilence: boolean;
+  loading: boolean;
+  error: string | null;
+  repeatCount: RepeatCount;
+  onRepeatCount: (n: RepeatCount) => void;
+  onPlay: () => void;
+  onPauseToggle: () => void;
+  onStop: () => void;
+  onPrev: () => void;
+  onNext: () => void;
+  onSurah: () => void;
+  onListenFromLearn: () => void;
+  onBasmala: () => void;
+};
+
+function AudioBar({
+  mode,
+  playing,
+  paused,
+  inSilence,
+  loading,
+  error,
+  repeatCount,
+  onRepeatCount,
+  onPlay,
+  onPauseToggle,
+  onStop,
+  onPrev,
+  onNext,
+  onSurah,
+  onListenFromLearn,
+  onBasmala,
+}: AudioBarProps) {
+  const busy = playing || inSilence;
+  const showFull = isAudioMode(mode);
+
+  return (
+    <div className="mt-2 rounded-2xl border border-[#e8c87a]/20 bg-[#080816]/75 px-3 py-3">
+      {mode === "learn" && (
+        <div className="flex flex-wrap items-center justify-center gap-2">
+          <button
+            type="button"
+            onClick={onListenFromLearn}
+            className="rounded-full bg-[#e8c87a]/20 px-4 py-2 text-sm text-[#f5e6b8] ring-1 ring-[#e8c87a]/40"
+          >
+            استمع
+          </button>
+          <p className="w-full text-center text-[11px] text-white/40">
+            خطوة الاستماع من التعلّم — بهدوء بلا درجات.
+          </p>
+        </div>
+      )}
+
+      {showFull && (
+        <>
+          {mode === "listenRepeat" && (
+            <div className="mb-3 flex flex-wrap items-center justify-center gap-1.5">
+              <span className="text-[11px] text-white/45">عدد التكرار</span>
+              {REPEAT_COUNT_OPTIONS.map((n) => (
+                <button
+                  key={n}
+                  type="button"
+                  onClick={() => onRepeatCount(n)}
+                  className={`h-8 w-8 rounded-full text-sm ${
+                    repeatCount === n
+                      ? "bg-[#e8c87a]/25 text-[#f5e6b8] ring-1 ring-[#e8c87a]/50"
+                      : "bg-white/5 text-white/55"
+                  }`}
+                >
+                  {n}
+                </button>
+              ))}
+            </div>
+          )}
+
+          <div className="flex items-center justify-center gap-3">
+            <button
+              type="button"
+              onClick={onPrev}
+              className="rounded-full border border-white/15 px-3 py-2 text-sm text-white/75"
+              aria-label="السابقة"
+            >
+              ‹
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                if (busy || paused) onPauseToggle();
+                else onPlay();
+              }}
+              disabled={loading}
+              className="flex h-14 w-14 items-center justify-center rounded-full bg-[#e8c87a]/25 text-lg text-[#f5e6b8] ring-1 ring-[#e8c87a]/45 disabled:opacity-50"
+              aria-label={busy && !paused ? "إيقاف مؤقت" : "تشغيل"}
+            >
+              {loading ? "…" : busy && !paused && !inSilence ? "❚❚" : "▶"}
+            </button>
+            <button
+              type="button"
+              onClick={onNext}
+              className="rounded-full border border-white/15 px-3 py-2 text-sm text-white/75"
+              aria-label="التالية"
+            >
+              ›
+            </button>
+          </div>
+
+          <div className="mt-3 flex flex-wrap items-center justify-center gap-2">
+            <button
+              type="button"
+              onClick={onSurah}
+              className="rounded-full border border-[#e8c87a]/30 px-3 py-1.5 text-xs text-[#e8c87a]/90"
+            >
+              السورة كاملة
+            </button>
+            <button
+              type="button"
+              onClick={onBasmala}
+              className="rounded-full border border-white/15 px-3 py-1.5 text-xs text-white/70"
+            >
+              البسملة
+            </button>
+            {(busy || paused) && (
+              <button
+                type="button"
+                onClick={onStop}
+                className="rounded-full border border-white/10 px-3 py-1.5 text-xs text-white/45"
+              >
+                إيقاف
+              </button>
+            )}
+          </div>
+
+          {inSilence && (
+            <p className="mt-2 text-center text-xs text-[#e8c87a]/70">
+              دورك للتكرار بصوت هادئ…
+            </p>
+          )}
+          {mode === "tilawaLink" && (
+            <p className="mt-2 text-center text-[11px] text-white/40">
+              وصل التلاوة: آية ثم التي تليها — غير وضع «الوصل» النصّي.
+            </p>
+          )}
+        </>
+      )}
+
+      {error && (
+        <p className="mt-2 text-center text-xs text-[#e8c87a]/85" role="status">
+          {error}
+        </p>
+      )}
     </div>
   );
 }

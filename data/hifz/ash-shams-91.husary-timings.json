@@ -1,0 +1,388 @@
+{
+  "surah": 91,
+  "reciter": "Mahmoud Khalil Al-Husary",
+  "style": "murattal",
+  "quranComChapterReciterId": 6,
+  "source": "https://api.quran.com/api/v4/chapter_recitations/6/91?segments=true",
+  "chapterAudioUrl": "https://download.quranicaudio.com/qdc/khalil_al_husary/murattal/91.mp3",
+  "audioCdnPattern": "https://mirrors.quranicaudio.com/everyayah/Husary_128kbps/{SSS}{AAA}.mp3",
+  "basmalaUrl": "https://mirrors.quranicaudio.com/everyayah/Husary_128kbps/bismillah.mp3",
+  "note": "Word segments are ms timings from Quran.com for Husary murattal; verified to match whitespace token counts of local Uthmani data. Per-ayah streams use EveryAyah Husary_128kbps via quranicaudio mirror (same collection Quran.com API exposes for this reciter).",
+  "ayat": [
+    {
+      "number": 1,
+      "verseKey": "91:1",
+      "durationMs": 5040,
+      "words": [
+        {
+          "index": 1,
+          "startMs": 0,
+          "endMs": 1690
+        },
+        {
+          "index": 2,
+          "startMs": 1690,
+          "endMs": 3550
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "verseKey": "91:2",
+      "durationMs": 5020,
+      "words": [
+        {
+          "index": 1,
+          "startMs": 0,
+          "endMs": 1430
+        },
+        {
+          "index": 2,
+          "startMs": 1430,
+          "endMs": 2300
+        },
+        {
+          "index": 3,
+          "startMs": 2300,
+          "endMs": 3820
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "verseKey": "91:3",
+      "durationMs": 6400,
+      "words": [
+        {
+          "index": 1,
+          "startMs": 0,
+          "endMs": 2250
+        },
+        {
+          "index": 2,
+          "startMs": 2250,
+          "endMs": 3210
+        },
+        {
+          "index": 3,
+          "startMs": 3210,
+          "endMs": 5080
+        }
+      ]
+    },
+    {
+      "number": 4,
+      "verseKey": "91:4",
+      "durationMs": 6840,
+      "words": [
+        {
+          "index": 1,
+          "startMs": 0,
+          "endMs": 1720
+        },
+        {
+          "index": 2,
+          "startMs": 1720,
+          "endMs": 2740
+        },
+        {
+          "index": 3,
+          "startMs": 2740,
+          "endMs": 4780
+        }
+      ]
+    },
+    {
+      "number": 5,
+      "verseKey": "91:5",
+      "durationMs": 7520,
+      "words": [
+        {
+          "index": 1,
+          "startMs": 0,
+          "endMs": 3580
+        },
+        {
+          "index": 2,
+          "startMs": 3580,
+          "endMs": 4600
+        },
+        {
+          "index": 3,
+          "startMs": 4600,
+          "endMs": 6270
+        }
+      ]
+    },
+    {
+      "number": 6,
+      "verseKey": "91:6",
+      "durationMs": 5850,
+      "words": [
+        {
+          "index": 1,
+          "startMs": 0,
+          "endMs": 1740
+        },
+        {
+          "index": 2,
+          "startMs": 1740,
+          "endMs": 2840
+        },
+        {
+          "index": 3,
+          "startMs": 2840,
+          "endMs": 4510
+        }
+      ]
+    },
+    {
+      "number": 7,
+      "verseKey": "91:7",
+      "durationMs": 6870,
+      "words": [
+        {
+          "index": 1,
+          "startMs": 0,
+          "endMs": 2514
+        },
+        {
+          "index": 2,
+          "startMs": 2514,
+          "endMs": 3470
+        },
+        {
+          "index": 3,
+          "startMs": 3470,
+          "endMs": 5730
+        }
+      ]
+    },
+    {
+      "number": 8,
+      "verseKey": "91:8",
+      "durationMs": 9530,
+      "words": [
+        {
+          "index": 1,
+          "startMs": 0,
+          "endMs": 2580
+        },
+        {
+          "index": 2,
+          "startMs": 2580,
+          "endMs": 4980
+        },
+        {
+          "index": 3,
+          "startMs": 4980,
+          "endMs": 7480
+        }
+      ]
+    },
+    {
+      "number": 9,
+      "verseKey": "91:9",
+      "durationMs": 7780,
+      "words": [
+        {
+          "index": 1,
+          "startMs": 0,
+          "endMs": 1790
+        },
+        {
+          "index": 2,
+          "startMs": 1790,
+          "endMs": 3080
+        },
+        {
+          "index": 3,
+          "startMs": 3080,
+          "endMs": 4234
+        },
+        {
+          "index": 4,
+          "startMs": 4234,
+          "endMs": 6550
+        }
+      ]
+    },
+    {
+      "number": 10,
+      "verseKey": "91:10",
+      "durationMs": 7000,
+      "words": [
+        {
+          "index": 1,
+          "startMs": 0,
+          "endMs": 1100
+        },
+        {
+          "index": 2,
+          "startMs": 1100,
+          "endMs": 2260
+        },
+        {
+          "index": 3,
+          "startMs": 2260,
+          "endMs": 3558
+        },
+        {
+          "index": 4,
+          "startMs": 3558,
+          "endMs": 5750
+        }
+      ]
+    },
+    {
+      "number": 11,
+      "verseKey": "91:11",
+      "durationMs": 7780,
+      "words": [
+        {
+          "index": 1,
+          "startMs": 0,
+          "endMs": 2140
+        },
+        {
+          "index": 2,
+          "startMs": 2140,
+          "endMs": 3600
+        },
+        {
+          "index": 3,
+          "startMs": 3600,
+          "endMs": 6330
+        }
+      ]
+    },
+    {
+      "number": 12,
+      "verseKey": "91:12",
+      "durationMs": 6110,
+      "words": [
+        {
+          "index": 1,
+          "startMs": 0,
+          "endMs": 620
+        },
+        {
+          "index": 2,
+          "startMs": 620,
+          "endMs": 2600
+        },
+        {
+          "index": 3,
+          "startMs": 2600,
+          "endMs": 4690
+        }
+      ]
+    },
+    {
+      "number": 13,
+      "verseKey": "91:13",
+      "durationMs": 12170,
+      "words": [
+        {
+          "index": 1,
+          "startMs": 0,
+          "endMs": 2450
+        },
+        {
+          "index": 2,
+          "startMs": 2450,
+          "endMs": 3360
+        },
+        {
+          "index": 3,
+          "startMs": 3360,
+          "endMs": 4680
+        },
+        {
+          "index": 4,
+          "startMs": 4680,
+          "endMs": 5970
+        },
+        {
+          "index": 5,
+          "startMs": 5970,
+          "endMs": 7350
+        },
+        {
+          "index": 6,
+          "startMs": 7350,
+          "endMs": 8580
+        },
+        {
+          "index": 7,
+          "startMs": 8580,
+          "endMs": 11020
+        }
+      ]
+    },
+    {
+      "number": 14,
+      "verseKey": "91:14",
+      "durationMs": 17030,
+      "words": [
+        {
+          "index": 1,
+          "startMs": 0,
+          "endMs": 2860
+        },
+        {
+          "index": 2,
+          "startMs": 2860,
+          "endMs": 5350
+        },
+        {
+          "index": 3,
+          "startMs": 5350,
+          "endMs": 6970
+        },
+        {
+          "index": 4,
+          "startMs": 6970,
+          "endMs": 8560
+        },
+        {
+          "index": 5,
+          "startMs": 8560,
+          "endMs": 10690
+        },
+        {
+          "index": 6,
+          "startMs": 10690,
+          "endMs": 13160
+        },
+        {
+          "index": 7,
+          "startMs": 13160,
+          "endMs": 15710
+        }
+      ]
+    },
+    {
+      "number": 15,
+      "verseKey": "91:15",
+      "durationMs": 6370,
+      "words": [
+        {
+          "index": 1,
+          "startMs": 0,
+          "endMs": 1350
+        },
+        {
+          "index": 2,
+          "startMs": 1350,
+          "endMs": 2880
+        },
+        {
+          "index": 3,
+          "startMs": 2880,
+          "endMs": 4990
+        }
+      ]
+    }
+  ]
+}
