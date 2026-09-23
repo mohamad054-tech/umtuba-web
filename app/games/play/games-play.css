@@ -1375,14 +1375,17 @@ body:has(.um-game-fit) {
 
 .um-play-gamemap {
   position: relative;
-  height: 220px;
-  min-height: 220px;
+  width: 100%;
+  height: min(56dvh, 480px);
+  min-height: 280px;
   direction: ltr;
 }
 
-.um-play-gamemap-canvas {
-  position: absolute;
-  inset: 0;
+.um-play-gamemap-canvas,
+.um-play-gamemap-canvas.maplibregl-map {
+  position: relative;
+  width: 100%;
+  height: 100%;
 }
 
 .um-play-mappin {

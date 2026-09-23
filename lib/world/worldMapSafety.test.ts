@@ -57,4 +57,15 @@ describe("world map safety", () => {
     expect(map).toContain("console.warn");
     expect(map).toContain('setWorkerUrl("/maplibre/maplibre-gl-worker.mjs")');
   });
+
+  it("uses the same map worker and style for the city collector", () => {
+    const gameMap = read("app/games/play/GameMap.tsx");
+    const css = read("app/games/play/games-play.css");
+    expect(gameMap).toContain('setWorkerUrl("/maplibre/maplibre-gl-worker.mjs")');
+    expect(gameMap).toContain("resolveMapStyleUrl()");
+    expect(gameMap).not.toMatch(/mapbox|access_token|MAPBOX|pk\./i);
+    expect(css).toContain(".um-play-gamemap-canvas.maplibregl-map");
+    expect(css).toContain("height: 100%");
+    expect(css).not.toContain(".um-play-gamemap-canvas {\n  position: absolute;");
+  });
 });

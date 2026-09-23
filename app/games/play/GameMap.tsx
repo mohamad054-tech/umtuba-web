@@ -162,6 +162,10 @@ export default function GameMap({
         map.resize();
         paintRef.current();
       });
+      window.requestAnimationFrame(() => {
+        if (cancelled) return;
+        map.resize();
+      });
     };
 
     const wait = () => {
