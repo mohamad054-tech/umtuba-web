@@ -10,8 +10,9 @@ import {
   formatPlayNumber,
   verdictFromScore,
 } from "../../../lib/games/play/engine";
-import { writeBestIfHigher } from "../../../lib/games/play/scores";
+import { readBest, writeBestIfHigher } from "../../../lib/games/play/scores";
 import type { PlayableGameSlug } from "../../../lib/games/play/catalog";
+import { useBoardScrollLock } from "./boardPointer";
 import {
   PlayHowTo,
   PlayPanel,
@@ -27,9 +28,21 @@ type Props = {
   seconds: number;
   extra?: (item: QuizItem, index: number) => ReactNode;
   hidePrompt?: boolean;
+  fit?: boolean;
 };
 
-export default function QuizPlay({ slug, howTo, load, seconds, extra, hidePrompt }: Props) {
+function ChoiceText({ text }: { text: string }) {
+  const [arabic, english] = text.split("\n");
+  if (!english) return <span>{text}</span>;
+  return (
+    <span className="um-place-names">
+      <span>{arabic}</span>
+      <span className="en">{english}</span>
+    </span>
+  );
+}
+
+export default function QuizPlay({ slug, howTo, load, seconds, extra, hidePrompt, fit }: Props) {
   const { t, locale } = useI18n();
   const sfx = useMemo(() => createPlaySfx(), []);
   const { helpOpen, ready, dismissHelp, toggleHelp, keepReadyOnReplay } = usePlayHelp();
@@ -47,9 +60,13 @@ export default function QuizPlay({ slug, howTo, load, seconds, extra, hidePrompt
   const clockRef = useRef(
     createPlayCountdown(seconds, setLeft, () => setTimedOut(true))
   );
+  const boardRef = useRef<HTMLDivElement>(null);
+  const [floor, setFloor] = useState(0);
+  useBoardScrollLock(boardRef, ready && !done);
 
   const begin = () => {
     if (!ready) {
+      setFloor(readBest(slug) ?? 0);
       setDeck(load());
       setIndex(0);
       setScore(0);
@@ -65,6 +82,7 @@ export default function QuizPlay({ slug, howTo, load, seconds, extra, hidePrompt
 
   const restart = () => {
     clockRef.current.stop();
+    setFloor(readBest(slug) ?? 0);
     setDeck(load());
     setIndex(0);
     setScore(0);
@@ -79,18 +97,23 @@ export default function QuizPlay({ slug, howTo, load, seconds, extra, hidePrompt
 
   useEffect(() => {
     if (!ready || done || deck.length === 0 || pick != null) return;
-    clockRef.current.start(seconds);
+    const clock = clockRef.current;
+    clock.start(seconds);
     return () => {
-      clockRef.current.stop();
+      clock.stop();
     };
   }, [ready, done, deck, index, pick, seconds]);
 
   useEffect(() => {
     if (!timedOut || pick != null) return;
-    setPick(-1);
-    clockRef.current.stop();
-    setStreak(0);
-    sfx.no();
+    const clock = clockRef.current;
+    const id = window.setTimeout(() => {
+      setPick(-1);
+      clock.stop();
+      setStreak(0);
+      sfx.no();
+    }, 0);
+    return () => window.clearTimeout(id);
   }, [timedOut, pick, sfx]);
 
   const item = deck[index];
@@ -129,23 +152,31 @@ export default function QuizPlay({ slug, howTo, load, seconds, extra, hidePrompt
   if (done) {
     return (
       <PlayPanel
+        fill={fit}
         stats={<PlayStat label={t("games.score")} value={formatPlayNumber(locale, score)} />}
         helpOpen={helpOpen}
         onToggleHelp={toggleHelp}
       >
         <PlayHowTo open={helpOpen} lines={howTo.map((key) => t(key))} cta="gotIt" onDismiss={dismissHelp} />
-        <PlayResult
-          score={score}
-          verdictKey={verdictFromScore("high", score)}
-          detail={`${formatPlayNumber(locale, right)} ${t("games.of")} ${formatPlayNumber(locale, deck.length)} · ${t("games.streak")} ${formatPlayNumber(locale, best)}`}
-          onAgain={restart}
-        />
+        <div className={score > floor ? "um-play-best" : "um-play-celebrate"}>
+          <PlayResult
+            score={score}
+            verdictKey={verdictFromScore("high", score)}
+            detail={
+              score > floor
+                ? t("games.localBest", { values: { score: formatPlayNumber(locale, score) } })
+                : `${formatPlayNumber(locale, right)} ${t("games.of")} ${formatPlayNumber(locale, deck.length)} · ${t("games.streak")} ${formatPlayNumber(locale, best)}`
+            }
+            onAgain={restart}
+          />
+        </div>
       </PlayPanel>
     );
   }
 
   return (
     <PlayPanel
+      fill={fit}
       stats={
         <>
           <PlayStat label={t("games.score")} value={formatPlayNumber(locale, score)} />
@@ -163,7 +194,11 @@ export default function QuizPlay({ slug, howTo, load, seconds, extra, hidePrompt
         onDismiss={begin}
       />
       {ready && item ? (
-        <div className="um-play-quiz" dir="ltr">
+        <div
+          ref={boardRef}
+          className={`um-play-quiz um-lit-board${fit ? " um-place-quiz" : ""}${pick === item.correct ? " um-play-celebrate" : ""}`}
+          dir="ltr"
+        >
           <p className="um-play-qnum">
             {t("games.question")} {formatPlayNumber(locale, index + 1)} {t("games.of")}{" "}
             {formatPlayNumber(locale, deck.length)}
@@ -183,7 +218,7 @@ export default function QuizPlay({ slug, howTo, load, seconds, extra, hidePrompt
                 onClick={() => answer(choice)}
               >
                 <span className="tag">{CHOICE_TAGS[choice] ?? choice + 1}</span>
-                <span>{text}</span>
+                <ChoiceText text={text} />
               </button>
             ))}
           </div>

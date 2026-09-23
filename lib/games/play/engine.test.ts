@@ -6,7 +6,11 @@ import {
   hanoiCanPlace,
   merge2048Line,
   move2048,
+  consumeSnakeTurn,
+  queueSnakeTurn,
+  snakeDirFromDelta,
   snakeTickMs,
+  snakeVisualChain,
   SNAKE_TICK_MIN_MS,
   SNAKE_TICK_START_MS,
   sudokuIsSolved,
@@ -15,6 +19,8 @@ import {
   xoCpuMove,
   xoHumanCenterThenBlock,
   unoCpuIndex,
+  wheelIndexAt,
+  wheelStopAngle,
   xoWinner,
   type UnoCard,
   type XoMark,
@@ -52,6 +58,36 @@ describe("play engine", () => {
     expect(snakeTickMs(40)).toBe(SNAKE_TICK_START_MS - 4 * 12);
     expect(snakeTickMs(200)).toBe(SNAKE_TICK_MIN_MS);
     expect(snakeTickMs(0, true)).toBeGreaterThan(snakeTickMs(0));
+  });
+
+  it("eases the snake head forward without cutting the corner", () => {
+    const body = [
+      { x: 8, y: 8 },
+      { x: 7, y: 8 },
+      { x: 6, y: 8 },
+    ];
+    expect(snakeVisualChain(body, "right", 0)).toEqual(body);
+    const mid = snakeVisualChain(body, "right", 0.5);
+    expect(mid[0]).toEqual({ x: 8.5, y: 8 });
+    expect(mid[1]).toEqual(body[0]);
+    expect(mid[mid.length - 1]).toEqual({ x: 6.5, y: 8 });
+    const bite = snakeVisualChain(body, "right", 1, true);
+    expect(bite[0]).toEqual({ x: 9, y: 8 });
+    expect(bite[bite.length - 1]).toEqual(body[2]);
+  });
+
+  it("keeps one extra snake turn and refuses a reverse", () => {
+    const straight = { dir: "right" as const, pending: "right" as const, extra: null };
+    const up = queueSnakeTurn(straight, "up");
+    expect(up).toEqual({ dir: "right", pending: "up", extra: null });
+    expect(queueSnakeTurn(up, "down")).toEqual(up);
+    const corner = queueSnakeTurn(up, "left");
+    expect(corner).toEqual({ dir: "right", pending: "up", extra: "left" });
+    expect(queueSnakeTurn(corner, "down")).toEqual(corner);
+    expect(consumeSnakeTurn(corner)).toEqual({ dir: "up", pending: "left", extra: null });
+    expect(snakeDirFromDelta(4, 1)).toBe("right");
+    expect(snakeDirFromDelta(-2, -9)).toBe("up");
+    expect(snakeDirFromDelta(0, 0)).toBeNull();
   });
 
   it("detects a win on every row, column, and diagonal without flipping indices", () => {
@@ -117,6 +153,16 @@ describe("play engine", () => {
     expect(hanoiCanPlace(3, 2)).toBe(true);
     expect(hanoiCanPlace(1, 2)).toBe(false);
     expect(hanoiCanPlace(undefined, 3)).toBe(true);
+  });
+
+  it("stops the wheel on the chosen slice under the pointer", () => {
+    const count = 6;
+    for (let index = 0; index < count; index += 1) {
+      const angle = wheelStopAngle(40, index, count, 5);
+      expect(wheelIndexAt(angle, count)).toBe(index);
+      expect(angle).toBeGreaterThan(40);
+    }
+    expect(wheelIndexAt(wheelStopAngle(0, 0, count, 0), count)).toBe(0);
   });
 
   it("picks a beatable Uno CPU move", () => {

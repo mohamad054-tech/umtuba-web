@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import dynamic from "next/dynamic";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useI18n } from "../../components/i18n";
 import type { TranslationKey } from "../../../lib/i18n/messages/types";
 import {
@@ -22,14 +23,21 @@ import {
 import {
   createPlaySfx,
   formatPlayNumber,
+  prefersReducedMotion,
   shuffled,
   unoCpuIndex,
   unoMatch,
   verdictFromScore,
+  wheelIndexAt,
+  wheelStopAngle,
   type UnoCard,
 } from "../../../lib/games/play/engine";
-import { writeBestIfHigher } from "../../../lib/games/play/scores";
+import { readBest, writeBestIfHigher } from "../../../lib/games/play/scores";
+import { useBoardScrollLock } from "./boardPointer";
 import type { PlayableGameSlug } from "../../../lib/games/play/catalog";
+import { ColorCard } from "./ColorCards";
+import ProductMark from "./ProductMark";
+import { CityFace, CountryShape, PairSketch, flagEmoji } from "./PlaceCard";
 import {
   PlayHowTo,
   PlayPanel,
@@ -37,6 +45,11 @@ import {
   PlayStat,
   usePlayHelp,
 } from "./PlayChrome";
+
+const GameMap = dynamic(() => import("./GameMap"), {
+  ssr: false,
+  loading: () => <div className="um-play-gamemap" dir="ltr" />,
+});
 
 function Shell({
   howTo,
@@ -100,7 +113,7 @@ export function FartherPairGame() {
     });
   };
 
-  const label = (id: string) => DIST_CITIES.find((city) => city.id === id)?.city ?? id;
+  const label = (id: string) => DIST_CITIES.find((city) => city.id === id);
 
   const begin = () => {
     if (!help.ready) {
@@ -139,8 +152,21 @@ export function FartherPairGame() {
     <Shell slug="farther-pair" howTo={["games.farther-pair.howTo1", "games.farther-pair.howTo2", "games.farther-pair.howTo3"]} stats={<PlayStat label={t("games.score")} value={formatPlayNumber(locale, score)} />} ready={help.ready} helpOpen={help.helpOpen} onToggleHelp={help.toggleHelp} begin={begin}>
       {pair ? (
         <div className="um-play-pairgrid" dir="ltr">
-          <button type="button" className="um-play-pair" data-play-item="true" onClick={() => pick("L")}>{label(pair.a)} — {label(pair.b)}</button>
-          <button type="button" className="um-play-pair" data-play-item="true" onClick={() => pick("R")}>{label(pair.c)} — {label(pair.d)}</button>
+          {(["L", "R"] as const).map((side) => {
+            const left = side === "L";
+            const first = label(left ? pair.a : pair.c);
+            const second = label(left ? pair.b : pair.d);
+            if (!first || !second) return null;
+            return (
+              <button key={side} type="button" className="um-place-card" data-play-item="true" onClick={() => pick(side)}>
+                <span className="um-place-row">
+                  <CityFace flag={flagEmoji(first.iso)} name={first.city} country={first.country} />
+                  <CityFace flag={flagEmoji(second.iso)} name={second.city} country={second.country} />
+                </span>
+                <PairSketch a={first} b={second} />
+              </button>
+            );
+          })}
         </div>
       ) : null}
     </Shell>
@@ -181,8 +207,12 @@ export function LargerCountryGame() {
     <Shell slug="larger-country" howTo={["games.larger-country.howTo1", "games.larger-country.howTo2", "games.larger-country.howTo3"]} stats={<PlayStat label={t("games.score")} value={formatPlayNumber(locale, score)} />} ready={help.ready} helpOpen={help.helpOpen} onToggleHelp={help.toggleHelp} begin={begin}>
       {pair ? (
         <div className="um-play-pairgrid" dir="ltr">
-          <button type="button" className="um-play-pair" data-play-item="true" onClick={() => pick(0)}>{pair[0].name}</button>
-          <button type="button" className="um-play-pair" data-play-item="true" onClick={() => pick(1)}>{pair[1].name}</button>
+          {pair.map((country, index) => (
+            <button key={country.id} type="button" className="um-place-card" data-play-item="true" onClick={() => pick(index as 0 | 1)}>
+              <CityFace flag={flagEmoji(country.id)} name={country.name} country="" />
+              <CountryShape id={country.id} />
+            </button>
+          ))}
         </div>
       ) : null}
     </Shell>
@@ -474,9 +504,14 @@ export function PriceGame() {
   return (
     <Shell slug="price" howTo={["games.price.howTo1", "games.price.howTo2", "games.price.howTo3"]} stats={<PlayStat label={t("games.score")} value={formatPlayNumber(locale, score)} />} ready={help.ready} helpOpen={help.helpOpen} onToggleHelp={help.toggleHelp} begin={begin}>
       {item ? (
-        <div className="um-play-quiz">
+        <div className="um-play-quiz" dir="ltr">
+          <p className="um-play-note">{t("games.madeUpPrices")}</p>
+          <ProductMark kind={item.k} />
           <p className="um-play-qtext">{item.n}</p>
-          <p className="um-play-priceline">{formatPlayNumber(locale, guess)}</p>
+          <p className="um-play-priceline" dir="ltr">
+            {formatPlayNumber(locale, guess)}
+            {locked ? ` / ${formatPlayNumber(locale, item.p)}` : ""}
+          </p>
           <input className="um-play-slider" type="range" min={min} max={max} step={5} value={guess} data-play-item="true" disabled={locked} onChange={(e) => setGuess(Number(e.target.value))} />
           <div className="um-play-row">
             {!locked ? (
@@ -495,35 +530,71 @@ export function WheelGame() {
   const { t, locale } = useI18n();
   const help = usePlayHelp();
   const sfx = useMemo(() => createPlaySfx(), []);
+  const angleRef = useRef(0);
+  const stageRef = useRef<HTMLDivElement>(null);
   const [angle, setAngle] = useState(0);
   const [total, setTotal] = useState(0);
   const [spins, setSpins] = useState(0);
   const [busy, setBusy] = useState(false);
+  const [won, setWon] = useState<number | null>(null);
+  const [floor, setFloor] = useState(0);
+  useBoardScrollLock(stageRef, help.ready);
 
-  const begin = () => { if (!help.ready) { setTotal(0); setSpins(0); } help.dismissHelp(); };
+  const begin = () => { if (!help.ready) { setFloor(readBest("wheel") ?? 0); setTotal(0); setSpins(0); setWon(null); } help.dismissHelp(); };
   const spin = () => {
     if (busy) return;
     setBusy(true);
+    setWon(null);
     const pick = Math.floor(Math.random() * WHEEL_SLICES.length);
-    const step = 360 / WHEEL_SLICES.length;
-    setAngle(360 * 5 - (pick * step + step / 2));
+    const reduced = prefersReducedMotion();
+    const next = wheelStopAngle(angleRef.current, pick, WHEEL_SLICES.length, reduced ? 0 : 5);
+    angleRef.current = next;
+    setAngle(next);
     window.setTimeout(() => {
-      const val = WHEEL_SLICES[pick] ?? 5;
+      const index = wheelIndexAt(next, WHEEL_SLICES.length);
+      const val = WHEEL_SLICES[index] ?? WHEEL_SLICES[pick] ?? 5;
       setSpins((n) => n + 1);
       setTotal((n) => n + val);
+      setWon(val);
       writeBestIfHigher("wheel", total + val);
       sfx.win();
       setBusy(false);
-    }, 900);
+    }, reduced ? 40 : 2600);
   };
+  const step = 360 / WHEEL_SLICES.length;
 
   return (
     <Shell slug="wheel" howTo={["games.wheel.howTo1", "games.wheel.howTo2", "games.wheel.howTo3"]} stats={<PlayStat label={t("games.score")} value={formatPlayNumber(locale, total)} />} ready={help.ready} helpOpen={help.helpOpen} onToggleHelp={help.toggleHelp} begin={begin}>
-      <div className="um-play-wheel" dir="ltr" data-play-item="true" style={{ transform: `rotate(${angle}deg)` }}>
-        {WHEEL_SLICES.map((value, index) => (
-          <span key={`${value}-${index}`} className="um-play-slice">{value}%</span>
-        ))}
+      <div ref={stageRef} className="um-play-wheel-stage um-lit-board" dir="ltr">
+        <div className="um-play-wheel-pointer" aria-hidden="true" />
+        <div
+          className="um-play-wheel"
+          data-play-item="true"
+          style={{ transform: `rotate(${angle}deg)` }}
+          onPointerDown={(event) => {
+            if (!event.isPrimary || busy) return;
+            event.currentTarget.setPointerCapture(event.pointerId);
+          }}
+          onPointerUp={(event) => {
+            if (!event.isPrimary) return;
+            spin();
+          }}
+        >
+          {WHEEL_SLICES.map((value, index) => (
+            <span
+              key={`${value}-${index}`}
+              className="um-play-slice"
+              dir="ltr"
+              style={{ transform: `rotate(${index * step + step / 2}deg) translateY(-78px)` }}
+            >
+              {value}%
+            </span>
+          ))}
+        </div>
       </div>
+      <p className={`um-play-wheel-won${won != null && total > floor ? " um-play-best" : won != null ? " um-play-celebrate" : ""}`} dir="ltr">
+        {won == null ? "\u00a0" : t("games.wheel.won", { values: { value: `${formatPlayNumber(locale, won)}%` } })}
+      </p>
       <div className="um-play-row" style={{ justifyContent: "center" }}>
         <button type="button" className="um-play-btn go" data-play-item="true" onClick={spin} disabled={busy}>{t("games.spin")}</button>
       </div>
@@ -571,10 +642,15 @@ export function BasketGame() {
 
   return (
     <Shell slug="basket" howTo={["games.basket.howTo1", "games.basket.howTo2", "games.basket.howTo3"]} stats={<PlayStat label={t("games.score")} value={`${formatPlayNumber(locale, sum)} / ${formatPlayNumber(locale, cap)}`} />} ready={help.ready} helpOpen={help.helpOpen} onToggleHelp={help.toggleHelp} begin={begin}>
+      <p className="um-play-note">{t("games.madeUpPrices")}</p>
       <div className="um-play-shelf">
         {BASKET_ITEMS.map((item, idx) => (
-          <button key={`${item.n}-${idx}`} type="button" className={`um-play-step${picked.includes(idx) ? " sel" : ""}`} data-play-item="true" onClick={() => toggle(idx)}>
-            {item.n} · {item.p}
+          <button key={`${item.n}-${idx}`} type="button" className={`um-product-card${picked.includes(idx) ? " sel" : ""}`} data-play-item="true" onClick={() => toggle(idx)}>
+            <ProductMark kind={item.k} />
+            <span className="um-product-copy">
+              <span className="um-place-name">{item.n}</span>
+              <span className="um-place-country" dir="ltr">{formatPlayNumber(locale, item.p)}</span>
+            </span>
           </button>
         ))}
       </div>
@@ -619,14 +695,18 @@ export function CollectorGame() {
 
   return (
     <Shell slug="collector" howTo={["games.collector.howTo1", "games.collector.howTo2", "games.collector.howTo3"]} stats={<PlayStat label={t("games.collected")} value={`${formatPlayNumber(locale, got.length)} / ${formatPlayNumber(locale, WORLD_CITIES.length)}`} />} ready={help.ready} helpOpen={help.helpOpen} onToggleHelp={help.toggleHelp} begin={begin}>
-      <p className="um-play-qtext">{current?.city}</p>
-      <div className="um-play-pins" dir="ltr">
-        {WORLD_CITIES.map((city) => (
-          <button key={city.id} type="button" className={`um-play-pin${got.includes(city.id) ? " on" : ""}`} data-play-item="true" onClick={() => drop(city.id)}>
-            {got.includes(city.id) ? city.city : "•"}
-          </button>
-        ))}
-      </div>
+      <p className="um-play-qtext">{current ? `${current.city} · ${current.country}` : ""}</p>
+      <GameMap
+        pins={WORLD_CITIES.map((city) => ({
+          id: city.id,
+          lng: city.lng,
+          lat: city.lat,
+          state: got.includes(city.id) ? "got" : "idle",
+        }))}
+        fit="all"
+        interactive
+        onPick={drop}
+      />
     </Shell>
   );
 }
@@ -644,9 +724,13 @@ export function HangwordGame() {
   const [solved, setSolved] = useState(0);
   const [done, setDone] = useState(false);
   const word = deck[i];
+  const boardRef = useRef<HTMLDivElement>(null);
+  const [floor, setFloor] = useState(0);
+  useBoardScrollLock(boardRef, help.ready && !done);
 
   const begin = () => {
     if (!help.ready) {
+      setFloor(readBest("hangword") ?? 0);
       setDeck(shuffled(HANG_WORDS).slice(0, 4));
       setI(0); setFound([]); setUsed([]); setLives(6); setScore(0); setSolved(0); setDone(false);
     }
@@ -681,7 +765,9 @@ export function HangwordGame() {
   if (done) {
     return (
       <PlayPanel stats={<PlayStat label={t("games.score")} value={formatPlayNumber(locale, score)} />}>
-        <PlayResult score={score} verdictKey={verdictFromScore("high", score)} detail={`${formatPlayNumber(locale, solved)} ${t("games.of")} 4`} onAgain={() => { setDeck(shuffled(HANG_WORDS).slice(0, 4)); setI(0); setFound([]); setUsed([]); setLives(6); setScore(0); setSolved(0); setDone(false); help.keepReadyOnReplay(); }} />
+        <div className={score > floor ? "um-play-best" : undefined}>
+          <PlayResult score={score} verdictKey={verdictFromScore("high", score)} detail={score > floor ? t("games.localBest", { values: { score: formatPlayNumber(locale, score) } }) : `${formatPlayNumber(locale, solved)} ${t("games.of")} 4`} onAgain={() => { setDeck(shuffled(HANG_WORDS).slice(0, 4)); setI(0); setFound([]); setUsed([]); setLives(6); setScore(0); setSolved(0); setDone(false); help.keepReadyOnReplay(); }} />
+        </div>
       </PlayPanel>
     );
   }
@@ -693,10 +779,10 @@ export function HangwordGame() {
           <p className="um-play-qnum">{word.h}</p>
           <div className="um-play-word">
             {[...word.w].map((ch, idx) => (
-              <span key={`${ch}-${idx}`} className="um-play-slot">{found.includes(normArabicLetter(ch)) ? ch : "_"}</span>
+              <span key={`${ch}-${idx}`} className="um-play-slot">{found.includes(normArabicLetter(ch)) ? ch : ""}</span>
             ))}
           </div>
-          <div className="um-play-letters">
+          <div ref={boardRef} className="um-play-letters um-lit-board">
             {ARABIC_LETTERS.map((ch) => (
               <button key={ch} type="button" className="um-play-ltr" data-play-item="true" disabled={used.includes(ch)} onClick={() => guess(ch)}>
                 {ch}
@@ -752,10 +838,13 @@ export function ShapesGame() {
   const help = usePlayHelp();
   const sfx = useMemo(() => createPlaySfx(), []);
   type Card = { sh: string; col: string; up: boolean; done: boolean };
+  const boardRef = useRef<HTMLDivElement>(null);
   const [cards, setCards] = useState<Card[]>([]);
   const [open, setOpen] = useState<number[]>([]);
   const [score, setScore] = useState(0);
   const [done, setDone] = useState(false);
+  const [floor, setFloor] = useState(0);
+  useBoardScrollLock(boardRef, help.ready && !done);
 
   const deal = () => {
     const shapes = ["circle", "square", "diamond"];
@@ -768,6 +857,7 @@ export function ShapesGame() {
     setOpen([]);
     setScore(0);
     setDone(false);
+    setFloor(readBest("shapes") ?? 0);
   };
 
   const begin = () => { if (!help.ready) deal(); help.dismissHelp(); };
@@ -802,22 +892,49 @@ export function ShapesGame() {
   if (done) {
     return (
       <PlayPanel stats={<PlayStat label={t("games.score")} value={formatPlayNumber(locale, score)} />}>
-        <PlayResult score={score} verdictKey={verdictFromScore("high", score)} detail={t("games.shapes.title")} onAgain={() => { deal(); help.keepReadyOnReplay(); }} />
+        <div className={score > floor ? "um-play-best" : undefined}>
+          <PlayResult score={score} verdictKey={verdictFromScore("high", score)} detail={score > floor ? t("games.localBest", { values: { score: formatPlayNumber(locale, score) } }) : t("games.shapes.title")} onAgain={() => { deal(); help.keepReadyOnReplay(); }} />
+        </div>
       </PlayPanel>
     );
   }
 
   return (
     <Shell slug="shapes" howTo={["games.shapes.howTo1", "games.shapes.howTo2", "games.shapes.howTo3"]} stats={<PlayStat label={t("games.score")} value={formatPlayNumber(locale, score)} />} ready={help.ready} helpOpen={help.helpOpen} onToggleHelp={help.toggleHelp} begin={begin}>
-      <div className="um-play-shapeg" dir="ltr">
-        {cards.map((card, index) => (
-          <button key={index} type="button" className={`um-play-scard${card.up || card.done ? " up" : ""}`} data-play-item="true" onClick={() => flip(index)}>
-            <span className={`um-play-shape ${card.sh}`} style={{ background: card.up || card.done ? card.col : "#1a2140" }} />
-          </button>
-        ))}
+      <div ref={boardRef} className="um-play-shapeg um-lit-board" dir="ltr">
+        {cards.map((card, index) => {
+          const face = card.up || card.done;
+          return (
+            <button key={index} type="button" className={`um-play-scard${face ? " up" : ""}`} data-play-item="true" onClick={() => flip(index)}>
+              {face ? <span className={`um-play-shape ${card.sh}`} style={{ background: card.col }} /> : <span className="um-play-shape-gem" aria-hidden="true" />}
+            </button>
+          );
+        })}
       </div>
     </Shell>
   );
+}
+
+function refillDeck(deck: UnoCard[], pile: UnoCard[]): { deck: UnoCard[]; pile: UnoCard[] } {
+  if (deck.length > 0 || pile.length < 2) return { deck, pile };
+  const top = pile[pile.length - 1]!;
+  return { deck: shuffled(pile.slice(0, -1)), pile: [top] };
+}
+
+function drawCards(deck: UnoCard[], pile: UnoCard[], n: number) {
+  let nextDeck = deck;
+  let nextPile = pile;
+  const drawn: UnoCard[] = [];
+  for (let i = 0; i < n; i += 1) {
+    const refilled = refillDeck(nextDeck, nextPile);
+    nextDeck = refilled.deck;
+    nextPile = refilled.pile;
+    const card = nextDeck[nextDeck.length - 1];
+    if (!card) break;
+    drawn.push(card);
+    nextDeck = nextDeck.slice(0, -1);
+  }
+  return { drawn, deck: nextDeck, pile: nextPile };
 }
 
 export function UnoGame() {
@@ -830,6 +947,12 @@ export function UnoGame() {
   const [deck, setDeck] = useState<UnoCard[]>([]);
   const [turn, setTurn] = useState<"you" | "cpu">("you");
   const [done, setDone] = useState<"win" | "lose" | null>(null);
+  const [floor, setFloor] = useState(0);
+  const tableRef = useRef<HTMLDivElement>(null);
+  const pileRef = useRef<HTMLDivElement>(null);
+  const dragRef = useRef<{ id: number; x: number; y: number } | null>(null);
+  const skipClick = useRef(false);
+  useBoardScrollLock(tableRef, help.ready && !done);
 
   const makeDeck = () => {
     const colors: UnoCard["c"][] = ["red", "gold", "mint", "ink"];
@@ -847,19 +970,10 @@ export function UnoGame() {
     setDeck(d.slice(15));
     setTurn("you");
     setDone(null);
+    setFloor(readBest("uno") ?? 0);
   };
 
   const begin = () => { if (!help.ready) deal(); help.dismissHelp(); };
-
-  const take = (from: UnoCard[], n = 1): [UnoCard[], UnoCard[]] => {
-    const nextDeck = [...from];
-    const out: UnoCard[] = [];
-    for (let i = 0; i < n; i += 1) {
-      const card = nextDeck.pop();
-      if (card) out.push(card);
-    }
-    return [out, nextDeck];
-  };
 
   const playYou = (index: number) => {
     if (turn !== "you" || done) return;
@@ -876,9 +990,10 @@ export function UnoGame() {
 
   const drawYou = () => {
     if (turn !== "you" || done) return;
-    const [drawn, next] = take(deck, 1);
-    setYou((cur) => [...cur, ...drawn]);
-    setDeck(next);
+    const taken = drawCards(deck, pile, 1);
+    setYou((cur) => [...cur, ...taken.drawn]);
+    setDeck(taken.deck);
+    setPile(taken.pile);
     setTurn("cpu");
   };
 
@@ -889,9 +1004,10 @@ export function UnoGame() {
     const timer = window.setTimeout(() => {
       const idx = unoCpuIndex(cpu, top);
       if (idx < 0) {
-        const [drawn, next] = take(deck, 1);
-        setCpu((cur) => [...cur, ...drawn]);
-        setDeck(next);
+        const taken = drawCards(deck, pile, 1);
+        setCpu((cur) => [...cur, ...taken.drawn]);
+        setDeck(taken.deck);
+        setPile(taken.pile);
         setTurn("you");
         return;
       }
@@ -901,7 +1017,7 @@ export function UnoGame() {
       setPile((cur) => [...cur, card]);
       if (!nextCpu.length) { setDone("lose"); return; }
       setTurn("you");
-    }, 350);
+    }, 450);
     return () => window.clearTimeout(timer);
   }, [turn, cpu, deck, pile, done]);
 
@@ -909,7 +1025,9 @@ export function UnoGame() {
     const pts = done === "win" ? 200 : 30;
     return (
       <PlayPanel stats={<PlayStat label={t("games.score")} value={formatPlayNumber(locale, pts)} />}>
-        <PlayResult score={pts} verdictKey={done === "win" ? "games.youWin" : "games.youLose"} detail={t("games.uno.title")} onAgain={() => { deal(); help.keepReadyOnReplay(); }} />
+        <div className={pts > floor ? "um-play-best" : undefined}>
+          <PlayResult score={pts} verdictKey={done === "win" ? "games.youWin" : "games.youLose"} detail={pts > floor ? t("games.localBest", { values: { score: formatPlayNumber(locale, pts) } }) : t("games.uno.title")} onAgain={() => { deal(); help.keepReadyOnReplay(); }} />
+        </div>
       </PlayPanel>
     );
   }
@@ -918,16 +1036,61 @@ export function UnoGame() {
 
   return (
     <Shell slug="uno" howTo={["games.uno.howTo1", "games.uno.howTo2", "games.uno.howTo3"]} stats={<PlayStat label={t("games.cpu")} value={formatPlayNumber(locale, cpu.length)} />} ready={help.ready} helpOpen={help.helpOpen} onToggleHelp={help.toggleHelp} begin={begin}>
-      <p className="um-play-qnum">{top ? `${top.c} ${top.v}` : ""}</p>
-      <div className="um-play-unohand" dir="ltr">
-        {you.map((card, index) => (
-          <button key={`${card.c}-${card.v}-${index}`} type="button" className={`um-play-ucard ${card.c}`} data-play-item="true" onClick={() => playYou(index)}>
-            {card.v}
+      <div ref={tableRef} className="um-color-table um-lit-board" dir="ltr">
+        <div className="um-color-cpu" aria-label={t("games.cpu")}>
+          {cpu.map((card, index) => (
+            <ColorCard key={`${card.c}-${card.v}-${index}`} faceDown />
+          ))}
+        </div>
+        <p className="um-color-turn">{turn === "you" ? t("games.yourTurn") : t("games.cpuTurn")}</p>
+        <div className="um-color-piles">
+          <button type="button" className="um-color-pile" data-play-item="true" onClick={drawYou} disabled={turn !== "you"}>
+            <ColorCard faceDown />
+            <span className="um-color-pile-label">{t("games.drawCard")} · {formatPlayNumber(locale, deck.length)}</span>
           </button>
-        ))}
-      </div>
-      <div className="um-play-row">
-        <button type="button" className="um-play-btn" data-play-item="true" onClick={drawYou}>{t("games.drawCard")}</button>
+          <div ref={pileRef} className="um-color-pile" data-uno-discard="true">
+            {top ? <ColorCard card={top} /> : <ColorCard faceDown />}
+            <span className="um-color-pile-label">{t("games.waste")}</span>
+          </div>
+        </div>
+        <div className="um-color-hand">
+          {you.map((card, index) => {
+            const legal = top ? unoMatch(card, top) : false;
+            return (
+              <button
+                key={`${card.c}-${card.v}-${index}`}
+                type="button"
+                className="um-color-play"
+                data-play-item="true"
+                disabled={turn !== "you" || !legal}
+                onPointerDown={(event) => {
+                  if (!event.isPrimary || turn !== "you" || !legal) return;
+                  dragRef.current = { id: index, x: event.clientX, y: event.clientY };
+                  event.currentTarget.setPointerCapture(event.pointerId);
+                }}
+                onPointerUp={(event) => {
+                  const start = dragRef.current;
+                  dragRef.current = null;
+                  if (!start || start.id !== index) return;
+                  if (Math.hypot(event.clientX - start.x, event.clientY - start.y) < 10) return;
+                  skipClick.current = true;
+                  const pile = pileRef.current;
+                  const hit = document.elementFromPoint(event.clientX, event.clientY);
+                  if (pile && hit && pile.contains(hit)) playYou(index);
+                }}
+                onClick={() => {
+                  if (skipClick.current) {
+                    skipClick.current = false;
+                    return;
+                  }
+                  playYou(index);
+                }}
+              >
+                <ColorCard card={card} />
+              </button>
+            );
+          })}
+        </div>
       </div>
     </Shell>
   );

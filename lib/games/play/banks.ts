@@ -165,22 +165,24 @@ export type WorldCity = {
   country: string;
   x: number;
   y: number;
+  lat: number;
+  lng: number;
   scene: string;
   hint: string;
 };
 
 export const WORLD_CITIES: WorldCity[] = [
-  { id: "jerusalem", city: "القدس", country: "فلسطين", x: 214.2, y: 58.2, scene: "dome", hint: "قبّة ذهبية ومدينة على تلال" },
-  { id: "cairo", city: "القاهرة", country: "مصر", x: 208.4, y: 62.8, scene: "pyramid", hint: "أهرامات ونهر طويل" },
-  { id: "dubai", city: "دبي", country: "الإمارات", x: 235.2, y: 64.5, scene: "tower", hint: "برج أطول من أي شي حواليه" },
-  { id: "paris", city: "باريس", country: "فرنسا", x: 182.3, y: 42.5, scene: "lattice", hint: "برج حديدي مشبّك" },
-  { id: "tokyo", city: "طوكيو", country: "اليابان", x: 319.7, y: 54.5, scene: "neon", hint: "لافتات مضيئة بالليل" },
-  { id: "newyork", city: "نيويورك", country: "أمريكا", x: 105.9, y: 49.3, scene: "skyline", hint: "ناطحات سحاب وتمثال على جزيرة" },
-  { id: "marrakesh", city: "مراكش", country: "المغرب", x: 172.0, y: 58.5, scene: "souq", hint: "أسواق بأقواس ومدينة حمرا" },
-  { id: "amman", city: "عمّان", country: "الأردن", x: 215.9, y: 58.0, scene: "hills", hint: "مدينة على تلال وبيوت بيضا" },
-  { id: "riyadh", city: "الرياض", country: "السعودية", x: 226.7, y: 65.3, scene: "tower", hint: "أبراج وسط صحرا مفتوحة" },
-  { id: "rome", city: "روما", country: "إيطاليا", x: 192.5, y: 48.2, scene: "arena", hint: "مدرّج دائري قديم" },
-  { id: "nairobi", city: "نيروبي", country: "كينيا", x: 216.8, y: 91.3, scene: "savanna", hint: "سهول مفتوحة وأشجار مسطّحة" },
+  { id: "jerusalem", city: "القدس", country: "فلسطين", x: 214.2, y: 58.2, lat: 31.778, lng: 35.235, scene: "dome", hint: "قبّة ذهبية ومدينة على تلال" },
+  { id: "cairo", city: "القاهرة", country: "مصر", x: 208.4, y: 62.8, lat: 30.044, lng: 31.236, scene: "pyramid", hint: "أهرامات ونهر طويل" },
+  { id: "dubai", city: "دبي", country: "الإمارات", x: 235.2, y: 64.5, lat: 25.205, lng: 55.271, scene: "tower", hint: "برج أطول من أي شي حواليه" },
+  { id: "paris", city: "باريس", country: "فرنسا", x: 182.3, y: 42.5, lat: 48.857, lng: 2.352, scene: "lattice", hint: "برج حديدي مشبّك" },
+  { id: "tokyo", city: "طوكيو", country: "اليابان", x: 319.7, y: 54.5, lat: 35.682, lng: 139.76, scene: "neon", hint: "لافتات مضيئة بالليل" },
+  { id: "newyork", city: "نيويورك", country: "أمريكا", x: 105.9, y: 49.3, lat: 40.713, lng: -74.006, scene: "skyline", hint: "ناطحات سحاب وتمثال على جزيرة" },
+  { id: "marrakesh", city: "مراكش", country: "المغرب", x: 172.0, y: 58.5, lat: 31.63, lng: -7.981, scene: "souq", hint: "أسواق بأقواس ومدينة حمرا" },
+  { id: "amman", city: "عمّان", country: "الأردن", x: 215.9, y: 58.0, lat: 31.953, lng: 35.91, scene: "hills", hint: "مدينة على تلال وبيوت بيضا" },
+  { id: "riyadh", city: "الرياض", country: "السعودية", x: 226.7, y: 65.3, lat: 24.714, lng: 46.675, scene: "tower", hint: "أبراج وسط صحرا مفتوحة" },
+  { id: "rome", city: "روما", country: "إيطاليا", x: 192.5, y: 48.2, lat: 41.89, lng: 12.492, scene: "arena", hint: "مدرّج دائري قديم" },
+  { id: "nairobi", city: "نيروبي", country: "كينيا", x: 216.8, y: 91.3, lat: -1.286, lng: 36.817, scene: "savanna", hint: "سهول مفتوحة وأشجار مسطّحة" },
 ];
 
 export const WORLD_LANDMARKS = [
@@ -208,18 +210,18 @@ export const FLAGS = [
 ] as const;
 
 export const DIST_CITIES = [
-  { id: "riyadh", city: "الرياض", country: "السعودية" },
-  { id: "jeddah", city: "جدّة", country: "السعودية" },
-  { id: "cairo", city: "القاهرة", country: "مصر" },
-  { id: "alexandria", city: "الإسكندرية", country: "مصر" },
-  { id: "amman", city: "عمّان", country: "الأردن" },
-  { id: "beirut", city: "بيروت", country: "لبنان" },
-  { id: "dubai", city: "دبي", country: "الإمارات" },
-  { id: "istanbul", city: "إسطنبول", country: "تركيا" },
-  { id: "paris", city: "باريس", country: "فرنسا" },
-  { id: "tokyo", city: "طوكيو", country: "اليابان" },
-  { id: "berlin", city: "برلين", country: "ألمانيا" },
-  { id: "rome", city: "روما", country: "إيطاليا" },
+  { id: "riyadh", city: "الرياض", country: "السعودية", iso: "sa", lat: 24.714, lng: 46.675 },
+  { id: "jeddah", city: "جدّة", country: "السعودية", iso: "sa", lat: 21.543, lng: 39.173 },
+  { id: "cairo", city: "القاهرة", country: "مصر", iso: "eg", lat: 30.044, lng: 31.236 },
+  { id: "alexandria", city: "الإسكندرية", country: "مصر", iso: "eg", lat: 31.2, lng: 29.919 },
+  { id: "amman", city: "عمّان", country: "الأردن", iso: "jo", lat: 31.945, lng: 35.928 },
+  { id: "beirut", city: "بيروت", country: "لبنان", iso: "lb", lat: 33.894, lng: 35.502 },
+  { id: "dubai", city: "دبي", country: "الإمارات", iso: "ae", lat: 25.205, lng: 55.271 },
+  { id: "istanbul", city: "إسطنبول", country: "تركيا", iso: "tr", lat: 41.008, lng: 28.978 },
+  { id: "paris", city: "باريس", country: "فرنسا", iso: "fr", lat: 48.857, lng: 2.352 },
+  { id: "tokyo", city: "طوكيو", country: "اليابان", iso: "jp", lat: 35.676, lng: 139.65 },
+  { id: "berlin", city: "برلين", country: "ألمانيا", iso: "de", lat: 52.52, lng: 13.405 },
+  { id: "rome", city: "روما", country: "إيطاليا", iso: "it", lat: 41.903, lng: 12.496 },
 ];
 
 const DIST: Record<string, number> = {

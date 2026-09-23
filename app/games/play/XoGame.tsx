@@ -11,7 +11,8 @@ import {
   type XoMark,
   verdictFromScore,
 } from "../../../lib/games/play/engine";
-import { writeBestIfHigher } from "../../../lib/games/play/scores";
+import { writeBestIfHigher, readBest } from "../../../lib/games/play/scores";
+import { useBoardScrollLock } from "./boardPointer";
 import {
   PlayHowTo,
   PlayPanel,
@@ -36,7 +37,10 @@ export default function XoGame() {
   const [sessionDone, setSessionDone] = useState(false);
   const [turnLabel, setTurnLabel] = useState<TranslationKey>("games.yourTurn");
   const busyRef = useRef(false);
-  const boardRef = useRef<XoMark[]>(EMPTY);
+  const boardRef = useRef<HTMLDivElement | null>(null);
+  const boardMarks = useRef<XoMark[]>(EMPTY);
+  const [isBest, setIsBest] = useState(false);
+  useBoardScrollLock(boardRef, ready && !sessionDone);
 
   const paintWin = (marks: XoMark[]) => {
     const result = xoWinner(marks);
@@ -79,14 +83,14 @@ export default function XoGame() {
   };
 
   const play = (index: number) => {
-    if (!ready || over || sessionDone || busyRef.current || boardRef.current[index]) {
+    if (!ready || over || sessionDone || busyRef.current || boardMarks.current[index]) {
       return;
     }
     busyRef.current = true;
-    const afterYou: XoMark[] = boardRef.current.map((cell, i) =>
+    const afterYou: XoMark[] = boardMarks.current.map((cell, i) =>
       i === index ? "X" : cell
     );
-    boardRef.current = afterYou;
+    boardMarks.current = afterYou;
     setBoard(afterYou);
     sfx.flip();
     if (paintWin(afterYou)) return;
@@ -96,7 +100,7 @@ export default function XoGame() {
       return;
     }
     const afterCpu: XoMark[] = afterYou.map((cell, i) => (i === cpu ? "O" : cell));
-    boardRef.current = afterCpu;
+    boardMarks.current = afterCpu;
     setBoard(afterCpu);
     paintWin(afterCpu);
   };
@@ -104,11 +108,13 @@ export default function XoGame() {
   const newRound = () => {
     const played = wins + draws + losses;
     if (played >= 5) {
+      const previous = readBest("xo") ?? 0;
       writeBestIfHigher("xo", score);
+      setIsBest(score > previous);
       setSessionDone(true);
       return;
     }
-    boardRef.current = EMPTY;
+    boardMarks.current = EMPTY;
     busyRef.current = false;
     setBoard(EMPTY);
     setOver(false);
@@ -118,7 +124,7 @@ export default function XoGame() {
   };
 
   const restart = () => {
-    boardRef.current = EMPTY;
+    boardMarks.current = EMPTY;
     busyRef.current = false;
     setBoard(EMPTY);
     setOver(false);
@@ -128,6 +134,7 @@ export default function XoGame() {
     setLosses(0);
     setScore(0);
     setSessionDone(false);
+    setIsBest(false);
     setTurnLabel("games.yourTurn");
     keepReadyOnReplay();
   };
@@ -157,12 +164,18 @@ export default function XoGame() {
         onToggleHelp={toggleHelp}
       >
         {howTo}
-        <PlayResult
-          score={score}
-          verdictKey={verdictFromScore("high", score)}
-          detail={`${formatPlayNumber(locale, wins)} ${t("games.wins")} · ${formatPlayNumber(locale, draws)} ${t("games.draws")} · ${formatPlayNumber(locale, losses)} ${t("games.losses")}`}
-          onAgain={restart}
-        />
+        <div className={isBest ? "um-play-best" : "um-play-celebrate"}>
+          <PlayResult
+            score={score}
+            verdictKey={verdictFromScore("high", score)}
+            detail={
+              isBest
+                ? t("games.localBest", { values: { score: formatPlayNumber(locale, score) } })
+                : `${formatPlayNumber(locale, wins)} ${t("games.wins")} · ${formatPlayNumber(locale, draws)} ${t("games.draws")} · ${formatPlayNumber(locale, losses)} ${t("games.losses")}`
+            }
+            onAgain={restart}
+          />
+        </div>
       </PlayPanel>
     );
   }
@@ -183,7 +196,7 @@ export default function XoGame() {
     >
       {howTo}
       <div className="um-play-turn">{t(turnLabel)}</div>
-      <div className="um-play-xo um-play-board" dir="ltr" data-board-dir="ltr">
+      <div ref={boardRef} className="um-play-xo um-play-board um-lit-board" dir="ltr" data-board-dir="ltr">
         {board.map((mark, index) => (
           <button
             key={index}

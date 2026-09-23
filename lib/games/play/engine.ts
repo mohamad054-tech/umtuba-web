@@ -3,6 +3,8 @@
  * No inline scripts, no Google Fonts, no cloud scores.
  */
 
+import { readGameMuted } from "./theme";
+
 export const PLAY_FIELD = "#0A1028";
 export const PLAY_SURFACE = "#12182F";
 export const PLAY_RAISE = "#1A2140";
@@ -97,6 +99,7 @@ export function createPlaySfx() {
 
   const tone = (frequency: number, ms: number, type: OscillatorType = "sine") => {
     try {
+      if (readGameMuted()) return;
       const ctx = getContext();
       if (!ctx) return;
       const osc = ctx.createOscillator();
@@ -267,6 +270,89 @@ export type SnakePoint = { x: number; y: number };
 
 export function snakeKey(point: SnakePoint): string {
   return `${point.x},${point.y}`;
+}
+
+export function snakeHeading(direction: Dir4): SnakePoint {
+  if (direction === "left") return { x: -1, y: 0 };
+  if (direction === "right") return { x: 1, y: 0 };
+  if (direction === "up") return { x: 0, y: -1 };
+  return { x: 0, y: 1 };
+}
+
+export function snakeDirAngle(direction: Dir4): number {
+  if (direction === "right") return 0;
+  if (direction === "down") return Math.PI / 2;
+  if (direction === "left") return Math.PI;
+  return -Math.PI / 2;
+}
+
+export function snakeDirsOpposite(a: Dir4, b: Dir4): boolean {
+  return (
+    (a === "left" && b === "right") ||
+    (a === "right" && b === "left") ||
+    (a === "up" && b === "down") ||
+    (a === "down" && b === "up")
+  );
+}
+
+/** Larger axis wins. A tap beside the head and a short swipe both use this. */
+export function snakeDirFromDelta(dx: number, dy: number): Dir4 | null {
+  if (dx === 0 && dy === 0) return null;
+  if (Math.abs(dx) >= Math.abs(dy)) return dx > 0 ? "right" : dx < 0 ? "left" : dy > 0 ? "down" : "up";
+  return dy > 0 ? "down" : "up";
+}
+
+export type SnakeTurnQueue = {
+  dir: Dir4;
+  pending: Dir4;
+  extra: Dir4 | null;
+};
+
+/**
+ * Accepts the next turn immediately, plus one extra turn so a fast second
+ * swipe is kept. A turn straight back into the body is ignored.
+ */
+export function queueSnakeTurn(queue: SnakeTurnQueue, next: Dir4): SnakeTurnQueue {
+  const facing = queue.extra ?? queue.pending;
+  if (next === facing || snakeDirsOpposite(facing, next)) return queue;
+  if (queue.extra == null && queue.pending === queue.dir) {
+    return { ...queue, pending: next };
+  }
+  if (queue.extra == null) return { ...queue, extra: next };
+  return queue;
+}
+
+export function consumeSnakeTurn(queue: SnakeTurnQueue): SnakeTurnQueue {
+  const dir = queue.pending;
+  if (queue.extra) return { dir, pending: queue.extra, extra: null };
+  return { dir, pending: dir, extra: null };
+}
+
+/**
+ * Head eases toward the next cell and the tail eases off the last cell,
+ * so the tube slides instead of jumping. A turn still follows the cells.
+ * While eating, the tail stays put so the snake grows.
+ */
+export function snakeVisualChain(
+  body: readonly SnakePoint[],
+  direction: Dir4,
+  progress: number,
+  eating = false
+): SnakePoint[] {
+  const head = body[0] ?? { x: 8, y: 8 };
+  const step = Math.min(1, Math.max(0, progress));
+  const rest = body.map((point) => ({ x: point.x, y: point.y }));
+  if (step < 0.001) return rest;
+  const heading = snakeHeading(direction);
+  const ahead = { x: head.x + heading.x * step, y: head.y + heading.y * step };
+  if (eating || rest.length < 2) return [ahead, ...rest];
+  const tail = rest[rest.length - 1]!;
+  const before = rest[rest.length - 2]!;
+  const tip = {
+    x: tail.x + (before.x - tail.x) * step,
+    y: tail.y + (before.y - tail.y) * step,
+  };
+  return [ahead, ...rest.slice(0, -1), tip];
 }
 
 export function stepSnake(
@@ -494,4 +580,30 @@ export function unoCpuIndex(
   if (action != null) return action;
   const color = legal.find((index) => hand[index]?.c === top.c);
   return color ?? legal[0] ?? -1;
+}
+
+/** Extra full turns, then stop so slice `index` sits under a top pointer. */
+export function wheelStopAngle(
+  current: number,
+  index: number,
+  count: number,
+  extraTurns = 5
+): number {
+  if (count <= 0) return current;
+  const slice = 360 / count;
+  const center = index * slice + slice / 2;
+  const norm = ((current % 360) + 360) % 360;
+  const target = (360 - center) % 360;
+  let delta = target - norm;
+  if (delta < 0) delta += 360;
+  return current + delta + 360 * extraTurns;
+}
+
+/** Which slice is under a pointer fixed at the top after `angle` degrees of clockwise rotation. */
+export function wheelIndexAt(angle: number, count: number): number {
+  if (count <= 0) return 0;
+  const slice = 360 / count;
+  const norm = ((angle % 360) + 360) % 360;
+  const pointerOffset = (360 - norm) % 360;
+  return Math.floor(pointerOffset / slice) % count;
 }

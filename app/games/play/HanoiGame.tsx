@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useI18n } from "../../components/i18n";
 import {
   createPlaySfx,
@@ -8,7 +8,8 @@ import {
   hanoiCanPlace,
   verdictFromScore,
 } from "../../../lib/games/play/engine";
-import { writeBestIfHigher } from "../../../lib/games/play/scores";
+import { writeBestIfHigher, readBest } from "../../../lib/games/play/scores";
+import { useBoardScrollLock } from "./boardPointer";
 import {
   PlayHowTo,
   PlayPanel,
@@ -29,6 +30,10 @@ export default function HanoiGame() {
   const [moves, setMoves] = useState(0);
   const [done, setDone] = useState(false);
   const [score, setScore] = useState(0);
+  const [isBest, setIsBest] = useState(false);
+  const boardRef = useRef<HTMLDivElement | null>(null);
+  const dragRef = useRef<{ x: number; y: number; peg: number } | null>(null);
+  const skipClick = useRef(false);
 
   const restart = () => {
     setPegs(START.map((peg) => [...peg]));
@@ -36,7 +41,37 @@ export default function HanoiGame() {
     setMoves(0);
     setDone(false);
     setScore(0);
+    setIsBest(false);
     keepReadyOnReplay();
+  };
+
+  const moveDisc = (fromIndex: number, pegIndex: number) => {
+    if (!ready || done || fromIndex === pegIndex) return;
+    const from = pegs[fromIndex] ?? [];
+    const to = pegs[pegIndex] ?? [];
+    const disc = from[from.length - 1];
+    if (disc == null || !hanoiCanPlace(to[to.length - 1], disc)) {
+      sfx.no();
+      setSelected(null);
+      return;
+    }
+    const next = pegs.map((peg) => [...peg]);
+    next[fromIndex] = from.slice(0, -1);
+    next[pegIndex] = [...to, disc];
+    const nextMoves = moves + 1;
+    setPegs(next);
+    setMoves(nextMoves);
+    setSelected(null);
+    sfx.ok();
+    if ((next[2] ?? []).length === DISCS) {
+      const pts = Math.max(80, 500 - (nextMoves - 15) * 12);
+      const previous = readBest("hanoi") ?? 0;
+      setScore(pts);
+      setIsBest(pts > previous);
+      writeBestIfHigher("hanoi", pts);
+      setDone(true);
+      sfx.win();
+    }
   };
 
   const tap = (pegIndex: number) => {
@@ -51,30 +86,46 @@ export default function HanoiGame() {
       setSelected(null);
       return;
     }
-    const from = pegs[selected] ?? [];
-    const to = pegs[pegIndex] ?? [];
-    const disc = from[from.length - 1];
-    if (disc == null || !hanoiCanPlace(to[to.length - 1], disc)) {
-      sfx.no();
-      setSelected(null);
-      return;
-    }
-    const next = pegs.map((peg) => [...peg]);
-    next[selected] = from.slice(0, -1);
-    next[pegIndex] = [...to, disc];
-    const nextMoves = moves + 1;
-    setPegs(next);
-    setMoves(nextMoves);
-    setSelected(null);
-    sfx.ok();
-    if ((next[2] ?? []).length === DISCS) {
-      const pts = Math.max(80, 500 - (nextMoves - 15) * 12);
-      setScore(pts);
-      writeBestIfHigher("hanoi", pts);
-      setDone(true);
-      sfx.win();
-    }
+    moveDisc(selected, pegIndex);
   };
+
+  const moveRef = useRef(moveDisc);
+  useEffect(() => {
+    moveRef.current = moveDisc;
+  });
+
+  useBoardScrollLock(boardRef, ready && !done);
+
+  useEffect(() => {
+    const element = boardRef.current;
+    if (!element || !ready || done) return;
+    const onDown = (event: PointerEvent) => {
+      const peg = (event.target as HTMLElement | null)?.closest("[data-hanoi-peg]");
+      if (!peg || !element.contains(peg)) return;
+      const index = [...element.querySelectorAll("[data-hanoi-peg]")].indexOf(peg);
+      if (index < 0) return;
+      dragRef.current = { x: event.clientX, y: event.clientY, peg: index };
+    };
+    const onUp = (event: PointerEvent) => {
+      const start = dragRef.current;
+      dragRef.current = null;
+      if (!start) return;
+      if (Math.hypot(event.clientX - start.x, event.clientY - start.y) < 10) return;
+      const hit = document.elementFromPoint(event.clientX, event.clientY);
+      const peg = hit?.closest("[data-hanoi-peg]");
+      if (!peg || !element.contains(peg)) return;
+      const index = [...element.querySelectorAll("[data-hanoi-peg]")].indexOf(peg);
+      if (index < 0 || index === start.peg) return;
+      skipClick.current = true;
+      moveRef.current(start.peg, index);
+    };
+    element.addEventListener("pointerdown", onDown);
+    element.addEventListener("pointerup", onUp);
+    return () => {
+      element.removeEventListener("pointerdown", onDown);
+      element.removeEventListener("pointerup", onUp);
+    };
+  }, [done, ready]);
 
   if (done) {
     return (
@@ -89,12 +140,18 @@ export default function HanoiGame() {
           cta="gotIt"
           onDismiss={dismissHelp}
         />
-        <PlayResult
-          score={score}
-          verdictKey={verdictFromScore("moves", moves)}
-          detail={`${formatPlayNumber(locale, moves)} ${t("games.moves")}`}
-          onAgain={restart}
-        />
+        <div className={isBest ? "um-play-best" : "um-play-celebrate"}>
+          <PlayResult
+            score={score}
+            verdictKey={verdictFromScore("moves", moves)}
+            detail={
+              isBest
+                ? t("games.localBest", { values: { score: formatPlayNumber(locale, score) } })
+                : `${formatPlayNumber(locale, moves)} ${t("games.moves")}`
+            }
+            onAgain={restart}
+          />
+        </div>
       </PlayPanel>
     );
   }
@@ -116,14 +173,20 @@ export default function HanoiGame() {
         cta={ready ? "gotIt" : "start"}
         onDismiss={dismissHelp}
       />
-      <div className="um-play-hanoi um-play-board" dir="ltr">
+      <div ref={boardRef} className="um-play-hanoi um-play-board um-lit-board" dir="ltr">
         {pegs.map((stack, pegIndex) => (
           <button
             key={pegIndex}
             type="button"
             className={`um-play-peg${selected === pegIndex ? " sel" : ""}`}
             data-hanoi-peg="true"
-            onClick={() => tap(pegIndex)}
+            onClick={() => {
+              if (skipClick.current) {
+                skipClick.current = false;
+                return;
+              }
+              tap(pegIndex);
+            }}
             aria-label={t("games.peg", { values: { n: pegIndex + 1 } })}
           >
             {stack.map((disc) => (
