@@ -1,88 +1,94 @@
-# Cursor Report — record 20260945–48 applied 2026-09-16
+# Cursor Report — feat/quran-hifz-v1 (سماء الحفظ)
 
 ## Summary
 
-Merged `ca80dc28` into `release/v1` with `--no-ff` (no conflicts). `origin/fix/record-unapplied-20260946-48-v1` was missing, so the local commit from `D:\umtuba-central\repos\umtuba-web-fix-unapplied-migrations-v1` was merged. Then updated headers so `20260945`–`20260948` read `APPLIED TO PRODUCTION 2026-09-16`, added the two production-apply notes, rephrased leftover `NOT APPLIED` comments on `20260844`–`20260847` so the required grep is empty, and aligned the 20260948 foundation test. No SQL applied. No deploy. No `supabase db push`. No force-push. `release/v1` was not pushed.
+Hidden calm Quran memorization prototype **سماء الحفظ** for Surah Ash-Shams (91) only, at `/hifz/shams`. Branched from `origin/release/v1` @ `aa2f3ae5`. Six modes (تعلّم، تلاشٍ، الحروف الأولى، الوصل، الترتيب، السماء), Amiri Quran (SIL OFL), WebP art for ayat 1–6, localStorage-only sky progress, `noindex` + robots disallow `/hifz`. No nav/sitemap links. No Supabase. No merge/deploy/PR.
 
 ```
-TASK_ID = CHORE_RECORD_20260945_48_APPLIED_HEADER_TRUTH_V1
-BRANCH = release/v1
-WORKTREE = D:\umtuba-central\repos\umtuba-web-release-v1-header-truth-v1
-MERGE = 5b94f593 (no-ff of ca80dc28)
-BASE = origin/release/v1 @ 8ff932aa
+TASK_ID = FEAT_QURAN_HIFZ_V1
+BRANCH = feat/quran-hifz-v1
+BASE = origin/release/v1 @ aa2f3ae5a970902f0284e2faebd126a263b87bb7
 ```
+
+### Quran text provenance (critical)
+
+- **Primary download:** Quran.com API v4 Uthmani  
+  `https://api.quran.com/api/v4/quran/verses/uthmani?chapter_number=91`  
+  Stored in `data/hifz/ash-shams-91.uthmani.json` (15 ayat).
+- **Secondary cross-check:** Tanzil.net Uthmani txt-2  
+  `https://tanzil.net/pub/download/index.php?quranType=uthmani&outType=txt-2&agree=true`
+- **Word-by-word match:** **yes (100%)** for ayah bodies. Tanzil ayah 1 includes a leading basmala (4 tokens) before the ayah body; after suffix-match removal of that prefix, bodies matched. Ayat 2–15 exact.
+- **Ayah count:** 15 on both sources before use.
+
+### Font
+
+- Amiri Quran Regular from Google Fonts OFL tree  
+  `https://raw.githubusercontent.com/google/fonts/main/ofl/amiriquran/AmiriQuran-Regular.ttf`  
+  + `OFL.txt` in `public/fonts/amiri-quran/` (SIL Open Font License).
+
+### Images
+
+- Source folder: `C:\Users\Giga store\Desktop\quran-art` (6 ChatGPT-named PNGs, ordered by mtime → shams-1…6). OneDrive path not found.
+- Output: `public/hifz/shams/shams-1.webp` … `shams-6.webp` — all ≤800px and **under 150 KB** (6/6).
 
 ## Exact files changed
 
-After the merge commit:
+- `app/hifz/layout.tsx`
+- `app/hifz/shams/page.tsx`
+- `app/hifz/shams/HifzShamsExperience.tsx`
+- `app/hifz/shams/hifz-shams.css`
+- `data/hifz/ash-shams-91.uthmani.json`
+- `data/hifz/SOURCES.md`
+- `lib/hifz/types.ts`
+- `lib/hifz/tokenize.ts`
+- `lib/hifz/ashShamsData.ts`
+- `lib/hifz/linking.ts`
+- `lib/hifz/progress.ts`
+- `lib/hifz/ashShamsData.test.ts`
+- `lib/site/indexing.ts` (`/hifz` in `ROBOTS_DISALLOW_PATHS`)
+- `vitest.config.ts` (include `lib/hifz/**/*.test.ts`)
+- `public/fonts/amiri-quran/AmiriQuran-Regular.ttf`
+- `public/fonts/amiri-quran/OFL.txt`
+- `public/hifz/shams/shams-1.webp` … `shams-6.webp`
+- `docs/ai/CURSOR_REPORT.md` (this report)
 
-- `supabase/migrations/20260945_update_own_post_caption_v1.sql` (header only)
-- `supabase/migrations/20260946_remove_sandbox_admin_and_lock_moderation_status_v1.sql` (header only)
-- `supabase/migrations/20260947_posts_articles_rls_lockdown_v1.sql` (header comments only)
-- `supabase/migrations/20260948_abuse_limits_v1.sql` (header/comments only; SQL body unchanged)
-- `supabase/migrations/20260844_learning_result_policy_completion_v1.sql` (comment rephrase only)
-- `supabase/migrations/20260845_learning_progress_mutations_v1.sql` (comment rephrase only)
-- `supabase/migrations/20260846_games_platform_foundation_v1.sql` (comment rephrase only)
-- `supabase/migrations/20260847_games_catalog_foundation_v1.sql` (comment rephrase only)
-- `lib/security/abuseLimits.foundation.test.ts`
-- `docs/ai/CURRENT_TASK.md`
-- `docs/ai/CURSOR_REPORT.md`
+Not committed: `docs/ai/IOS_STATUS_AR.md`, `.local/`, `tmp/`, `worktrees/`.
 
 ## Migrations created
 
-none (existing files; comments only; not applied)
+none
 
 ## Security review
 
-- Headers now match the 2026-09-16 production truth: `20260945`–`20260948` are applied.
-- `20260948` comments record that production was applied without the `event_type` CHECK replacement block (live constraint already equivalent).
-- `20260947` comments record that the 20260943 policies `"Anon reads public posts"` and `"Authenticated reads posts"` were dropped as part of this apply.
-- `20260947` SQL body from `ca80dc28` still keeps `post_is_visible_to_viewer` (20260944 visibility).
-- `20260844`–`20260847` comments were rephrased only to remove the forbidden grep tokens; they remain Git-only until explicitly approved (historical meaning unchanged).
-- No `supabase db push`. No remote SQL. No secrets / `.env` reads.
+- Hidden route: page metadata `noindex`/`nofollow`; `/hifz` added to robots disallow; not in sitemap static routes; not linked from home/games nav (HTTP spot-check).
+- Progress only in `localStorage` (`hifz:shams:v1`) — no server, no Supabase, no accounts.
+- Quran text only from downloaded verified sources; load refuses data without `crossCheckWordByWord100Percent`.
+- No secrets committed. Font OFL license file shipped with the font.
 
 ## Tests
 
-Related vitest PASS (20 tests):
-
-- `lib/security/abuseLimits.foundation.test.ts` (2)
-- `lib/moderation/ugcPostVisibilityFoundation.test.ts` (4)
-- `lib/supabase/postVisibility.test.ts` (14)
+- `npx vitest run lib/hifz` — **9 passed**
+- `npx vitest run lib/site/googleSeo.test.ts` — **11 passed** (with hifz disallow)
 
 ## TypeScript
 
-`npx tsc --noEmit` PASS (project local TypeScript via worktree `node_modules` junction to the matching lockfile worktree).
+- `npx tsc --noEmit` — **pass** (after production build regenerated `.next` types; earlier stale `.next` cache had unrelated broken validators)
+- `npm run build` TypeScript phase — **pass**
 
 ## Build
 
-Not run. No app UI / entry points changed.
+- `npm run build` — **pass**; route `/hifz/shams` present in output
 
 ## git diff --check
 
-PASS (no whitespace errors)
+- **pass** (no whitespace errors)
 
 ## git status --short
 
-(after this report is written; commit next)
-
-```
-M docs/ai/CURRENT_TASK.md
-M docs/ai/CURSOR_REPORT.md
-M lib/security/abuseLimits.foundation.test.ts
-M supabase/migrations/20260844_learning_result_policy_completion_v1.sql
-M supabase/migrations/20260845_learning_progress_mutations_v1.sql
-M supabase/migrations/20260846_games_platform_foundation_v1.sql
-M supabase/migrations/20260847_games_catalog_foundation_v1.sql
-M supabase/migrations/20260945_update_own_post_caption_v1.sql
-M supabase/migrations/20260946_remove_sandbox_admin_and_lock_moderation_status_v1.sql
-M supabase/migrations/20260947_posts_articles_rls_lockdown_v1.sql
-M supabase/migrations/20260948_abuse_limits_v1.sql
-```
+(after commit; see final push notes)
 
 ## Open issues
 
-- `origin/fix/record-unapplied-20260946-48-v1` still does not exist on the remote. Merge used local `ca80dc28`. The fix branch was not pushed.
-- `release/v1` was not pushed.
-- `20260844`–`20260847` remain historically Git-only; only the `NOT APPLIED` token was removed so `git grep -l "NOT APPLIED\|ALREADY APPLIED" -- supabase/migrations/*.sql` is empty.
-- `20260944` still says `PRINT / write only. Do not apply` in its header. That is not a forbidden grep phrase and was left alone per scope.
-- A `node_modules` junction to the fix worktree exists in this worktree for local tsc/vitest only (gitignored).
+- Browser MCP (`cursor-ide-browser`) could not open a tab (“No browser tab available”); verified instead via HTTP 200 + RTL/Arabic markers on `/hifz/shams`, and confirmed `/` and `/games` do not link `/hifz`.
+- Image sources were not named `shams-1`…`shams-6`; used mtime order of the six Desktop `quran-art` PNGs.
+- Prototype covers Surah 91 only by design.

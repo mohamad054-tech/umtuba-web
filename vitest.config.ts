@@ -50,6 +50,7 @@ export default defineConfig({
       "lib/articles/**/*.test.ts",
       "lib/content/**/*.test.ts",
       "lib/games/**/*.test.ts",
+      "lib/hifz/**/*.test.ts",
       "platforms/core/**/*.test.ts",
       "app/watch/**/*.test.ts",
       "app/life/**/*.test.ts",

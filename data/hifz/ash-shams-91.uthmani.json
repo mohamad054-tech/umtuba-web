@@ -1,0 +1,99 @@
+{
+  "surah": 91,
+  "transliteration": "Ash-Shams",
+  "ayahCount": 15,
+  "script": "Uthmani",
+  "sources": [
+    {
+      "role": "primary",
+      "name": "Quran.com API v4 — Uthmani verses",
+      "url": "https://api.quran.com/api/v4/quran/verses/uthmani?chapter_number=91",
+      "downloadedFile": "tmp/hifz/qurancom-91.json"
+    },
+    {
+      "role": "secondary_cross_check",
+      "name": "Tanzil.net Uthmani (txt-2, quranType=uthmani)",
+      "url": "https://tanzil.net/pub/download/index.php?quranType=uthmani&outType=txt-2&agree=true",
+      "note": "Ayah 1 on Tanzil includes a leading basmala (4 whitespace tokens) before the ayah body; ayah body matched Quran.com exactly. Ayat 2–15 matched exactly after whitespace normalize."
+    }
+  ],
+  "crossCheckWordByWord100Percent": true,
+  "downloadedAtUtc": "2026-09-23T07:50:36.130Z",
+  "ayat": [
+    {
+      "number": 1,
+      "text": "وَٱلشَّمْسِ وَضُحَىٰهَا",
+      "verseKey": "91:1"
+    },
+    {
+      "number": 2,
+      "text": "وَٱلْقَمَرِ إِذَا تَلَىٰهَا",
+      "verseKey": "91:2"
+    },
+    {
+      "number": 3,
+      "text": "وَٱلنَّهَارِ إِذَا جَلَّىٰهَا",
+      "verseKey": "91:3"
+    },
+    {
+      "number": 4,
+      "text": "وَٱلَّيْلِ إِذَا يَغْشَىٰهَا",
+      "verseKey": "91:4"
+    },
+    {
+      "number": 5,
+      "text": "وَٱلسَّمَآءِ وَمَا بَنَىٰهَا",
+      "verseKey": "91:5"
+    },
+    {
+      "number": 6,
+      "text": "وَٱلْأَرْضِ وَمَا طَحَىٰهَا",
+      "verseKey": "91:6"
+    },
+    {
+      "number": 7,
+      "text": "وَنَفْسٍ وَمَا سَوَّىٰهَا",
+      "verseKey": "91:7"
+    },
+    {
+      "number": 8,
+      "text": "فَأَلْهَمَهَا فُجُورَهَا وَتَقْوَىٰهَا",
+      "verseKey": "91:8"
+    },
+    {
+      "number": 9,
+      "text": "قَدْ أَفْلَحَ مَن زَكَّىٰهَا",
+      "verseKey": "91:9"
+    },
+    {
+      "number": 10,
+      "text": "وَقَدْ خَابَ مَن دَسَّىٰهَا",
+      "verseKey": "91:10"
+    },
+    {
+      "number": 11,
+      "text": "كَذَّبَتْ ثَمُودُ بِطَغْوَىٰهَآ",
+      "verseKey": "91:11"
+    },
+    {
+      "number": 12,
+      "text": "إِذِ ٱنۢبَعَثَ أَشْقَىٰهَا",
+      "verseKey": "91:12"
+    },
+    {
+      "number": 13,
+      "text": "فَقَالَ لَهُمْ رَسُولُ ٱللَّهِ نَاقَةَ ٱللَّهِ وَسُقْيَـٰهَا",
+      "verseKey": "91:13"
+    },
+    {
+      "number": 14,
+      "text": "فَكَذَّبُوهُ فَعَقَرُوهَا فَدَمْدَمَ عَلَيْهِمْ رَبُّهُم بِذَنۢبِهِمْ فَسَوَّىٰهَا",
+      "verseKey": "91:14"
+    },
+    {
+      "number": 15,
+      "text": "وَلَا يَخَافُ عُقْبَـٰهَا",
+      "verseKey": "91:15"
+    }
+  ]
+}
