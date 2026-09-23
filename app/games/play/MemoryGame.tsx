@@ -20,7 +20,72 @@ import {
   usePlayHelp,
 } from "./PlayChrome";
 
-const FACES = ["🌿", "🕌", "🏔️", "🌊", "🪁", "🎻", "🫖", "🧭"];
+const FACES = ["lamp", "bloom", "wave", "peak", "kite", "compass", "drop", "star"] as const;
+
+function MemoryGlyph({ face }: { face: string }) {
+  if (face === "lamp") {
+    return (
+      <svg viewBox="0 0 64 64" className="um-mem-glyph" aria-hidden="true">
+        <path d="M32 8c-8 8-12 16-8 24h16c4-8 0-16-8-24z" />
+        <path d="M24 36h16v4H24zM28 42h8v6h-8z" />
+      </svg>
+    );
+  }
+  if (face === "bloom") {
+    return (
+      <svg viewBox="0 0 64 64" className="um-mem-glyph" aria-hidden="true">
+        <circle cx="32" cy="18" r="8" />
+        <circle cx="32" cy="46" r="8" />
+        <circle cx="18" cy="32" r="8" />
+        <circle cx="46" cy="32" r="8" />
+        <circle cx="32" cy="32" r="5" />
+      </svg>
+    );
+  }
+  if (face === "wave") {
+    return (
+      <svg viewBox="0 0 64 64" className="um-mem-glyph" aria-hidden="true">
+        <path fill="none" d="M8 28c6 0 6-8 12-8s6 8 12 8 6-8 12-8 6 8 12 8" />
+        <path fill="none" d="M8 42c6 0 6-8 12-8s6 8 12 8 6-8 12-8 6 8 12 8" />
+      </svg>
+    );
+  }
+  if (face === "peak") {
+    return (
+      <svg viewBox="0 0 64 64" className="um-mem-glyph" aria-hidden="true">
+        <path d="M6 50 L26 16 L36 34 L44 22 L58 50 Z" />
+      </svg>
+    );
+  }
+  if (face === "kite") {
+    return (
+      <svg viewBox="0 0 64 64" className="um-mem-glyph" aria-hidden="true">
+        <path d="M32 6 L52 32 L32 46 L12 32 Z" />
+        <path fill="none" d="M32 46 L38 58" />
+      </svg>
+    );
+  }
+  if (face === "compass") {
+    return (
+      <svg viewBox="0 0 64 64" className="um-mem-glyph" aria-hidden="true">
+        <circle cx="32" cy="32" r="20" fill="none" />
+        <path d="M32 16 L38 32 L32 48 L26 32 Z" />
+      </svg>
+    );
+  }
+  if (face === "drop") {
+    return (
+      <svg viewBox="0 0 64 64" className="um-mem-glyph" aria-hidden="true">
+        <path d="M32 8c10 14 16 22 16 30a16 16 0 1 1-32 0c0-8 6-16 16-30z" />
+      </svg>
+    );
+  }
+  return (
+    <svg viewBox="0 0 64 64" className="um-mem-glyph" aria-hidden="true">
+      <path d="M32 6l6 16h16l-12 10 5 16-15-10-15 10 5-16L10 22h16z" />
+    </svg>
+  );
+}
 
 type Card = { id: number; face: string; up: boolean; done: boolean };
 
@@ -132,6 +197,7 @@ export default function MemoryGame() {
   if (done) {
     return (
     <PlayPanel
+      fill
       stats={
         <>
           <PlayStat label={t("games.moves")} value={formatPlayNumber(locale, moves)} />
@@ -165,6 +231,7 @@ export default function MemoryGame() {
 
   return (
     <PlayPanel
+      fill
       stats={
         <>
           <PlayStat label={t("games.moves")} value={formatPlayNumber(locale, moves)} />
@@ -185,6 +252,7 @@ export default function MemoryGame() {
         onDismiss={begin}
       />
       {cards.length > 0 ? (
+        <div className="um-fit-slot">
         <div ref={boardRef} className="um-play-memgrid um-play-board um-lit-board" dir="ltr" data-mem-board="true">
           {cards.map((card, index) => (
             <button
@@ -196,13 +264,22 @@ export default function MemoryGame() {
               aria-label={card.up || card.done ? card.face : t("games.cardFacedown")}
             >
               <span className="um-play-mem-inner">
-                <span className="um-play-mem-face um-play-mem-back" data-mem-face="back" />
+                <span className="um-play-mem-face um-play-mem-back" data-mem-face="back">
+                  <svg viewBox="0 0 64 64" className="um-mem-back-mark" aria-hidden="true">
+                    <circle cx="32" cy="16" r="7" />
+                    <circle cx="32" cy="48" r="7" />
+                    <circle cx="16" cy="32" r="7" />
+                    <circle cx="48" cy="32" r="7" />
+                    <circle cx="32" cy="32" r="4" />
+                  </svg>
+                </span>
                 <span className="um-play-mem-face um-play-mem-front" data-mem-face="front">
-                  {card.face}
+                  <MemoryGlyph face={card.face} />
                 </span>
               </span>
             </button>
           ))}
+        </div>
         </div>
       ) : null}
       {ready ? (

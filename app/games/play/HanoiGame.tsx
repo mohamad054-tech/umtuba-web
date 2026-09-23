@@ -46,7 +46,7 @@ export default function HanoiGame() {
   };
 
   const moveDisc = (fromIndex: number, pegIndex: number) => {
-    if (!ready || done || fromIndex === pegIndex) return;
+    if (done || fromIndex === pegIndex) return;
     const from = pegs[fromIndex] ?? [];
     const to = pegs[pegIndex] ?? [];
     const disc = from[from.length - 1];
@@ -75,7 +75,8 @@ export default function HanoiGame() {
   };
 
   const tap = (pegIndex: number) => {
-    if (!ready || done) return;
+    if (done) return;
+    if (!ready) dismissHelp();
     if (selected == null) {
       if ((pegs[pegIndex] ?? []).length === 0) return;
       setSelected(pegIndex);
@@ -98,8 +99,9 @@ export default function HanoiGame() {
 
   useEffect(() => {
     const element = boardRef.current;
-    if (!element || !ready || done) return;
+    if (!element || done) return;
     const onDown = (event: PointerEvent) => {
+      if (!ready) dismissHelp();
       const peg = (event.target as HTMLElement | null)?.closest("[data-hanoi-peg]");
       if (!peg || !element.contains(peg)) return;
       const index = [...element.querySelectorAll("[data-hanoi-peg]")].indexOf(peg);

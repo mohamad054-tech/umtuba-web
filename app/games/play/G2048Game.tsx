@@ -27,6 +27,7 @@ type Tile = {
   row: number;
   col: number;
   born: boolean;
+  merged: boolean;
 };
 
 function keyToDir(key: string): Dir4 | null {
@@ -58,6 +59,7 @@ function tilesFromBoard(board: readonly number[], nextId: { n: number }): Tile[]
       row: Math.floor(index / 4),
       col: index % 4,
       born: true,
+      merged: false,
     });
     nextId.n += 1;
   });
@@ -85,11 +87,11 @@ function slideTiles(tiles: readonly Tile[], direction: Dir4): { tiles: Tile[]; g
       const current = compact[cursor]!;
       const upcoming = compact[cursor + 1];
       if (upcoming && current.value === upcoming.value) {
-        placed.push({ ...current, value: current.value * 2, born: false });
+        placed.push({ ...current, value: current.value * 2, born: false, merged: true });
         gained += current.value * 2;
         cursor += 1;
       } else {
-        placed.push({ ...current, born: false });
+        placed.push({ ...current, born: false, merged: false });
       }
     }
     placed.forEach((tile, slot) => {
@@ -119,6 +121,7 @@ function spawnTile(tiles: readonly Tile[], nextId: { n: number }): Tile[] {
       row: Math.floor(slot / 4),
       col: slot % 4,
       born: true,
+      merged: false,
     },
   ];
 }
@@ -236,6 +239,7 @@ export default function G2048Game() {
   if (over) {
     return (
       <PlayPanel
+        fill
         stats={<PlayStat label={t("games.score")} value={formatPlayNumber(locale, score)} />}
         helpOpen={helpOpen}
         onToggleHelp={toggleHelp}
@@ -261,6 +265,7 @@ export default function G2048Game() {
 
   return (
     <PlayPanel
+      fill
       stats={
         <>
           <PlayStat label={t("games.score")} value={formatPlayNumber(locale, score)} />
@@ -272,6 +277,7 @@ export default function G2048Game() {
     >
       {howTo}
       {ready ? (
+        <div className="um-fit-slot">
         <div
           ref={boardRef}
           className="um-g2048 um-play-board um-lit-board"
@@ -290,17 +296,18 @@ export default function G2048Game() {
           {tiles.map((tile) => (
             <div
               key={tile.id}
-              className={`um-g2048-tile v${tile.value}${tile.born ? " born" : ""}`}
+              className={`um-g2048-tile v${tile.value}${tile.born ? " born" : ""}${tile.merged ? " merged" : ""}`}
               data-g2048-tile="true"
               data-row={tile.row}
               data-col={tile.col}
               data-val={tile.value}
               style={{ ["--c" as string]: tile.col, ["--r" as string]: tile.row }}
             >
-              {formatPlayNumber(locale, tile.value)}
+              <span className="um-g2048-face">{formatPlayNumber(locale, tile.value)}</span>
             </div>
           ))}
           {pop ? <span className="um-g2048-pop">+{formatPlayNumber(locale, pop)}</span> : null}
+        </div>
         </div>
       ) : null}
       <div className="um-play-row" style={{ justifyContent: "center" }}>

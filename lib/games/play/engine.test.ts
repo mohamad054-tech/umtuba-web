@@ -14,6 +14,8 @@ import {
   SNAKE_TICK_MIN_MS,
   SNAKE_TICK_START_MS,
   sudokuIsSolved,
+  SUDOKU_PUZZLES,
+  pickSudokuPuzzle,
   XO_LINES,
   xoBestMove,
   xoCpuMove,
@@ -183,5 +185,36 @@ describe("play engine", () => {
     expect(
       sudokuIsSolved(solution.split("").map(Number), solution)
     ).toBe(true);
+  });
+
+  it("keeps every sudoku puzzle solvable and rotates away from the current one", () => {
+    const seen = new Set<string>();
+    for (const pack of SUDOKU_PUZZLES) {
+      expect(pack.puzzle).toHaveLength(81);
+      expect(pack.solution).toHaveLength(81);
+      expect(seen.has(pack.puzzle)).toBe(false);
+      seen.add(pack.puzzle);
+      const solution = pack.solution.split("").map(Number);
+      expect(sudokuIsSolved(solution, pack.solution)).toBe(true);
+      for (let index = 0; index < 81; index += 1) {
+        const given = Number(pack.puzzle[index]);
+        if (given !== 0) expect(given).toBe(solution[index]);
+      }
+      const units = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+      for (const i of units) {
+        const row = new Set(solution.slice(i * 9, i * 9 + 9));
+        const col = new Set(units.map((r) => solution[r * 9 + i]));
+        const br = Math.floor(i / 3) * 3;
+        const bc = (i % 3) * 3;
+        const box = new Set<number>();
+        for (let r = 0; r < 3; r += 1) {
+          for (let c = 0; c < 3; c += 1) box.add(solution[(br + r) * 9 + bc + c] ?? 0);
+        }
+        expect(row.size).toBe(9);
+        expect(col.size).toBe(9);
+        expect(box.size).toBe(9);
+      }
+      expect(pickSudokuPuzzle(pack.puzzle, () => 0).puzzle).not.toBe(pack.puzzle);
+    }
   });
 });

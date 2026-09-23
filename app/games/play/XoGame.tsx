@@ -23,6 +23,22 @@ import {
 
 const EMPTY: XoMark[] = ["", "", "", "", "", "", "", "", ""];
 
+function MarkX() {
+  return (
+    <svg viewBox="0 0 100 100" className="um-xo-mark x" aria-hidden="true">
+      <path d="M24 24 L76 76 M76 24 L24 76" />
+    </svg>
+  );
+}
+
+function MarkO() {
+  return (
+    <svg viewBox="0 0 100 100" className="um-xo-mark o" aria-hidden="true">
+      <circle cx="50" cy="50" r="26" />
+    </svg>
+  );
+}
+
 export default function XoGame() {
   const { t, locale } = useI18n();
   const sfx = useMemo(() => createPlaySfx(), []);
@@ -83,9 +99,10 @@ export default function XoGame() {
   };
 
   const play = (index: number) => {
-    if (!ready || over || sessionDone || busyRef.current || boardMarks.current[index]) {
+    if (over || sessionDone || busyRef.current || boardMarks.current[index]) {
       return;
     }
+    if (!ready) dismissHelp();
     busyRef.current = true;
     const afterYou: XoMark[] = boardMarks.current.map((cell, i) =>
       i === index ? "X" : cell
@@ -151,6 +168,7 @@ export default function XoGame() {
   if (sessionDone) {
     return (
       <PlayPanel
+        fill
         stats={
           <>
             <PlayStat label={t("games.score")} value={formatPlayNumber(locale, score)} />
@@ -182,6 +200,7 @@ export default function XoGame() {
 
   return (
     <PlayPanel
+      fill
       stats={
         <>
           <PlayStat label={t("games.score")} value={formatPlayNumber(locale, score)} />
@@ -196,6 +215,7 @@ export default function XoGame() {
     >
       {howTo}
       <div className="um-play-turn">{t(turnLabel)}</div>
+      <div className="um-fit-slot">
       <div ref={boardRef} className="um-play-xo um-play-board um-lit-board" dir="ltr" data-board-dir="ltr">
         {board.map((mark, index) => (
           <button
@@ -205,12 +225,23 @@ export default function XoGame() {
             data-xo-cell="true"
             className={`${mark === "X" ? "x" : mark === "O" ? "o" : ""}${line.includes(index) ? " win" : ""}`}
             onClick={() => play(index)}
-            disabled={!ready || over || Boolean(mark)}
+            disabled={over || Boolean(mark)}
             aria-label={mark ? mark : t("games.emptyCell")}
           >
-            {mark === "X" ? "✕" : mark === "O" ? "◯" : ""}
+            {mark === "X" ? <MarkX /> : mark === "O" ? <MarkO /> : null}
           </button>
         ))}
+        {line.length === 3 ? (
+          <svg className="um-xo-line" viewBox="0 0 3 3" aria-hidden="true">
+            <line
+              x1={(line[0]! % 3) + 0.5}
+              y1={Math.floor(line[0]! / 3) + 0.5}
+              x2={(line[2]! % 3) + 0.5}
+              y2={Math.floor(line[2]! / 3) + 0.5}
+            />
+          </svg>
+        ) : null}
+      </div>
       </div>
       <div className="um-play-row" style={{ justifyContent: "center" }}>
         <button type="button" className="um-play-btn" onClick={over ? newRound : restart}>

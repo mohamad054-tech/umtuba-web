@@ -60,6 +60,7 @@ function Shell({
   helpOpen,
   onToggleHelp,
   begin,
+  fill = false,
 }: {
   slug: PlayableGameSlug;
   howTo: TranslationKey[];
@@ -69,14 +70,15 @@ function Shell({
   helpOpen: boolean;
   onToggleHelp: () => void;
   begin: () => void;
+  fill?: boolean;
 }) {
   const { t } = useI18n();
   return (
     <PlayPanel
+      fill={fill || slug === "larger-country" || slug === "farther-pair"}
       stats={stats}
       helpOpen={helpOpen}
       onToggleHelp={onToggleHelp}
-      fill={slug === "larger-country" || slug === "farther-pair"}
     >
       <PlayHowTo
         open={helpOpen}
@@ -1033,7 +1035,7 @@ export function UnoGame() {
   if (done) {
     const pts = done === "win" ? 200 : 30;
     return (
-      <PlayPanel stats={<PlayStat label={t("games.score")} value={formatPlayNumber(locale, pts)} />}>
+      <PlayPanel fill stats={<PlayStat label={t("games.score")} value={formatPlayNumber(locale, pts)} />}>
         <div className={pts > floor ? "um-play-best" : undefined}>
           <PlayResult score={pts} verdictKey={done === "win" ? "games.youWin" : "games.youLose"} detail={pts > floor ? t("games.localBest", { values: { score: formatPlayNumber(locale, pts) } }) : t("games.uno.title")} onAgain={() => { deal(); help.keepReadyOnReplay(); }} />
         </div>
@@ -1044,7 +1046,7 @@ export function UnoGame() {
   const top = pile[pile.length - 1];
 
   return (
-    <Shell slug="uno" howTo={["games.uno.howTo1", "games.uno.howTo2", "games.uno.howTo3"]} stats={<PlayStat label={t("games.cpu")} value={formatPlayNumber(locale, cpu.length)} />} ready={help.ready} helpOpen={help.helpOpen} onToggleHelp={help.toggleHelp} begin={begin}>
+    <Shell fill slug="uno" howTo={["games.uno.howTo1", "games.uno.howTo2", "games.uno.howTo3"]} stats={<PlayStat label={t("games.cpu")} value={formatPlayNumber(locale, cpu.length)} />} ready={help.ready} helpOpen={help.helpOpen} onToggleHelp={help.toggleHelp} begin={begin}>
       <div ref={tableRef} className="um-color-table um-lit-board" dir="ltr">
         <div className="um-color-cpu" aria-label={t("games.cpu")}>
           {cpu.map((card, index) => (

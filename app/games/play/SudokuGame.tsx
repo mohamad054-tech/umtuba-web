@@ -7,6 +7,7 @@ import {
   createPlayStopwatch,
   formatPlayClock,
   formatPlayNumber,
+  pickSudokuPuzzle,
   sudokuCell,
   sudokuIsSolved,
   SUDOKU_PUZZLES,
@@ -22,8 +23,20 @@ import {
   usePlayHelp,
 } from "./PlayChrome";
 
-function pickPuzzle() {
-  return SUDOKU_PUZZLES[Math.floor(Math.random() * SUDOKU_PUZZLES.length)] ?? SUDOKU_PUZZLES[0];
+function firstEmpty(puzzle: string) {
+  for (let index = 0; index < 81; index += 1) {
+    if (sudokuCell(puzzle, index) === 0) return index;
+  }
+  return 0;
+}
+
+function digitFromKey(key: string): number | null {
+  if (key >= "0" && key <= "9") return Number(key);
+  const arabic = "٠١٢٣٤٥٦٧٨٩".indexOf(key);
+  if (arabic >= 0) return arabic;
+  const persian = "۰۱۲۳۴۵۶۷۸۹".indexOf(key);
+  if (persian >= 0) return persian;
+  return null;
 }
 
 function emptyNotes(): number[][] {
@@ -34,12 +47,12 @@ export default function SudokuGame() {
   const { t, locale } = useI18n();
   const { helpOpen, ready, dismissHelp, toggleHelp, keepReadyOnReplay } = usePlayHelp();
   const sfx = useMemo(() => createPlaySfx(), []);
-  const [pack, setPack] = useState(pickPuzzle);
+  const [pack, setPack] = useState<(typeof SUDOKU_PUZZLES)[number]>(SUDOKU_PUZZLES[0]);
   const [board, setBoard] = useState(() =>
     Array.from({ length: 81 }, (_, i) => sudokuCell(pack.puzzle, i))
   );
   const [notes, setNotes] = useState(emptyNotes);
-  const [selected, setSelected] = useState(0);
+  const [selected, setSelected] = useState(() => firstEmpty(pack.puzzle));
   const [noteMode, setNoteMode] = useState(false);
   const [errors, setErrors] = useState<number[]>([]);
   const [hints, setHints] = useState(0);
@@ -56,11 +69,11 @@ export default function SudokuGame() {
   );
 
   const startFresh = useCallback(() => {
-    const next = pickPuzzle();
+    const next = pickSudokuPuzzle(pack.puzzle);
     setPack(next);
     setBoard(Array.from({ length: 81 }, (_, i) => sudokuCell(next.puzzle, i)));
     setNotes(emptyNotes());
-    setSelected(0);
+    setSelected(firstEmpty(next.puzzle));
     setNoteMode(false);
     setErrors([]);
     setHints(0);
@@ -70,8 +83,9 @@ export default function SudokuGame() {
     watchRef.current.stop();
     watchRef.current = createPlayStopwatch(setElapsed);
     if (ready) watchRef.current.start();
+    else dismissHelp();
     keepReadyOnReplay();
-  }, [keepReadyOnReplay, ready]);
+  }, [dismissHelp, keepReadyOnReplay, pack.puzzle, ready]);
 
   useEffect(() => {
     if (!ready) return;
@@ -99,9 +113,11 @@ export default function SudokuGame() {
   );
 
   const place = useCallback(
-    (value: number) => {
-      if (!ready || done || given[selected]) return;
-      if (noteMode) {
+    (value: number, asValue = false) => {
+      if (done) return;
+      if (!ready) dismissHelp();
+      if (given[selected]) return;
+      if (noteMode && !asValue) {
         if (value === 0) {
           setNotes((prev) => {
             const next = prev.map((row) => [...row]);
@@ -136,17 +152,19 @@ export default function SudokuGame() {
       const nextBoard = board.map((cell, i) => (i === selected ? value : cell));
       finish(nextBoard);
     },
-    [board, done, finish, given, noteMode, ready, selected, sfx]
+    [board, dismissHelp, done, finish, given, noteMode, ready, selected, sfx]
   );
 
   const hint = () => {
     if (done || given[selected]) return;
+    if (!ready) dismissHelp();
     const value = sudokuCell(pack.solution, selected);
     setHints((n) => n + 1);
-    place(value);
+    place(value, true);
   };
 
   const check = () => {
+    if (!ready) dismissHelp();
     const bad = board
       .map((value, i) => (value && value !== sudokuCell(pack.solution, i) ? i : -1))
       .filter((i) => i >= 0);
@@ -157,19 +175,33 @@ export default function SudokuGame() {
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
-      if (done || !ready) return;
-      if (event.key >= "1" && event.key <= "9") {
-        place(Number(event.key));
+      if (done) return;
+      const target = event.target as HTMLElement | null;
+      if (
+        target &&
+        (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable)
+      ) {
         return;
       }
-      if (event.key === "Backspace" || event.key === "Delete" || event.key === "0") {
+      const digit = digitFromKey(event.key);
+      const erase = event.key === "Backspace" || event.key === "Delete" || digit === 0;
+      const note = event.key === "n" || event.key === "N";
+      const arrow = event.key.startsWith("Arrow");
+      if ((digit == null || digit === 0) && !erase && !note && !arrow) return;
+      if (!ready) dismissHelp();
+      if (digit != null && digit >= 1) {
+        place(digit);
+        return;
+      }
+      if (erase) {
         place(0);
         return;
       }
-      if (event.key === "n" || event.key === "N") {
+      if (note) {
         setNoteMode((v) => !v);
         return;
       }
+      event.preventDefault();
       const row = Math.floor(selected / 9);
       const col = selected % 9;
       if (event.key === "ArrowLeft") setSelected(row * 9 + Math.max(0, col - 1));
@@ -179,7 +211,7 @@ export default function SudokuGame() {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [done, place, ready, selected]);
+  }, [dismissHelp, done, place, ready, selected]);
 
   if (done) {
     return (
@@ -245,7 +277,10 @@ export default function SudokuGame() {
             type="button"
             data-sudoku-cell="true"
             className={`${given[index] ? "given" : ""} ${selected === index ? "sel" : ""} ${errors.includes(index) ? "err" : ""}`}
-            onClick={() => setSelected(index)}
+            onClick={() => {
+              if (!ready) dismissHelp();
+              setSelected(index);
+            }}
             aria-label={value ? String(value) : t("games.emptyCell")}
           >
             {value ? (
@@ -270,7 +305,10 @@ export default function SudokuGame() {
         <button
           type="button"
           className={`um-play-btn${noteMode ? " on" : ""}`}
-          onClick={() => setNoteMode((v) => !v)}
+          onClick={() => {
+            if (!ready) dismissHelp();
+            setNoteMode((v) => !v);
+          }}
         >
           {t("games.notes")}
         </button>
