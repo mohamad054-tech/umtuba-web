@@ -121,6 +121,7 @@ describe("route robots / sitemap policy", () => {
           path.startsWith("/live/media-lab") ||
           path.startsWith("/sandbox") ||
           path.startsWith("/hifz") ||
+          path.startsWith("/learning/quran") ||
           path.startsWith("/store/demo-preview") ||
           path.startsWith("/store/cart") ||
           path.startsWith("/store/checkout") ||
