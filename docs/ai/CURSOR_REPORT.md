@@ -1,48 +1,33 @@
-# Cursor Report — feat/quran-hifz-v1 (Husary listen & repeat)
+# Cursor Report — feat/quran-hifz-v1 (owner phone UX fixes)
 
 ## Summary
 
-Added calm **listen / listen-and-repeat / tilawa-link** audio to the hidden Ash-Shams prototype at `/hifz/shams`. Streams Sheikh Mahmoud Khalil Al-Husary **murattal** ayah-by-ayah (+ basmala) from the Quranicaudio EveryAyah mirror URLs exposed by Quran.com — **no audio binaries in the repo**. Word-by-word highlight included (Quran.com Husary murattal segments align 15/15 with local Uthmani tokens). Existing text modes unchanged. noindex / not linked. No Supabase. No merge/deploy/PR.
+Fixed four owner-tested phone issues on the hidden Ash-Shams experience at `/hifz/shams` only. Shortened listen-and-repeat silence (default **short**), added short/medium/long pause choice remembered in localStorage, made **وصل التلاوة** continue through ayah 15, clarified **رتّب الآيات** with intro + demo + hints, and turned sky into simple **تقدّم الحفظ** progress. No Quran text edits, no audio binaries, no hadith, no games/video/watch. noindex unchanged. No Supabase. No merge/deploy/PR.
 
 ```
-TASK_ID = FEAT_QURAN_HIFZ_AUDIO_V1
+TASK_ID = FIX_QURAN_HIFZ_OWNER_PHONE_UX_V1
 BRANCH = feat/quran-hifz-v1
-BASE = origin/feat/quran-hifz-v1 @ c01fdfc085119f389af1a72ed1b5d6fc7e5309f7
-RELEASE_ANCESTOR = origin/release/v1 @ aa2f3ae5 (ancestor of feature tip; feature already ahead — no FF needed)
+BASE = origin/feat/quran-hifz-v1 @ c14a06190db42fe500424f399d19af513cb00155
 ```
 
-### Audio provenance & permission
+### The 4 fixes (everyday)
 
-- **Source name:** Quran.com / Quran Foundation (CDN: mirrors.quranicaudio.com EveryAyah Husary set)
-- **Reciter:** Mahmoud Khalil Al-Husary, murattal (`recitation_id` 6). Muallim also listed as id 12 — not used in UI.
-- **Terms URL:** https://api-docs.quran.com/legal/developer-terms/
-- **Quote (permission):** “QF grants Developer a … license to access and use the APIs solely to develop and operate Applications that provide beneficial Quranic experiences to end users.” / “Developer may display QF Content to end users within the Application, provided that: … QF Content is not sold, sublicensed, or redistributed.” Free/paid apps allowed when content is only part of the end-user experience.
-- **Audio URL pattern:** `https://mirrors.quranicaudio.com/everyayah/Husary_128kbps/091{AAA}.mp3`
-  Basmala: `…/bismillah.mp3` (same bytes as `001001.mp3`; **not** `091001.mp3`)
-- **16 files checked:** **yes** — HTTP 200, `audio/mpeg`, MP3 headers; ayah 1 ≠ basmala; mapping 91:1–15 correct.
-- **Word timings:** **yes** — from `chapter_recitations/6/91?segments=true`; segment counts match Uthmani whitespace tokens for all 15 ayat → word highlight **included**.
-
-### Modes added (Arabic labels)
-
-- الاستماع — listen (tap ayah / controls)
-- التكرار — listen & repeat (1/3/5/7, default 3; silent pause ≈ ayah + a little; words fade per round)
-- وصل التلاوة — audio link of ayah N then N+1 (distinct from text «الوصل»)
-- Learn mode gains an **استمع** step into listen
+1. **Repeat gap** — Default silence between repeats is a short breath (~28% of ayah length), not “as long as the ayah.” User can pick قصيرة / متوسطة / طويلة; choice saved on the device only.
+2. **Connected recitation** — From the current ayah (or basmala then 1), plays continuously to ayah 15 or until Stop; current ayah number is highlighted.
+3. **Order mode** — Renamed to رتّب الآيات; short Arabic goal + calm demo animation before start; next ayah pulsed; gentle hint when stuck; quiet «في مكانها» / «أحسنت» on correct taps.
+4. **Sky / progress** — Renamed to تقدّم الحفظ; large «حفظت N من 15 آية» plus what to do next; sky stars are lit/unlit progress only (no dim-after-days rule on screen).
 
 ## Exact files changed
 
-- `app/hifz/shams/HifzShamsExperience.tsx`
-- `app/hifz/shams/useHusaryPlayer.ts` (new)
-- `app/hifz/shams/hifz-shams.css`
-- `lib/hifz/audio.ts` (new)
-- `lib/hifz/audio.test.ts` (new)
-- `lib/hifz/husaryTimings.ts` (new)
-- `lib/hifz/types.ts`
-- `data/hifz/ash-shams-91.husary-timings.json` (new — timing metadata only)
-- `data/hifz/SOURCES.md`
+- `lib/hifz/audio.ts` — pause lengths; `buildHusaryQueue` (tilawa through end)
+- `lib/hifz/audio.test.ts` — pause + queue tests
+- `lib/hifz/progress.ts` — `readRepeatPauseLength` / `writeRepeatPauseLength`
+- `app/hifz/shams/useHusaryPlayer.ts` — pause length + shared queue builder
+- `app/hifz/shams/HifzShamsExperience.tsx` — UI for all four fixes
+- `app/hifz/shams/hifz-shams.css` — calm order demo / pulse / praise animations
 - `docs/ai/CURSOR_REPORT.md` (this report)
 
-Not committed: `docs/ai/IOS_STATUS_AR.md`, `.local/`, `tmp/`, `worktrees/`.
+Not staged: `AGENTS.md`, `.local/`, `docs/ai/IOS_STATUS_AR.md`, `tmp/`, `worktrees/`.
 
 ## Migrations created
 
@@ -51,34 +36,32 @@ none
 ## Security review
 
 - Still hidden: `noindex`, robots disallow `/hifz`, not in nav/sitemap.
-- Audio streamed on demand (`preload="none"`); no audio binaries committed.
-- Quran text unchanged (downloaded Uthmani only); basmala shown as UI label «البسملة» without inventing Quran words.
-- Media Session + `playsInline` HTML audio for mobile background where the browser allows; no promise beyond standard approach.
-- No secrets; no Supabase; localStorage progress unchanged.
-- Attribution shown for Husary / Quran.com.
+- Audio still streamed on demand; no audio binaries.
+- Quran ayah strings untouched.
+- Pause preference and progress stay in localStorage only (device).
+- No secrets; no Supabase; no new network endpoints beyond existing Husary streams.
 
 ## Tests
 
-- `npx vitest run lib/hifz` — **15 passed** (9 prior + 6 audio/timings)
+- `npx vitest run lib/hifz/audio.test.ts lib/hifz/ashShamsData.test.ts` — **PASS** (20 tests)
 
 ## TypeScript
 
-- `npx tsc --noEmit` — **pass**
+- `npx tsc --noEmit` — **PASS**
 
 ## Build
 
-- `npm run build` — **pass**; route `/hifz/shams` present
+- `npm run build` — **PASS** (`/hifz/shams` present; unrelated Turbopack FS tracing warnings in translation-studio)
 
 ## git diff --check
 
-- **pass** (trailing whitespace cleaned)
+- **PASS** (on staged hifz + report files)
 
 ## git status --short
 
-- Clean feature commit on `feat/quran-hifz-v1` after push (see SHA below). Unrelated untracked left out: `.local/`, `tmp/`, `docs/ai/IOS_STATUS_AR.md`, `worktrees/`.
+After commit (expected): clean for staged paths; unrelated dirt left alone (`AGENTS.md`, `.local/`, etc.).
 
 ## Open issues
 
-- Lock-screen / background playback depends on the mobile browser; implemented via HTML `<audio>` + Media Session, not guaranteed on every OS.
-- Quran.com public API lists Husary as `Husary_64kbps`; UI streams the same reciter’s `Husary_128kbps` mirror paths (verified HTTP 200) for clearer audio.
-- Browser MCP (`cursor-ide-browser`) could not open a tab in this environment. Verified instead via: HTTP 200 for `/hifz/shams` with mode labels الاستماع / التكرار / وصل التلاوة / existing modes present; audio URLs not in first paint (lazy); all 16 stream URLs previously HEAD/GET verified.
+- **Browser MCP:** `cursor-ide-browser` `browser_navigate` returned “No browser tab available” — could not visually verify phone/wide layouts in-session. Logic covered by unit tests; manual check on device recommended for pause feel and order demo.
+- Owner should confirm SHORT pause feels like a brief breath on a real phone with Husary streaming.
