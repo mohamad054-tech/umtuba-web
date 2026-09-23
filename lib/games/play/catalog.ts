@@ -57,7 +57,7 @@ export const PLAYABLE_GAMES: readonly PlayableGame[] = [
   { slug: "wheel", titleKey: "games.wheel.title", blurbKey: "games.wheel.blurb", demoData: true },
   { slug: "basket", titleKey: "games.basket.title", blurbKey: "games.basket.blurb", demoData: true },
   { slug: "hangword", titleKey: "games.hangword.title", blurbKey: "games.hangword.blurb", arabicContent: true },
-  { slug: "flag-guess", titleKey: "games.flag-guess.title", blurbKey: "games.flag-guess.blurb", demoData: true },
+  { slug: "flag-guess", titleKey: "games.flag-guess.title", blurbKey: "games.flag-guess.blurb" },
   { slug: "farther-pair", titleKey: "games.farther-pair.title", blurbKey: "games.farther-pair.blurb" },
   { slug: "larger-country", titleKey: "games.larger-country.title", blurbKey: "games.larger-country.blurb" },
   { slug: "cheaper", titleKey: "games.cheaper.title", blurbKey: "games.cheaper.blurb", demoData: true },

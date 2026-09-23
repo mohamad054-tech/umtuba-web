@@ -142,7 +142,7 @@ export function FlagGuessGame() {
       load={flagQuiz}
       seconds={18}
       extra={(item) => (
-        <div className="um-play-flagbox" data-play-item="true">
+        <div className="um-play-flagbox" data-play-item="true" dir="ltr">
           <FlagMark id={item.prompt} />
         </div>
       )}
