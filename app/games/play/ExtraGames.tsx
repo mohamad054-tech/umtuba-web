@@ -37,7 +37,7 @@ import { useBoardScrollLock } from "./boardPointer";
 import type { PlayableGameSlug } from "../../../lib/games/play/catalog";
 import { ColorCard } from "./ColorCards";
 import ProductMark from "./ProductMark";
-import { CityFace, CountryShape, PairSketch, flagEmoji } from "./PlaceCard";
+import { CityFace, CountryFlag, PairSketch } from "./PlaceCard";
 import {
   PlayHowTo,
   PlayPanel,
@@ -52,6 +52,7 @@ const GameMap = dynamic(() => import("./GameMap"), {
 });
 
 function Shell({
+  slug,
   howTo,
   stats,
   children,
@@ -71,7 +72,12 @@ function Shell({
 }) {
   const { t } = useI18n();
   return (
-    <PlayPanel stats={stats} helpOpen={helpOpen} onToggleHelp={onToggleHelp}>
+    <PlayPanel
+      stats={stats}
+      helpOpen={helpOpen}
+      onToggleHelp={onToggleHelp}
+      fill={slug === "larger-country" || slug === "farther-pair"}
+    >
       <PlayHowTo
         open={helpOpen}
         lines={howTo.map((key) => t(key))}
@@ -160,8 +166,8 @@ export function FartherPairGame() {
             return (
               <button key={side} type="button" className="um-place-card" data-play-item="true" onClick={() => pick(side)}>
                 <span className="um-place-row">
-                  <CityFace flag={flagEmoji(first.iso)} name={first.city} country={first.country} />
-                  <CityFace flag={flagEmoji(second.iso)} name={second.city} country={second.country} />
+                  <CityFace iso={first.iso} name={first.city} country={first.country} />
+                  <CityFace iso={second.iso} name={second.city} country={second.country} />
                 </span>
                 <PairSketch a={first} b={second} />
               </button>
@@ -208,9 +214,12 @@ export function LargerCountryGame() {
       {pair ? (
         <div className="um-play-pairgrid" dir="ltr">
           {pair.map((country, index) => (
-            <button key={country.id} type="button" className="um-place-card" data-play-item="true" onClick={() => pick(index as 0 | 1)}>
-              <CityFace flag={flagEmoji(country.id)} name={country.name} country="" />
-              <CountryShape id={country.id} />
+            <button key={country.id} type="button" className="um-place-card um-country-card" data-play-item="true" onClick={() => pick(index as 0 | 1)}>
+              <CountryFlag id={country.id} large />
+              <span className="um-place-names">
+                <span className="um-place-name">{country.name}</span>
+                <span className="en">{country.nameEn}</span>
+              </span>
             </button>
           ))}
         </div>

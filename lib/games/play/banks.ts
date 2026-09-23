@@ -252,18 +252,18 @@ export function cityDistance(a: string, b: string): number {
 }
 
 export const COUNTRIES = [
-  { id: "sa", name: "السعودية", km2: 2149690 },
-  { id: "eg", name: "مصر", km2: 1002450 },
-  { id: "tr", name: "تركيا", km2: 783562 },
-  { id: "fr", name: "فرنسا", km2: 551695 },
-  { id: "de", name: "ألمانيا", km2: 357114 },
-  { id: "jp", name: "اليابان", km2: 377975 },
-  { id: "it", name: "إيطاليا", km2: 301340 },
-  { id: "ae", name: "الإمارات", km2: 83600 },
-  { id: "jo", name: "الأردن", km2: 89342 },
-  { id: "lb", name: "لبنان", km2: 10452 },
-  { id: "ps", name: "فلسطين", km2: 6220 },
-  { id: "se", name: "السويد", km2: 450295 },
+  { id: "sa", name: "السعودية", nameEn: "Saudi Arabia", km2: 2149690 },
+  { id: "eg", name: "مصر", nameEn: "Egypt", km2: 1002450 },
+  { id: "tr", name: "تركيا", nameEn: "Turkey", km2: 783562 },
+  { id: "fr", name: "فرنسا", nameEn: "France", km2: 551695 },
+  { id: "de", name: "ألمانيا", nameEn: "Germany", km2: 357114 },
+  { id: "jp", name: "اليابان", nameEn: "Japan", km2: 377975 },
+  { id: "it", name: "إيطاليا", nameEn: "Italy", km2: 301340 },
+  { id: "ae", name: "الإمارات", nameEn: "United Arab Emirates", km2: 83600 },
+  { id: "jo", name: "الأردن", nameEn: "Jordan", km2: 89342 },
+  { id: "lb", name: "لبنان", nameEn: "Lebanon", km2: 10452 },
+  { id: "ps", name: "فلسطين", nameEn: "Palestine", km2: 6220 },
+  { id: "se", name: "السويد", nameEn: "Sweden", km2: 450295 },
 ];
 
 export type DemoProduct = {
