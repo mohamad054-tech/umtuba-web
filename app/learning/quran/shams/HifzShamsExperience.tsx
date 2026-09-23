@@ -11,30 +11,34 @@ import {
   type CSSProperties,
   type PointerEvent as ReactPointerEvent,
 } from "react";
-import { ayahImageSrc, getAshShamsAyat } from "../../../lib/hifz/ashShamsData";
+import { ayahImageSrc, getAshShamsAyat } from "../../../../lib/hifz/ashShamsData";
 import {
   HUSARY_AUDIO_ATTRIBUTION,
-  repeatWordOpacity,
   REPEAT_COUNT_OPTIONS,
+  REPEAT_PAUSE_LENGTH_OPTIONS,
+  repeatWordOpacity,
   type HifzAudioClipId,
   type RepeatCount,
-} from "../../../lib/hifz/audio";
-import { buildLinkingPrompt } from "../../../lib/hifz/linking";
+  type RepeatPauseLength,
+} from "../../../../lib/hifz/audio";
+import { buildLinkingPrompt } from "../../../../lib/hifz/linking";
 import {
-  isStarDimmed,
   markAyahReviewed,
   readProgress,
+  readRepeatPauseLength,
   softMasteryVibrate,
-} from "../../../lib/hifz/progress";
+  writeRepeatPauseLength,
+} from "../../../../lib/hifz/progress";
 import {
   firstLetterOfToken,
   tokenizeAyah,
-} from "../../../lib/hifz/tokenize";
-import type { HifzLocalProgress, HifzModeId } from "../../../lib/hifz/types";
+} from "../../../../lib/hifz/tokenize";
+import type { HifzLocalProgress, HifzModeId } from "../../../../lib/hifz/types";
 import { useHusaryPlayer } from "./useHusaryPlayer";
+import { VerseSourcedNotes } from "./VerseSourcedNotes";
 
 const amiriQuran = localFont({
-  src: "../../../public/fonts/amiri-quran/AmiriQuran-Regular.ttf",
+  src: "../../../../public/fonts/amiri-quran/AmiriQuran-Regular.ttf",
   display: "swap",
   variable: "--font-amiri-quran",
 });
@@ -47,8 +51,8 @@ const MODES: Array<{ id: HifzModeId; label: string }> = [
   { id: "fading", label: "تلاشٍ" },
   { id: "letters", label: "الحروف الأولى" },
   { id: "linking", label: "الوصل" },
-  { id: "order", label: "الترتيب" },
-  { id: "sky", label: "السماء" },
+  { id: "order", label: "رتّب الآيات" },
+  { id: "sky", label: "تقدّم الحفظ" },
 ];
 
 /** Calm scattered positions for 15 constellation stars (phone-first %). */
@@ -70,12 +74,29 @@ const STAR_LAYOUT: Array<{ x: number; y: number }> = [
   { x: 50, y: 52 },
 ];
 
+const ORDER_HINT_IDLE_MS = 4500;
+
 function clampAyah(n: number): number {
   return Math.min(15, Math.max(1, n));
 }
 
 function isAudioMode(mode: HifzModeId): boolean {
   return mode === "listen" || mode === "listenRepeat" || mode === "tilawaLink";
+}
+
+function countMemorized(stars: HifzLocalProgress["stars"]): number {
+  let n = 0;
+  for (let i = 1; i <= 15; i++) {
+    if (stars[String(i)]) n += 1;
+  }
+  return n;
+}
+
+function nextUnreviewed(stars: HifzLocalProgress["stars"]): number | null {
+  for (let i = 1; i <= 15; i++) {
+    if (!stars[String(i)]) return i;
+  }
+  return null;
 }
 
 export default function HifzShamsExperience() {
@@ -91,14 +112,21 @@ export default function HifzShamsExperience() {
   const [orderNext, setOrderNext] = useState(1);
   const [orderPath, setOrderPath] = useState<number[]>([]);
   const [orderComplete, setOrderComplete] = useState(false);
+  const [orderStarted, setOrderStarted] = useState(false);
+  const [orderHint, setOrderHint] = useState(false);
+  const [orderPraise, setOrderPraise] = useState<string | null>(null);
   const [progress, setProgress] = useState<HifzLocalProgress | null>(null);
   const [fadeVisible, setFadeVisible] = useState(true);
   const touchRef = useRef<{ x: number; y: number } | null>(null);
+  const orderIdleRef = useRef<number | null>(null);
+  const praiseTimerRef = useRef<number | null>(null);
 
   const player = useHusaryPlayer();
 
   useEffect(() => {
     setProgress(readProgress());
+    player.setPauseLength(readRepeatPauseLength());
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- hydrate once on mount
   }, []);
 
   const ayah = ayat[ayahIndex - 1];
@@ -136,6 +164,36 @@ export default function HifzShamsExperience() {
       setFadeVisible(true);
     }
   }, [player.activeClip, ayahIndex]);
+
+  const clearOrderIdle = useCallback(() => {
+    if (orderIdleRef.current != null) {
+      window.clearTimeout(orderIdleRef.current);
+      orderIdleRef.current = null;
+    }
+  }, []);
+
+  const armOrderIdle = useCallback(() => {
+    clearOrderIdle();
+    if (!orderStarted || orderComplete) return;
+    orderIdleRef.current = window.setTimeout(() => {
+      setOrderHint(true);
+    }, ORDER_HINT_IDLE_MS);
+  }, [clearOrderIdle, orderComplete, orderStarted]);
+
+  useEffect(() => {
+    if (mode !== "order" || !orderStarted || orderComplete) {
+      clearOrderIdle();
+      return;
+    }
+    armOrderIdle();
+    return clearOrderIdle;
+  }, [mode, orderStarted, orderComplete, orderNext, armOrderIdle, clearOrderIdle]);
+
+  useEffect(() => {
+    return () => {
+      if (praiseTimerRef.current != null) window.clearTimeout(praiseTimerRef.current);
+    };
+  }, []);
 
   const onPointerDown = (e: ReactPointerEvent) => {
     touchRef.current = { x: e.clientX, y: e.clientY };
@@ -238,17 +296,45 @@ export default function HifzShamsExperience() {
     }
   };
 
+  const showOrderPraise = (msg: string) => {
+    if (praiseTimerRef.current != null) window.clearTimeout(praiseTimerRef.current);
+    setOrderPraise(msg);
+    praiseTimerRef.current = window.setTimeout(() => setOrderPraise(null), 1400);
+  };
+
   const onOrderTap = (n: number) => {
     if (orderComplete) return;
-    if (n !== orderNext) return;
+    if (!orderStarted) {
+      setOrderStarted(true);
+      setOrderHint(false);
+    }
+    if (n !== orderNext) {
+      setOrderHint(true);
+      armOrderIdle();
+      return;
+    }
     const path = [...orderPath, n];
     setOrderPath(path);
+    setOrderHint(false);
     recordMastery(n);
+    showOrderPraise(n === 15 ? "أحسنت" : "في مكانها");
     if (n === 15) {
       setOrderComplete(true);
+      clearOrderIdle();
     } else {
       setOrderNext(n + 1);
+      armOrderIdle();
     }
+  };
+
+  const resetOrder = () => {
+    setOrderNext(1);
+    setOrderPath([]);
+    setOrderComplete(false);
+    setOrderStarted(false);
+    setOrderHint(false);
+    setOrderPraise(null);
+    clearOrderIdle();
   };
 
   const startClip: HifzAudioClipId = showBasmala ? "basmala" : ayahIndex;
@@ -267,12 +353,25 @@ export default function HifzShamsExperience() {
     player.start("surah", "basmala");
   };
 
+  const onPauseLength = (length: RepeatPauseLength) => {
+    player.setPauseLength(length);
+    writeRepeatPauseLength(length);
+  };
+
   const skyStars = progress?.stars ?? {};
+  const memorizedCount = countMemorized(skyStars);
+  const nextReview = nextUnreviewed(skyStars);
   const showAyahPane =
     mode === "learn" ||
     mode === "fading" ||
     mode === "letters" ||
     isAudioMode(mode);
+
+  const tilawaPlaying =
+    mode === "tilawaLink" &&
+    (player.playing || player.paused) &&
+    player.activeClip != null &&
+    player.activeClip !== "basmala";
 
   return (
     <div
@@ -307,15 +406,15 @@ export default function HifzShamsExperience() {
 
       <header className="relative z-10 shrink-0 px-4 pb-2 pt-[max(0.75rem,env(safe-area-inset-top))]">
         <p className="text-center text-[11px] tracking-[0.35em] text-[#e8c87a]/70">
-          سماء الحفظ
+          سماء الحفظ · Memorization sky
         </p>
         <h1 className="mt-1 text-center text-lg font-semibold text-[#f3e6c0]">
-          سورة الشمس
+          سورة الشمس · Surah ash-Shams
         </h1>
       </header>
 
       <nav
-        className="relative z-10 mx-auto flex w-full max-w-lg gap-1.5 overflow-x-auto px-3 pb-3"
+        className="relative z-10 mx-auto flex w-full max-w-3xl gap-1.5 overflow-x-auto px-3 pb-3"
         aria-label="أوضاع الحفظ"
       >
         {MODES.map((m) => {
@@ -334,12 +433,10 @@ export default function HifzShamsExperience() {
                   setLinkDone(false);
                 }
                 if (m.id === "order") {
-                  setOrderNext(1);
-                  setOrderPath([]);
-                  setOrderComplete(false);
+                  resetOrder();
                 }
               }}
-              className={`shrink-0 rounded-full px-3 py-1.5 text-xs transition ${
+              className={`shrink-0 rounded-full px-3 py-2 text-xs transition sm:py-1.5 ${
                 active
                   ? "bg-[#e8c87a]/20 text-[#f5e6b8] ring-1 ring-[#e8c87a]/45"
                   : "bg-white/5 text-white/55 ring-1 ring-white/10"
@@ -354,13 +451,18 @@ export default function HifzShamsExperience() {
       <main className="relative z-10 flex min-h-0 flex-1 flex-col px-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
         {showAyahPane && (
           <div
-            className={`mx-auto flex w-full max-w-lg flex-1 flex-col transition-opacity duration-300 ${
+            className={`mx-auto flex w-full max-w-3xl flex-1 flex-col transition-opacity duration-300 ${
               fadeVisible ? "opacity-100" : "opacity-0"
             }`}
           >
             <div className="flex flex-1 flex-col items-center justify-center gap-5">
+              {tilawaPlaying && (
+                <p className="rounded-full bg-[#e8c87a]/15 px-4 py-1.5 text-sm text-[#f5e6b8] ring-1 ring-[#e8c87a]/40">
+                  الآن تُتلى الآية ﴿{ayahIndex}﴾
+                </p>
+              )}
               <div
-                className="relative aspect-square w-full max-w-[min(100%,280px)] overflow-hidden rounded-[28px] border border-white/10 bg-[#080816]/70 transition-opacity duration-700"
+                className="relative aspect-square w-full max-w-[min(100%,320px)] overflow-hidden rounded-[28px] border border-white/10 bg-[#080816]/70 transition-opacity duration-700 sm:max-w-[min(100%,360px)]"
                 style={{ opacity: imageOpacity }}
               >
                 {imageSrc && !showBasmala ? (
@@ -368,7 +470,7 @@ export default function HifzShamsExperience() {
                     src={imageSrc}
                     alt=""
                     fill
-                    sizes="280px"
+                    sizes="360px"
                     className="object-cover"
                     priority={ayahIndex <= 2}
                   />
@@ -464,12 +566,22 @@ export default function HifzShamsExperience() {
                       </span>
                     );
                   })}
-                  <span className="ms-2 inline-block align-baseline font-sans text-base text-[#e8c87a]/80">
+                  <span
+                    className={`ms-2 inline-block align-baseline font-sans text-base transition ${
+                      tilawaPlaying
+                        ? "rounded-full bg-[#e8c87a]/25 px-2 py-0.5 text-[#ffe9a8] ring-1 ring-[#e8c87a]/50"
+                        : "text-[#e8c87a]/80"
+                    }`}
+                  >
                     ﴿{ayahIndex}﴾
                   </span>
                 </div>
               )}
             </div>
+
+            {!showBasmala && showAyahPane && (
+              <VerseSourcedNotes ayahNumber={ayahIndex} />
+            )}
 
             {(mode === "learn" || isAudioMode(mode)) && (
               <AudioBar
@@ -481,6 +593,8 @@ export default function HifzShamsExperience() {
                 error={player.audioError}
                 repeatCount={player.repeatCount}
                 onRepeatCount={(n) => player.setRepeatCount(n)}
+                pauseLength={player.pauseLength}
+                onPauseLength={onPauseLength}
                 onPlay={playCurrent}
                 onPauseToggle={player.togglePause}
                 onStop={player.stop}
@@ -524,7 +638,7 @@ export default function HifzShamsExperience() {
                 type="button"
                 onClick={() => goAyah(ayahIndex + 1)}
                 disabled={ayahIndex >= 15}
-                className="rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm text-white/80 disabled:opacity-30"
+                className="min-h-11 rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm text-white/80 disabled:opacity-30"
               >
                 التالية
               </button>
@@ -553,7 +667,7 @@ export default function HifzShamsExperience() {
                 type="button"
                 onClick={() => goAyah(ayahIndex - 1)}
                 disabled={ayahIndex <= 1 && !showBasmala}
-                className="rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm text-white/80 disabled:opacity-30"
+                className="min-h-11 rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm text-white/80 disabled:opacity-30"
               >
                 السابقة
               </button>
@@ -566,7 +680,7 @@ export default function HifzShamsExperience() {
         )}
 
         {mode === "linking" && (
-          <div className="mx-auto flex w-full max-w-lg flex-1 flex-col items-center justify-center gap-6">
+          <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col items-center justify-center gap-6">
             {linkDone || !linkingPrompt ? (
               <p className="text-center text-[#e8c87a]/90">
                 أحسنت — وصلتَ آخر الآيات بهدوء.
@@ -593,7 +707,7 @@ export default function HifzShamsExperience() {
                       key={opt.ayah}
                       type="button"
                       onClick={() => onLinkChoose(opt.ayah)}
-                      className={`${amiriQuran.className} rounded-2xl border border-[#e8c87a]/25 bg-[#080816]/80 px-4 py-3 text-lg text-[#f3e6c0] transition hover:border-[#e8c87a]/55`}
+                      className={`${amiriQuran.className} min-h-12 rounded-2xl border border-[#e8c87a]/25 bg-[#080816]/80 px-4 py-3 text-lg text-[#f3e6c0] transition hover:border-[#e8c87a]/55`}
                     >
                       {opt.snippet}…
                     </button>
@@ -605,105 +719,208 @@ export default function HifzShamsExperience() {
         )}
 
         {mode === "order" && (
-          <div className="relative mx-auto h-full w-full max-w-lg flex-1">
-            <svg
-              className="absolute inset-0 h-full w-full"
-              viewBox="0 0 100 100"
-              preserveAspectRatio="none"
-              aria-hidden
-            >
-              {orderPath.length > 1 &&
-                orderPath.slice(1).map((n, i) => {
-                  const a = STAR_LAYOUT[orderPath[i] - 1];
-                  const b = STAR_LAYOUT[n - 1];
-                  return (
-                    <line
-                      key={`line-${n}`}
-                      x1={a.x}
-                      y1={a.y}
-                      x2={b.x}
-                      y2={b.y}
-                      stroke="rgba(232,200,122,0.75)"
-                      strokeWidth="0.45"
-                    />
-                  );
-                })}
-            </svg>
-            {STAR_LAYOUT.map((pos, i) => {
-              const n = i + 1;
-              const lit = orderPath.includes(n);
-              const next = n === orderNext && !orderComplete;
-              return (
+          <div className="relative mx-auto flex h-full w-full max-w-3xl flex-1 flex-col">
+            {!orderStarted && (
+              <div className="relative z-10 mb-3 shrink-0 rounded-2xl border border-[#e8c87a]/20 bg-[#080816]/80 px-4 py-3">
+                <p className="text-center text-base leading-relaxed text-[#f3e6c0]">
+                  اضغط النجوم بالترتيب من ١ إلى ١٥ لتربطها بخطٍ ذهبي.
+                </p>
+                <OrderDemoAnimation />
                 <button
-                  key={n}
                   type="button"
-                  onClick={() => onOrderTap(n)}
-                  className={`absolute h-9 w-9 -translate-x-1/2 -translate-y-1/2 rounded-full text-xs transition ${
-                    lit
-                      ? "bg-[#e8c87a] text-[#1a1205] shadow-[0_0_16px_rgba(232,200,122,0.65)]"
-                      : next
-                        ? "bg-white/15 text-[#f5e6b8] ring-1 ring-[#e8c87a]/50"
-                        : "bg-white/10 text-white/50"
-                  } ${orderComplete ? "shadow-[0_0_22px_rgba(232,200,122,0.85)]" : ""}`}
-                  style={{ left: `${pos.x}%`, top: `${pos.y}%` }}
-                  aria-label={`آية ${n}`}
+                  onClick={() => {
+                    setOrderStarted(true);
+                    setOrderHint(false);
+                    armOrderIdle();
+                  }}
+                  className="mx-auto mt-3 flex min-h-11 items-center justify-center rounded-full bg-[#e8c87a]/20 px-6 py-2 text-sm text-[#f5e6b8] ring-1 ring-[#e8c87a]/45"
                 >
-                  {n}
+                  ابدأ
                 </button>
-              );
-            })}
-            {orderComplete && (
-              <p className="absolute inset-x-0 bottom-4 text-center text-sm text-[#e8c87a]/90">
-                اكتمل برج الآيات بهدوء.
-              </p>
+              </div>
             )}
+
+            {orderStarted && !orderComplete && (
+              <div className="relative z-10 mb-2 shrink-0 text-center">
+                <p className="text-sm text-white/55">
+                  اضغط النجمة المضيئة التالية:{" "}
+                  <span className="text-[#e8c87a]">﴿{orderNext}﴾</span>
+                </p>
+                {orderHint && (
+                  <p className="mt-1 text-sm text-[#e8c87a]/85" role="status">
+                    تلميح هادئ: الآية التالية رقم {orderNext}
+                  </p>
+                )}
+                {orderPraise && (
+                  <p className="mt-1 text-sm text-[#f5e6b8]/90 hifz-order-praise" role="status">
+                    {orderPraise}
+                  </p>
+                )}
+              </div>
+            )}
+
+            <div className="relative min-h-0 flex-1">
+              <svg
+                className="absolute inset-0 h-full w-full"
+                viewBox="0 0 100 100"
+                preserveAspectRatio="none"
+                aria-hidden
+              >
+                {orderPath.length > 1 &&
+                  orderPath.slice(1).map((n, i) => {
+                    const a = STAR_LAYOUT[orderPath[i] - 1];
+                    const b = STAR_LAYOUT[n - 1];
+                    return (
+                      <line
+                        key={`line-${n}`}
+                        x1={a.x}
+                        y1={a.y}
+                        x2={b.x}
+                        y2={b.y}
+                        stroke="rgba(232,200,122,0.75)"
+                        strokeWidth="0.45"
+                      />
+                    );
+                  })}
+              </svg>
+              {STAR_LAYOUT.map((pos, i) => {
+                const n = i + 1;
+                const lit = orderPath.includes(n);
+                const next = orderStarted && n === orderNext && !orderComplete;
+                return (
+                  <button
+                    key={n}
+                    type="button"
+                    onClick={() => onOrderTap(n)}
+                    className={`absolute flex h-11 w-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full text-sm transition sm:h-10 sm:w-10 ${
+                      lit
+                        ? "bg-[#e8c87a] text-[#1a1205] shadow-[0_0_16px_rgba(232,200,122,0.65)]"
+                        : next
+                          ? "hifz-order-next bg-white/20 text-[#f5e6b8] ring-2 ring-[#e8c87a]/70"
+                          : "bg-white/10 text-white/50"
+                    } ${orderComplete ? "shadow-[0_0_22px_rgba(232,200,122,0.85)]" : ""}`}
+                    style={{ left: `${pos.x}%`, top: `${pos.y}%` }}
+                    aria-label={`آية ${n}${next ? " — التالية" : ""}`}
+                  >
+                    {n}
+                  </button>
+                );
+              })}
+              {orderComplete && (
+                <div className="absolute inset-x-0 bottom-4 z-10 text-center">
+                  <p className="text-sm text-[#e8c87a]/90">اكتمل برج الآيات بهدوء.</p>
+                  <button
+                    type="button"
+                    onClick={resetOrder}
+                    className="mt-2 min-h-11 rounded-full border border-white/15 px-4 py-2 text-sm text-white/70"
+                  >
+                    من جديد
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         )}
 
         {mode === "sky" && (
-          <div className="relative mx-auto h-full w-full max-w-lg flex-1">
-            <p className="mb-3 text-center text-sm text-white/45">
-              كل آية راجعتها تصبح نجمة. بعد أيام قليلة تخفت قليلاً حتى تعود إليها.
-            </p>
-            {STAR_LAYOUT.map((pos, i) => {
-              const n = i + 1;
-              const entry = skyStars[String(n)];
-              const dim = isStarDimmed(entry?.lastReviewedAt);
-              const known = Boolean(entry);
-              return (
-                <button
-                  key={n}
-                  type="button"
-                  onClick={() => {
-                    setMode("learn");
-                    goAyah(n);
-                  }}
-                  title={
-                    entry?.lastReviewedAt
-                      ? `آخر مراجعة: ${new Date(entry.lastReviewedAt).toLocaleDateString("ar")}`
-                      : "لم تُراجع بعد"
-                  }
-                  className="absolute h-8 w-8 -translate-x-1/2 -translate-y-1/2 rounded-full transition"
-                  style={{
-                    left: `${pos.x}%`,
-                    top: `${pos.y}%`,
-                    background: known
-                      ? dim
-                        ? "rgba(232,200,122,0.28)"
-                        : "rgba(232,200,122,0.95)"
-                      : "rgba(255,255,255,0.12)",
-                    boxShadow:
-                      known && !dim
+          <div className="relative mx-auto flex h-full w-full max-w-3xl flex-1 flex-col">
+            <div className="relative z-10 mb-4 shrink-0 rounded-2xl border border-[#e8c87a]/20 bg-[#080816]/80 px-4 py-4 text-center">
+              <p className="text-xl font-medium text-[#f5e6b8] sm:text-2xl">
+                حفظت {memorizedCount} من 15 آية
+              </p>
+              <p className="mt-2 text-base leading-relaxed text-white/70">
+                {memorizedCount >= 15
+                  ? "أحسنت — راجعت السورة كلها. افتح وضعاً للمراجعة بهدوء."
+                  : nextReview != null
+                    ? `الآية التالية للمراجعة: ﴿${nextReview}﴾ — اضغط النجمة أو افتح «تعلّم».`
+                    : "اضغط نجمة لفتح آيتها في التعلّم."}
+              </p>
+            </div>
+            <div className="relative min-h-0 flex-1">
+              {STAR_LAYOUT.map((pos, i) => {
+                const n = i + 1;
+                const entry = skyStars[String(n)];
+                const known = Boolean(entry);
+                const isNext = nextReview === n;
+                return (
+                  <button
+                    key={n}
+                    type="button"
+                    onClick={() => {
+                      setMode("learn");
+                      goAyah(n);
+                    }}
+                    title={known ? "راجعتها" : "لم تُراجع بعد"}
+                    className={`absolute flex h-11 w-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full text-xs transition sm:h-10 sm:w-10 ${
+                      isNext ? "ring-2 ring-[#e8c87a]/60" : ""
+                    }`}
+                    style={{
+                      left: `${pos.x}%`,
+                      top: `${pos.y}%`,
+                      background: known
+                        ? "rgba(232,200,122,0.95)"
+                        : "rgba(255,255,255,0.12)",
+                      boxShadow: known
                         ? "0 0 14px rgba(232,200,122,0.7)"
                         : "none",
-                  }}
-                  aria-label={`نجمة الآية ${n}`}
-                />
-              );
-            })}
+                      color: known ? "#1a1205" : "rgba(255,255,255,0.45)",
+                    }}
+                    aria-label={`نجمة الآية ${n}${known ? " — محفوظة" : ""}`}
+                  >
+                    {n}
+                  </button>
+                );
+              })}
+            </div>
           </div>
         )}
       </main>
+    </div>
+  );
+}
+
+function OrderDemoAnimation() {
+  return (
+    <div
+      className="mx-auto mt-3 flex h-16 w-full max-w-[220px] items-center justify-center"
+      aria-hidden
+    >
+      <svg viewBox="0 0 160 56" className="h-full w-full overflow-visible">
+        <line
+          x1="28"
+          y1="28"
+          x2="132"
+          y2="28"
+          className="hifz-order-demo-line"
+          stroke="rgba(232,200,122,0.55)"
+          strokeWidth="2"
+          strokeLinecap="round"
+        />
+        <circle cx="28" cy="28" r="12" fill="rgba(232,200,122,0.95)" />
+        <text
+          x="28"
+          y="32"
+          textAnchor="middle"
+          fontSize="11"
+          fill="#1a1205"
+          fontFamily="sans-serif"
+        >
+          1
+        </text>
+        <g className="hifz-order-demo-star">
+          <circle cx="132" cy="28" r="12" fill="rgba(255,255,255,0.18)" stroke="rgba(232,200,122,0.7)" strokeWidth="1.5" />
+          <text
+            x="132"
+            y="32"
+            textAnchor="middle"
+            fontSize="11"
+            fill="#f5e6b8"
+            fontFamily="sans-serif"
+          >
+            2
+          </text>
+        </g>
+      </svg>
     </div>
   );
 }
@@ -723,6 +940,8 @@ type AudioBarProps = {
   error: string | null;
   repeatCount: RepeatCount;
   onRepeatCount: (n: RepeatCount) => void;
+  pauseLength: RepeatPauseLength;
+  onPauseLength: (length: RepeatPauseLength) => void;
   onPlay: () => void;
   onPauseToggle: () => void;
   onStop: () => void;
@@ -742,6 +961,8 @@ function AudioBar({
   error,
   repeatCount,
   onRepeatCount,
+  pauseLength,
+  onPauseLength,
   onPlay,
   onPauseToggle,
   onStop,
@@ -761,7 +982,7 @@ function AudioBar({
           <button
             type="button"
             onClick={onListenFromLearn}
-            className="rounded-full bg-[#e8c87a]/20 px-4 py-2 text-sm text-[#f5e6b8] ring-1 ring-[#e8c87a]/40"
+            className="min-h-11 rounded-full bg-[#e8c87a]/20 px-4 py-2 text-sm text-[#f5e6b8] ring-1 ring-[#e8c87a]/40"
           >
             استمع
           </button>
@@ -774,30 +995,49 @@ function AudioBar({
       {showFull && (
         <>
           {mode === "listenRepeat" && (
-            <div className="mb-3 flex flex-wrap items-center justify-center gap-1.5">
-              <span className="text-[11px] text-white/45">عدد التكرار</span>
-              {REPEAT_COUNT_OPTIONS.map((n) => (
-                <button
-                  key={n}
-                  type="button"
-                  onClick={() => onRepeatCount(n)}
-                  className={`h-8 w-8 rounded-full text-sm ${
-                    repeatCount === n
-                      ? "bg-[#e8c87a]/25 text-[#f5e6b8] ring-1 ring-[#e8c87a]/50"
-                      : "bg-white/5 text-white/55"
-                  }`}
-                >
-                  {n}
-                </button>
-              ))}
-            </div>
+            <>
+              <div className="mb-3 flex flex-wrap items-center justify-center gap-1.5">
+                <span className="text-[11px] text-white/45">عدد التكرار</span>
+                {REPEAT_COUNT_OPTIONS.map((n) => (
+                  <button
+                    key={n}
+                    type="button"
+                    onClick={() => onRepeatCount(n)}
+                    className={`h-10 w-10 rounded-full text-sm sm:h-8 sm:w-8 ${
+                      repeatCount === n
+                        ? "bg-[#e8c87a]/25 text-[#f5e6b8] ring-1 ring-[#e8c87a]/50"
+                        : "bg-white/5 text-white/55"
+                    }`}
+                  >
+                    {n}
+                  </button>
+                ))}
+              </div>
+              <div className="mb-3 flex flex-wrap items-center justify-center gap-1.5">
+                <span className="text-[11px] text-white/45">فاصل التكرار</span>
+                {REPEAT_PAUSE_LENGTH_OPTIONS.map((opt) => (
+                  <button
+                    key={opt.id}
+                    type="button"
+                    onClick={() => onPauseLength(opt.id)}
+                    className={`min-h-10 rounded-full px-3 py-1.5 text-sm sm:min-h-8 sm:text-xs ${
+                      pauseLength === opt.id
+                        ? "bg-[#e8c87a]/25 text-[#f5e6b8] ring-1 ring-[#e8c87a]/50"
+                        : "bg-white/5 text-white/55"
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </>
           )}
 
           <div className="flex items-center justify-center gap-3">
             <button
               type="button"
               onClick={onPrev}
-              className="rounded-full border border-white/15 px-3 py-2 text-sm text-white/75"
+              className="min-h-11 min-w-11 rounded-full border border-white/15 px-3 py-2 text-sm text-white/75"
               aria-label="السابقة"
             >
               ‹
@@ -817,7 +1057,7 @@ function AudioBar({
             <button
               type="button"
               onClick={onNext}
-              className="rounded-full border border-white/15 px-3 py-2 text-sm text-white/75"
+              className="min-h-11 min-w-11 rounded-full border border-white/15 px-3 py-2 text-sm text-white/75"
               aria-label="التالية"
             >
               ›
@@ -828,14 +1068,14 @@ function AudioBar({
             <button
               type="button"
               onClick={onSurah}
-              className="rounded-full border border-[#e8c87a]/30 px-3 py-1.5 text-xs text-[#e8c87a]/90"
+              className="min-h-10 rounded-full border border-[#e8c87a]/30 px-3 py-1.5 text-xs text-[#e8c87a]/90"
             >
               السورة كاملة
             </button>
             <button
               type="button"
               onClick={onBasmala}
-              className="rounded-full border border-white/15 px-3 py-1.5 text-xs text-white/70"
+              className="min-h-10 rounded-full border border-white/15 px-3 py-1.5 text-xs text-white/70"
             >
               البسملة
             </button>
@@ -843,7 +1083,7 @@ function AudioBar({
               <button
                 type="button"
                 onClick={onStop}
-                className="rounded-full border border-white/10 px-3 py-1.5 text-xs text-white/45"
+                className="min-h-10 rounded-full border border-white/10 px-3 py-1.5 text-xs text-white/45"
               >
                 إيقاف
               </button>
@@ -857,7 +1097,7 @@ function AudioBar({
           )}
           {mode === "tilawaLink" && (
             <p className="mt-2 text-center text-[11px] text-white/40">
-              وصل التلاوة: آية ثم التي تليها — غير وضع «الوصل» النصّي.
+              وصل التلاوة: من هذه الآية حتى آخر السورة — أو حتى تضغط إيقاف.
             </p>
           )}
         </>

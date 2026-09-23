@@ -1,0 +1,109 @@
+{
+  "surah": 91,
+  "locale": "pt",
+  "kind": "meanings",
+  "quranEncKey": "portuguese_nasr",
+  "version": "1.4.1",
+  "displayNameAr": "ترجمة حلمي نصر",
+  "displayNameEn": "Portuguese Translation — Helmi Nasr",
+  "publisher": "Helmi Nasr / QuranEnc.com",
+  "attributionRequired": true,
+  "sources": [
+    {
+      "role": "primary_download",
+      "name": "QuranEnc.com API v1 — sura translation",
+      "url": "https://quranenc.com/api/v1/translation/sura/portuguese_nasr/91",
+      "sha256": "e98aeb69ebfe0d779629b8e9d47c60f043bd12a0cbfd12bb5e87eeba3ac637ec",
+      "downloadedFile": "tmp/hifz/sources/portuguese_nasr-91-a.json"
+    },
+    {
+      "role": "secondary_cross_check",
+      "name": "QuranEnc.com API v1 — identical re-download",
+      "url": "https://quranenc.com/api/v1/translation/sura/portuguese_nasr/91",
+      "sha256": "e98aeb69ebfe0d779629b8e9d47c60f043bd12a0cbfd12bb5e87eeba3ac637ec",
+      "downloadedFile": "tmp/hifz/sources/portuguese_nasr-91-b.json",
+      "note": "Byte-identical to primary download (SHA-256 match)."
+    }
+  ],
+  "termsUrl": "https://quranenc.com/en/home/contact_us",
+  "crossCheckWordByWord100Percent": true,
+  "downloadedAtUtc": "2026-09-23T15:21:03.036Z",
+  "ayahCount": 15,
+  "ayat": [
+    {
+      "number": 1,
+      "text": "Pelo sol e por sua plena luz matinal!",
+      "footnotes": null
+    },
+    {
+      "number": 2,
+      "text": "E pela lua, quando o sucede!",
+      "footnotes": null
+    },
+    {
+      "number": 3,
+      "text": "E pelo dia, quando o mostra, em plenitude!",
+      "footnotes": null
+    },
+    {
+      "number": 4,
+      "text": "E pela noite, quando o encobre!",
+      "footnotes": null
+    },
+    {
+      "number": 5,
+      "text": "E pelo céu e por Quem o edificou!",
+      "footnotes": null
+    },
+    {
+      "number": 6,
+      "text": "E pela terra e por Quem a distendeu!",
+      "footnotes": null
+    },
+    {
+      "number": 7,
+      "text": "E pela alma e por Quem a formou!",
+      "footnotes": null
+    },
+    {
+      "number": 8,
+      "text": "Então, lhe inspirou[1] sua impiedade e sua piedade!",
+      "footnotes": "[1] Ou seja, Deus inspirou ao homem o caminho do mal e do bem."
+    },
+    {
+      "number": 9,
+      "text": "Com efeito, bem aventurado é quem a dignifica.",
+      "footnotes": null
+    },
+    {
+      "number": 10,
+      "text": "E, com efeito, mal aventurado é quem a degrada.",
+      "footnotes": null
+    },
+    {
+      "number": 11,
+      "text": "O povo de Thamud, por sua transgressão, desmentiu ao Mensageiro.",
+      "footnotes": null
+    },
+    {
+      "number": 12,
+      "text": "Quando o mais infeliz deles partiu, empenhado[1] em matar o camelo fêmea,",
+      "footnotes": "[1] Alusão a Qudar Ibn Salif. Cf. VII 73 n3."
+    },
+    {
+      "number": 13,
+      "text": "Então, o Mensageiro de Allah disse-lhes: \"Deixai o camelo fêmea - vindo de Allah - e sua porção de bebida.\"",
+      "footnotes": null
+    },
+    {
+      "number": 14,
+      "text": "E desmentiram-no e abateram-no[1]. Então, por seu delito, seu Senhor esmigalhou-lhes as casas sobre eles, e nivelou-as.",
+      "footnotes": "[1] No: o camelo."
+    },
+    {
+      "number": 15,
+      "text": "E Ele não teme as conseqüências disso.",
+      "footnotes": null
+    }
+  ]
+}

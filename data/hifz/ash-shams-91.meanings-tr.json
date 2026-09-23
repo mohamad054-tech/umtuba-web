@@ -1,0 +1,110 @@
+{
+  "surah": 91,
+  "locale": "tr",
+  "kind": "meanings",
+  "quranEncKey": "turkish_mokhtasar",
+  "version": "quranenc-api-download-2026-09-23",
+  "displayNameAr": "المختصر في تفسير القرآن الكريم",
+  "displayNameEn": "Al-Mukhtasar (Tafsir Center)",
+  "publisher": "Tafsir Center for Quranic Studies / QuranEnc.com",
+  "attributionRequired": true,
+  "sources": [
+    {
+      "role": "primary_download",
+      "name": "QuranEnc.com API v1 — sura translation",
+      "url": "https://quranenc.com/api/v1/translation/sura/turkish_mokhtasar/91",
+      "sha256": "c3b00009f906e89e3181b5efc4670188471e7e6701704fa1fa3a15929d7a0924",
+      "downloadedFile": "tmp/hifz/sources/turkish_mokhtasar-91-a.json"
+    },
+    {
+      "role": "secondary_cross_check",
+      "name": "QuranEnc.com API v1 — identical re-download",
+      "url": "https://quranenc.com/api/v1/translation/sura/turkish_mokhtasar/91",
+      "sha256": "c3b00009f906e89e3181b5efc4670188471e7e6701704fa1fa3a15929d7a0924",
+      "downloadedFile": "tmp/hifz/sources/turkish_mokhtasar-91-b.json",
+      "note": "Byte-identical to primary download (SHA-256 match)."
+    }
+  ],
+  "termsUrl": "https://quranenc.com/en/home/contact_us",
+  "crossCheckWordByWord100Percent": true,
+  "downloadedAtUtc": "2026-09-23T15:21:03.036Z",
+  "ayahCount": 15,
+  "ayat": [
+    {
+      "number": 1,
+      "text": "Allah Teâlâ, Güneş'e ve doğudan doğmasının ardından gelen yükselme vaktine yemin etmiştir.",
+      "footnotes": null
+    },
+    {
+      "number": 2,
+      "text": "Ve Güneş'in batmasının ardından izini takip eden Ay’a yemin etmiştir.",
+      "footnotes": null
+    },
+    {
+      "number": 3,
+      "text": "Ve yeryüzünün üzerinde bulunanları ışığıyla ortaya çıkaran gündüze yemin etmiştir.",
+      "footnotes": null
+    },
+    {
+      "number": 4,
+      "text": "Ve yeryüzünü kaplayıp karanlık olduğunda geceye yemin etmiştir.",
+      "footnotes": null
+    },
+    {
+      "number": 5,
+      "text": "Gökyüzüne ve sağlamca inşa edilen binasına yemin etmiştir.",
+      "footnotes": null
+    },
+    {
+      "number": 6,
+      "text": "Yeryüzüne ve insanların üzerinde yaşaması için onun yayıp döşenmesine yemin etmiştir.",
+      "footnotes": null
+    },
+    {
+      "number": 7,
+      "text": "Bütün canlılara ve Allah’ın onları düzgünce yaratmasına yemin etmiştir.",
+      "footnotes": null
+    },
+    {
+      "number": 8,
+      "text": "Yüce Allah uzak durup, kaçınması için kötülükleri ve amel edip, işlemesi için iyilikleri insana öğretmeden nefislere yerleştirip, anlamasını sağlamıştır.",
+      "footnotes": null
+    },
+    {
+      "number": 9,
+      "text": "Nefsini faziletlerle süsleyerek ve rezilliklerden temizleyerek arındıran kimse elbette muradını kazanmıştır.",
+      "footnotes": null
+    },
+    {
+      "number": 10,
+      "text": "Nefsini gizlice günah ve suçların içine gömen ise hüsrana uğramıştır.",
+      "footnotes": null
+    },
+    {
+      "number": 11,
+      "text": "Semûd kavmi, sınırları çiğneyip, suç işlemeleri ve günahlara dalmaları sebebiyle peygamberi Salih’i yalanladı.",
+      "footnotes": null
+    },
+    {
+      "number": 12,
+      "text": "Onların en bedbaht/eşkıya olanı, kavminin kendisini görevlendirmesinin ardından bu işi yapmaya kalktı.",
+      "footnotes": null
+    },
+    {
+      "number": 13,
+      "text": "Allah’ın resulü Salih -aleyhisselam- onlara şöyle dedi: \"Allah’ın devesini su içmenin ona ait olduğu günde bırakın suyunu içsin ve ona bir kötülük etmeyin!''",
+      "footnotes": null
+    },
+    {
+      "number": 14,
+      "text": "Deve hakkında peygamberlerini yalanladılar. Kavmin en azgın olanı, yaptığı işe onların rızasını alıp, deveyi kesip, öldürdü. Böylece bu günaha ortak oldular. Allah Teâlâ da, günahları sebebiyle üzerlerine azabını göndererek onları bir haykırışla helak etti. Onları helak ederek yerle bir etti.",
+      "footnotes": null
+    },
+    {
+      "number": 15,
+      "text": "Allah -Subhanehu ve Teâlâ-, sonucundan korkmadan onları helak eden bir azap gönderdi.",
+      "footnotes": null
+    }
+  ],
+  "versionNote": "Edition not published in QuranEnc /translations/list; version identity is the download date of the API payload (SHA-256 recorded in sources)."
+}

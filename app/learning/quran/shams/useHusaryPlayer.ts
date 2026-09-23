@@ -2,67 +2,26 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
+  buildHusaryQueue,
   DEFAULT_REPEAT_COUNT,
+  DEFAULT_REPEAT_PAUSE_LENGTH,
   husaryClipUrl,
-  repeatPauseMs,
+  type AudioPlayMode,
   type HifzAudioClipId,
+  type HusaryQueueItem,
   type RepeatCount,
-} from "../../../lib/hifz/audio";
+  type RepeatPauseLength,
+} from "../../../../lib/hifz/audio";
 import {
   getHusaryAyahTiming,
   wordIndexAtMs,
-} from "../../../lib/hifz/husaryTimings";
+} from "../../../../lib/hifz/husaryTimings";
 
-export type AudioPlayMode = "single" | "repeat" | "tilawaLink" | "surah";
-
-type QueueItem = {
-  clip: HifzAudioClipId;
-  /** When set, after this clip ends wait silently then continue (listen & repeat). */
-  pauseAfterMs?: number;
-  repeatIndex?: number;
-  repeatCount?: RepeatCount;
-};
-
-function buildQueue(
-  mode: AudioPlayMode,
-  start: HifzAudioClipId,
-  repeatCount: RepeatCount,
-): QueueItem[] {
-  if (mode === "single") {
-    return [{ clip: start }];
-  }
-  if (mode === "repeat") {
-    if (start === "basmala") return [{ clip: "basmala" }];
-    const ayah = start;
-    const durationMs = getHusaryAyahTiming(ayah)?.durationMs ?? 5000;
-    const pause = repeatPauseMs(durationMs);
-    const items: QueueItem[] = [];
-    for (let i = 0; i < repeatCount; i++) {
-      items.push({
-        clip: ayah,
-        pauseAfterMs: i < repeatCount - 1 ? pause : undefined,
-        repeatIndex: i,
-        repeatCount,
-      });
-    }
-    return items;
-  }
-  if (mode === "tilawaLink") {
-    if (start === "basmala") {
-      return [{ clip: "basmala" }, { clip: 1 }];
-    }
-    if (start >= 15) return [{ clip: start }];
-    return [{ clip: start }, { clip: (start + 1) as number }];
-  }
-  // whole surah
-  const items: QueueItem[] = [{ clip: "basmala" }];
-  for (let n = 1; n <= 15; n++) items.push({ clip: n });
-  return items;
-}
+export type { AudioPlayMode } from "../../../../lib/hifz/audio";
 
 export function useHusaryPlayer() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const queueRef = useRef<QueueItem[]>([]);
+  const queueRef = useRef<HusaryQueueItem[]>([]);
   const indexRef = useRef(0);
   const pauseTimerRef = useRef<number | null>(null);
   const scaleRef = useRef(1);
@@ -75,6 +34,9 @@ export function useHusaryPlayer() {
   const [activeWord, setActiveWord] = useState(-1);
   const [repeatIndex, setRepeatIndex] = useState(0);
   const [repeatCount, setRepeatCount] = useState<RepeatCount>(DEFAULT_REPEAT_COUNT);
+  const [pauseLength, setPauseLengthState] = useState<RepeatPauseLength>(
+    DEFAULT_REPEAT_PAUSE_LENGTH,
+  );
   const [audioError, setAudioError] = useState<string | null>(null);
   const [loadState, setLoadState] = useState<"idle" | "loading" | "ready" | "error">(
     "idle",
@@ -255,12 +217,21 @@ export function useHusaryPlayer() {
   const start = useCallback(
     (mode: AudioPlayMode, startClip: HifzAudioClipId) => {
       stopInternal();
-      queueRef.current = buildQueue(mode, startClip, repeatCount);
+      queueRef.current = buildHusaryQueue(
+        mode,
+        startClip,
+        repeatCount,
+        pauseLength,
+      );
       indexRef.current = 0;
       void playIndex(0);
     },
-    [playIndex, repeatCount, stopInternal],
+    [pauseLength, playIndex, repeatCount, stopInternal],
   );
+
+  const setPauseLength = useCallback((length: RepeatPauseLength) => {
+    setPauseLengthState(length);
+  }, []);
 
   const togglePause = useCallback(() => {
     const el = audioRef.current;
@@ -297,6 +268,8 @@ export function useHusaryPlayer() {
     repeatIndex,
     repeatCount,
     setRepeatCount,
+    pauseLength,
+    setPauseLength,
     audioError,
     loadState,
     clearError: () => setAudioError(null),
