@@ -524,36 +524,37 @@ body:has(.um-game-fit) {
 .um-play-sudoku {
   display: grid;
   grid-template-columns: repeat(9, minmax(0, 1fr));
-  gap: 3px;
-  max-width: 360px;
+  gap: 0;
+  width: min(100%, 420px);
   margin-inline: auto;
-  padding: 8px;
-  border-radius: 18px;
+  padding: 0;
+  border: 3px solid #ffe7a3;
+  border-radius: 12px;
   overflow: hidden;
 }
 
 .um-play-sudoku button {
   aspect-ratio: 1;
-  border: 0;
-  border-radius: 6px;
+  border: 1px solid rgba(247, 244, 234, 0.28);
+  border-radius: 0;
   background: rgba(6, 5, 18, 0.28);
   color: #f7f4ea;
   font: inherit;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
-  min-height: 28px;
+  min-height: 0;
   cursor: pointer;
   box-shadow: inset 0 0 8px rgba(6, 5, 18, 0.25);
 }
 
 .um-play-sudoku button:nth-child(9n + 3),
 .um-play-sudoku button:nth-child(9n + 6) {
-  border-inline-end: 2px solid rgba(240, 169, 59, 0.45);
+  border-inline-end: 3px solid #ffe7a3;
 }
 
 .um-play-sudoku button:nth-child(n + 19):nth-child(-n + 27),
 .um-play-sudoku button:nth-child(n + 46):nth-child(-n + 54) {
-  border-bottom: 2px solid rgba(240, 169, 59, 0.45);
+  border-bottom: 3px solid #ffe7a3;
 }
 
 .um-play-sudoku button.given {
@@ -562,10 +563,13 @@ body:has(.um-game-fit) {
 }
 
 .um-play-sudoku button.sel {
-  outline: 0;
+  position: relative;
+  z-index: 1;
+  outline: 2px solid #fff4cc;
+  outline-offset: -3px;
   box-shadow:
-    0 0 0 2px #f0a93b,
-    0 0 12px rgba(240, 169, 59, 0.55);
+    inset 0 0 0 2px #f0a93b,
+    0 0 14px rgba(240, 169, 59, 0.75);
 }
 
 .um-play-sudoku button.err {
@@ -1104,6 +1108,7 @@ body:has(.um-game-fit) {
   background: color-mix(in srgb, var(--um-field) 88%, transparent);
   color: inherit;
   text-align: start;
+  touch-action: manipulation;
 }
 
 .um-place-row {
@@ -1122,6 +1127,75 @@ body:has(.um-game-fit) {
 .um-place-flag {
   font-size: 28px;
   line-height: 1;
+}
+
+.um-country-flag {
+  display: block;
+  width: 72px;
+  height: auto;
+  border-radius: 4px;
+}
+
+.um-country-flag.large {
+  width: 100%;
+  max-height: 22dvh;
+  min-height: 0;
+  object-fit: contain;
+}
+
+.um-country-card {
+  justify-items: center;
+  text-align: center;
+  touch-action: manipulation;
+  min-height: 0;
+}
+
+.um-country-card .um-place-names {
+  align-items: center;
+  text-align: center;
+}
+
+@media (max-width: 639px) {
+  .um-game-fit-pair .um-game-fit-body > h2,
+  .um-game-fit-pair .um-game-fit-body > [data-games-subtitle] {
+    display: none;
+  }
+}
+
+.um-game-fit-pair .um-play-panel.fit .um-play-body {
+  padding: 6px 8px;
+}
+
+.um-game-fit-pair .um-play-pairgrid {
+  flex: 1;
+  min-height: 0;
+  grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+}
+
+.um-game-fit-pair .um-country-card {
+  grid-template-rows: minmax(0, 1fr) auto;
+  overflow: hidden;
+}
+
+.um-game-fit-pair .um-country-flag.large {
+  width: auto;
+  max-width: 100%;
+  height: 100%;
+  max-height: none;
+}
+
+.um-game-fit-pair .um-place-card:not(.um-country-card) {
+  min-height: 0;
+  overflow: hidden;
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
+.um-game-fit-pair .um-place-sketch {
+  width: 100%;
+  height: 100%;
+  max-height: none;
+  max-width: none;
+  margin: 0;
 }
 
 .um-place-name {
