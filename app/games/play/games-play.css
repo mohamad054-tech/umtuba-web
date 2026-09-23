@@ -1326,7 +1326,8 @@ body:has(.um-game-fit) {
 }
 
 .um-play-flagbox svg,
-.um-play-scene svg {
+.um-play-scene svg,
+.um-play-flagimg {
   display: block;
   width: 100%;
   height: auto;
