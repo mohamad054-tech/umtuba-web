@@ -1,0 +1,110 @@
+{
+  "surah": 91,
+  "locale": "fr",
+  "kind": "meanings",
+  "quranEncKey": "french_mokhtasar",
+  "version": "quranenc-api-download-2026-09-23",
+  "displayNameAr": "المختصر في تفسير القرآن الكريم",
+  "displayNameEn": "Al-Mukhtasar (Tafsir Center)",
+  "publisher": "Tafsir Center for Quranic Studies / QuranEnc.com",
+  "attributionRequired": true,
+  "sources": [
+    {
+      "role": "primary_download",
+      "name": "QuranEnc.com API v1 — sura translation",
+      "url": "https://quranenc.com/api/v1/translation/sura/french_mokhtasar/91",
+      "sha256": "f421215d579cc8f24ed1000efd180e5c82ae09ad38ff6d5db68e45f1fe8c339d",
+      "downloadedFile": "tmp/hifz/sources/french_mokhtasar-91-a.json"
+    },
+    {
+      "role": "secondary_cross_check",
+      "name": "QuranEnc.com API v1 — identical re-download",
+      "url": "https://quranenc.com/api/v1/translation/sura/french_mokhtasar/91",
+      "sha256": "f421215d579cc8f24ed1000efd180e5c82ae09ad38ff6d5db68e45f1fe8c339d",
+      "downloadedFile": "tmp/hifz/sources/french_mokhtasar-91-b.json",
+      "note": "Byte-identical to primary download (SHA-256 match)."
+    }
+  ],
+  "termsUrl": "https://quranenc.com/en/home/contact_us",
+  "crossCheckWordByWord100Percent": true,
+  "downloadedAtUtc": "2026-09-23T15:21:03.036Z",
+  "ayahCount": 15,
+  "ayat": [
+    {
+      "number": 1,
+      "text": "Allah prête serment par le soleil et par le moment où il s’élève au-dessus de l’horizon après s’être levé,",
+      "footnotes": null
+    },
+    {
+      "number": 2,
+      "text": "par la lune qui apparaît après que le soleil se soit couché,",
+      "footnotes": null
+    },
+    {
+      "number": 3,
+      "text": "par le jour qui, par sa lumière, fait apparaître ce qui se trouve à la surface de la Terre,",
+      "footnotes": null
+    },
+    {
+      "number": 4,
+      "text": "par la nuit qui enveloppe la surface de la Terre et l’obscurcit,",
+      "footnotes": null
+    },
+    {
+      "number": 5,
+      "text": "par le Ciel et sa construction parfaite,",
+      "footnotes": null
+    },
+    {
+      "number": 6,
+      "text": "par la Terre et son étendue propice à l’installation des gens,",
+      "footnotes": null
+    },
+    {
+      "number": 7,
+      "text": "par toute âme et sa création harmonieuse par Allah",
+      "footnotes": null
+    },
+    {
+      "number": 8,
+      "text": "qui lui a inspiré, sans qu’elle n’ait eu besoin d’aucun apprentissage, ce qui est mal, afin qu’elle s’en écarte et ce qui est bien, afin qu’elle s’en approche, que:",
+      "footnotes": null
+    },
+    {
+      "number": 9,
+      "text": "Celui qui purifie son âme en la pourvoyant de vertus et en la défaisant des turpitudes, remporte ce qu’il désire",
+      "footnotes": null
+    },
+    {
+      "number": 10,
+      "text": "et celui qui la corrompt en lui faisant commettre des actes de désobéissance et des péchés est perdant. ",
+      "footnotes": null
+    },
+    {
+      "number": 11,
+      "text": "Les Thamûd, par leur exagération dans les péchés, ont traité leur prophète Şâliħ de menteur",
+      "footnotes": null
+    },
+    {
+      "number": 12,
+      "text": "lorsque le plus misérable d’entre eux, désigné par les siens, se leva.",
+      "footnotes": null
+    },
+    {
+      "number": 13,
+      "text": "Le messager d’Allah, Şâliħ, leur dit: Laissez la chamelle d’Allah boire durant son jour et ne vous en prenez pas à elle.",
+      "footnotes": null
+    },
+    {
+      "number": 14,
+      "text": "Seulement, ils démentirent leur messager au sujet de la chamelle et le plus misérable d’entre eux la tua avec leur approbation. Ils furent donc les complices de son crime et Allah abattit sur eux Son châtiment. Il les fit périr par le Cri, pour leurs péchés et étendit son châtiment sur tous,",
+      "footnotes": null
+    },
+    {
+      "number": 15,
+      "text": "sans qu’Allah n’eut à craindre la conséquence de Son châtiment.",
+      "footnotes": null
+    }
+  ],
+  "versionNote": "Edition not published in QuranEnc /translations/list; version identity is the download date of the API payload (SHA-256 recorded in sources)."
+}

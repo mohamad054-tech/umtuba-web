@@ -1,0 +1,110 @@
+{
+  "surah": 91,
+  "locale": "es",
+  "kind": "meanings",
+  "quranEncKey": "spanish_mokhtasar",
+  "version": "quranenc-api-download-2026-09-23",
+  "displayNameAr": "المختصر في تفسير القرآن الكريم",
+  "displayNameEn": "Al-Mukhtasar (Tafsir Center)",
+  "publisher": "Tafsir Center for Quranic Studies / QuranEnc.com",
+  "attributionRequired": true,
+  "sources": [
+    {
+      "role": "primary_download",
+      "name": "QuranEnc.com API v1 — sura translation",
+      "url": "https://quranenc.com/api/v1/translation/sura/spanish_mokhtasar/91",
+      "sha256": "59cb1339e2ffbff6cdded075c41ff1821c75f4cdb59883f8dae4da2240296d34",
+      "downloadedFile": "tmp/hifz/sources/spanish_mokhtasar-91-a.json"
+    },
+    {
+      "role": "secondary_cross_check",
+      "name": "QuranEnc.com API v1 — identical re-download",
+      "url": "https://quranenc.com/api/v1/translation/sura/spanish_mokhtasar/91",
+      "sha256": "59cb1339e2ffbff6cdded075c41ff1821c75f4cdb59883f8dae4da2240296d34",
+      "downloadedFile": "tmp/hifz/sources/spanish_mokhtasar-91-b.json",
+      "note": "Byte-identical to primary download (SHA-256 match)."
+    }
+  ],
+  "termsUrl": "https://quranenc.com/en/home/contact_us",
+  "crossCheckWordByWord100Percent": true,
+  "downloadedAtUtc": "2026-09-23T15:21:03.036Z",
+  "ayahCount": 15,
+  "ayat": [
+    {
+      "number": 1,
+      "text": "1. Al-lah jura por el Sol y su salida después de irrumpir en el horizonte oriental. ",
+      "footnotes": null
+    },
+    {
+      "number": 2,
+      "text": "2. También jura por la Luna cuando aparece tras la puesta del Sol. ",
+      "footnotes": null
+    },
+    {
+      "number": 3,
+      "text": "3. Y jura por el día, cuando revela todo lo que hay sobre la faz de la Tierra a través de su luz. ",
+      "footnotes": null
+    },
+    {
+      "number": 4,
+      "text": "4. Y por la noche, cuando cubre la faz de la Tierra, oscureciéndola. ",
+      "footnotes": null
+    },
+    {
+      "number": 5,
+      "text": "5. Y jura por el cielo y la perfecta creación que hay en él. ",
+      "footnotes": null
+    },
+    {
+      "number": 6,
+      "text": "6. También jura por la Tierra y la forma en que fue extendida para que la gente pudiera vivir en ella. ",
+      "footnotes": null
+    },
+    {
+      "number": 7,
+      "text": "7. Y jura por cada alma, que Al-lah ha creado en armonía. ",
+      "footnotes": null
+    },
+    {
+      "number": 8,
+      "text": "8. Al-lah le dio al ser humano las herramientas para comprender y distinguir entre lo que era malo para que se pudiera abstenerse, y lo que era bueno para que lo pudiera implementar. ",
+      "footnotes": null
+    },
+    {
+      "number": 9,
+      "text": "9. Quien haya purificado su alma adornándola con virtudes y liberándola de los malos rasgos, ha triunfado. ",
+      "footnotes": null
+    },
+    {
+      "number": 10,
+      "text": "10. Pero ciertamente quien secretamente ha inmerso su alma en el pecado y la desobediencia, ha fracasado. ",
+      "footnotes": null
+    },
+    {
+      "number": 11,
+      "text": "11. Después de que Al-lah menciona el fracaso de quien empuja su alma secretamente hacia los pecados, menciona al pueblo de Zamud como ejemplo de ello, diciendo: El pueblo de Zamud rechazó a su Profeta Sálih, transgrediendo los límites al cometer pecados y desobedeciendo a Al-lah. ",
+      "footnotes": null
+    },
+    {
+      "number": 12,
+      "text": "12. Cuando el más miserable de entre ellos se preparó para matar a la camella cuando su pueblo le encomendó esa tarea. ",
+      "footnotes": null
+    },
+    {
+      "number": 13,
+      "text": "13. El Mensajero de Al-lah, Sálih u les dijo: “Dejen en paz a la camella de Al-lah; dejen que beba libremente y no la persigan con la intención de hacerle mal”. ",
+      "footnotes": null
+    },
+    {
+      "number": 14,
+      "text": "14. Pero ellos desestimaron a su Mensajero con respecto a la camella, y así los más miserables de entre ellos la mataron con el consentimiento de su pueblo. Pero todos ellos fueron culpables del crimen, y por eso Al-lah los envolvió en Su castigo y los destruyó con un grito a causa de sus pecados. Al-lah castigó con justicia al ejecutor del crimen, así como a los que lo idearon. ",
+      "footnotes": null
+    },
+    {
+      "number": 15,
+      "text": "15. Al-lah les impuso un castigo que los destruyó, sin temer reproche por Sus acciones. ",
+      "footnotes": null
+    }
+  ],
+  "versionNote": "Edition not published in QuranEnc /translations/list; version identity is the download date of the API payload (SHA-256 recorded in sources)."
+}

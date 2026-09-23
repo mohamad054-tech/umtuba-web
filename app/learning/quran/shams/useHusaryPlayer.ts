@@ -11,13 +11,13 @@ import {
   type HusaryQueueItem,
   type RepeatCount,
   type RepeatPauseLength,
-} from "../../../lib/hifz/audio";
+} from "../../../../lib/hifz/audio";
 import {
   getHusaryAyahTiming,
   wordIndexAtMs,
-} from "../../../lib/hifz/husaryTimings";
+} from "../../../../lib/hifz/husaryTimings";
 
-export type { AudioPlayMode } from "../../../lib/hifz/audio";
+export type { AudioPlayMode } from "../../../../lib/hifz/audio";
 
 export function useHusaryPlayer() {
   const audioRef = useRef<HTMLAudioElement | null>(null);

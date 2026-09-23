@@ -1,0 +1,110 @@
+{
+  "surah": 91,
+  "locale": "id",
+  "kind": "meanings",
+  "quranEncKey": "indonesian_mokhtasar",
+  "version": "quranenc-api-download-2026-09-23",
+  "displayNameAr": "المختصر في تفسير القرآن الكريم",
+  "displayNameEn": "Al-Mukhtasar (Tafsir Center)",
+  "publisher": "Tafsir Center for Quranic Studies / QuranEnc.com",
+  "attributionRequired": true,
+  "sources": [
+    {
+      "role": "primary_download",
+      "name": "QuranEnc.com API v1 — sura translation",
+      "url": "https://quranenc.com/api/v1/translation/sura/indonesian_mokhtasar/91",
+      "sha256": "7bb43203561f1249c6572252f229f86052b0f06a0e113e92842798fa521d04a1",
+      "downloadedFile": "tmp/hifz/sources/indonesian_mokhtasar-91-a.json"
+    },
+    {
+      "role": "secondary_cross_check",
+      "name": "QuranEnc.com API v1 — identical re-download",
+      "url": "https://quranenc.com/api/v1/translation/sura/indonesian_mokhtasar/91",
+      "sha256": "7bb43203561f1249c6572252f229f86052b0f06a0e113e92842798fa521d04a1",
+      "downloadedFile": "tmp/hifz/sources/indonesian_mokhtasar-91-b.json",
+      "note": "Byte-identical to primary download (SHA-256 match)."
+    }
+  ],
+  "termsUrl": "https://quranenc.com/en/home/contact_us",
+  "crossCheckWordByWord100Percent": true,
+  "downloadedAtUtc": "2026-09-23T15:21:03.036Z",
+  "ayahCount": 15,
+  "ayat": [
+    {
+      "number": 1,
+      "text": "Allah bersumpah dengan matahari dan bersumpah dengan waktu naiknya matahari setelah terbitnya dari tempat munculnya.",
+      "footnotes": null
+    },
+    {
+      "number": 2,
+      "text": "Dia bersumpah dengan bulan apabila mengiringi jejak matahari setelah matahari tenggelam.",
+      "footnotes": null
+    },
+    {
+      "number": 3,
+      "text": "Dia bersumpah dengan siang hari apabila telah menyingkap apa yang berada di atas permukaan bumi dengan cahayanya.",
+      "footnotes": null
+    },
+    {
+      "number": 4,
+      "text": "Dia bersumpah dengan malam hari apabila telah menutupi permukaan bumi sehingga menjadi gelap.",
+      "footnotes": null
+    },
+    {
+      "number": 5,
+      "text": "Dia bersumpah dengan langit dan bersumpah dengan pembangunannya yang teliti.",
+      "footnotes": null
+    },
+    {
+      "number": 6,
+      "text": "Dia bersumpah dengan bumi dan bersumpah dengan hamparannya agar manusia bisa menghuninya.",
+      "footnotes": null
+    },
+    {
+      "number": 7,
+      "text": "Dia bersumpah dengan setiap jiwa dan bersumpah dengan penciptaan jiwa tersebut secara sempurna.",
+      "footnotes": null
+    },
+    {
+      "number": 8,
+      "text": "Lalu Dia memahamkan kepadanya tanpa belajar segala yang buruk agar ia menghindarinya dan segala yang baik agar ia melakukannya.",
+      "footnotes": null
+    },
+    {
+      "number": 9,
+      "text": "Sungguh, orang yang menyucikan jiwanya serta menghiasinya dengan sifat-sifat kebaikan dan mengosongkannya dari sifat-sifat buruk telah menang dengan mendapatkan apa yang diinginkannya.",
+      "footnotes": null
+    },
+    {
+      "number": 10,
+      "text": "Sebaliknya, orang yang mengotori jiwanya dengan kemaksiatan dan dosa secara sembunyi-sembunyi telah merugi.",
+      "footnotes": null
+    },
+    {
+      "number": 11,
+      "text": "Kaum Ṡamūd telah mendustakan Nabi mereka, Saleh, karena mereka telah melampaui batas dalam melakukan kemaksiatan dan dosa,",
+      "footnotes": null
+    },
+    {
+      "number": 12,
+      "text": "yaitu ketika orang paling celaka di antara mereka berdiri (untuk menyembelih unta betina Allah) setelah kaumnya mewakilkan itu padanya.",
+      "footnotes": null
+    },
+    {
+      "number": 13,
+      "text": "Rasul Allah, Saleh -'alaihissalām-, lantas berkata kepada mereka, “Biarkan unta Allah ini dan giliran minumnya pada waktunya, janganlah kalian mengganggunya.”",
+      "footnotes": null
+    },
+    {
+      "number": 14,
+      "text": "Lalu mereka mendustakan Rasul mereka dalam perkara unta ini, kemudian orang paling celaka dari mereka membunuh unta itu dengan restu dari mereka terhadap perbuatannya, sehingga mereka semua bersekutu dalam perbuatan dosa, lalu Allah pun menimpakan siksa-Nya kepada mereka dengan menghancurkan mereka dengan suara keras yang menggelegar karena dosa-dosa mereka dan Allah menyamaratakan mereka dalam hukuman yang Allah gunakan untuk menghancurkan mereka.",
+      "footnotes": null
+    },
+    {
+      "number": 15,
+      "text": "Allah menimpakan siksa yang membinasakan mereka ini tanpa takut dengan akibat yang timbul.",
+      "footnotes": null
+    }
+  ],
+  "versionNote": "Edition not published in QuranEnc /translations/list; version identity is the download date of the API payload (SHA-256 recorded in sources)."
+}

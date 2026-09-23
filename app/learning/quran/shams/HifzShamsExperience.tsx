@@ -11,7 +11,7 @@ import {
   type CSSProperties,
   type PointerEvent as ReactPointerEvent,
 } from "react";
-import { ayahImageSrc, getAshShamsAyat } from "../../../lib/hifz/ashShamsData";
+import { ayahImageSrc, getAshShamsAyat } from "../../../../lib/hifz/ashShamsData";
 import {
   HUSARY_AUDIO_ATTRIBUTION,
   REPEAT_COUNT_OPTIONS,
@@ -20,24 +20,25 @@ import {
   type HifzAudioClipId,
   type RepeatCount,
   type RepeatPauseLength,
-} from "../../../lib/hifz/audio";
-import { buildLinkingPrompt } from "../../../lib/hifz/linking";
+} from "../../../../lib/hifz/audio";
+import { buildLinkingPrompt } from "../../../../lib/hifz/linking";
 import {
   markAyahReviewed,
   readProgress,
   readRepeatPauseLength,
   softMasteryVibrate,
   writeRepeatPauseLength,
-} from "../../../lib/hifz/progress";
+} from "../../../../lib/hifz/progress";
 import {
   firstLetterOfToken,
   tokenizeAyah,
-} from "../../../lib/hifz/tokenize";
-import type { HifzLocalProgress, HifzModeId } from "../../../lib/hifz/types";
+} from "../../../../lib/hifz/tokenize";
+import type { HifzLocalProgress, HifzModeId } from "../../../../lib/hifz/types";
 import { useHusaryPlayer } from "./useHusaryPlayer";
+import { VerseSourcedNotes } from "./VerseSourcedNotes";
 
 const amiriQuran = localFont({
-  src: "../../../public/fonts/amiri-quran/AmiriQuran-Regular.ttf",
+  src: "../../../../public/fonts/amiri-quran/AmiriQuran-Regular.ttf",
   display: "swap",
   variable: "--font-amiri-quran",
 });
@@ -405,10 +406,10 @@ export default function HifzShamsExperience() {
 
       <header className="relative z-10 shrink-0 px-4 pb-2 pt-[max(0.75rem,env(safe-area-inset-top))]">
         <p className="text-center text-[11px] tracking-[0.35em] text-[#e8c87a]/70">
-          سماء الحفظ
+          سماء الحفظ · Memorization sky
         </p>
         <h1 className="mt-1 text-center text-lg font-semibold text-[#f3e6c0]">
-          سورة الشمس
+          سورة الشمس · Surah ash-Shams
         </h1>
       </header>
 
@@ -577,6 +578,10 @@ export default function HifzShamsExperience() {
                 </div>
               )}
             </div>
+
+            {!showBasmala && showAyahPane && (
+              <VerseSourcedNotes ayahNumber={ayahIndex} />
+            )}
 
             {(mode === "learn" || isAudioMode(mode)) && (
               <AudioBar

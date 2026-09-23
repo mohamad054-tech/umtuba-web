@@ -1,0 +1,110 @@
+{
+  "surah": 91,
+  "locale": "ja",
+  "kind": "meanings",
+  "quranEncKey": "japanese_mokhtasar",
+  "version": "quranenc-api-download-2026-09-23",
+  "displayNameAr": "المختصر في تفسير القرآن الكريم",
+  "displayNameEn": "Al-Mukhtasar (Tafsir Center)",
+  "publisher": "Tafsir Center for Quranic Studies / QuranEnc.com",
+  "attributionRequired": true,
+  "sources": [
+    {
+      "role": "primary_download",
+      "name": "QuranEnc.com API v1 — sura translation",
+      "url": "https://quranenc.com/api/v1/translation/sura/japanese_mokhtasar/91",
+      "sha256": "ee872cb7e561ca06c70f789801868ac3310d642eecc154c0760185b70acace08",
+      "downloadedFile": "tmp/hifz/sources/japanese_mokhtasar-91-a.json"
+    },
+    {
+      "role": "secondary_cross_check",
+      "name": "QuranEnc.com API v1 — identical re-download",
+      "url": "https://quranenc.com/api/v1/translation/sura/japanese_mokhtasar/91",
+      "sha256": "ee872cb7e561ca06c70f789801868ac3310d642eecc154c0760185b70acace08",
+      "downloadedFile": "tmp/hifz/sources/japanese_mokhtasar-91-b.json",
+      "note": "Byte-identical to primary download (SHA-256 match)."
+    }
+  ],
+  "termsUrl": "https://quranenc.com/en/home/contact_us",
+  "crossCheckWordByWord100Percent": true,
+  "downloadedAtUtc": "2026-09-23T15:21:03.036Z",
+  "ayahCount": 15,
+  "ayat": [
+    {
+      "number": 1,
+      "text": "アッラーは誓う、太陽と東の水平線に昇ることにかけて、",
+      "footnotes": null
+    },
+    {
+      "number": 2,
+      "text": "日没に続く月にかけて、",
+      "footnotes": null
+    },
+    {
+      "number": 3,
+      "text": "太陽の輝きで地上のすべてを現わす昼にかけて、",
+      "footnotes": null
+    },
+    {
+      "number": 4,
+      "text": "それを包み隠す夜にかけて、",
+      "footnotes": null
+    },
+    {
+      "number": 5,
+      "text": "天空とその完璧な創造にかけて、",
+      "footnotes": null
+    },
+    {
+      "number": 6,
+      "text": "大地とそれを広げて人びとが住めるようにしたお方にかけて、",
+      "footnotes": null
+    },
+    {
+      "number": 7,
+      "text": "魂とそれを形成したお方にかけて、",
+      "footnotes": null
+    },
+    {
+      "number": 8,
+      "text": "行わないために何が悪か、そして実行するために何が善かということを、教えなくても理解するようにされた。",
+      "footnotes": null
+    },
+    {
+      "number": 9,
+      "text": "実際、美徳及び悪徳から逃れることで魂を清める者は確かに成功する。",
+      "footnotes": null
+    },
+    {
+      "number": 10,
+      "text": "秘密裏に魂を罪と非服従に投げ出す人は滅びる。",
+      "footnotes": null
+    },
+    {
+      "number": 11,
+      "text": "サムード族は、罪と不服従で則を越えて、預言者サーリフを嘘付きだとした。",
+      "footnotes": null
+    },
+    {
+      "number": 12,
+      "text": "かれらの中の最も性悪な者が使徒に対抗するために選ばれた時、",
+      "footnotes": null
+    },
+    {
+      "number": 13,
+      "text": "アッラーの使徒サーリフ（平安を）はかれらに、これはアッラーの雌ラクダだから、飲み水を取らせてやって、それに悪さをしないようにと言った。",
+      "footnotes": null
+    },
+    {
+      "number": 14,
+      "text": "だがかれらは使徒を嘘付きとして、仲間の合意も得てからその男は、ラクダの足の腱を切った。そこでアッラーはその罪のために、かれらをまとめて滅ぼし、全員同様に懲罰された。",
+      "footnotes": null
+    },
+    {
+      "number": 15,
+      "text": "かれはこういう罰の報い方を、何の非難も恐れずにされる。アッラーに称賛あれ。",
+      "footnotes": null
+    }
+  ],
+  "versionNote": "Edition not published in QuranEnc /translations/list; version identity is the download date of the API payload (SHA-256 recorded in sources)."
+}

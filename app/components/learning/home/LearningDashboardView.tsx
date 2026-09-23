@@ -21,6 +21,7 @@ import { DueLearningAction } from "./DueLearningAction";
 import { RecommendedLearning } from "./RecommendedLearning";
 import { LearningCategories } from "./LearningCategories";
 import { PartnerLearningPreview } from "./PartnerLearningPreview";
+import { LearningQuranSection } from "./LearningQuranSection";
 
 export function LearningDashboardView({
   home,
@@ -53,6 +54,7 @@ export function LearningDashboardView({
         data-learning-catalog-preview={recommended.length}
       >
         <LearningGreeting home={home} isTeacher={isTeacher} />
+        <LearningQuranSection />
         <ContinueLearningCard home={home} />
         <LearningSnapshot snapshot={snapshot} />
         <OneToOnePreview data={oneToOne} />
