@@ -9,7 +9,6 @@ import {
   useRef,
   useState,
   type CSSProperties,
-  type PointerEvent as ReactPointerEvent,
 } from "react";
 import { ayahImageSrc, getAshShamsAyat } from "../../../../lib/hifz/ashShamsData";
 import {
@@ -17,23 +16,40 @@ import {
   REPEAT_COUNT_OPTIONS,
   REPEAT_PAUSE_LENGTH_OPTIONS,
   repeatWordOpacity,
-  type HifzAudioClipId,
   type RepeatCount,
   type RepeatPauseLength,
 } from "../../../../lib/hifz/audio";
 import { buildLinkingPrompt } from "../../../../lib/hifz/linking";
 import {
-  markAyahReviewed,
+  advancePath,
+  displayAyah,
+  initialPathState,
+  isHideStep,
+  isLinkStep,
+  nextDisabled,
+  PATH_STEP_LABELS_AR,
+  showsNextButton,
+  type PathState,
+  type PathStepId,
+} from "../../../../lib/hifz/pathSteps";
+import {
+  listDueToday,
+  rateAyah,
   readProgress,
   readRepeatPauseLength,
   softMasteryVibrate,
   writeRepeatPauseLength,
 } from "../../../../lib/hifz/progress";
 import {
+  mapVerseStatus,
+  surahProgressPercent,
+  type MapVerseStatus,
+} from "../../../../lib/hifz/reviewSchedule";
+import {
   firstLetterOfToken,
   tokenizeAyah,
 } from "../../../../lib/hifz/tokenize";
-import type { HifzLocalProgress, HifzModeId } from "../../../../lib/hifz/types";
+import type { HifzLocalProgress } from "../../../../lib/hifz/types";
 import { useHusaryPlayer } from "./useHusaryPlayer";
 import { VerseSourcedNotes } from "./VerseSourcedNotes";
 
@@ -43,19 +59,38 @@ const amiriQuran = localFont({
   variable: "--font-amiri-quran",
 });
 
-const MODES: Array<{ id: HifzModeId; label: string }> = [
-  { id: "learn", label: "تعلّم" },
-  { id: "listen", label: "الاستماع" },
-  { id: "listenRepeat", label: "التكرار" },
-  { id: "tilawaLink", label: "وصل التلاوة" },
-  { id: "fading", label: "تلاشٍ" },
-  { id: "letters", label: "الحروف الأولى" },
-  { id: "linking", label: "الوصل" },
+type Surface =
+  | "path"
+  | "map"
+  | "reviews"
+  | "order"
+  | "linking"
+  | "tilawa"
+  | "listenBlind";
+
+type ToolActionId =
+  | "order"
+  | "tilawa"
+  | "surah"
+  | "basmala"
+  | "linking"
+  | "listenBlind";
+
+const TOOL_ITEMS: Array<{ id: ToolActionId; label: string }> = [
   { id: "order", label: "رتّب الآيات" },
-  { id: "sky", label: "تقدّم الحفظ" },
+  { id: "tilawa", label: "وصل التلاوة" },
+  { id: "surah", label: "السورة كاملة" },
+  { id: "basmala", label: "البسملة" },
+  { id: "linking", label: "الوصل" },
+  { id: "listenBlind", label: "الاستماع بلا نظر" },
 ];
 
-/** Calm scattered positions for 15 constellation stars (phone-first %). */
+const MAP_STATUS_LABEL: Record<MapVerseStatus, string> = {
+  memorized: "محفوظة ✓",
+  needsReview: "تحتاج مراجعة",
+  notStarted: "لم تبدأ",
+};
+
 const STAR_LAYOUT: Array<{ x: number; y: number }> = [
   { x: 18, y: 22 },
   { x: 42, y: 14 },
@@ -76,36 +111,38 @@ const STAR_LAYOUT: Array<{ x: number; y: number }> = [
 
 const ORDER_HINT_IDLE_MS = 4500;
 
-function clampAyah(n: number): number {
-  return Math.min(15, Math.max(1, n));
+function setCopy(prev: Set<number>, idx: number): Set<number> {
+  const next = new Set(prev);
+  next.add(idx);
+  return next;
 }
 
-function isAudioMode(mode: HifzModeId): boolean {
-  return mode === "listen" || mode === "listenRepeat" || mode === "tilawaLink";
+function needsAudioControls(step: PathStepId): boolean {
+  return step === "listen" || step === "repeat" || isLinkStep(step);
 }
 
-function countMemorized(stars: HifzLocalProgress["stars"]): number {
-  let n = 0;
-  for (let i = 1; i <= 15; i++) {
-    if (stars[String(i)]) n += 1;
-  }
-  return n;
-}
-
-function nextUnreviewed(stars: HifzLocalProgress["stars"]): number | null {
-  for (let i = 1; i <= 15; i++) {
-    if (!stars[String(i)]) return i;
-  }
+function hideModeForStep(
+  step: PathStepId,
+): "full" | "partial" | "letters" | "all" | null {
+  if (step === "hideFull") return "full";
+  if (step === "hidePartial") return "partial";
+  if (step === "hideLetters") return "letters";
+  if (step === "hideAll") return "all";
   return null;
 }
 
+function isMemoryStep(step: PathStepId): boolean {
+  return step === "reciteMemory" || step === "surahMemory";
+}
 export default function HifzShamsExperience() {
   const ayat = useMemo(() => getAshShamsAyat(), []);
-  const [mode, setMode] = useState<HifzModeId>("learn");
-  const [ayahIndex, setAyahIndex] = useState(1);
-  const [showBasmala, setShowBasmala] = useState(false);
-  const [fadeStep, setFadeStep] = useState(0);
+  const [surface, setSurface] = useState<Surface>("path");
+  const [path, setPath] = useState<PathState>(() => initialPathState(1));
+  const [toolsOpen, setToolsOpen] = useState(false);
+  const [memoryRevealed, setMemoryRevealed] = useState(false);
   const [revealedWords, setRevealedWords] = useState<Set<number>>(() => new Set());
+  const [showBasmala, setShowBasmala] = useState(false);
+  const [blindAyah, setBlindAyah] = useState(1);
   const [linkPromptIndex, setLinkPromptIndex] = useState(1);
   const [linkShake, setLinkShake] = useState(false);
   const [linkDone, setLinkDone] = useState(false);
@@ -117,9 +154,9 @@ export default function HifzShamsExperience() {
   const [orderPraise, setOrderPraise] = useState<string | null>(null);
   const [progress, setProgress] = useState<HifzLocalProgress | null>(null);
   const [fadeVisible, setFadeVisible] = useState(true);
-  const touchRef = useRef<{ x: number; y: number } | null>(null);
   const orderIdleRef = useRef<number | null>(null);
   const praiseTimerRef = useRef<number | null>(null);
+  const lastAutoStepRef = useRef<string>("");
 
   const player = useHusaryPlayer();
 
@@ -129,41 +166,63 @@ export default function HifzShamsExperience() {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- hydrate once on mount
   }, []);
 
-  const ayah = ayat[ayahIndex - 1];
+  const shownAyah = surface === "listenBlind" ? blindAyah : displayAyah(path);
+  const ayah = ayat[shownAyah - 1];
   const words = useMemo(() => tokenizeAyah(ayah.text), [ayah.text]);
-  const imageSrc = ayahImageSrc(ayahIndex);
+  const imageSrc = ayahImageSrc(shownAyah);
+  const step = path.step;
+  const hideMode = hideModeForStep(step);
+  const dueToday = useMemo(
+    () => (progress ? listDueToday(progress) : []),
+    [progress],
+  );
 
-  const recordMastery = useCallback((n: number) => {
-    const next = markAyahReviewed(n);
-    setProgress(next);
-    softMasteryVibrate();
-  }, []);
+  const mapStatuses = useMemo(() => {
+    const now = new Date();
+    return Array.from({ length: 15 }, (_, i) => {
+      const entry = progress?.verses[String(i + 1)];
+      return mapVerseStatus(
+        entry ? { rating: entry.rating, dueAt: entry.dueAt } : null,
+        now,
+      );
+    });
+  }, [progress]);
 
-  const goAyah = useCallback((next: number) => {
+  const mapPercent = surahProgressPercent(mapStatuses);
+
+  const goPath = useCallback((event: Parameters<typeof advancePath>[1]) => {
     setFadeVisible(false);
-    setShowBasmala(false);
     window.setTimeout(() => {
-      setAyahIndex(clampAyah(next));
-      setFadeStep(0);
+      setPath((prev) => advancePath(prev, event));
+      setMemoryRevealed(false);
       setRevealedWords(new Set());
+      setShowBasmala(false);
       setFadeVisible(true);
-    }, 180);
+    }, 160);
   }, []);
 
-  // Sync displayed ayah with player when audio advances
-  useEffect(() => {
-    const clip = player.activeClip;
-    if (clip == null) return;
-    if (clip === "basmala") {
-      setShowBasmala(true);
-      return;
-    }
-    setShowBasmala(false);
-    if (clip !== ayahIndex) {
-      setAyahIndex(clip);
+  const openAyahOnPath = useCallback((n: number) => {
+    setSurface("path");
+    setToolsOpen(false);
+    setFadeVisible(false);
+    window.setTimeout(() => {
+      setPath(initialPathState(n));
+      setMemoryRevealed(false);
+      setRevealedWords(new Set());
+      setShowBasmala(false);
       setFadeVisible(true);
-    }
-  }, [player.activeClip, ayahIndex]);
+    }, 160);
+  }, []);
+
+  const onRate = useCallback(
+    (rating: "again" | "unsure" | "remembered") => {
+      const next = rateAyah(path.ayah, rating);
+      setProgress(next);
+      if (rating === "remembered") softMasteryVibrate();
+      goPath({ type: "rate", rating });
+    },
+    [goPath, path.ayah],
+  );
 
   const clearOrderIdle = useCallback(() => {
     if (orderIdleRef.current != null) {
@@ -181,13 +240,13 @@ export default function HifzShamsExperience() {
   }, [clearOrderIdle, orderComplete, orderStarted]);
 
   useEffect(() => {
-    if (mode !== "order" || !orderStarted || orderComplete) {
+    if (surface !== "order" || !orderStarted || orderComplete) {
       clearOrderIdle();
       return;
     }
     armOrderIdle();
     return clearOrderIdle;
-  }, [mode, orderStarted, orderComplete, orderNext, armOrderIdle, clearOrderIdle]);
+  }, [surface, orderStarted, orderComplete, orderNext, armOrderIdle, clearOrderIdle]);
 
   useEffect(() => {
     return () => {
@@ -195,98 +254,98 @@ export default function HifzShamsExperience() {
     };
   }, []);
 
-  const onPointerDown = (e: ReactPointerEvent) => {
-    touchRef.current = { x: e.clientX, y: e.clientY };
-  };
+  useEffect(() => {
+    setRevealedWords(new Set());
+    setMemoryRevealed(false);
+  }, [step, shownAyah]);
 
-  const onPointerUp = (e: ReactPointerEvent) => {
-    const start = touchRef.current;
-    touchRef.current = null;
-    if (!start) return;
-    if (mode !== "learn" && mode !== "fading" && mode !== "letters" && !isAudioMode(mode)) {
+  // Auto-play listen / link audio when those path steps begin
+  useEffect(() => {
+    if (surface !== "path") return;
+    const key = `${path.ayah}:${step}`;
+    if (lastAutoStepRef.current === key) return;
+    lastAutoStepRef.current = key;
+
+    if (step === "listen") {
+      player.start("single", path.ayah);
       return;
     }
-    const dx = e.clientX - start.x;
-    const dy = e.clientY - start.y;
-    if (Math.abs(dx) < 48 || Math.abs(dx) < Math.abs(dy)) return;
-    if (dx > 0) goAyah(ayahIndex - 1);
-    else goAyah(ayahIndex + 1);
-  };
-
-  useEffect(() => {
-    if (mode !== "fading") return;
-    setFadeStep(0);
-    setRevealedWords(new Set());
-    const t1 = window.setTimeout(() => setFadeStep(1), 900);
-    const t2 = window.setTimeout(() => setFadeStep(2), 1800);
-    const t3 = window.setTimeout(() => setFadeStep(3), 2700);
-    return () => {
-      window.clearTimeout(t1);
-      window.clearTimeout(t2);
-      window.clearTimeout(t3);
-    };
-  }, [mode, ayahIndex]);
-
-  useEffect(() => {
-    if (mode === "letters") setRevealedWords(new Set());
-  }, [mode, ayahIndex]);
-
-  useEffect(() => {
-    if (!isAudioMode(mode)) {
+    if (step === "repeat") {
+      player.start("repeat", path.ayah);
+      return;
+    }
+    if (step === "linkAlone") {
+      player.startQueue([path.ayah]);
+      return;
+    }
+    if (step === "linkNextAlone") {
+      const next = Math.min(15, path.ayah + 1);
+      player.startQueue([next]);
+      return;
+    }
+    if (step === "linkTogether") {
+      const next = Math.min(15, path.ayah + 1);
+      player.startQueue([path.ayah, next]);
+      return;
+    }
+    if (!needsAudioControls(step)) {
       player.stop();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- stop only on mode leave
-  }, [mode]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional on step enter
+  }, [surface, path.ayah, step]);
+
+  useEffect(() => {
+    if (surface === "path" || surface === "tilawa" || surface === "listenBlind") return;
+    player.stop();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [surface]);
+
+  useEffect(() => {
+    const clip = player.activeClip;
+    if (clip == null || clip === "basmala") return;
+    if (surface === "tilawa" && clip !== shownAyah) {
+      setPath((prev) => ({ ...prev, ayah: clip }));
+    }
+  }, [player.activeClip, surface, shownAyah]);
 
   const linkingPrompt = useMemo(() => {
-    if (mode !== "linking") return null;
+    if (surface !== "linking") return null;
     return buildLinkingPrompt(ayat, linkPromptIndex);
-  }, [mode, ayat, linkPromptIndex]);
+  }, [surface, ayat, linkPromptIndex]);
 
   const revealWord = (idx: number) => {
-    setRevealedWords((prev) => {
-      const next = setCopy(prev, idx);
-      if (next.size === words.length) {
-        window.setTimeout(() => recordMastery(ayahIndex), 0);
-      }
-      return next;
-    });
+    setRevealedWords((prev) => setCopy(prev, idx));
   };
 
   const wordOpacity = (idx: number): number => {
-    if (mode === "listenRepeat" && (player.playing || player.inRepeatSilence)) {
-      return repeatWordOpacity(
-        player.repeatIndex,
-        player.repeatCount,
-      );
+    if (surface === "path" && step === "repeat" && (player.playing || player.inRepeatSilence)) {
+      return repeatWordOpacity(player.repeatIndex, player.repeatCount);
     }
-    if (mode === "learn" || isAudioMode(mode)) return 1;
-    if (mode === "letters") {
+    if (hideMode === "letters") {
       return revealedWords.has(idx) ? 1 : 0.22;
     }
-    if (mode === "fading") {
+    if (hideMode === "partial") {
       if (revealedWords.has(idx)) return 1;
-      if (fadeStep <= 0) return 1;
-      if (fadeStep === 1) return idx % 3 === 0 ? 0.35 : 1;
-      if (fadeStep === 2) return idx % 2 === 0 ? 0.2 : 0.55;
-      return 0.08;
+      return idx % 2 === 0 ? 0.2 : 0.55;
+    }
+    if (hideMode === "all") {
+      return revealedWords.has(idx) ? 1 : 0.08;
     }
     return 1;
   };
 
   const imageOpacity =
-    mode === "fading" && fadeStep >= 3 && revealedWords.size < words.length
-      ? 0.15
-      : 1;
+    hideMode === "all" && revealedWords.size < words.length ? 0.15 : 1;
 
   const onLinkChoose = (chosen: number) => {
     if (!linkingPrompt) return;
     if (chosen === linkingPrompt.correctAyah) {
-      recordMastery(linkingPrompt.fromAyah);
-      recordMastery(linkingPrompt.correctAyah);
-      if (linkPromptIndex >= 14) {
-        setLinkDone(true);
-      } else {
+      const a = rateAyah(linkingPrompt.fromAyah, "remembered");
+      const b = rateAyah(linkingPrompt.correctAyah, "remembered");
+      setProgress(b.verses ? b : a);
+      softMasteryVibrate();
+      if (linkPromptIndex >= 14) setLinkDone(true);
+      else {
         setLinkPromptIndex((n) => n + 1);
         setLinkShake(false);
       }
@@ -313,10 +372,11 @@ export default function HifzShamsExperience() {
       armOrderIdle();
       return;
     }
-    const path = [...orderPath, n];
-    setOrderPath(path);
+    const nextPath = [...orderPath, n];
+    setOrderPath(nextPath);
     setOrderHint(false);
-    recordMastery(n);
+    setProgress(rateAyah(n, "remembered"));
+    softMasteryVibrate();
     showOrderPraise(n === 15 ? "أحسنت" : "في مكانها");
     if (n === 15) {
       setOrderComplete(true);
@@ -337,41 +397,80 @@ export default function HifzShamsExperience() {
     clearOrderIdle();
   };
 
-  const startClip: HifzAudioClipId = showBasmala ? "basmala" : ayahIndex;
-
-  const playCurrent = () => {
-    if (mode === "listenRepeat") {
-      player.start("repeat", typeof startClip === "number" ? startClip : 1);
-    } else if (mode === "tilawaLink") {
-      player.start("tilawaLink", startClip === "basmala" ? "basmala" : ayahIndex);
-    } else {
-      player.start("single", startClip);
-    }
-  };
-
-  const playWholeSurah = () => {
-    player.start("surah", "basmala");
-  };
-
   const onPauseLength = (length: RepeatPauseLength) => {
     player.setPauseLength(length);
     writeRepeatPauseLength(length);
   };
 
-  const skyStars = progress?.stars ?? {};
-  const memorizedCount = countMemorized(skyStars);
-  const nextReview = nextUnreviewed(skyStars);
-  const showAyahPane =
-    mode === "learn" ||
-    mode === "fading" ||
-    mode === "letters" ||
-    isAudioMode(mode);
+  const playPathAudio = () => {
+    if (step === "repeat") {
+      player.start("repeat", path.ayah);
+      return;
+    }
+    if (step === "linkAlone") {
+      player.startQueue([path.ayah]);
+      return;
+    }
+    if (step === "linkNextAlone") {
+      player.startQueue([Math.min(15, path.ayah + 1)]);
+      return;
+    }
+    if (step === "linkTogether") {
+      const next = Math.min(15, path.ayah + 1);
+      player.startQueue([path.ayah, next]);
+      return;
+    }
+    player.start("single", path.ayah);
+  };
 
-  const tilawaPlaying =
-    mode === "tilawaLink" &&
-    (player.playing || player.paused) &&
-    player.activeClip != null &&
-    player.activeClip !== "basmala";
+  const onToolPick = (id: ToolActionId) => {
+    setToolsOpen(false);
+    if (id === "surah") {
+      setShowBasmala(true);
+      player.start("surah", "basmala");
+      setSurface("tilawa");
+      return;
+    }
+    if (id === "basmala") {
+      setShowBasmala(true);
+      player.start("single", "basmala");
+      setSurface("tilawa");
+      return;
+    }
+    if (id === "order") {
+      resetOrder();
+      setSurface("order");
+      return;
+    }
+    if (id === "linking") {
+      setLinkPromptIndex(1);
+      setLinkDone(false);
+      setSurface("linking");
+      return;
+    }
+    if (id === "tilawa") {
+      setShowBasmala(false);
+      setSurface("tilawa");
+      return;
+    }
+    if (id === "listenBlind") {
+      setBlindAyah(path.ayah);
+      setSurface("listenBlind");
+    }
+  };
+
+  const showVerseText =
+    surface === "path" &&
+    !isMemoryStep(step) &&
+    step !== "rate" &&
+    !showBasmala;
+
+  const showPathAyahPane =
+    surface === "path" &&
+    (needsAudioControls(step) ||
+      isHideStep(step) ||
+      isMemoryStep(step) ||
+      step === "rate");
 
   return (
     <div
@@ -382,15 +481,8 @@ export default function HifzShamsExperience() {
         background:
           "radial-gradient(ellipse at 50% 0%, #1a1540 0%, #0a0a1a 45%, #050510 100%)",
       }}
-      onPointerDown={onPointerDown}
-      onPointerUp={onPointerUp}
     >
-      <audio
-        ref={player.bindAudio}
-        playsInline
-        preload="none"
-        className="hidden"
-      />
+      <audio ref={player.bindAudio} playsInline preload="none" className="hidden" />
 
       <div
         aria-hidden
@@ -404,63 +496,108 @@ export default function HifzShamsExperience() {
         }}
       />
 
-      <header className="relative z-10 shrink-0 px-4 pb-2 pt-[max(0.75rem,env(safe-area-inset-top))]">
-        <p className="text-center text-[11px] tracking-[0.35em] text-[#e8c87a]/70">
-          سماء الحفظ · Memorization sky
-        </p>
-        <h1 className="mt-1 text-center text-lg font-semibold text-[#f3e6c0]">
-          سورة الشمس · Surah ash-Shams
-        </h1>
+      <header className="relative z-10 shrink-0 px-4 pb-1 pt-[max(0.75rem,env(safe-area-inset-top))]">
+        <h1 className="text-center text-lg font-semibold text-[#f3e6c0]">سورة الشمس</h1>
       </header>
 
-      <nav
-        className="relative z-10 mx-auto flex w-full max-w-3xl gap-1.5 overflow-x-auto px-3 pb-3"
-        aria-label="أوضاع الحفظ"
-      >
-        {MODES.map((m) => {
-          const active = mode === m.id;
-          return (
-            <button
-              key={m.id}
-              type="button"
-              onClick={() => {
-                setMode(m.id);
-                setFadeStep(0);
-                setRevealedWords(new Set());
-                setShowBasmala(false);
-                if (m.id === "linking") {
-                  setLinkPromptIndex(1);
-                  setLinkDone(false);
-                }
-                if (m.id === "order") {
-                  resetOrder();
-                }
-              }}
-              className={`shrink-0 rounded-full px-3 py-2 text-xs transition sm:py-1.5 ${
-                active
-                  ? "bg-[#e8c87a]/20 text-[#f5e6b8] ring-1 ring-[#e8c87a]/45"
-                  : "bg-white/5 text-white/55 ring-1 ring-white/10"
-              }`}
+      <div className="relative z-20 mx-auto flex w-full max-w-3xl items-center justify-center gap-2 px-3 pb-3">
+        <button
+          type="button"
+          onClick={() => {
+            setToolsOpen(false);
+            setSurface("reviews");
+            setProgress(readProgress());
+          }}
+          className={`min-h-11 shrink-0 rounded-full px-3 py-2 text-xs transition ${
+            surface === "reviews"
+              ? "bg-[#e8c87a]/20 text-[#f5e6b8] ring-1 ring-[#e8c87a]/45"
+              : "bg-white/5 text-white/60 ring-1 ring-white/10"
+          }`}
+        >
+          مراجعات اليوم
+          {dueToday.length > 0 ? ` (${dueToday.length})` : ""}
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            setToolsOpen(false);
+            setSurface("map");
+            setProgress(readProgress());
+          }}
+          className={`min-h-11 shrink-0 rounded-full px-3 py-2 text-xs transition ${
+            surface === "map"
+              ? "bg-[#e8c87a]/20 text-[#f5e6b8] ring-1 ring-[#e8c87a]/45"
+              : "bg-white/5 text-white/60 ring-1 ring-white/10"
+          }`}
+        >
+          خريطة الحفظ
+        </button>
+        <div className="relative">
+          <button
+            type="button"
+            onClick={() => setToolsOpen((o) => !o)}
+            className={`min-h-11 shrink-0 rounded-full px-3 py-2 text-xs transition ${
+              toolsOpen ||
+              surface === "order" ||
+              surface === "linking" ||
+              surface === "tilawa" ||
+              surface === "listenBlind"
+                ? "bg-[#e8c87a]/20 text-[#f5e6b8] ring-1 ring-[#e8c87a]/45"
+                : "bg-white/5 text-white/60 ring-1 ring-white/10"
+            }`}
+            aria-expanded={toolsOpen}
+            aria-haspopup="menu"
+          >
+            أدوات أخرى
+          </button>
+          {toolsOpen && (
+            <div
+              role="menu"
+              className="absolute left-1/2 top-full z-30 mt-2 w-52 -translate-x-1/2 rounded-2xl border border-[#e8c87a]/25 bg-[#0a0a18]/98 p-2 shadow-xl backdrop-blur"
             >
-              {m.label}
-            </button>
-          );
-        })}
-      </nav>
-
+              {TOOL_ITEMS.map((item) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  role="menuitem"
+                  onClick={() => onToolPick(item.id)}
+                  className="flex min-h-11 w-full items-center justify-center rounded-xl px-3 py-2 text-sm text-[#f3e6c0] transition hover:bg-[#e8c87a]/15"
+                >
+                  {item.label}
+                </button>
+              ))}
+              {surface !== "path" && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setToolsOpen(false);
+                    setSurface("path");
+                    player.stop();
+                  }}
+                  className="mt-1 flex min-h-11 w-full items-center justify-center rounded-xl border border-white/10 px-3 py-2 text-sm text-white/55"
+                >
+                  العودة للمسار
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
       <main className="relative z-10 flex min-h-0 flex-1 flex-col px-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
-        {showAyahPane && (
+        {surface === "path" && showPathAyahPane && (
           <div
             className={`mx-auto flex w-full max-w-3xl flex-1 flex-col transition-opacity duration-300 ${
               fadeVisible ? "opacity-100" : "opacity-0"
             }`}
           >
+            <p className="mb-2 text-center text-sm text-[#e8c87a]/85">
+              {PATH_STEP_LABELS_AR[step]}
+              <span className="ms-2 font-sans text-xs text-white/40">
+                ﴿{path.ayah}﴾ · {path.ayah}/15
+              </span>
+            </p>
+
             <div className="flex flex-1 flex-col items-center justify-center gap-5">
-              {tilawaPlaying && (
-                <p className="rounded-full bg-[#e8c87a]/15 px-4 py-1.5 text-sm text-[#f5e6b8] ring-1 ring-[#e8c87a]/40">
-                  الآن تُتلى الآية ﴿{ayahIndex}﴾
-                </p>
-              )}
               <div
                 className="relative aspect-square w-full max-w-[min(100%,320px)] overflow-hidden rounded-[28px] border border-white/10 bg-[#080816]/70 transition-opacity duration-700 sm:max-w-[min(100%,360px)]"
                 style={{ opacity: imageOpacity }}
@@ -472,7 +609,7 @@ export default function HifzShamsExperience() {
                     fill
                     sizes="360px"
                     className="object-cover"
-                    priority={ayahIndex <= 2}
+                    priority={shownAyah <= 2}
                   />
                 ) : (
                   <div
@@ -485,69 +622,79 @@ export default function HifzShamsExperience() {
                 )}
               </div>
 
-              {showBasmala ? (
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (isAudioMode(mode)) player.start("single", "basmala");
-                  }}
-                  className="text-center text-xl text-[#e8c87a]/90"
-                >
-                  البسملة
-                </button>
-              ) : (
+              {isMemoryStep(step) && (
+                <div className="flex flex-col items-center gap-3">
+                  {!memoryRevealed ? (
+                    <button
+                      type="button"
+                      onClick={() => setMemoryRevealed(true)}
+                      className="min-h-12 rounded-full bg-[#e8c87a]/20 px-6 py-3 text-base text-[#f5e6b8] ring-1 ring-[#e8c87a]/45"
+                    >
+                      أظهر الآية
+                    </button>
+                  ) : (
+                    <p
+                      className={`${amiriQuran.className} px-2 text-center text-[1.55rem] leading-[2.35] text-[#f7efd8] sm:text-[1.75rem]`}
+                    >
+                      {ayah.text}
+                      <span className="ms-2 inline-block align-baseline font-sans text-base text-[#e8c87a]/80">
+                        ﴿{shownAyah}﴾
+                      </span>
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {step === "rate" && (
+                <div className="flex w-full max-w-sm flex-col gap-3">
+                  <button
+                    type="button"
+                    onClick={() => onRate("remembered")}
+                    className="min-h-14 rounded-2xl bg-[#e8c87a]/25 text-lg text-[#f5e6b8] ring-1 ring-[#e8c87a]/50"
+                  >
+                    حفظتها
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => onRate("unsure")}
+                    className="min-h-14 rounded-2xl border border-white/15 bg-white/5 text-lg text-white/80"
+                  >
+                    متردد
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => onRate("again")}
+                    className="min-h-14 rounded-2xl border border-white/15 bg-white/5 text-lg text-white/80"
+                  >
+                    أعدها
+                  </button>
+                </div>
+              )}
+
+              {showVerseText && (
                 <div
-                  className={`${amiriQuran.className} px-2 text-center text-[1.55rem] leading-[2.35] text-[#f7efd8] sm:text-[1.75rem] ${
-                    isAudioMode(mode) ? "cursor-pointer" : ""
-                  }`}
-                  onClick={() => {
-                    if (!isAudioMode(mode)) return;
-                    if (mode === "listenRepeat") player.start("repeat", ayahIndex);
-                    else if (mode === "tilawaLink") {
-                      player.start("tilawaLink", ayahIndex);
-                    } else player.start("single", ayahIndex);
-                  }}
-                  onKeyDown={(e) => {
-                    if (!isAudioMode(mode)) return;
-                    if (e.key === "Enter" || e.key === " ") {
-                      e.preventDefault();
-                      if (mode === "listenRepeat") player.start("repeat", ayahIndex);
-                      else if (mode === "tilawaLink") {
-                        player.start("tilawaLink", ayahIndex);
-                      } else player.start("single", ayahIndex);
-                    }
-                  }}
-                  role={isAudioMode(mode) ? "button" : undefined}
-                  tabIndex={isAudioMode(mode) ? 0 : undefined}
+                  className={`${amiriQuran.className} px-2 text-center text-[1.55rem] leading-[2.35] text-[#f7efd8] sm:text-[1.75rem]`}
                 >
                   {words.map((word, idx) => {
                     const showLettersOnly =
-                      mode === "letters" && !revealedWords.has(idx);
+                      hideMode === "letters" && !revealedWords.has(idx);
                     const opaque = wordOpacity(idx);
-                    const hiddenFaded =
-                      mode === "fading" && fadeStep >= 1 && !revealedWords.has(idx);
+                    const interactive = hideMode != null && hideMode !== "full";
                     const listeningHighlight =
-                      isAudioMode(mode) &&
-                      player.activeClip === ayahIndex &&
+                      needsAudioControls(step) &&
+                      player.activeClip === shownAyah &&
                       player.activeWord === idx &&
                       (player.playing || player.paused);
-                    if (mode === "fading" || mode === "letters") {
+                    if (interactive) {
                       return (
                         <button
-                          key={`${ayahIndex}-${idx}`}
+                          key={`${shownAyah}-${idx}`}
                           type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            revealWord(idx);
-                          }}
-                          className={`mx-0.5 inline-block rounded-md px-0.5 align-baseline transition-opacity duration-700 cursor-pointer ${
-                            hiddenFaded ? "hover:opacity-40" : ""
-                          }`}
+                          onClick={() => revealWord(idx)}
+                          className="mx-0.5 inline-block rounded-md px-0.5 align-baseline transition-opacity duration-700"
                           style={{ opacity: opaque } satisfies CSSProperties}
                           aria-label={
-                            showLettersOnly
-                              ? `كشف كلمة ${idx + 1}`
-                              : undefined
+                            showLettersOnly ? `كشف كلمة ${idx + 1}` : undefined
                           }
                         >
                           {showLettersOnly ? firstLetterOfToken(word) : word}
@@ -556,7 +703,7 @@ export default function HifzShamsExperience() {
                     }
                     return (
                       <span
-                        key={`${ayahIndex}-${idx}`}
+                        key={`${shownAyah}-${idx}`}
                         className={`mx-0.5 inline-block rounded-md px-0.5 align-baseline transition duration-500 ${
                           listeningHighlight ? "hifz-word-active" : ""
                         }`}
@@ -566,26 +713,21 @@ export default function HifzShamsExperience() {
                       </span>
                     );
                   })}
-                  <span
-                    className={`ms-2 inline-block align-baseline font-sans text-base transition ${
-                      tilawaPlaying
-                        ? "rounded-full bg-[#e8c87a]/25 px-2 py-0.5 text-[#ffe9a8] ring-1 ring-[#e8c87a]/50"
-                        : "text-[#e8c87a]/80"
-                    }`}
-                  >
-                    ﴿{ayahIndex}﴾
+                  <span className="ms-2 inline-block align-baseline font-sans text-base text-[#e8c87a]/80">
+                    ﴿{shownAyah}﴾
                   </span>
                 </div>
               )}
             </div>
 
-            {!showBasmala && showAyahPane && (
-              <VerseSourcedNotes ayahNumber={ayahIndex} />
-            )}
+            {!showBasmala &&
+              (showVerseText || (isMemoryStep(step) && memoryRevealed)) && (
+                <VerseSourcedNotes ayahNumber={shownAyah} />
+              )}
 
-            {(mode === "learn" || isAudioMode(mode)) && (
-              <AudioBar
-                mode={mode}
+            {needsAudioControls(step) && (
+              <PathAudioBar
+                step={step}
                 playing={player.playing}
                 paused={player.paused}
                 inSilence={player.inRepeatSilence}
@@ -595,91 +737,259 @@ export default function HifzShamsExperience() {
                 onRepeatCount={(n) => player.setRepeatCount(n)}
                 pauseLength={player.pauseLength}
                 onPauseLength={onPauseLength}
-                onPlay={playCurrent}
+                onPlay={playPathAudio}
                 onPauseToggle={player.togglePause}
                 onStop={player.stop}
-                onPrev={() => {
-                  if (showBasmala) {
-                    setShowBasmala(false);
-                    return;
-                  }
-                  if (ayahIndex <= 1) {
-                    setShowBasmala(true);
-                    player.stop();
-                    return;
-                  }
-                  goAyah(ayahIndex - 1);
-                  player.stop();
-                }}
-                onNext={() => {
-                  if (showBasmala) {
-                    setShowBasmala(false);
-                    goAyah(1);
-                    player.stop();
-                    return;
-                  }
-                  goAyah(ayahIndex + 1);
-                  player.stop();
-                }}
-                onSurah={playWholeSurah}
-                onListenFromLearn={() => {
-                  setMode("listen");
-                  window.setTimeout(() => player.start("single", ayahIndex), 0);
-                }}
-                onBasmala={() => {
-                  setShowBasmala(true);
-                  player.start("single", "basmala");
-                }}
               />
             )}
 
-            <div className="mt-3 flex items-center justify-between gap-3">
-              <button
-                type="button"
-                onClick={() => goAyah(ayahIndex + 1)}
-                disabled={ayahIndex >= 15}
-                className="min-h-11 rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm text-white/80 disabled:opacity-30"
-              >
-                التالية
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  if (isAudioMode(mode) || mode === "learn") {
-                    setShowBasmala(false);
-                    if (mode === "listen" || mode === "learn") {
-                      player.start("single", ayahIndex);
-                    } else if (mode === "listenRepeat") {
-                      player.start("repeat", ayahIndex);
-                    } else if (mode === "tilawaLink") {
-                      player.start("tilawaLink", ayahIndex);
-                    }
-                  }
-                }}
-                className={`${amiriQuran.className} max-w-[55%] truncate text-xs text-white/40 underline-offset-4 ${
-                  isAudioMode(mode) ? "hover:text-[#e8c87a]/80 hover:underline" : ""
-                }`}
-                title={isAudioMode(mode) ? "استمع لهذه الآية" : undefined}
-              >
-                {showBasmala ? "البسملة" : `${ayahIndex} / 15`}
-              </button>
-              <button
-                type="button"
-                onClick={() => goAyah(ayahIndex - 1)}
-                disabled={ayahIndex <= 1 && !showBasmala}
-                className="min-h-11 rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm text-white/80 disabled:opacity-30"
-              >
-                السابقة
-              </button>
-            </div>
+            {showsNextButton(step) && (
+              <div className="mt-4 flex justify-center">
+                <button
+                  type="button"
+                  onClick={() => goPath({ type: "next" })}
+                  disabled={nextDisabled(path)}
+                  className="min-h-14 min-w-[10rem] rounded-full bg-[#e8c87a]/25 px-8 py-3 text-lg text-[#f5e6b8] ring-1 ring-[#e8c87a]/50 disabled:opacity-35"
+                >
+                  التالي
+                </button>
+              </div>
+            )}
 
-            <p className="mt-2 text-center text-[10px] leading-relaxed text-white/30">
+            <p className="mt-3 text-center text-[10px] leading-relaxed text-white/30">
               {HUSARY_AUDIO_ATTRIBUTION}
             </p>
           </div>
         )}
 
-        {mode === "linking" && (
+        {surface === "map" && (
+          <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-4 overflow-y-auto">
+            <div className="rounded-2xl border border-[#e8c87a]/20 bg-[#080816]/80 px-4 py-4 text-center">
+              <p className="text-2xl font-medium text-[#f5e6b8]">{mapPercent}%</p>
+              <p className="mt-1 text-sm text-white/60">نسبة الآيات المحفوظة</p>
+            </div>
+            <div className="grid grid-cols-3 gap-2 sm:grid-cols-5">
+              {mapStatuses.map((status, i) => {
+                const n = i + 1;
+                const tone =
+                  status === "memorized"
+                    ? "border-[#e8c87a]/45 bg-[#e8c87a]/20 text-[#f5e6b8]"
+                    : status === "needsReview"
+                      ? "border-white/20 bg-white/10 text-white/80"
+                      : "border-white/10 bg-white/5 text-white/45";
+                return (
+                  <button
+                    key={n}
+                    type="button"
+                    onClick={() => openAyahOnPath(n)}
+                    className={`flex min-h-[5.5rem] flex-col items-center justify-center gap-1 rounded-2xl border px-2 py-3 text-center ${tone}`}
+                  >
+                    <span className="text-lg">﴿{n}﴾</span>
+                    <span className="text-[11px] leading-snug">
+                      {MAP_STATUS_LABEL[status]}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+            <button
+              type="button"
+              onClick={() => setSurface("path")}
+              className="mx-auto min-h-11 rounded-full border border-white/15 px-5 py-2 text-sm text-white/70"
+            >
+              العودة للمسار
+            </button>
+          </div>
+        )}
+
+        {surface === "reviews" && (
+          <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col items-center gap-4 overflow-y-auto pt-4">
+            <p className="text-sm text-white/55">مراجعات مستحقة اليوم</p>
+            {dueToday.length === 0 ? (
+              <p className="text-center text-[#e8c87a]/85">لا مراجعات اليوم — أحسنت.</p>
+            ) : (
+              <div className="flex w-full flex-col gap-2">
+                {dueToday.map((n) => (
+                  <button
+                    key={n}
+                    type="button"
+                    onClick={() => openAyahOnPath(n)}
+                    className="min-h-14 rounded-2xl border border-[#e8c87a]/25 bg-[#080816]/80 px-4 text-lg text-[#f3e6c0]"
+                  >
+                    راجع الآية ﴿{n}﴾
+                  </button>
+                ))}
+              </div>
+            )}
+            <button
+              type="button"
+              onClick={() => setSurface("path")}
+              className="min-h-11 rounded-full border border-white/15 px-5 py-2 text-sm text-white/70"
+            >
+              العودة للمسار
+            </button>
+          </div>
+        )}
+
+        {surface === "listenBlind" && (
+          <div className="mx-auto flex w-full max-w-md flex-1 flex-col items-center justify-center gap-8">
+            <p className="text-sm text-white/45">الاستماع بلا نظر</p>
+            <p className="text-4xl text-[#f5e6b8]">﴿{blindAyah}﴾</p>
+            <p className="text-center text-sm text-white/50">الشيخ محمود خليل الحصري</p>
+            <div className="flex items-center gap-4">
+              <button
+                type="button"
+                onClick={() => {
+                  setBlindAyah((n) => Math.max(1, n - 1));
+                  player.stop();
+                }}
+                className="min-h-11 min-w-11 rounded-full border border-white/15 text-white/70"
+              >
+                ‹
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  if (player.playing || player.paused) player.togglePause();
+                  else player.start("single", blindAyah);
+                }}
+                className="flex h-16 w-16 items-center justify-center rounded-full bg-[#e8c87a]/25 text-xl text-[#f5e6b8] ring-1 ring-[#e8c87a]/45"
+                aria-label={player.playing ? "إيقاف مؤقت" : "تشغيل"}
+              >
+                {player.playing && !player.paused ? "❚❚" : "▶"}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setBlindAyah((n) => Math.min(15, n + 1));
+                  player.stop();
+                }}
+                className="min-h-11 min-w-11 rounded-full border border-white/15 text-white/70"
+              >
+                ›
+              </button>
+            </div>
+            {(player.playing || player.paused) && (
+              <button
+                type="button"
+                onClick={player.stop}
+                className="min-h-10 rounded-full border border-white/10 px-4 text-xs text-white/45"
+              >
+                إيقاف
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => {
+                player.stop();
+                setSurface("path");
+              }}
+              className="min-h-11 rounded-full border border-white/15 px-5 py-2 text-sm text-white/70"
+            >
+              العودة للمسار
+            </button>
+          </div>
+        )}
+        {surface === "tilawa" && (
+          <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col">
+            <p className="mb-2 text-center text-sm text-[#e8c87a]/85">وصل التلاوة</p>
+            <div className="flex flex-1 flex-col items-center justify-center gap-5">
+              <div className="relative aspect-square w-full max-w-[min(100%,320px)] overflow-hidden rounded-[28px] border border-white/10 bg-[#080816]/70 sm:max-w-[min(100%,360px)]">
+                {ayahImageSrc(path.ayah) && !showBasmala ? (
+                  <Image
+                    src={ayahImageSrc(path.ayah)!}
+                    alt=""
+                    fill
+                    sizes="360px"
+                    className="object-cover"
+                  />
+                ) : (
+                  <div
+                    className="absolute inset-0"
+                    style={{
+                      background:
+                        "radial-gradient(circle at 40% 30%, #2a2458, #050510 70%)",
+                    }}
+                  />
+                )}
+              </div>
+              {showBasmala ? (
+                <p className="text-center text-xl text-[#e8c87a]/90">البسملة</p>
+              ) : (
+                <p
+                  className={`${amiriQuran.className} px-2 text-center text-[1.55rem] leading-[2.35] text-[#f7efd8]`}
+                >
+                  {ayat[path.ayah - 1].text}
+                  <span className="ms-2 font-sans text-base text-[#e8c87a]/80">
+                    ﴿{path.ayah}﴾
+                  </span>
+                </p>
+              )}
+            </div>
+            <PathAudioBar
+              step="listen"
+              playing={player.playing}
+              paused={player.paused}
+              inSilence={player.inRepeatSilence}
+              loading={player.loadState === "loading"}
+              error={player.audioError}
+              repeatCount={player.repeatCount}
+              onRepeatCount={(n) => player.setRepeatCount(n)}
+              pauseLength={player.pauseLength}
+              onPauseLength={onPauseLength}
+              onPlay={() => {
+                if (showBasmala) player.start("surah", "basmala");
+                else player.start("tilawaLink", path.ayah);
+              }}
+              onPauseToggle={player.togglePause}
+              onStop={player.stop}
+              tilawaExtras
+              onBasmala={() => {
+                setShowBasmala(true);
+                player.start("single", "basmala");
+              }}
+              onSurah={() => {
+                setShowBasmala(true);
+                player.start("surah", "basmala");
+              }}
+              onPrev={() => {
+                if (showBasmala) {
+                  setShowBasmala(false);
+                  return;
+                }
+                if (path.ayah <= 1) {
+                  setShowBasmala(true);
+                  player.stop();
+                  return;
+                }
+                setPath((p) => ({ ...p, ayah: p.ayah - 1 }));
+                player.stop();
+              }}
+              onNext={() => {
+                if (showBasmala) {
+                  setShowBasmala(false);
+                  setPath((p) => ({ ...p, ayah: 1 }));
+                  player.stop();
+                  return;
+                }
+                setPath((p) => ({ ...p, ayah: Math.min(15, p.ayah + 1) }));
+                player.stop();
+              }}
+            />
+            <button
+              type="button"
+              onClick={() => {
+                player.stop();
+                setSurface("path");
+              }}
+              className="mx-auto mt-3 min-h-11 rounded-full border border-white/15 px-5 py-2 text-sm text-white/70"
+            >
+              العودة للمسار
+            </button>
+          </div>
+        )}
+
+        {surface === "linking" && (
           <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col items-center justify-center gap-6">
             {linkDone || !linkingPrompt ? (
               <p className="text-center text-[#e8c87a]/90">
@@ -691,9 +1001,7 @@ export default function HifzShamsExperience() {
                 <p
                   className={`${amiriQuran.className} text-center text-2xl leading-relaxed text-[#f7efd8] transition-transform`}
                   style={
-                    linkShake
-                      ? { animation: "hifz-shake 0.4s ease" }
-                      : undefined
+                    linkShake ? { animation: "hifz-shake 0.4s ease" } : undefined
                   }
                 >
                   …{linkingPrompt.endSnippet}
@@ -715,10 +1023,17 @@ export default function HifzShamsExperience() {
                 </div>
               </>
             )}
+            <button
+              type="button"
+              onClick={() => setSurface("path")}
+              className="min-h-11 rounded-full border border-white/15 px-5 py-2 text-sm text-white/70"
+            >
+              العودة للمسار
+            </button>
           </div>
         )}
 
-        {mode === "order" && (
+        {surface === "order" && (
           <div className="relative mx-auto flex h-full w-full max-w-3xl flex-1 flex-col">
             {!orderStarted && (
               <div className="relative z-10 mb-3 shrink-0 rounded-2xl border border-[#e8c87a]/20 bg-[#080816]/80 px-4 py-3">
@@ -752,7 +1067,10 @@ export default function HifzShamsExperience() {
                   </p>
                 )}
                 {orderPraise && (
-                  <p className="mt-1 text-sm text-[#f5e6b8]/90 hifz-order-praise" role="status">
+                  <p
+                    className="mt-1 text-sm text-[#f5e6b8]/90 hifz-order-praise"
+                    role="status"
+                  >
                     {orderPraise}
                   </p>
                 )}
@@ -819,66 +1137,19 @@ export default function HifzShamsExperience() {
                 </div>
               )}
             </div>
-          </div>
-        )}
-
-        {mode === "sky" && (
-          <div className="relative mx-auto flex h-full w-full max-w-3xl flex-1 flex-col">
-            <div className="relative z-10 mb-4 shrink-0 rounded-2xl border border-[#e8c87a]/20 bg-[#080816]/80 px-4 py-4 text-center">
-              <p className="text-xl font-medium text-[#f5e6b8] sm:text-2xl">
-                حفظت {memorizedCount} من 15 آية
-              </p>
-              <p className="mt-2 text-base leading-relaxed text-white/70">
-                {memorizedCount >= 15
-                  ? "أحسنت — راجعت السورة كلها. افتح وضعاً للمراجعة بهدوء."
-                  : nextReview != null
-                    ? `الآية التالية للمراجعة: ﴿${nextReview}﴾ — اضغط النجمة أو افتح «تعلّم».`
-                    : "اضغط نجمة لفتح آيتها في التعلّم."}
-              </p>
-            </div>
-            <div className="relative min-h-0 flex-1">
-              {STAR_LAYOUT.map((pos, i) => {
-                const n = i + 1;
-                const entry = skyStars[String(n)];
-                const known = Boolean(entry);
-                const isNext = nextReview === n;
-                return (
-                  <button
-                    key={n}
-                    type="button"
-                    onClick={() => {
-                      setMode("learn");
-                      goAyah(n);
-                    }}
-                    title={known ? "راجعتها" : "لم تُراجع بعد"}
-                    className={`absolute flex h-11 w-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full text-xs transition sm:h-10 sm:w-10 ${
-                      isNext ? "ring-2 ring-[#e8c87a]/60" : ""
-                    }`}
-                    style={{
-                      left: `${pos.x}%`,
-                      top: `${pos.y}%`,
-                      background: known
-                        ? "rgba(232,200,122,0.95)"
-                        : "rgba(255,255,255,0.12)",
-                      boxShadow: known
-                        ? "0 0 14px rgba(232,200,122,0.7)"
-                        : "none",
-                      color: known ? "#1a1205" : "rgba(255,255,255,0.45)",
-                    }}
-                    aria-label={`نجمة الآية ${n}${known ? " — محفوظة" : ""}`}
-                  >
-                    {n}
-                  </button>
-                );
-              })}
-            </div>
+            <button
+              type="button"
+              onClick={() => setSurface("path")}
+              className="relative z-10 mx-auto mt-2 mb-2 min-h-11 rounded-full border border-white/15 px-5 py-2 text-sm text-white/70"
+            >
+              العودة للمسار
+            </button>
           </div>
         )}
       </main>
     </div>
   );
 }
-
 function OrderDemoAnimation() {
   return (
     <div
@@ -908,7 +1179,14 @@ function OrderDemoAnimation() {
           1
         </text>
         <g className="hifz-order-demo-star">
-          <circle cx="132" cy="28" r="12" fill="rgba(255,255,255,0.18)" stroke="rgba(232,200,122,0.7)" strokeWidth="1.5" />
+          <circle
+            cx="132"
+            cy="28"
+            r="12"
+            fill="rgba(255,255,255,0.18)"
+            stroke="rgba(232,200,122,0.7)"
+            strokeWidth="1.5"
+          />
           <text
             x="132"
             y="32"
@@ -925,14 +1203,8 @@ function OrderDemoAnimation() {
   );
 }
 
-function setCopy(prev: Set<number>, idx: number): Set<number> {
-  const next = new Set(prev);
-  next.add(idx);
-  return next;
-}
-
-type AudioBarProps = {
-  mode: HifzModeId;
+type PathAudioBarProps = {
+  step: PathStepId;
   playing: boolean;
   paused: boolean;
   inSilence: boolean;
@@ -945,15 +1217,15 @@ type AudioBarProps = {
   onPlay: () => void;
   onPauseToggle: () => void;
   onStop: () => void;
-  onPrev: () => void;
-  onNext: () => void;
-  onSurah: () => void;
-  onListenFromLearn: () => void;
-  onBasmala: () => void;
+  tilawaExtras?: boolean;
+  onBasmala?: () => void;
+  onSurah?: () => void;
+  onPrev?: () => void;
+  onNext?: () => void;
 };
 
-function AudioBar({
-  mode,
+function PathAudioBar({
+  step,
   playing,
   paused,
   inSilence,
@@ -966,105 +1238,94 @@ function AudioBar({
   onPlay,
   onPauseToggle,
   onStop,
+  tilawaExtras,
+  onBasmala,
+  onSurah,
   onPrev,
   onNext,
-  onSurah,
-  onListenFromLearn,
-  onBasmala,
-}: AudioBarProps) {
+}: PathAudioBarProps) {
   const busy = playing || inSilence;
-  const showFull = isAudioMode(mode);
+  const showRepeat = step === "repeat";
 
   return (
     <div className="mt-2 rounded-2xl border border-[#e8c87a]/20 bg-[#080816]/75 px-3 py-3">
-      {mode === "learn" && (
-        <div className="flex flex-wrap items-center justify-center gap-2">
-          <button
-            type="button"
-            onClick={onListenFromLearn}
-            className="min-h-11 rounded-full bg-[#e8c87a]/20 px-4 py-2 text-sm text-[#f5e6b8] ring-1 ring-[#e8c87a]/40"
-          >
-            استمع
-          </button>
-          <p className="w-full text-center text-[11px] text-white/40">
-            خطوة الاستماع من التعلّم — بهدوء بلا درجات.
-          </p>
-        </div>
+      {showRepeat && (
+        <>
+          <div className="mb-3 flex flex-wrap items-center justify-center gap-1.5">
+            <span className="text-[11px] text-white/45">عدد التكرار</span>
+            {REPEAT_COUNT_OPTIONS.map((n) => (
+              <button
+                key={n}
+                type="button"
+                onClick={() => onRepeatCount(n)}
+                className={`h-10 w-10 rounded-full text-sm sm:h-8 sm:w-8 ${
+                  repeatCount === n
+                    ? "bg-[#e8c87a]/25 text-[#f5e6b8] ring-1 ring-[#e8c87a]/50"
+                    : "bg-white/5 text-white/55"
+                }`}
+              >
+                {n}
+              </button>
+            ))}
+          </div>
+          <div className="mb-3 flex flex-wrap items-center justify-center gap-1.5">
+            <span className="text-[11px] text-white/45">فاصل التكرار</span>
+            {REPEAT_PAUSE_LENGTH_OPTIONS.map((opt) => (
+              <button
+                key={opt.id}
+                type="button"
+                onClick={() => onPauseLength(opt.id)}
+                className={`min-h-10 rounded-full px-3 py-1.5 text-sm sm:min-h-8 sm:text-xs ${
+                  pauseLength === opt.id
+                    ? "bg-[#e8c87a]/25 text-[#f5e6b8] ring-1 ring-[#e8c87a]/50"
+                    : "bg-white/5 text-white/55"
+                }`}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        </>
       )}
 
-      {showFull && (
-        <>
-          {mode === "listenRepeat" && (
-            <>
-              <div className="mb-3 flex flex-wrap items-center justify-center gap-1.5">
-                <span className="text-[11px] text-white/45">عدد التكرار</span>
-                {REPEAT_COUNT_OPTIONS.map((n) => (
-                  <button
-                    key={n}
-                    type="button"
-                    onClick={() => onRepeatCount(n)}
-                    className={`h-10 w-10 rounded-full text-sm sm:h-8 sm:w-8 ${
-                      repeatCount === n
-                        ? "bg-[#e8c87a]/25 text-[#f5e6b8] ring-1 ring-[#e8c87a]/50"
-                        : "bg-white/5 text-white/55"
-                    }`}
-                  >
-                    {n}
-                  </button>
-                ))}
-              </div>
-              <div className="mb-3 flex flex-wrap items-center justify-center gap-1.5">
-                <span className="text-[11px] text-white/45">فاصل التكرار</span>
-                {REPEAT_PAUSE_LENGTH_OPTIONS.map((opt) => (
-                  <button
-                    key={opt.id}
-                    type="button"
-                    onClick={() => onPauseLength(opt.id)}
-                    className={`min-h-10 rounded-full px-3 py-1.5 text-sm sm:min-h-8 sm:text-xs ${
-                      pauseLength === opt.id
-                        ? "bg-[#e8c87a]/25 text-[#f5e6b8] ring-1 ring-[#e8c87a]/50"
-                        : "bg-white/5 text-white/55"
-                    }`}
-                  >
-                    {opt.label}
-                  </button>
-                ))}
-              </div>
-            </>
-          )}
+      <div className="flex items-center justify-center gap-3">
+        {tilawaExtras && onPrev && (
+          <button
+            type="button"
+            onClick={onPrev}
+            className="min-h-11 min-w-11 rounded-full border border-white/15 px-3 py-2 text-sm text-white/75"
+            aria-label="السابقة"
+          >
+            ‹
+          </button>
+        )}
+        <button
+          type="button"
+          onClick={() => {
+            if (busy || paused) onPauseToggle();
+            else onPlay();
+          }}
+          disabled={loading}
+          className="flex h-14 w-14 items-center justify-center rounded-full bg-[#e8c87a]/25 text-lg text-[#f5e6b8] ring-1 ring-[#e8c87a]/45 disabled:opacity-50"
+          aria-label={busy && !paused ? "إيقاف مؤقت" : "تشغيل"}
+        >
+          {loading ? "…" : busy && !paused && !inSilence ? "❚❚" : "▶"}
+        </button>
+        {tilawaExtras && onNext && (
+          <button
+            type="button"
+            onClick={onNext}
+            className="min-h-11 min-w-11 rounded-full border border-white/15 px-3 py-2 text-sm text-white/75"
+            aria-label="التالية"
+          >
+            ›
+          </button>
+        )}
+      </div>
 
-          <div className="flex items-center justify-center gap-3">
-            <button
-              type="button"
-              onClick={onPrev}
-              className="min-h-11 min-w-11 rounded-full border border-white/15 px-3 py-2 text-sm text-white/75"
-              aria-label="السابقة"
-            >
-              ‹
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                if (busy || paused) onPauseToggle();
-                else onPlay();
-              }}
-              disabled={loading}
-              className="flex h-14 w-14 items-center justify-center rounded-full bg-[#e8c87a]/25 text-lg text-[#f5e6b8] ring-1 ring-[#e8c87a]/45 disabled:opacity-50"
-              aria-label={busy && !paused ? "إيقاف مؤقت" : "تشغيل"}
-            >
-              {loading ? "…" : busy && !paused && !inSilence ? "❚❚" : "▶"}
-            </button>
-            <button
-              type="button"
-              onClick={onNext}
-              className="min-h-11 min-w-11 rounded-full border border-white/15 px-3 py-2 text-sm text-white/75"
-              aria-label="التالية"
-            >
-              ›
-            </button>
-          </div>
-
-          <div className="mt-3 flex flex-wrap items-center justify-center gap-2">
+      {(tilawaExtras || busy || paused) && (
+        <div className="mt-3 flex flex-wrap items-center justify-center gap-2">
+          {tilawaExtras && onSurah && (
             <button
               type="button"
               onClick={onSurah}
@@ -1072,6 +1333,8 @@ function AudioBar({
             >
               السورة كاملة
             </button>
+          )}
+          {tilawaExtras && onBasmala && (
             <button
               type="button"
               onClick={onBasmala}
@@ -1079,30 +1342,29 @@ function AudioBar({
             >
               البسملة
             </button>
-            {(busy || paused) && (
-              <button
-                type="button"
-                onClick={onStop}
-                className="min-h-10 rounded-full border border-white/10 px-3 py-1.5 text-xs text-white/45"
-              >
-                إيقاف
-              </button>
-            )}
-          </div>
-
-          {inSilence && (
-            <p className="mt-2 text-center text-xs text-[#e8c87a]/70">
-              دورك للتكرار بصوت هادئ…
-            </p>
           )}
-          {mode === "tilawaLink" && (
-            <p className="mt-2 text-center text-[11px] text-white/40">
-              وصل التلاوة: من هذه الآية حتى آخر السورة — أو حتى تضغط إيقاف.
-            </p>
+          {(busy || paused) && (
+            <button
+              type="button"
+              onClick={onStop}
+              className="min-h-10 rounded-full border border-white/10 px-3 py-1.5 text-xs text-white/45"
+            >
+              إيقاف
+            </button>
           )}
-        </>
+        </div>
       )}
 
+      {inSilence && (
+        <p className="mt-2 text-center text-xs text-[#e8c87a]/70">
+          دورك للتكرار بصوت هادئ…
+        </p>
+      )}
+      {tilawaExtras && (
+        <p className="mt-2 text-center text-[11px] text-white/40">
+          وصل التلاوة: من هذه الآية حتى آخر السورة — أو حتى تضغط إيقاف.
+        </p>
+      )}
       {error && (
         <p className="mt-2 text-center text-xs text-[#e8c87a]/85" role="status">
           {error}

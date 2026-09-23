@@ -229,6 +229,18 @@ export function useHusaryPlayer() {
     [pauseLength, playIndex, repeatCount, stopInternal],
   );
 
+  /** Play an explicit clip list (e.g. chain-link N then N+1). */
+  const startQueue = useCallback(
+    (clips: readonly HifzAudioClipId[]) => {
+      stopInternal();
+      if (clips.length === 0) return;
+      queueRef.current = clips.map((clip) => ({ clip }));
+      indexRef.current = 0;
+      void playIndex(0);
+    },
+    [playIndex, stopInternal],
+  );
+
   const setPauseLength = useCallback((length: RepeatPauseLength) => {
     setPauseLengthState(length);
   }, []);
@@ -258,6 +270,7 @@ export function useHusaryPlayer() {
   return {
     bindAudio,
     start,
+    startQueue,
     stop: stopInternal,
     togglePause,
     playing,

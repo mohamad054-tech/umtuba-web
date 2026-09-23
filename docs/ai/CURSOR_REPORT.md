@@ -1,36 +1,46 @@
-# Cursor Report — release-candidate/2026-09-23-quran
+﻿# Cursor Report — feat/quran-hifz-path-v1 (guided path UX)
 
 ## Summary
 
-Prepared a release candidate that keeps the live games work and adds the Learning Quran section. The live site was **not** switched.
-
-Public site checks before any change still matched the current live copy: games pages answer, the old sun page answers, and the new Quran addresses do not exist yet. This machine has no way to sign in to the server, so the live folder name was **not** read on the server, and no new folder was created there. Nothing was switched. `release/v1` was not moved.
+Redesigned `/learning/quran/shams` from nine top mode buttons into one calm guided memorization path. Main screen stays quiet: current step, verse/audio for that step, one «التالي», plus a small row for «مراجعات اليوم» / «خريطة الحفظ» / «أدوات أخرى». Spaced self-ratings are stored on-device only. Branch created from live Quran+games commit `e63f2377ab7696d5603d45934fa222d2b43516a4`. No deploy. No merge. `release/v1` untouched.
 
 ```
-BRANCH = release-candidate/2026-09-23-quran
-BASE = d2e72b8da963d898735888ad0509da31ea356114 (integrate/games-hifz-v1)
-MERGED = d37c52a435c708c04ade2e5a1fa0e25ab6cf7d18 (feat/quran-hifz-v1)
-MERGE = clean (ort). Parents are exactly those two commits.
-NOT INCLUDED = fix/watch-shared-link-v1, feat/games-v2 tip, deca19b8
-release/v1 = still aa2f3ae5a970902f0284e2faebd126a263b87bb7
-DEPLOY = NOT DONE (no server access from this machine)
-ROLLBACK TARGET = unchanged live folder (expected d2e72b8d-20260923142924; not re-read on the host)
+BRANCH = feat/quran-hifz-path-v1
+BASE = e63f2377ab7696d5603d45934fa222d2b43516a4
+DEPLOY = FORBIDDEN
+MERGE = FORBIDDEN
 ```
 
-Local production server (`next start` on port 3460), Arabic preference:
+### Guided path (Arabic on-screen)
 
-- `/` 200, `/games` 200, `/games/flag-guess` 200, `/games/larger-country` 200, `/games/farther-pair` 200
-- `/learning` 200 and contains **القرآن الكريم والحديث الشريف**
-- `/learning/quran` 200, `/learning/quran/shams` 200 with surah text and **التفسير**
-- Husary audio host is in the client bundle (`mirrors.quranicaudio.com`), not in the first HTML
-- `/hifz/shams` 308 to `/learning/quran/shams`
-- `public/games/flags/sa.svg` still has `flag-icons-sa`; `jo.svg` still present
+استمع → كرّر → الآية كاملة → بعض الكلمات مخفية → الحروف الأولى → مخفية بالكامل → من الذاكرة → كيف كان حفظك؟  
+After «حفظتها»: وصل — هذه الآية → وصل — الآية التالية → وصل — الآيتان معاً  
+After last ayah: السورة من الصور (text hidden; «أظهر الآية» per verse; night sky if no image)
+
+### أدوات أخرى
+
+رتّب الآيات · وصل التلاوة · السورة كاملة · البسملة · الوصل · الاستماع بلا نظر
+
+### Review ladder (localStorage only)
+
+- أعدها = later today (+4 hours)
+- متردد = tomorrow (+1 day)
+- حفظتها = 3 → 7 → 14 → 30 → 60 days (streak grows; caps at 60)
+
+### Images
+
+Ayat **1–6** have `public/hifz/shams/shams-{n}.webp`. Ayat **7–15** have no image (night sky only).
 
 ## Exact files changed
 
-Merge of `d37c52a4` onto `d2e72b8d` (34 files: Learning Quran section, sourced texts, permanent redirect, audio pause tweak). Plus this handoff:
-
-- `lib/site/metadata.test.ts` — accept `/learning/quran` in the robots disallow list (same pattern as `/hifz`)
+- `app/learning/quran/shams/HifzShamsExperience.tsx` — guided-path UX rewrite
+- `app/learning/quran/shams/useHusaryPlayer.ts` — `startQueue` for chain-link audio
+- `lib/hifz/reviewSchedule.ts` — spaced schedule + map status helpers
+- `lib/hifz/reviewSchedule.test.ts` — unit tests for ratings / due / map
+- `lib/hifz/pathSteps.ts` — pure path state machine
+- `lib/hifz/pathSteps.test.ts` — path advancement / chain / surah memory
+- `lib/hifz/progress.ts` — progress v2, `rateAyah`, v1 migrate, `listDueToday`
+- `lib/hifz/types.ts` — HifzLocalProgress v2 + tool types
 - `docs/ai/CURSOR_REPORT.md` — this report
 
 ## Migrations created
@@ -39,38 +49,58 @@ none
 
 ## Security review
 
-- No new secrets, no env values printed, no service-role use, no remote migration.
-- Quran routes stay noindex / robots-disallowed / off the sitemap.
-- Audio host unchanged. Report-only content security policy was not edited.
-- `release/v1` not updated. No other branch merged.
+- Progress and reviews stay device-only (`localStorage` via `rateAyah` / `readProgress`).
+- No secrets, no env values printed, no remote DB, no service-role use.
+- Quran ayah / tafsir / meanings strings were not invented or edited.
+- Husary audio still streamed from Quran.com CDN (not copied into repo).
+- Page stays noindex. Old `/hifz/shams` permanent redirect unchanged.
+- Games / video / watch not modified.
 
 ## Tests
 
-- Targeted: hifz audio, sourced texts, metadata, title brand, games flags/catalog/places/engine, google SEO, indexing repair — **70 passed**
-- Full `npx vitest run` — **25 failed, 4751 passed, 11 skipped**. Failures are the same pre-existing set (learning contracts, profile, messenger, translation studio, landing). None are in the Quran or games files changed by this merge.
+```
+npx vitest run lib/hifz/reviewSchedule.test.ts lib/hifz/pathSteps.test.ts lib/hifz/ashShamsData.test.ts lib/hifz/audio.test.ts
+```
+
+**PASS** — 4 files, 39 tests.
 
 ## TypeScript
 
-- `npx tsc --noEmit` — **PASS**
+```
+npx tsc --noEmit
+```
+
+**PASS** (exit 0)
 
 ## Build
 
-- `npm run build` — **PASS** (exit 0). Routes include `/learning/quran` and `/learning/quran/shams`. Unrelated Turbopack filesystem-tracing warnings in translation-studio remain.
+```
+npm run build
+```
+
+**PASS** (exit 0). Routes include `/learning/quran` and `/learning/quran/shams`. Unrelated Turbopack filesystem-tracing warnings in translation-studio remain.
 
 ## git diff --check
 
-- **PASS** (no whitespace errors on the handoff diff)
+**PASS** (no whitespace errors; CRLF conversion warnings only)
 
 ## git status --short
 
-Before the handoff commit:
+(relevant to commit)
 
+- `M app/learning/quran/shams/HifzShamsExperience.tsx`
+- `M app/learning/quran/shams/useHusaryPlayer.ts`
+- `M lib/hifz/progress.ts`
+- `M lib/hifz/types.ts`
+- `A lib/hifz/pathSteps.ts`
+- `A lib/hifz/pathSteps.test.ts`
+- `A lib/hifz/reviewSchedule.ts`
+- `A lib/hifz/reviewSchedule.test.ts`
 - `M docs/ai/CURSOR_REPORT.md`
-- `M lib/site/metadata.test.ts`
+
+Unrelated dirt not committed: `.local/`, `tmp/`, `docs/ai/IOS_STATUS_AR.md`, `worktrees/`, `AGENTS.md` (stash).
 
 ## Open issues
 
-- Live site was **not** updated. This machine cannot reach the production server (no sign-in, no host name). Do not treat the public pages as a folder-name confirmation.
-- Side-by-side folder on the server was **not** built. Rollback folder was **not** re-read on the host.
-- Korean meanings still omitted (no verified edition).
-- Full test suite still has 25 older failures unrelated to this merge.
+- cursor-ide-browser MCP could not open a usable tab (tabs list empty / navigate failed). Local production server was started on port 3461 for manual check; automated phone/wide viewport browser pass was **not** verified.
+- Auto-play may start on listen / repeat / link steps; pause/stop remain available.
