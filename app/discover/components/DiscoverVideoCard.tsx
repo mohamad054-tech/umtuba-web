@@ -217,30 +217,21 @@ export default function DiscoverVideoCard({
         onEnded={onEnded}
       />
 
-      <div className="pointer-events-none absolute inset-x-0 bottom-14 top-0 z-20 flex flex-col justify-end">
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[55%] bg-gradient-to-t from-black/85 via-black/45 to-transparent" />
+      <div className="pointer-events-none absolute inset-0 z-20 flex flex-col justify-end">
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black/80 via-black/35 to-transparent" />
 
-        <div
-          ref={chromeRef}
-          className="relative z-10 flex items-end justify-between gap-3 p-5 pb-4 md:gap-4 md:p-6 md:pb-5"
-        >
+        <div ref={chromeRef} className="feed-caption-safe z-10">
           {showLeftActionRail ? (
-            // Bound to Right Action Rail (slight vertical extend).
-            // Micro-align: whole rail left for creator breathing room.
             <div
               ref={leftRailRef}
               data-home-arc-rail="left-action"
-              className="pointer-events-auto absolute left-[5px] z-10 overflow-visible md:left-[5px]"
+              className="pointer-events-auto absolute start-3 z-30 overflow-visible"
             >
               <HomeCircularArc />
             </div>
           ) : null}
 
-          <div
-            className={`min-w-0 flex-1 space-y-3 ${
-              showLeftActionRail ? "pl-16" : ""
-            }`}
-          >
+          <div className="min-w-0 space-y-2">
             <div className="pointer-events-auto">
               <DiscoverCreatorInfo
                 creator={video.creator}
@@ -262,20 +253,11 @@ export default function DiscoverVideoCard({
               articleHref={video.articleHref}
               articleTitle={video.articleTitle}
             />
-            {video.articleHref ? (
-              <button
-                type="button"
-                onClick={handleTeaserOpen}
-                className="pointer-events-auto rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-bold text-white/90 transition hover:bg-white/15"
-              >
-                Read article
-              </button>
-            ) : null}
           </div>
 
           <div
             ref={rightRailRef}
-            className="pointer-events-auto shrink-0"
+            className="feed-side-rail pointer-events-auto end-3"
             data-home-action-rail="right"
           >
             <DiscoverActionRail

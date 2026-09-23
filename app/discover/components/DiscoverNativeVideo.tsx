@@ -6,7 +6,11 @@ import { useFeedMutePreference } from "../../components/video/FeedMuteProvider";
 import TapToUnmuteOverlay from "../../components/video/TapToUnmuteOverlay";
 import type { WatchProgressEvent } from "../../components/video/VideoPlayer";
 import { refreshWatchPlaybackAction } from "../../actions/loadWatchFeed";
-import { initialElementMuted } from "../../../lib/video/feedMutePreference";
+import { initialElementMuted, readUserWantsSound } from "../../../lib/video/feedMutePreference";
+import {
+  isFeedPlaybackSuppressed,
+  releaseFeedPlaybackSuppression,
+} from "../../../lib/video/feedHiddenPlayback";
 import {
   isPlayableHttpSrc,
   resolveHomeDiscoverMediaPreload,
@@ -18,6 +22,7 @@ import {
 } from "../../lib/video/signedPlaybackRetry";
 import { pauseInactiveVideo, playActiveVideo } from "../../../lib/video/playActiveVideo";
 import { localizedVideoTitle } from "../../watch/lib/mapWatchVideo";
+import FeedVideoProgress from "../../components/video/FeedVideoProgress";
 
 type DiscoverNativeVideoProps = {
   src: string;
@@ -60,6 +65,7 @@ export default function DiscoverNativeVideo({
   const [playbackStatus, setPlaybackStatus] = useState<PlaybackStatus>("ok");
   const [retrying, setRetrying] = useState(false);
   const [playbackSrc, setPlaybackSrc] = useState(src);
+  const [progress, setProgress] = useState(0);
   const muteEpoch = `${playbackSrc}:${String(userWantsSound)}`;
   const [muteEpochApplied, setMuteEpochApplied] = useState(muteEpoch);
   const [autoplayFallbackMuted, setAutoplayFallbackMuted] = useState(false);
@@ -67,8 +73,9 @@ export default function DiscoverNativeVideo({
     setMuteEpochApplied(muteEpoch);
     setAutoplayFallbackMuted(false);
   }
-  const isCurrentlyMuted =
-    autoplayFallbackMuted || initialElementMuted(userWantsSound);
+  const isCurrentlyMuted = userWantsSound
+    ? false
+    : autoplayFallbackMuted || initialElementMuted(userWantsSound);
 
   useEffect(() => {
     autoRemintAttemptedRef.current = false;
@@ -87,14 +94,23 @@ export default function DiscoverNativeVideo({
       return;
     }
 
-    if (!active || playbackStatus !== "ok") {
+    if (!active || playbackStatus !== "ok" || isFeedPlaybackSuppressed()) {
       pauseInactiveVideo(video);
       return;
     }
 
-    const startMuted = initialElementMuted(userWantsSound);
+    const wantsSound = readUserWantsSound();
+    const startMuted = !wantsSound;
     video.muted = startMuted;
     void playActiveVideo(video, startMuted).then((result) => {
+      if (readUserWantsSound() && !isFeedPlaybackSuppressed()) {
+        video.muted = false;
+        setAutoplayFallbackMuted(false);
+        if (video.paused) {
+          void video.play().catch(() => undefined);
+        }
+        return;
+      }
       if (result === "muted_fallback") {
         setAutoplayFallbackMuted(true);
       }
@@ -113,15 +129,16 @@ export default function DiscoverNativeVideo({
     }
 
     const emit = (completed = false) => {
-      if (!report) {
-        return;
-      }
       const durationMs = Number.isFinite(video.duration)
         ? Math.max(0, video.duration * 1000)
         : 0;
       const currentTimeMs = Number.isFinite(video.currentTime)
         ? Math.max(0, video.currentTime * 1000)
         : 0;
+      setProgress(durationMs > 0 ? Math.min(1, currentTimeMs / durationMs) : 0);
+      if (!report) {
+        return;
+      }
       report({
         currentTimeMs,
         durationMs,
@@ -206,13 +223,12 @@ export default function DiscoverNativeVideo({
         <video
           key={playbackSrc}
           ref={videoRef}
-          className="h-full w-full object-contain"
+          className="h-full w-full object-cover"
           src={playbackSrc}
           poster={poster}
-          controls
-          controlsList="nodownload"
           playsInline
           muted={isCurrentlyMuted}
+          disableRemotePlayback
           preload={resolveHomeDiscoverMediaPreload(active)}
           aria-label={displayLabel}
           onError={handlePlaybackError}
@@ -247,10 +263,12 @@ export default function DiscoverNativeVideo({
           ) : null}
         </div>
       )}
+      {active && attachMedia ? <FeedVideoProgress progress={progress} /> : null}
       <TapToUnmuteOverlay
         visible={active && attachMedia && isCurrentlyMuted}
         label={t("watch.tapToUnmute")}
         onUnmute={() => {
+          releaseFeedPlaybackSuppression();
           setUserWantsSound(true);
           setAutoplayFallbackMuted(false);
           const video = videoRef.current;
@@ -259,6 +277,11 @@ export default function DiscoverNativeVideo({
           }
           video.muted = false;
           void playActiveVideo(video, false).then((result) => {
+            if (readUserWantsSound() && !isFeedPlaybackSuppressed()) {
+              video.muted = false;
+              setAutoplayFallbackMuted(false);
+              return;
+            }
             if (result === "muted_fallback") {
               setAutoplayFallbackMuted(true);
             }

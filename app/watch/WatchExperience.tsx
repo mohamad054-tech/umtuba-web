@@ -10,6 +10,7 @@ import {
   useRef,
   useState,
 } from "react";
+import UmtubaStackedLogo from "../components/brand/UmtubaStackedLogo";
 import { useSearchParams } from "next/navigation";
 import VerticalVideoFeed from "../components/video/VerticalVideoFeed";
 import WatchAmbientBackground from "../components/video/WatchAmbientBackground";
@@ -53,6 +54,7 @@ import { findWatchVideoIndex, localizedVideoTitle } from "./lib/mapWatchVideo";
 import type { WatchVideo } from "./types";
 import { composeFeedWithWatchHide } from "../../lib/video/watchHidePolicy";
 import { readLocalWatchHideEntries } from "../../lib/video/watchHideStorage";
+import { replaceFeedPostInAddress } from "../../lib/video/syncFeedPostUrl";
 
 const PRODUCTION_WATCH_PANELS = new Set<Exclude<WatchPanelId, null>>([
   "comments",
@@ -117,9 +119,13 @@ export default function WatchExperience({
   const loadingMoreRef = useRef(false);
   const nextCursorRef = useRef<string | null>(initialCursor);
 
-  const focusKey = searchParams.get("post") ?? searchParams.get("id");
+  const [focusKey] = useState(
+    () => searchParams.get("post") ?? searchParams.get("id")
+  );
   const seedVideos = initialVideos;
-  const initialIndex = findWatchVideoIndex(seedVideos, focusKey);
+  const [pinnedInitialIndex] = useState(() =>
+    findWatchVideoIndex(seedVideos, focusKey)
+  );
   const prototypePanelsAllowed = allowWatchPrototypePanels();
 
   const [videos, setVideos] = useState<WatchVideo[]>(seedVideos);
@@ -129,7 +135,7 @@ export default function WatchExperience({
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [activeVideo, setActiveVideo] = useState<WatchVideo | null>(
-    () => seedVideos[initialIndex] ?? seedVideos[0] ?? null
+    () => seedVideos[pinnedInitialIndex] ?? seedVideos[0] ?? null
   );
   const [activePanel, setActivePanel] = useState<WatchPanelId>(null);
   const [livingNavigation, dispatchLivingNavigation] = useReducer(
@@ -281,6 +287,7 @@ export default function WatchExperience({
     setActiveVideo(video);
     setActivePanel(null);
     setPlaybackTimeMs(0);
+    replaceFeedPostInAddress(video.postId);
 
     if (video.source !== "supabase" || !video.postId) {
       return;
@@ -530,15 +537,16 @@ export default function WatchExperience({
     : t("watch.emptyFeed");
 
   return (
-    <main className="watch-page-enter relative min-h-screen overflow-hidden bg-[#050510] text-white md:min-h-screen">
+    <main className="watch-page-enter relative flex h-dvh flex-col overflow-hidden bg-[#050510] text-white">
       <WatchAmbientBackground />
 
-      <header className="pointer-events-none absolute inset-x-0 top-0 z-30 mx-auto flex max-w-7xl items-center justify-between px-4 py-4 md:pointer-events-auto md:relative md:px-8">
+      <header className="pointer-events-none absolute inset-x-0 top-0 z-30 mx-auto flex max-w-7xl items-center justify-between px-4 py-3 lg:pointer-events-auto lg:relative lg:shrink-0 lg:px-8">
         <Link
           href="/"
-          className="watch-focus-ring pointer-events-auto rounded-full bg-black/25 px-3 py-1 text-2xl font-black tracking-tight backdrop-blur-md md:bg-transparent md:px-0 md:py-0 md:backdrop-blur-none"
+          aria-label="UMTUBA"
+          className="watch-focus-ring pointer-events-auto rounded-md"
         >
-          UMTUBA
+          <UmtubaStackedLogo size="nav" priority className="!h-10 !w-auto" />
         </Link>
 
         <p className="hidden max-w-md truncate text-sm text-white/50 md:block">
@@ -588,14 +596,14 @@ export default function WatchExperience({
         </p>
       ) : null}
 
-      <div className="relative z-10 mx-auto flex w-full max-w-7xl justify-center px-0 md:px-8 md:pb-8 md:pt-0">
+      <div className="relative z-10 flex min-h-0 w-full flex-1 justify-center lg:px-8 lg:pb-4">
         <div
           ref={stageRef}
-          className="video-watch-stage relative h-[calc(100dvh-var(--app-mobile-bottom-nav-offset,0px)-var(--analytics-consent-banner-offset,0px))] w-full overflow-hidden bg-black md:mt-0 md:h-[calc(100dvh-6.5rem)] md:max-w-[510px] md:rounded-[36px] md:border md:border-white/10"
+          className="video-watch-stage relative h-full min-h-0 w-full overflow-hidden bg-black lg:max-w-[510px] lg:rounded-[36px] lg:border lg:border-white/10"
         >
           <VerticalVideoFeed
             videos={videos}
-            initialIndex={initialIndex}
+            initialIndex={pinnedInitialIndex}
             viewerId={initialViewerId}
             forcePause={forcePause}
             transitionLocked={journeyTransitionActive}

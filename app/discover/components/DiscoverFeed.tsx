@@ -3,11 +3,14 @@
 import {
   useCallback,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
 } from "react";
 import { refreshWatchPlaybackAction } from "../../actions/loadWatchFeed";
+import { readUserWantsSound } from "../../../lib/video/feedMutePreference";
+import { isFeedPlaybackSuppressed } from "../../../lib/video/feedHiddenPlayback";
 import { isPlayableHttpSrc } from "../../lib/video/playbackFetchPolicy";
 import type { DiscoverStats, DiscoverVideo } from "../types";
 import DiscoverVideoCard from "./DiscoverVideoCard";
@@ -80,6 +83,9 @@ export default function DiscoverFeed({
   const videoIdsKey = videos.map((video) => video.id).join(",");
   const previousVideoIdsRef = useRef(videoIdsKey);
   const signingRef = useRef(new Set<number>());
+  const deepLinkAppliedRef = useRef(false);
+  const applyingDeepLinkRef = useRef(false);
+  const userMovedRef = useRef(false);
 
   const activeVideo = videos[activeIndex] ?? videos[0];
 
@@ -108,22 +114,51 @@ export default function DiscoverFeed({
   }, [activeIndex, videos.length, onNearEnd]);
 
   useEffect(() => {
-    if (initialIndex <= 0 || videos.length === 0) {
+    const scroller = scrollerRef.current;
+    if (!scroller) return;
+
+    function onUserScroll() {
+      if (applyingDeepLinkRef.current) return;
+      userMovedRef.current = true;
+      deepLinkAppliedRef.current = true;
+    }
+
+    scroller.addEventListener("scroll", onUserScroll, { passive: true });
+    scroller.addEventListener("wheel", onUserScroll, { passive: true });
+    scroller.addEventListener("touchmove", onUserScroll, { passive: true });
+    return () => {
+      scroller.removeEventListener("scroll", onUserScroll);
+      scroller.removeEventListener("wheel", onUserScroll);
+      scroller.removeEventListener("touchmove", onUserScroll);
+    };
+  }, [videos.length]);
+
+  useLayoutEffect(() => {
+    if (
+      deepLinkAppliedRef.current ||
+      userMovedRef.current ||
+      videos.length === 0
+    ) {
       return;
     }
 
+    const safeIndex = Math.min(Math.max(initialIndex, 0), videos.length - 1);
     const scroller = scrollerRef.current;
-    const frame = window.requestAnimationFrame(() => {
-      const video = videos[initialIndex];
-      const node = video ? slideNodesRef.current.get(video.id) : null;
+    const video = videos[safeIndex];
+    const node = video ? slideNodesRef.current.get(video.id) : null;
+    if (!video || !scroller || !node) {
+      return;
+    }
 
-      if (scroller && node) {
-        scrollScrollerToSlide(scroller, node, "auto");
-        setActiveIndex(initialIndex);
-      }
-    });
-
-    return () => window.cancelAnimationFrame(frame);
+    deepLinkAppliedRef.current = true;
+    if (safeIndex > 0) {
+      applyingDeepLinkRef.current = true;
+      scrollScrollerToSlide(scroller, node, "auto");
+      setActiveIndex(safeIndex);
+      window.requestAnimationFrame(() => {
+        applyingDeepLinkRef.current = false;
+      });
+    }
   }, [initialIndex, videos]);
 
   const mountedIndexes = useMemo(() => {
@@ -329,6 +364,62 @@ export default function DiscoverFeed({
       window.removeEventListener("keydown", onKeyDown);
     };
   }, [advanceLocked, stepByDelta, videos.length]);
+
+  useEffect(() => {
+    const scroller = scrollerRef.current;
+    const activeId = activeVideo?.id;
+    if (!scroller || !activeId) return;
+
+    const wantsSound = readUserWantsSound() && !isFeedPlaybackSuppressed();
+    scroller.querySelectorAll<HTMLElement>("[data-video-id]").forEach((slide) => {
+      const isActive = slide.dataset.videoId === activeId;
+      slide.querySelectorAll("video").forEach((video) => {
+        if (!isActive) {
+          video.muted = true;
+          video.pause();
+          return;
+        }
+        if (wantsSound) {
+          video.muted = false;
+          if (video.paused && !isFeedPlaybackSuppressed()) {
+            void video.play().catch(() => undefined);
+          }
+        }
+      });
+    });
+  }, [activeIndex, activeVideo?.id, videos]);
+
+  useEffect(() => {
+    const scroller = scrollerRef.current;
+    if (!scroller) return;
+    const feed = scroller;
+
+    function keepSoundOnGesture() {
+      if (!readUserWantsSound() || isFeedPlaybackSuppressed()) return;
+      const root = feed.getBoundingClientRect();
+      const pick: { video: HTMLVideoElement | null; ratio: number } = {
+        video: null,
+        ratio: 0,
+      };
+      feed.querySelectorAll<HTMLElement>("[data-video-id]").forEach((slide) => {
+        const rect = slide.getBoundingClientRect();
+        const visible =
+          Math.min(rect.bottom, root.bottom) - Math.max(rect.top, root.top);
+        const ratio = visible / Math.max(rect.height, 1);
+        const video = slide.querySelector("video");
+        if (video && ratio > pick.ratio) {
+          pick.ratio = ratio;
+          pick.video = video;
+        }
+      });
+      if (!pick.video || pick.ratio < 0.45) return;
+      pick.video.muted = false;
+      void pick.video.play().catch(() => undefined);
+    }
+
+    scroller.addEventListener("pointerup", keepSoundOnGesture);
+    return () => scroller.removeEventListener("pointerup", keepSoundOnGesture);
+  }, [videos.length]);
 
   if (videos.length === 0) {
     return (
