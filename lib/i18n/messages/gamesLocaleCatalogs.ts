@@ -1,12 +1,6 @@
 import type { GamesMessages } from "./types";
 
-/** Locale catalogs keep the release translations. New game phrases are overlaid separately. */
-type TranslatedGamesMessages = Omit<
-  GamesMessages,
-  "games.wheel.won" | "games.madeUpPrices" | "games.mute" | "games.unmute"
->;
-
-export const gamesFrMessages: TranslatedGamesMessages = {
+export const gamesFrMessages: GamesMessages = {
   "games.title": "Jeux",
   "games.subtitle":
     "Des parties courtes sur cet appareil. Votre meilleur score reste dans ce navigateur.",
@@ -224,9 +218,13 @@ export const gamesFrMessages: TranslatedGamesMessages = {
   "games.uno.howTo1": "Jouez une carte de même couleur ou valeur.",
   "games.uno.howTo2": "Piochez si vous ne pouvez pas. Le CPU est 75 % gourmand, 25 % aléatoire.",
   "games.uno.howTo3": "Videz votre main en premier.",
+  "games.wheel.won": "Tu as gagné {value}",
+  "games.madeUpPrices": "Prix inventés. Ce n'est qu'un jeu.",
+  "games.mute": "Couper le son",
+  "games.unmute": "Son",
 };
 
-export const gamesEsMessages: TranslatedGamesMessages = {
+export const gamesEsMessages: GamesMessages = {
   "games.title": "Juegos",
   "games.subtitle":
     "Partidas cortas en este dispositivo. Tu mejor puntuación se queda en este navegador.",
@@ -444,9 +442,13 @@ export const gamesEsMessages: TranslatedGamesMessages = {
   "games.uno.howTo1": "Juega una carta del mismo color o valor.",
   "games.uno.howTo2": "Roba si no puedes. El CPU es 75 % ambicioso y 25 % aleatorio.",
   "games.uno.howTo3": "Vacía tu mano primero.",
+  "games.wheel.won": "Has ganado {value}",
+  "games.madeUpPrices": "Precios inventados. Esto es solo un juego.",
+  "games.mute": "Silenciar",
+  "games.unmute": "Sonido",
 };
 
-export const gamesDeMessages: TranslatedGamesMessages = {
+export const gamesDeMessages: GamesMessages = {
   "games.title": "Spiele",
   "games.subtitle":
     "Kurze Spiele auf diesem Gerät. Ihr Bestwert bleibt in diesem Browser.",
@@ -664,9 +666,13 @@ export const gamesDeMessages: TranslatedGamesMessages = {
   "games.uno.howTo1": "Spielen Sie eine Karte mit gleicher Farbe oder gleichem Wert.",
   "games.uno.howTo2": "Ziehen Sie, wenn Sie nicht können. Die CPU ist zu 75 % gierig, zu 25 % zufällig.",
   "games.uno.howTo3": "Leeren Sie zuerst Ihre Hand.",
+  "games.wheel.won": "Du gewinnst {value}",
+  "games.madeUpPrices": "Erfundene Preise. Das ist nur ein Spiel.",
+  "games.mute": "Ton aus",
+  "games.unmute": "Ton an",
 };
 
-export const gamesPtMessages: TranslatedGamesMessages = {
+export const gamesPtMessages: GamesMessages = {
   "games.title": "Jogos",
   "games.subtitle":
     "Partidas curtas neste aparelho. Sua melhor pontuação fica neste navegador.",
@@ -884,9 +890,13 @@ export const gamesPtMessages: TranslatedGamesMessages = {
   "games.uno.howTo1": "Jogue uma carta da mesma cor ou valor.",
   "games.uno.howTo2": "Compre se não puder. O CPU é 75% ganancioso e 25% aleatório.",
   "games.uno.howTo3": "Esvazie a mão primeiro.",
+  "games.wheel.won": "Você ganhou {value}",
+  "games.madeUpPrices": "Preços inventados. Isto é só um jogo.",
+  "games.mute": "Silenciar",
+  "games.unmute": "Som",
 };
 
-export const gamesIdMessages: TranslatedGamesMessages = {
+export const gamesIdMessages: GamesMessages = {
   "games.title": "Game",
   "games.subtitle":
     "Game singkat di perangkat ini. Skor terbaik Anda tetap di browser ini.",
@@ -1104,9 +1114,13 @@ export const gamesIdMessages: TranslatedGamesMessages = {
   "games.uno.howTo1": "Mainkan kartu dengan warna atau nilai yang sama.",
   "games.uno.howTo2": "Ambil jika tidak bisa. CPU 75% rakus, 25% acak.",
   "games.uno.howTo3": "Kosongkan tangan Anda lebih dulu.",
+  "games.wheel.won": "Kamu mendapat {value}",
+  "games.madeUpPrices": "Harga karangan. Ini hanya permainan.",
+  "games.mute": "Bisukan",
+  "games.unmute": "Suara",
 };
 
-export const gamesHiMessages: TranslatedGamesMessages = {
+export const gamesHiMessages: GamesMessages = {
   "games.title": "गेम",
   "games.subtitle":
     "इस डिवाइस पर छोटे गेम। आपका सर्वश्रेष्ठ स्कोर इसी ब्राउज़र में रहता है।",
@@ -1324,9 +1338,13 @@ export const gamesHiMessages: TranslatedGamesMessages = {
   "games.uno.howTo1": "समान रंग या मान वाली कार्ड खेलें।",
   "games.uno.howTo2": "न हो तो निकालें। CPU 75% लालची, 25% यादृच्छिक।",
   "games.uno.howTo3": "पहले अपना हाथ खाली करें।",
+  "games.wheel.won": "आपको {value} मिला",
+  "games.madeUpPrices": "काल्पनिक कीमतें. यह सिर्फ़ एक खेल है.",
+  "games.mute": "आवाज़ बंद",
+  "games.unmute": "आवाज़",
 };
 
-export const gamesRuMessages: TranslatedGamesMessages = {
+export const gamesRuMessages: GamesMessages = {
   "games.title": "Игры",
   "games.subtitle":
     "Короткие игры на этом устройстве. Лучший результат остаётся в этом браузере.",
@@ -1544,9 +1562,13 @@ export const gamesRuMessages: TranslatedGamesMessages = {
   "games.uno.howTo1": "Сыграйте карту того же цвета или значения.",
   "games.uno.howTo2": "Берите, если нельзя ходить. CPU на 75% жадный, на 25% случайный.",
   "games.uno.howTo3": "Первым опустошите руку.",
+  "games.wheel.won": "Вам выпало {value}",
+  "games.madeUpPrices": "Цены выдуманы. Это только игра.",
+  "games.mute": "Без звука",
+  "games.unmute": "Звук",
 };
 
-export const gamesTrMessages: TranslatedGamesMessages = {
+export const gamesTrMessages: GamesMessages = {
   "games.title": "Oyunlar",
   "games.subtitle":
     "Bu cihazda kısa oyunlar. En iyi skorunuz bu tarayıcıda kalır.",
@@ -1764,9 +1786,13 @@ export const gamesTrMessages: TranslatedGamesMessages = {
   "games.uno.howTo1": "Aynı renk veya değerde bir kart oynayın.",
   "games.uno.howTo2": "Oynayamazsanız çekin. CPU %75 açgözlü, %25 rastgele.",
   "games.uno.howTo3": "Elinizi önce boşaltın.",
+  "games.wheel.won": "{value} kazandın",
+  "games.madeUpPrices": "Uydurma fiyatlar. Bu sadece bir oyun.",
+  "games.mute": "Sesi kapat",
+  "games.unmute": "Ses",
 };
 
-export const gamesZhCNMessages: TranslatedGamesMessages = {
+export const gamesZhCNMessages: GamesMessages = {
   "games.title": "游戏",
   "games.subtitle": "在此设备上玩短局。最佳成绩保存在本浏览器中。",
   "games.catalogEyebrow": "开始玩",
@@ -1983,9 +2009,13 @@ export const gamesZhCNMessages: TranslatedGamesMessages = {
   "games.uno.howTo1": "打出颜色或点数相同的牌。",
   "games.uno.howTo2": "不能出就抽牌。CPU 75% 贪心，25% 随机。",
   "games.uno.howTo3": "先把手牌打完。",
+  "games.wheel.won": "你转到了 {value}",
+  "games.madeUpPrices": "价格是编的。这只是游戏。",
+  "games.mute": "静音",
+  "games.unmute": "声音",
 };
 
-export const gamesJaMessages: TranslatedGamesMessages = {
+export const gamesJaMessages: GamesMessages = {
   "games.title": "ゲーム",
   "games.subtitle": "この端末で短く遊べます。ベストスコアはこのブラウザに残ります。",
   "games.catalogEyebrow": "プレイ",
@@ -2202,9 +2232,13 @@ export const gamesJaMessages: TranslatedGamesMessages = {
   "games.uno.howTo1": "同じ色または同じ数字のカードを出す。",
   "games.uno.howTo2": "出せなければ引く。CPU は75%貪欲、25%ランダム。",
   "games.uno.howTo3": "先に手札を空にする。",
+  "games.wheel.won": "{value} が出ました",
+  "games.madeUpPrices": "価格は架空です。これはゲームです。",
+  "games.mute": "消音",
+  "games.unmute": "音声",
 };
 
-export const gamesKoMessages: TranslatedGamesMessages = {
+export const gamesKoMessages: GamesMessages = {
   "games.title": "게임",
   "games.subtitle": "이 기기에서 짧게 플레이하세요. 최고 점수는 이 브라우저에 남습니다.",
   "games.catalogEyebrow": "플레이",
@@ -2421,6 +2455,10 @@ export const gamesKoMessages: TranslatedGamesMessages = {
   "games.uno.howTo1": "같은 색 또는 같은 숫자 카드를 내세요.",
   "games.uno.howTo2": "낼 수 없으면 뽑으세요. CPU는 75% 탐욕, 25% 무작위입니다.",
   "games.uno.howTo3": "먼저 손을 비우세요.",
+  "games.wheel.won": "{value}이(가) 나왔습니다",
+  "games.madeUpPrices": "가격은 꾸민 것입니다. 이것은 게임입니다.",
+  "games.mute": "음소거",
+  "games.unmute": "소리",
 };
 
 
