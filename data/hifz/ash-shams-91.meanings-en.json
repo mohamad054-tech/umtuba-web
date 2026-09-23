@@ -1,0 +1,110 @@
+{
+  "surah": 91,
+  "locale": "en",
+  "kind": "meanings",
+  "quranEncKey": "english_mokhtasar",
+  "version": "quranenc-api-download-2026-09-23",
+  "displayNameAr": "المختصر في تفسير القرآن الكريم",
+  "displayNameEn": "Al-Mukhtasar (Tafsir Center)",
+  "publisher": "Tafsir Center for Quranic Studies / QuranEnc.com",
+  "attributionRequired": true,
+  "sources": [
+    {
+      "role": "primary_download",
+      "name": "QuranEnc.com API v1 — sura translation",
+      "url": "https://quranenc.com/api/v1/translation/sura/english_mokhtasar/91",
+      "sha256": "196832a97a5a517a1ca21785b3c21be77fc1d59196cd6601a2bf03d5805d30fd",
+      "downloadedFile": "tmp/hifz/sources/english_mokhtasar-91-a.json"
+    },
+    {
+      "role": "secondary_cross_check",
+      "name": "QuranEnc.com API v1 — identical re-download",
+      "url": "https://quranenc.com/api/v1/translation/sura/english_mokhtasar/91",
+      "sha256": "196832a97a5a517a1ca21785b3c21be77fc1d59196cd6601a2bf03d5805d30fd",
+      "downloadedFile": "tmp/hifz/sources/english_mokhtasar-91-b.json",
+      "note": "Byte-identical to primary download (SHA-256 match)."
+    }
+  ],
+  "termsUrl": "https://quranenc.com/en/home/contact_us",
+  "crossCheckWordByWord100Percent": true,
+  "downloadedAtUtc": "2026-09-23T15:21:03.036Z",
+  "ayahCount": 15,
+  "ayat": [
+    {
+      "number": 1,
+      "text": "1. Allah takes an oath on the sun and its rising after breaking onto the eastern horizon.",
+      "footnotes": null
+    },
+    {
+      "number": 2,
+      "text": "2. He also takes an oath on the moon when it follows the sun after it has set.",
+      "footnotes": null
+    },
+    {
+      "number": 3,
+      "text": "3. Allah also takes an oath on the day when it reveals whatever is on the face of the earth through its light.",
+      "footnotes": null
+    },
+    {
+      "number": 4,
+      "text": "4. And He also takes an oath on the night when it covers the face of the earth, darkening it.",
+      "footnotes": null
+    },
+    {
+      "number": 5,
+      "text": "5. And He takes an oath on the sky, taking an oath on its perfect creation.",
+      "footnotes": null
+    },
+    {
+      "number": 6,
+      "text": "6. He also takes an oath on the earth: the way it has been spread so that people can live on it.",
+      "footnotes": null
+    },
+    {
+      "number": 7,
+      "text": "7. He also takes an oath on each soul, with Allah having created it equally.",
+      "footnotes": null
+    },
+    {
+      "number": 8,
+      "text": "8. Then He made it understand - without teaching it - what was evil so it could be abstained from, and what was good so it could be implemented.",
+      "footnotes": null
+    },
+    {
+      "number": 9,
+      "text": "9. Verily, the one who has purified his soul by adorning it with virtuous characteristics and freeing it from evil traits, has succeeded.",
+      "footnotes": null
+    },
+    {
+      "number": 10,
+      "text": "10. And verily the one who has secretly thrust his soul into sins and disobedience, has lost.",
+      "footnotes": null
+    },
+    {
+      "number": 11,
+      "text": "11. After Allah mentions the loss of the one who thrust his soul secretly into sins, He mentions the Thamūd as an example of that, saying: The Thamūd rejected their Prophet Saleh due to their transgressing the limits in committing sins and disobedience.",
+      "footnotes": null
+    },
+    {
+      "number": 12,
+      "text": "12. When the most wretched among them stood up after his people has appointed him for the task.",
+      "footnotes": null
+    },
+    {
+      "number": 13,
+      "text": "13. The Messenger of Allah Saleh (peace be upon him) said to them: “Leave the camel of Allah alone; let it drink on its day and do not pursue it intending evil.”",
+      "footnotes": null
+    },
+    {
+      "number": 14,
+      "text": "14. But they rejected their Messenger with regards to the camel, and so the most wretched among them killed it with the consent of his people. Therefore, they were all guilty of the crime and so Allah enveloped them into His punishment and destroyed them by a shriek due to their sins. He made them equal in the punishment that He destroyed them with.",
+      "footnotes": null
+    },
+    {
+      "number": 15,
+      "text": "15. Allah set the punishment that destroyed them, upon them, without Him, may He be glorified, fearing any reproach over His actions.",
+      "footnotes": null
+    }
+  ],
+  "versionNote": "Edition not published in QuranEnc /translations/list; version identity is the download date of the API payload (SHA-256 recorded in sources)."
+}

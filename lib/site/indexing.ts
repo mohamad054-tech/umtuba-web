@@ -11,7 +11,7 @@
  * - login, signup, register, password reset, auth callbacks
  * - settings, messages, notifications, create, saved, rewards, creator
  * - /learning (My Learning hub), /life/compose, cart/checkout/orders/wishlist
- * - feed, journey-pro, city, live/media-lab, sandbox, store/demo-preview, hifz
+ * - feed, journey-pro, city, live/media-lab, sandbox, store/demo-preview, hifz, learning/quran
  * - admin, seller, instructor, attempts
  *
  * Dynamic live rooms (/live/[roomId]) are allowlisted for crawling when linked
@@ -49,6 +49,7 @@ export const ROBOTS_DISALLOW_PATHS = [
   "/live/media-lab",
   "/sandbox",
   "/hifz",
+  "/learning/quran",
   "/store/demo-preview",
   "/store/cart",
   "/store/checkout",

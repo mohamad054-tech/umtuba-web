@@ -1,0 +1,109 @@
+{
+  "surah": 91,
+  "locale": "de",
+  "kind": "meanings",
+  "quranEncKey": "german_bubenheim",
+  "version": "1.1.4",
+  "displayNameAr": "ترجمة فرانك بوبنهايم",
+  "displayNameEn": "German Translation — Frank Bubenheim",
+  "publisher": "Frank Bubenheim / QuranEnc.com",
+  "attributionRequired": true,
+  "sources": [
+    {
+      "role": "primary_download",
+      "name": "QuranEnc.com API v1 — sura translation",
+      "url": "https://quranenc.com/api/v1/translation/sura/german_bubenheim/91",
+      "sha256": "addc4506cde1ad73439bb85266e7f3e6c719e948f1ff556cb51216073d305ca9",
+      "downloadedFile": "tmp/hifz/sources/german_bubenheim-91-a.json"
+    },
+    {
+      "role": "secondary_cross_check",
+      "name": "QuranEnc.com API v1 — identical re-download",
+      "url": "https://quranenc.com/api/v1/translation/sura/german_bubenheim/91",
+      "sha256": "addc4506cde1ad73439bb85266e7f3e6c719e948f1ff556cb51216073d305ca9",
+      "downloadedFile": "tmp/hifz/sources/german_bubenheim-91-b.json",
+      "note": "Byte-identical to primary download (SHA-256 match)."
+    }
+  ],
+  "termsUrl": "https://quranenc.com/en/home/contact_us",
+  "crossCheckWordByWord100Percent": true,
+  "downloadedAtUtc": "2026-09-23T15:21:03.036Z",
+  "ayahCount": 15,
+  "ayat": [
+    {
+      "number": 1,
+      "text": "Bei der Sonne und ihrer Morgenhelle",
+      "footnotes": null
+    },
+    {
+      "number": 2,
+      "text": "und dem Mond, wenn er ihr folgt,",
+      "footnotes": null
+    },
+    {
+      "number": 3,
+      "text": "und dem Tag, wenn er sie erscheinen läßt,",
+      "footnotes": null
+    },
+    {
+      "number": 4,
+      "text": "und der Nacht, wenn sie sie überdeckt,",
+      "footnotes": null
+    },
+    {
+      "number": 5,
+      "text": "und dem Himmel und Dem, Der ihn aufgebaut hat,",
+      "footnotes": null
+    },
+    {
+      "number": 6,
+      "text": "und der Erde und Dem, Der sie ausgebreitet hat,",
+      "footnotes": null
+    },
+    {
+      "number": 7,
+      "text": "und einer (jeden) Seele und Dem, Der sie zurechtgeformt hat",
+      "footnotes": null
+    },
+    {
+      "number": 8,
+      "text": "und ihr dann ihre Sittenlosigkeit und ihre Gottesfurcht eingegeben hat!",
+      "footnotes": null
+    },
+    {
+      "number": 9,
+      "text": "Wohl ergehen wird es ja jemandem, der sie läutert,",
+      "footnotes": null
+    },
+    {
+      "number": 10,
+      "text": "und enttäuscht sein wird ja, wer sie verkümmern läßt.",
+      "footnotes": null
+    },
+    {
+      "number": 11,
+      "text": "Die Tamud erklärten in ihrer Auflehnung (die Botschaft) für Lüge,",
+      "footnotes": null
+    },
+    {
+      "number": 12,
+      "text": "als der Unseligste von ihnen sich erhob.",
+      "footnotes": null
+    },
+    {
+      "number": 13,
+      "text": "Allahs Gesandter sagte zu ihnen: (Achtet auf) Allahs Kamelstute und ihre Trinkzeit.",
+      "footnotes": null
+    },
+    {
+      "number": 14,
+      "text": "Sie aber bezichtigten ihn der Lüge, und so schnitten sie ihr die Sehnen durch. Da schmetterte ihr Herr sie für ihre Sünde nieder, und so ebnete Er über ihnen die Erde ein.",
+      "footnotes": null
+    },
+    {
+      "number": 15,
+      "text": "Und Er (Allah) fürchtet nicht die Folge davon.",
+      "footnotes": null
+    }
+  ]
+}

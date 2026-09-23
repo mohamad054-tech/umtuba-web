@@ -1,0 +1,110 @@
+{
+  "surah": 91,
+  "locale": "ru",
+  "kind": "meanings",
+  "quranEncKey": "russian_mokhtasar",
+  "version": "quranenc-api-download-2026-09-23",
+  "displayNameAr": "المختصر في تفسير القرآن الكريم",
+  "displayNameEn": "Al-Mukhtasar (Tafsir Center)",
+  "publisher": "Tafsir Center for Quranic Studies / QuranEnc.com",
+  "attributionRequired": true,
+  "sources": [
+    {
+      "role": "primary_download",
+      "name": "QuranEnc.com API v1 — sura translation",
+      "url": "https://quranenc.com/api/v1/translation/sura/russian_mokhtasar/91",
+      "sha256": "dcaa9d04be1be47b9c79619721b6c0ad072a5bf557046fa87889748c43bdff80",
+      "downloadedFile": "tmp/hifz/sources/russian_mokhtasar-91-a.json"
+    },
+    {
+      "role": "secondary_cross_check",
+      "name": "QuranEnc.com API v1 — identical re-download",
+      "url": "https://quranenc.com/api/v1/translation/sura/russian_mokhtasar/91",
+      "sha256": "dcaa9d04be1be47b9c79619721b6c0ad072a5bf557046fa87889748c43bdff80",
+      "downloadedFile": "tmp/hifz/sources/russian_mokhtasar-91-b.json",
+      "note": "Byte-identical to primary download (SHA-256 match)."
+    }
+  ],
+  "termsUrl": "https://quranenc.com/en/home/contact_us",
+  "crossCheckWordByWord100Percent": true,
+  "downloadedAtUtc": "2026-09-23T15:21:03.036Z",
+  "ayahCount": 15,
+  "ayat": [
+    {
+      "number": 1,
+      "text": "1) Аллах поклялся солнцем и временем его поднятия после его восхода на востоке. ",
+      "footnotes": null
+    },
+    {
+      "number": 2,
+      "text": "2) И поклялся Он луной, когда она следует за ним [солнцем] после его заката.",
+      "footnotes": null
+    },
+    {
+      "number": 3,
+      "text": "3) И поклялся Он днем, когда он озаряет своим сиянием все, что находится на поверхности земли.",
+      "footnotes": null
+    },
+    {
+      "number": 4,
+      "text": "4) И поклялся Он ночью, когда она покрывает поверхность земли и наступает мрак.",
+      "footnotes": null
+    },
+    {
+      "number": 5,
+      "text": "5) И поклялся Он небом и его совершенным строением.",
+      "footnotes": null
+    },
+    {
+      "number": 6,
+      "text": "6) И поклялся Он землей и тем, как Он распростер ее для того, чтобы люди проживали на ней.",
+      "footnotes": null
+    },
+    {
+      "number": 7,
+      "text": "7) И поклялся Он каждой душой и тем, как Аллах сотворил ее соразмерно. ",
+      "footnotes": null
+    },
+    {
+      "number": 8,
+      "text": "8) А потом внушил ей, что есть – зло, чтобы она сторонилась его, и что есть – добро, чтобы она совершала его. ",
+      "footnotes": null
+    },
+    {
+      "number": 9,
+      "text": "9) Приобрел желаемое тот, кто очистил свою душу, украсив ее достоинствами и освободив ее от пороков.",
+      "footnotes": null
+    },
+    {
+      "number": 10,
+      "text": "10) И потерпел убыток тот, кто запятнал свою душу, скрытно совершая ослушание и грехи.",
+      "footnotes": null
+    },
+    {
+      "number": 11,
+      "text": "11) Самудьяне сочли лжецом своего пророка Салиха, из-за того, что преступали границы дозволенного, совершая ослушание и грехи,",
+      "footnotes": null
+    },
+    {
+      "number": 12,
+      "text": "12) и тогда самый несчастный из них поднялся, после того как его народ поручил ему [убить верблюдицу].",
+      "footnotes": null
+    },
+    {
+      "number": 13,
+      "text": "13) Посланник Аллаха – Салих сказал им: «Оставьте верблюдицу Аллаха и ее питье в выделенный для нее день, и не причиняйте ей зла!».",
+      "footnotes": null
+    },
+    {
+      "number": 14,
+      "text": "14) Они посчитали, что их посланник лжет им о верблюдице, и ее убил самый несчастный из них, в то время как остальные также были довольны этим поступком и являлись соучастниками в этом грехе. Аллах обрушил на них Свое наказание и погубил их гласом за их грехи, сделав их равными в наказании, которым уничтожил их.",
+      "footnotes": null
+    },
+    {
+      "number": 15,
+      "text": "15) Аллах обрушил на них наказание, которое уничтожил их, не опасаясь его последствий. ",
+      "footnotes": null
+    }
+  ],
+  "versionNote": "Edition not published in QuranEnc /translations/list; version identity is the download date of the API payload (SHA-256 recorded in sources)."
+}
