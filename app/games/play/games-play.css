@@ -220,6 +220,13 @@ body:has(.um-game-fit) {
   padding-bottom: 8px;
 }
 
+@media (max-width: 639px) {
+  .um-game-fit-place .um-game-fit-body > h2,
+  .um-game-fit-place .um-game-fit-body > [data-games-subtitle] {
+    display: none;
+  }
+}
+
 .um-game-fit .um-play-root,
 .um-play-panel.fit {
   flex: 1;
@@ -244,6 +251,107 @@ body:has(.um-game-fit) {
   flex-direction: column;
   overflow: hidden;
   padding: 8px 10px;
+}
+
+.um-play-panel.fit .um-place-quiz {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px;
+  overflow: hidden;
+}
+
+.um-place-photo-wrap {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  border-radius: 14px;
+  background: rgba(6, 5, 18, 0.35);
+  direction: ltr;
+}
+
+.um-place-photo {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
+}
+
+.um-play-panel.fit .um-place-quiz .um-play-choices,
+.um-play-panel.fit .um-place-quiz .um-play-why,
+.um-play-panel.fit .um-place-quiz .um-play-row,
+.um-play-panel.fit .um-place-quiz .um-play-qnum {
+  flex-shrink: 0;
+}
+
+.um-play-panel.fit .um-place-quiz .um-play-choices {
+  gap: 6px;
+}
+
+.um-play-panel.fit .um-place-quiz .um-play-choice {
+  min-height: 44px;
+  padding: 4px 10px;
+}
+
+.um-game-fit-place .um-game-fit-body {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+.um-game-fit-place .um-play-panel.fit .um-play-bar {
+  padding: 2px 8px;
+  gap: 8px;
+}
+
+.um-game-fit-place .um-play-panel.fit .um-play-help-btn {
+  min-height: 36px;
+  padding: 4px 10px;
+}
+
+.um-game-fit-place .um-play-panel.fit .um-play-body {
+  padding: 4px 8px;
+}
+
+.um-game-fit-place .um-play-panel.fit .um-place-quiz {
+  gap: 4px;
+  padding: 4px;
+}
+
+.um-game-fit-place .um-play-panel.fit .um-place-quiz .um-play-why {
+  padding: 4px 8px;
+  font-size: 0.8rem;
+  line-height: 1.25;
+}
+
+.um-game-fit-place .um-play-panel.fit .um-place-quiz .um-play-row {
+  margin-top: 0;
+}
+
+.um-game-fit-place .um-play-panel.fit .um-place-quiz .um-play-btn {
+  min-height: 44px;
+  padding: 6px 14px;
+}
+
+.um-place-names {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
+  line-height: 1.15;
+  text-align: start;
+}
+
+.um-place-names .en {
+  font-size: 0.72rem;
+  font-weight: 650;
+  opacity: 0.75;
 }
 
 .um-play-bar {

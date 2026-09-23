@@ -47,13 +47,13 @@ export default async function GamePlayPage({ params }: Props) {
   const game = getPlayableGame(slug);
   if (!game) notFound();
 
-  const fit = slug === "solitaire";
+  const fit = slug === "solitaire" || slug === "guess-city" || slug === "landmark";
 
   return (
     <main
       className={`um-games-shell relative text-white ${
         fit ? "um-game-fit" : "min-h-screen"
-      } ${MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS}`}
+      } ${slug === "guess-city" || slug === "landmark" ? "um-game-fit-place" : ""} ${MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS}`}
     >
       <AppTopNav
         title={t(game.titleKey)}

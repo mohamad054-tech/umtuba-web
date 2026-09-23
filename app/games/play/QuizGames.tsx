@@ -1,6 +1,5 @@
 "use client";
 
-import dynamic from "next/dynamic";
 import { shuffled } from "../../../lib/games/play/engine";
 import {
   BLANKS,
@@ -9,51 +8,26 @@ import {
   QUICK_Q,
   STORE_PRODUCTS,
   VOCAB,
-  WORLD_CITIES,
-  WORLD_LANDMARKS,
   pickQuiz,
   type QuizItem,
 } from "../../../lib/games/play/banks";
+import {
+  CITY_ROUND,
+  GAME_CITIES,
+  GAME_LANDMARKS,
+  LANDMARK_ROUND,
+  buildPlaceQuiz,
+  placeSrc,
+} from "../../../lib/games/play/places";
 import FlagMark from "./FlagMark";
-import LandmarkDraw from "./LandmarkDraw";
 import QuizPlay from "./QuizPlay";
 
-const GameMap = dynamic(() => import("./GameMap"), {
-  ssr: false,
-  loading: () => <div className="um-play-gamemap" dir="ltr" />,
-});
-
-function cityQuiz(): QuizItem[] {
-  return shuffled(WORLD_CITIES)
-    .slice(0, 6)
-    .map((city) => {
-      const label = `${city.city} · ${city.country}`;
-      const wrong = shuffled(WORLD_CITIES.filter((item) => item.id !== city.id))
-        .slice(0, 3)
-        .map((item) => `${item.city} · ${item.country}`);
-      const choices = shuffled([label, ...wrong]);
-      return {
-        prompt: city.id,
-        choices,
-        correct: choices.indexOf(label),
-        why: `${city.city} — ${city.country}. ${city.hint}`,
-      };
-    });
-}
-
-function landmarkQuiz(): QuizItem[] {
-  return shuffled(WORLD_LANDMARKS).map((mark) => {
-    const wrong = shuffled(WORLD_LANDMARKS.filter((item) => item.id !== mark.id))
-      .slice(0, 3)
-      .map((item) => item.name);
-    const choices = shuffled([mark.name, ...wrong]);
-    return {
-      prompt: mark.id,
-      choices,
-      correct: choices.indexOf(mark.name),
-      why: mark.fact,
-    };
-  });
+function PlacePhoto({ src }: { src: string }) {
+  return (
+    <div className="um-place-photo-wrap" dir="ltr">
+      <img className="um-place-photo" src={src} alt="" draggable={false} />
+    </div>
+  );
 }
 
 function flagQuiz(): QuizItem[] {
@@ -181,23 +155,11 @@ export function GuessCityGame() {
   return (
     <QuizPlay
       slug="guess-city"
+      fit
       howTo={["games.guess-city.howTo1", "games.guess-city.howTo2", "games.guess-city.howTo3"]}
-      load={cityQuiz}
+      load={() => buildPlaceQuiz(GAME_CITIES, CITY_ROUND)}
       seconds={18}
-      extra={(item) => {
-        const city = WORLD_CITIES.find((entry) => entry.id === item.prompt);
-        if (!city) return null;
-        return (
-          <GameMap
-            pins={[{ id: city.id, lng: city.lng, lat: city.lat }]}
-            focusId={city.id}
-            zoom={5}
-            hideLabels
-            fit="point"
-            interactive
-          />
-        );
-      }}
+      extra={(item) => <PlacePhoto src={placeSrc("cities", item.prompt)} />}
       hidePrompt
     />
   );
@@ -207,14 +169,11 @@ export function LandmarkGame() {
   return (
     <QuizPlay
       slug="landmark"
+      fit
       howTo={["games.landmark.howTo1", "games.landmark.howTo2", "games.landmark.howTo3"]}
-      load={landmarkQuiz}
-      seconds={12}
-      extra={(item) => (
-        <div className="um-play-scene" data-play-item="true" dir="ltr">
-          <LandmarkDraw id={item.prompt} />
-        </div>
-      )}
+      load={() => buildPlaceQuiz(GAME_LANDMARKS, LANDMARK_ROUND)}
+      seconds={18}
+      extra={(item) => <PlacePhoto src={placeSrc("landmarks", item.prompt)} />}
       hidePrompt
     />
   );

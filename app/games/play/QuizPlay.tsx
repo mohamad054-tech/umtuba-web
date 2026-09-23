@@ -28,9 +28,21 @@ type Props = {
   seconds: number;
   extra?: (item: QuizItem, index: number) => ReactNode;
   hidePrompt?: boolean;
+  fit?: boolean;
 };
 
-export default function QuizPlay({ slug, howTo, load, seconds, extra, hidePrompt }: Props) {
+function ChoiceText({ text }: { text: string }) {
+  const [arabic, english] = text.split("\n");
+  if (!english) return <span>{text}</span>;
+  return (
+    <span className="um-place-names">
+      <span>{arabic}</span>
+      <span className="en">{english}</span>
+    </span>
+  );
+}
+
+export default function QuizPlay({ slug, howTo, load, seconds, extra, hidePrompt, fit }: Props) {
   const { t, locale } = useI18n();
   const sfx = useMemo(() => createPlaySfx(), []);
   const { helpOpen, ready, dismissHelp, toggleHelp, keepReadyOnReplay } = usePlayHelp();
@@ -140,6 +152,7 @@ export default function QuizPlay({ slug, howTo, load, seconds, extra, hidePrompt
   if (done) {
     return (
       <PlayPanel
+        fill={fit}
         stats={<PlayStat label={t("games.score")} value={formatPlayNumber(locale, score)} />}
         helpOpen={helpOpen}
         onToggleHelp={toggleHelp}
@@ -163,6 +176,7 @@ export default function QuizPlay({ slug, howTo, load, seconds, extra, hidePrompt
 
   return (
     <PlayPanel
+      fill={fit}
       stats={
         <>
           <PlayStat label={t("games.score")} value={formatPlayNumber(locale, score)} />
@@ -180,7 +194,11 @@ export default function QuizPlay({ slug, howTo, load, seconds, extra, hidePrompt
         onDismiss={begin}
       />
       {ready && item ? (
-        <div ref={boardRef} className={`um-play-quiz um-lit-board${pick === item.correct ? " um-play-celebrate" : ""}`} dir="ltr">
+        <div
+          ref={boardRef}
+          className={`um-play-quiz um-lit-board${fit ? " um-place-quiz" : ""}${pick === item.correct ? " um-play-celebrate" : ""}`}
+          dir="ltr"
+        >
           <p className="um-play-qnum">
             {t("games.question")} {formatPlayNumber(locale, index + 1)} {t("games.of")}{" "}
             {formatPlayNumber(locale, deck.length)}
@@ -200,7 +218,7 @@ export default function QuizPlay({ slug, howTo, load, seconds, extra, hidePrompt
                 onClick={() => answer(choice)}
               >
                 <span className="tag">{CHOICE_TAGS[choice] ?? choice + 1}</span>
-                <span>{text}</span>
+                <ChoiceText text={text} />
               </button>
             ))}
           </div>
