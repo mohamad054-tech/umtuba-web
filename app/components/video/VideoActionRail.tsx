@@ -52,6 +52,10 @@ type VideoActionRailProps = {
   onHideFromFeed?: (postId: number) => void;
   onCaptionChange?: (caption: string) => void;
   onUiLockChange?: (locked: boolean) => void;
+  onJourney?: () => void;
+  journeyLabel?: string;
+  summaryTitle?: string;
+  summaryBody?: string;
 };
 
 export default function VideoActionRail({
@@ -71,6 +75,10 @@ export default function VideoActionRail({
   onHideFromFeed,
   onCaptionChange,
   onUiLockChange,
+  onJourney,
+  journeyLabel,
+  summaryTitle,
+  summaryBody,
 }: VideoActionRailProps) {
   const router = useRouter();
   const [sharedPulse, setSharedPulse] = useState(false);
@@ -402,6 +410,10 @@ export default function VideoActionRail({
           onHideFromFeed={onHideFromFeed}
           onCaptionChange={onCaptionChange}
           onUiLockChange={onUiLockChange}
+          onJourney={onJourney}
+          journeyLabel={journeyLabel}
+          summaryTitle={summaryTitle}
+          summaryBody={summaryBody}
         />
       ) : null}
     </div>

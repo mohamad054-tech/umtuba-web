@@ -8,7 +8,11 @@ import {
   type MouseEvent,
 } from "react";
 import { useTranslation } from "../i18n";
-import { initialElementMuted } from "../../../lib/video/feedMutePreference";
+import { initialElementMuted, readUserWantsSound } from "../../../lib/video/feedMutePreference";
+import {
+  isFeedPlaybackSuppressed,
+  releaseFeedPlaybackSuppression,
+} from "../../../lib/video/feedHiddenPlayback";
 import {
   pauseInactiveVideo,
   playActiveVideo,
@@ -18,6 +22,7 @@ import {
   resolveWatchMediaPreload,
 } from "../../lib/video/playbackFetchPolicy";
 import { useFeedMutePreference } from "./FeedMuteProvider";
+import FeedVideoProgress from "./FeedVideoProgress";
 import TapToUnmuteOverlay from "./TapToUnmuteOverlay";
 import WatchFloatingControls from "./WatchFloatingControls";
 
@@ -70,10 +75,12 @@ export default function VideoPlayer({
     setMuteEpochApplied(muteEpoch);
     setAutoplayFallbackMuted(false);
   }
-  const isCurrentlyMuted =
-    autoplayFallbackMuted || initialElementMuted(userWantsSound);
+  const isCurrentlyMuted = userWantsSound
+    ? false
+    : autoplayFallbackMuted || initialElementMuted(userWantsSound);
   const [pausedByUser, setPausedByUser] = useState(false);
   const [isPaused, setIsPaused] = useState(true);
+  const [progress, setProgress] = useState(0);
   const [isReady, setIsReady] = useState(false);
   const [flashIcon, setFlashIcon] = useState<"play" | "pause" | null>(null);
   const flashTimerRef = useRef<number | null>(null);
@@ -91,7 +98,7 @@ export default function VideoPlayer({
       return;
     }
 
-    if (!active || playbackStatus !== "ok") {
+    if (!active || playbackStatus !== "ok" || isFeedPlaybackSuppressed()) {
       playGenerationRef.current += 1;
       pauseInactiveVideo(video);
       return;
@@ -105,10 +112,19 @@ export default function VideoPlayer({
 
     const generation = playGenerationRef.current + 1;
     playGenerationRef.current = generation;
-    const startMuted = initialElementMuted(userWantsSound);
+    const wantsSound = readUserWantsSound();
+    const startMuted = !wantsSound;
     video.muted = startMuted;
     void playActiveVideo(video, startMuted).then((result) => {
       if (playGenerationRef.current !== generation) {
+        return;
+      }
+      if (readUserWantsSound() && !isFeedPlaybackSuppressed()) {
+        video.muted = false;
+        setAutoplayFallbackMuted(false);
+        if (video.paused) {
+          void video.play().catch(() => undefined);
+        }
         return;
       }
       if (result === "muted_fallback") {
@@ -206,6 +222,7 @@ export default function VideoPlayer({
       const currentTimeMs = Number.isFinite(video.currentTime)
         ? Math.max(0, video.currentTime * 1000)
         : 0;
+      setProgress(durationMs > 0 ? Math.min(1, currentTimeMs / durationMs) : 0);
       report({
         currentTimeMs,
         durationMs,
@@ -259,6 +276,7 @@ export default function VideoPlayer({
     }
 
     if (video.paused) {
+      releaseFeedPlaybackSuppression();
       setPausedByUser(false);
       const startMuted = initialElementMuted(userWantsSound);
       video.muted = startMuted;
@@ -310,6 +328,7 @@ export default function VideoPlayer({
           playsInline
           loop={loopWhenEnded}
           muted={isCurrentlyMuted}
+          disableRemotePlayback
           preload={resolveWatchMediaPreload(active)}
           onClick={handleSurfaceClick}
           onLoadedData={() => setIsReady(true)}
@@ -376,6 +395,7 @@ export default function VideoPlayer({
         visible={active && isCurrentlyMuted}
         label={t("watch.tapToUnmute")}
         onUnmute={() => {
+          releaseFeedPlaybackSuppression();
           setUserWantsSound(true);
           setAutoplayFallbackMuted(false);
           const video = videoRef.current;
@@ -393,9 +413,14 @@ export default function VideoPlayer({
         }}
       />
 
+      {active && playable ? <FeedVideoProgress progress={progress} /> : null}
+
       <WatchFloatingControls
         muted={isCurrentlyMuted}
-        onToggleMute={toggleUserWantsSound}
+        onToggleMute={() => {
+          releaseFeedPlaybackSuppression();
+          toggleUserWantsSound();
+        }}
         unmuteLabel={t("watch.unmute")}
         muteLabel={t("watch.mute")}
       />

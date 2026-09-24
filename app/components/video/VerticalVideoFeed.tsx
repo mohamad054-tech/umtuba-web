@@ -3,6 +3,7 @@
 import {
   useCallback,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -12,6 +13,8 @@ import { useTranslation } from "../i18n";
 import { localizedVideoTitle } from "../../watch/lib/mapWatchVideo";
 import type { WatchVideo } from "../../watch/types";
 import { refreshWatchPlaybackAction } from "../../actions/loadWatchFeed";
+import { readUserWantsSound } from "../../../lib/video/feedMutePreference";
+import { isFeedPlaybackSuppressed } from "../../../lib/video/feedHiddenPlayback";
 import {
   WATCH_PLAYBACK_NEIGHBOR_WINDOW,
   isPlayableHttpSrc,
@@ -100,6 +103,9 @@ export default function VerticalVideoFeed({
   const lastRestoreTokenRef = useRef<number | null>(null);
   const signingRef = useRef(new Set<number>());
   const programmaticIndexRef = useRef<number | null>(null);
+  const deepLinkAppliedRef = useRef(false);
+  const applyingDeepLinkRef = useRef(false);
+  const userMovedRef = useRef(false);
 
   const activeVideo = videos[activeIndex] ?? videos[0];
 
@@ -245,17 +251,51 @@ export default function VerticalVideoFeed({
   }, [activeIndex, videos.length, onNearEnd]);
 
   useEffect(() => {
-    const target = videos[initialIndex];
+    const scroller = scrollerRef.current;
+    if (!scroller) return;
 
-    if (!target) {
+    function onUserScroll() {
+      if (applyingDeepLinkRef.current) return;
+      userMovedRef.current = true;
+      deepLinkAppliedRef.current = true;
+    }
+
+    scroller.addEventListener("scroll", onUserScroll, { passive: true });
+    scroller.addEventListener("wheel", onUserScroll, { passive: true });
+    scroller.addEventListener("touchmove", onUserScroll, { passive: true });
+    return () => {
+      scroller.removeEventListener("scroll", onUserScroll);
+      scroller.removeEventListener("wheel", onUserScroll);
+      scroller.removeEventListener("touchmove", onUserScroll);
+    };
+  }, [videos.length]);
+
+  useLayoutEffect(() => {
+    if (
+      deepLinkAppliedRef.current ||
+      userMovedRef.current ||
+      videos.length === 0
+    ) {
       return;
     }
 
-    const node = slideNodesRef.current.get(target.id);
+    const safeIndex = Math.min(Math.max(initialIndex, 0), videos.length - 1);
+    const target = videos[safeIndex];
+    const node = target ? slideNodesRef.current.get(target.id) : null;
+    const scroller = scrollerRef.current;
 
-    if (node && scrollerRef.current) {
-      scrollScrollerToSlide(scrollerRef.current, node, "auto");
-      setActiveIndex(initialIndex);
+    if (!target || !node || !scroller) {
+      return;
+    }
+
+    deepLinkAppliedRef.current = true;
+    if (safeIndex > 0) {
+      applyingDeepLinkRef.current = true;
+      scrollScrollerToSlide(scroller, node, "auto");
+      setActiveIndex(safeIndex);
+      window.requestAnimationFrame(() => {
+        applyingDeepLinkRef.current = false;
+      });
     }
   }, [initialIndex, videos]);
 
@@ -353,16 +393,56 @@ export default function VerticalVideoFeed({
       return;
     }
 
+    const wantsSound = readUserWantsSound() && !isFeedPlaybackSuppressed();
     scroller.querySelectorAll<HTMLElement>("[data-video-id]").forEach((slide) => {
-      if (slide.dataset.videoId === activeId) {
-        return;
-      }
+      const isActive = slide.dataset.videoId === activeId;
       slide.querySelectorAll("video").forEach((video) => {
-        video.muted = true;
-        video.pause();
+        if (!isActive) {
+          video.muted = true;
+          video.pause();
+          return;
+        }
+        if (wantsSound) {
+          video.muted = false;
+          if (video.paused && !isFeedPlaybackSuppressed()) {
+            void video.play().catch(() => undefined);
+          }
+        }
       });
     });
   }, [activeIndex, activeVideo?.id, videos]);
+
+  useEffect(() => {
+    const scroller = scrollerRef.current;
+    if (!scroller) return;
+    const feed = scroller;
+
+    function keepSoundOnGesture() {
+      if (!readUserWantsSound() || isFeedPlaybackSuppressed()) return;
+      const root = feed.getBoundingClientRect();
+      const pick: { video: HTMLVideoElement | null; ratio: number } = {
+        video: null,
+        ratio: 0,
+      };
+      feed.querySelectorAll<HTMLElement>("[data-video-id]").forEach((slide) => {
+        const rect = slide.getBoundingClientRect();
+        const visible =
+          Math.min(rect.bottom, root.bottom) - Math.max(rect.top, root.top);
+        const ratio = visible / Math.max(rect.height, 1);
+        const video = slide.querySelector("video");
+        if (video && ratio > pick.ratio) {
+          pick.ratio = ratio;
+          pick.video = video;
+        }
+      });
+      if (!pick.video || pick.ratio < 0.45) return;
+      pick.video.muted = false;
+      void pick.video.play().catch(() => undefined);
+    }
+
+    scroller.addEventListener("pointerup", keepSoundOnGesture);
+    return () => scroller.removeEventListener("pointerup", keepSoundOnGesture);
+  }, [videos.length]);
 
   if (videos.length === 0) {
     return (

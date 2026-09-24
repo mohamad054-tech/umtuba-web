@@ -79,8 +79,9 @@ describe("canonical video feed architecture", () => {
   });
 
   it("does not reintroduce gated prototype panels outside surfaceGates", () => {
+    const watch = read("app/watch/WatchExperience.tsx");
     const overlay = read("app/components/video/VideoOverlay.tsx");
-    expect(overlay).toMatch(/allowWatchPrototypePanels/);
+    expect(watch).toMatch(/allowWatchPrototypePanels/);
     expect(overlay).not.toMatch(/UConnect/);
   });
 

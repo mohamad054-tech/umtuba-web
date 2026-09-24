@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import AppTopNav from "../../components/AppTopNav";
 import { useTranslation } from "../../components/i18n";
-import { APP_ROUTES, MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS } from "../../lib/nav";
+import { APP_ROUTES } from "../../lib/nav";
 import HomeSectionCircles from "./HomeSectionCircles";
 
 type DiscoverShellProps = {
@@ -23,7 +23,7 @@ export default function DiscoverShell({ children }: DiscoverShellProps) {
 
   return (
     <main
-      className={`relative flex min-h-dvh flex-1 flex-col overflow-x-hidden bg-[#050510] text-white ${MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS}`}
+      className="relative flex h-dvh min-h-dvh flex-col overflow-hidden overflow-x-hidden bg-[#050510] text-white"
     >
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <div className="absolute left-[-12%] top-[-8%] h-[28rem] w-[28rem] rounded-full bg-blue-600/25 blur-3xl" />
@@ -68,7 +68,7 @@ export default function DiscoverShell({ children }: DiscoverShellProps) {
         </div>
       </div>
 
-      <div className="relative z-10 mx-auto flex w-full max-w-[1400px] flex-1 flex-col overflow-x-hidden px-0 md:px-6 md:py-5">
+      <div className="relative z-10 mx-auto flex min-h-0 w-full max-w-[1400px] flex-1 flex-col overflow-hidden px-0 lg:px-6 lg:py-5">
         {children}
       </div>
     </main>

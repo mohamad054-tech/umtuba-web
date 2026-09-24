@@ -27,6 +27,7 @@ import type { DiscoverStats, DiscoverVideo } from "./types";
 import { extractHashtagsFromCaption } from "../../lib/supabase/updateOwnPostCaption";
 import { composeFeedWithWatchHide } from "../../lib/video/watchHidePolicy";
 import { readLocalWatchHideEntries } from "../../lib/video/watchHideStorage";
+import { replaceFeedPostInAddress } from "../../lib/video/syncFeedPostUrl";
 
 type DiscoverExperienceProps = {
   videos: DiscoverVideo[];
@@ -45,8 +46,8 @@ export default function DiscoverExperience({
   const { t } = useTranslation();
   const searchParams = useSearchParams();
   const cityParam = searchParams.get("city");
-  const postParam = searchParams.get("post");
   const commentParam = searchParams.get("comment");
+  const [postParam] = useState(() => searchParams.get("post"));
 
   const [videos, setVideos] = useState(initialVideos);
   const [nextCursor, setNextCursor] = useState<string | null>(initialCursor);
@@ -97,6 +98,7 @@ export default function DiscoverExperience({
     }
     return findIndexByCity(videos, cityParam);
   }, [cityParam, postParam, videos]);
+  const [pinnedInitialIndex] = useState(initialIndex);
 
   const postDeepLinkMatched = useMemo(() => {
     if (!postParam) {
@@ -128,6 +130,8 @@ export default function DiscoverExperience({
   const handleActiveChange = useCallback((video: DiscoverVideo) => {
     setActiveVideo(video);
     setCommentsOpen(false);
+    const postId = Number(video.id);
+    replaceFeedPostInAddress(Number.isInteger(postId) ? postId : null);
   }, []);
 
   const handleComment = useCallback((video: DiscoverVideo) => {
@@ -335,14 +339,14 @@ export default function DiscoverExperience({
 
   return (
     <DiscoverShell>
-      <div className="flex flex-1 flex-col gap-3">
+      <div className="flex min-h-0 flex-1 flex-col gap-3">
         <StoryRail viewerId={viewerId} />
-        <div className="flex flex-1 flex-col gap-3 md:flex-row md:items-stretch md:justify-center">
-        <div className="relative mx-auto w-full max-w-[510px] shrink-0">
-          <div className="video-watch-stage relative z-10 h-[calc(100dvh-4rem-5.75rem-var(--app-mobile-bottom-nav-offset,0px)-var(--analytics-consent-banner-offset,0px))] w-full overflow-hidden bg-black md:h-[calc(100dvh-7.5rem-5.75rem)] md:rounded-[36px] md:border md:border-white/10">
+        <div className="flex min-h-0 flex-1 flex-col gap-3 lg:flex-row lg:items-stretch lg:justify-center">
+        <div className="relative mx-auto flex min-h-0 w-full flex-1 lg:max-w-[510px] lg:flex-none">
+          <div className="video-watch-stage relative z-10 h-full min-h-0 w-full flex-1 overflow-hidden bg-black lg:rounded-[36px] lg:border lg:border-white/10">
             <DiscoverFeed
               videos={videos}
-              initialIndex={initialIndex}
+              initialIndex={pinnedInitialIndex}
               viewerId={viewerId}
               onActiveChange={handleActiveChange}
               onComment={handleComment}
@@ -415,7 +419,7 @@ export default function DiscoverExperience({
         </div>
         </div>
 
-        <div className="flex justify-center px-4 pb-4">
+        <div className="hidden justify-center px-4 pb-4 lg:flex">
           <Link
             href={exploreHref}
             className="watch-focus-ring rounded-full border border-sky-400/30 bg-sky-500/15 px-4 py-2 text-xs font-black uppercase tracking-[0.16em] text-sky-50 transition hover:bg-sky-500/25"

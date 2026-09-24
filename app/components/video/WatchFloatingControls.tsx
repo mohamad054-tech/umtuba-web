@@ -14,7 +14,7 @@ export default function WatchFloatingControls({
   muteLabel,
 }: WatchFloatingControlsProps) {
   return (
-    <div className="absolute right-4 top-20 z-30 md:top-4">
+    <div className="absolute end-4 top-16 z-30 lg:top-4">
       <button
         type="button"
         onClick={(event) => {

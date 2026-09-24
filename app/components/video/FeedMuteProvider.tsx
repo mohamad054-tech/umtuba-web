@@ -4,10 +4,12 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useSyncExternalStore,
   type ReactNode,
 } from "react";
+import { pauseFeedVideosForHiddenPage } from "../../../lib/video/feedHiddenPlayback";
 import {
   persistUserWantsSound,
   readUserWantsSound,
@@ -44,6 +46,25 @@ export function FeedMuteProvider({ children }: { children: ReactNode }) {
 
   const toggleUserWantsSound = useCallback(() => {
     persistUserWantsSound(!readUserWantsSound());
+  }, []);
+
+  useEffect(() => {
+    function onPageHidden() {
+      pauseFeedVideosForHiddenPage();
+    }
+
+    function onVisibilityChange() {
+      if (document.visibilityState === "hidden") {
+        onPageHidden();
+      }
+    }
+
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    window.addEventListener("pagehide", onPageHidden);
+    return () => {
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+      window.removeEventListener("pagehide", onPageHidden);
+    };
   }, []);
 
   const value = useMemo(

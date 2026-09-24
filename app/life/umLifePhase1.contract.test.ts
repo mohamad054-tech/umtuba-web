@@ -163,11 +163,10 @@ describe("UM Life Phase 1 — navigation entries", () => {
     expect(buildLifeHref({ from: "profile" })).not.toContain("user=");
   });
 
-  it("Watch keeps a 2-3 line excerpt and routes Read on UM Life to the same post id", () => {
+  it("Watch keeps a one-line title and the creator profile link", () => {
     const overlay = read("app/components/video/VideoOverlay.tsx");
-    expect(overlay).toMatch(/line-clamp-3/);
-    expect(overlay).toMatch(/watch\.readOnUmLife/);
-    expect(overlay).toMatch(/buildLifePostHref\(video\.postId\)/);
+    expect(overlay).toMatch(/truncate/);
+    expect(overlay).not.toMatch(/line-clamp-3/);
     expect(overlay).toMatch(/buildCreatorProfileHref/);
   });
 
@@ -284,8 +283,8 @@ describe("UM Life Phase 1 — feed, focused post, RTL, locales", () => {
     expect(watchPage).toMatch(/getWatchVideosPageServer/);
 
     const overlay = read("app/components/video/VideoOverlay.tsx");
-    expect(overlay).toMatch(/line-clamp-3/);
-    expect(overlay).toMatch(/watch\.readOnUmLife/);
+    expect(overlay).toMatch(/truncate/);
+    expect(overlay).not.toMatch(/line-clamp-3/);
   });
 });
 

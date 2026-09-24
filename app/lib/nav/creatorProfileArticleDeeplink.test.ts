@@ -46,7 +46,7 @@ describe("Creator profile article deeplink V1", () => {
   it("Watch overlay forwards articleId into profile href", () => {
     const overlay = read("app/components/video/VideoOverlay.tsx");
     expect(overlay).toMatch(/articleId:\s*video\.articleId/);
-    expect(overlay).toMatch(/Linked article/);
+    expect(overlay).toMatch(/buildCreatorProfileHref/);
   });
 
   it("Profile shows linked-article prompt only from ?article=", () => {
@@ -62,8 +62,8 @@ describe("Creator profile article deeplink V1", () => {
     const prompt = read(
       "app/profile/components/ProfileLinkedArticlePrompt.tsx"
     );
-    expect(prompt).toMatch(/Read article now/);
-    expect(prompt).toMatch(/Browse profile/);
+    expect(prompt).toMatch(/profile\.readArticleNow/);
+    expect(prompt).toMatch(/profile\.browseCta/);
     expect(prompt).toMatch(/buildArticleHref/);
   });
 
