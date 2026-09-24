@@ -45,9 +45,9 @@ export function getAshShamsAyah(number: number): HifzAyah {
   return ayah;
 }
 
-/** Public image path for ayat 1–6; null for 7–15 (night sky only). */
+/** Public image path for ayat 1–15; null outside that range. */
 export function ayahImageSrc(ayahNumber: number): string | null {
-  if (ayahNumber >= 1 && ayahNumber <= 6) {
+  if (ayahNumber >= 1 && ayahNumber <= 15) {
     return `/hifz/shams/shams-${ayahNumber}.webp`;
   }
   return null;
