@@ -26,11 +26,13 @@ describe("ash-shams downloaded data", () => {
     });
   });
 
-  it("maps images only for ayat 1–6", () => {
+  it("maps images for ayat 1–15", () => {
     expect(ayahImageSrc(1)).toBe("/hifz/shams/shams-1.webp");
     expect(ayahImageSrc(6)).toBe("/hifz/shams/shams-6.webp");
-    expect(ayahImageSrc(7)).toBeNull();
-    expect(ayahImageSrc(15)).toBeNull();
+    expect(ayahImageSrc(7)).toBe("/hifz/shams/shams-7.webp");
+    expect(ayahImageSrc(15)).toBe("/hifz/shams/shams-15.webp");
+    expect(ayahImageSrc(0)).toBeNull();
+    expect(ayahImageSrc(16)).toBeNull();
   });
 });
 
