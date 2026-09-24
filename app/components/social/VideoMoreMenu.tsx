@@ -36,6 +36,12 @@ type VideoMoreMenuProps = {
   onHideFromFeed?: (postId: number) => void;
   onCaptionChange?: (caption: string) => void;
   onUiLockChange?: (locked: boolean) => void;
+  /** Watch: post journey lives in this menu instead of on the video. */
+  onJourney?: () => void;
+  journeyLabel?: string;
+  /** Watch: AI summary lives in this menu instead of on the video. */
+  summaryTitle?: string;
+  summaryBody?: string;
 };
 
 export default function VideoMoreMenu({
@@ -49,6 +55,10 @@ export default function VideoMoreMenu({
   onHideFromFeed,
   onCaptionChange,
   onUiLockChange,
+  onJourney,
+  journeyLabel,
+  summaryTitle,
+  summaryBody,
 }: VideoMoreMenuProps) {
   const { t } = useTranslation();
   const router = useRouter();
@@ -131,8 +141,8 @@ export default function VideoMoreMenu({
           },
           viewport: { width: window.innerWidth, height: window.innerHeight },
           dir,
-          menuWidth: 220,
-          menuHeight: 168,
+          menuWidth: summaryBody ? 280 : 220,
+          menuHeight: 176 + (summaryBody ? 96 : 0) + (onJourney ? 48 : 0),
         })
       );
     }
@@ -144,7 +154,7 @@ export default function VideoMoreMenu({
       window.removeEventListener("resize", syncMenuBox);
       window.removeEventListener("scroll", syncMenuBox, true);
     };
-  }, [menuOpen]);
+  }, [menuOpen, onJourney, summaryBody]);
 
   if (!Number.isInteger(postId) || postId <= 0) {
     return null;
@@ -297,8 +307,25 @@ export default function VideoMoreMenu({
                       }
                     : { visibility: "hidden" }
                 }
-                className="fixed z-[131] max-w-[calc(100vw-1.5rem)] overflow-hidden rounded-2xl border border-white/15 bg-[#0b0b18]/96 p-1.5 shadow-2xl backdrop-blur-xl"
+                className="fixed z-[131] max-h-[70vh] max-w-[calc(100vw-1.5rem)] overflow-y-auto rounded-2xl border border-white/15 bg-[#0b0b18]/96 p-1.5 shadow-2xl backdrop-blur-xl"
               >
+                {summaryBody ? (
+                  <div className="px-3 py-2">
+                    <p className="text-[11px] font-bold text-purple-200/90">
+                      {summaryTitle}
+                    </p>
+                    <p className="mt-1 text-xs leading-5 text-white/80">{summaryBody}</p>
+                  </div>
+                ) : null}
+                {onJourney && journeyLabel ? (
+                  <MenuItem
+                    label={journeyLabel}
+                    onClick={() => {
+                      closeMenu();
+                      onJourney();
+                    }}
+                  />
+                ) : null}
                 {isOwner ? (
                   <>
                     <MenuItem

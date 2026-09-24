@@ -73,7 +73,12 @@ export default function AppTopNav({
             aria-label={t("nav.homeAria")}
             className={`watch-focus-ring shrink-0 overflow-visible rounded-md ${focusRing}`}
           >
-            <UmtubaStackedLogo size="header" priority />
+            <span className="inline-flex h-10 items-center lg:hidden">
+              <UmtubaStackedLogo size="nav" priority className="!h-10 !w-auto" />
+            </span>
+            <span className="hidden lg:inline-block">
+              <UmtubaStackedLogo size="header" priority />
+            </span>
           </Link>
           <h1 className="sr-only">{title}</h1>
           {badge ? (

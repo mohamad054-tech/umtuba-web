@@ -258,7 +258,7 @@ describe("stories UI + navigation contracts", () => {
     const experience = readRepoFile("app/discover/DiscoverExperience.tsx");
     expect(experience).toMatch(/import StoryRail from "\.\.\/stories\/components\/StoryRail"/);
     expect(experience).toMatch(/<StoryRail viewerId=\{viewerId\} \/>/);
-    expect(experience).toMatch(/5\.75rem/);
+    expect(experience).toMatch(/min-h-0/);
   });
 
   it("StoryRail starts with Add Story and opens a fullscreen viewer", () => {

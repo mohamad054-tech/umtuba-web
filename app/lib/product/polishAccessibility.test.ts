@@ -65,8 +65,9 @@ describe("polish & accessibility contracts", () => {
   });
 
   it("Watch stage accounts for mobile bottom nav offset", () => {
-    const watch = read("app/watch/WatchExperience.tsx");
-    expect(watch).toMatch(/--app-mobile-bottom-nav-offset/);
+    const css = read("app/globals.css");
+    expect(css).toMatch(/--app-mobile-bottom-nav-offset/);
+    expect(css).toMatch(/--feed-chrome-bottom/);
   });
 
   it("CommentsPanel, WatchPanel, ShareMenu, and LiveCollaborationPanel use dialog a11y helper", () => {

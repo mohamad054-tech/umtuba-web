@@ -24,8 +24,8 @@ describe("Left Action Rail (approved drawing)", () => {
     );
     expect(card).toMatch(/data-home-arc-rail="left-action"/);
     expect(card).toMatch(/data-home-action-rail="right"/);
-    expect(card).toMatch(/items-end justify-between/);
-    expect(card).toMatch(/left-\[5px\]/);
+    expect(card).toMatch(/feed-caption-safe/);
+    expect(card).toMatch(/start-3/);
     expect(card).toMatch(/extendPx = 8/);
     expect(card).not.toMatch(/-translate-x-\[calc/);
   });

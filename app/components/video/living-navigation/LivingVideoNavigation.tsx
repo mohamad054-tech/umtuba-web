@@ -30,7 +30,7 @@ export default function LivingVideoNavigation({
     <>
       <nav
         aria-label="Living video navigation"
-        className="pointer-events-auto absolute right-3 top-[28%] z-30 flex max-h-[38%] flex-col gap-2 overflow-y-auto md:top-[24%]"
+        className="pointer-events-auto absolute start-3 top-20 z-30 flex max-h-[min(16rem,38%)] flex-col gap-2 overflow-y-auto"
       >
         {LIVING_NAVIGATION_ITEMS.map((item) => (
           <LivingNavigationAction
