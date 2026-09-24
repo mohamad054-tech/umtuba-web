@@ -1,6 +1,5 @@
 "use client";
 
-import dynamic from "next/dynamic";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useI18n } from "../../components/i18n";
 import type { TranslationKey } from "../../../lib/i18n/messages/types";
@@ -37,7 +36,8 @@ import { useBoardScrollLock } from "./boardPointer";
 import type { PlayableGameSlug } from "../../../lib/games/play/catalog";
 import { ColorCard } from "./ColorCards";
 import ProductMark from "./ProductMark";
-import { CityFace, CountryFlag, PairSketch } from "./PlaceCard";
+import { CountryFlag } from "./PlaceCard";
+import LightWorldMap from "./LightWorldMap";
 import {
   PlayHowTo,
   PlayPanel,
@@ -45,11 +45,6 @@ import {
   PlayStat,
   usePlayHelp,
 } from "./PlayChrome";
-
-const GameMap = dynamic(() => import("./GameMap"), {
-  ssr: false,
-  loading: () => <div className="um-play-gamemap" dir="ltr" />,
-});
 
 function Shell({
   slug,
@@ -164,12 +159,15 @@ export function FartherPairGame() {
             const second = label(left ? pair.b : pair.d);
             if (!first || !second) return null;
             return (
-              <button key={side} type="button" className="um-place-card" data-play-item="true" onClick={() => pick(side)}>
-                <span className="um-place-row">
-                  <CityFace iso={first.iso} name={first.city} country={first.country} />
-                  <CityFace iso={second.iso} name={second.city} country={second.country} />
+              <button key={side} type="button" className="um-place-card um-photo-pair" data-play-item="true" onClick={() => pick(side)}>
+                <span className="um-photo-duo">
+                  {[first, second].map((city) => (
+                    <span key={city.id} className="um-photo-tile">
+                      <img src={`/games/cities/${city.id}.webp`} alt="" draggable={false} />
+                      <span className="um-photo-caption">{city.city}</span>
+                    </span>
+                  ))}
                 </span>
-                <PairSketch a={first} b={second} />
               </button>
             );
           })}
@@ -215,10 +213,12 @@ export function LargerCountryGame() {
         <div className="um-play-pairgrid" dir="ltr">
           {pair.map((country, index) => (
             <button key={country.id} type="button" className="um-place-card um-country-card" data-play-item="true" onClick={() => pick(index as 0 | 1)}>
-              <CountryFlag id={country.id} large />
-              <span className="um-place-names">
-                <span className="um-place-name">{country.name}</span>
-                <span className="en">{country.nameEn}</span>
+              <span className="um-photo-tile">
+                <CountryFlag id={country.id} large />
+                <span className="um-photo-caption">
+                  <span className="um-place-name">{country.name}</span>
+                  <span className="en">{country.nameEn}</span>
+                </span>
               </span>
             </button>
           ))}
@@ -762,17 +762,7 @@ export function CollectorGame() {
   return (
     <Shell slug="collector" howTo={["games.collector.howTo1", "games.collector.howTo2", "games.collector.howTo3"]} stats={<PlayStat label={t("games.collected")} value={`${formatPlayNumber(locale, got.length)} / ${formatPlayNumber(locale, WORLD_CITIES.length)}`} />} ready={help.ready} helpOpen={help.helpOpen} onToggleHelp={help.toggleHelp} begin={begin}>
       <p className="um-play-qtext">{current ? `${current.city} · ${current.country}` : ""}</p>
-      <GameMap
-        pins={WORLD_CITIES.map((city) => ({
-          id: city.id,
-          lng: city.lng,
-          lat: city.lat,
-          state: got.includes(city.id) ? "got" : "idle",
-        }))}
-        fit="all"
-        interactive
-        onPick={drop}
-      />
+      <LightWorldMap cities={WORLD_CITIES} got={got} onPick={drop} />
     </Shell>
   );
 }
