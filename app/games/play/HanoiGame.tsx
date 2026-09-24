@@ -194,10 +194,8 @@ export default function HanoiGame() {
                 key={disc}
                 className="um-play-disc"
                 data-hanoi-disc="true"
-                style={{ width: `${36 + (3 - disc) * 16}%` }}
-              >
-                {formatPlayNumber(locale, disc + 1)}
-              </span>
+                style={{ width: `${40 + disc * 14}%` }}
+              />
             ))}
           </button>
         ))}

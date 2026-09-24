@@ -23,6 +23,22 @@ import {
 
 const EMPTY: XoMark[] = ["", "", "", "", "", "", "", "", ""];
 
+function XMark() {
+  return (
+    <svg className="um-xo-mark" viewBox="0 0 64 64" aria-hidden="true">
+      <path d="M16 16 L48 48 M48 16 L16 48" />
+    </svg>
+  );
+}
+
+function OMark() {
+  return (
+    <svg className="um-xo-mark o" viewBox="0 0 64 64" aria-hidden="true">
+      <circle cx="32" cy="32" r="14" />
+    </svg>
+  );
+}
+
 export default function XoGame() {
   const { t, locale } = useI18n();
   const sfx = useMemo(() => createPlaySfx(), []);
@@ -208,7 +224,7 @@ export default function XoGame() {
             disabled={!ready || over || Boolean(mark)}
             aria-label={mark ? mark : t("games.emptyCell")}
           >
-            {mark === "X" ? "✕" : mark === "O" ? "◯" : ""}
+            {mark === "X" ? <XMark /> : mark === "O" ? <OMark /> : null}
           </button>
         ))}
       </div>

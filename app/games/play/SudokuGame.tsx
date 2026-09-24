@@ -99,23 +99,23 @@ export default function SudokuGame() {
   );
 
   const place = useCallback(
-    (value: number) => {
-      if (!ready || done || given[selected]) return;
+    (value: number, index = selected) => {
+      if (!ready || done || given[index]) return;
       if (noteMode) {
         if (value === 0) {
           setNotes((prev) => {
             const next = prev.map((row) => [...row]);
-            next[selected] = [];
+            next[index] = [];
             return next;
           });
           return;
         }
         setNotes((prev) => {
           const next = prev.map((row) => [...row]);
-          const current = new Set(next[selected]);
+          const current = new Set(next[index]);
           if (current.has(value)) current.delete(value);
           else current.add(value);
-          next[selected] = [...current].sort((a, b) => a - b);
+          next[index] = [...current].sort((a, b) => a - b);
           return next;
         });
         sfx.flip();
@@ -123,17 +123,17 @@ export default function SudokuGame() {
       }
       setBoard((prev) => {
         const next = [...prev];
-        next[selected] = value;
+        next[index] = value;
         return next;
       });
       setNotes((prev) => {
         const next = prev.map((row) => [...row]);
-        next[selected] = [];
+        next[index] = [];
         return next;
       });
-      setErrors((prev) => prev.filter((i) => i !== selected));
+      setErrors((prev) => prev.filter((i) => i !== index));
       if (value) sfx.ok();
-      const nextBoard = board.map((cell, i) => (i === selected ? value : cell));
+      const nextBoard = board.map((cell, i) => (i === index ? value : cell));
       finish(nextBoard);
     },
     [board, done, finish, given, noteMode, ready, selected, sfx]
@@ -232,10 +232,9 @@ export default function SudokuGame() {
         cta={ready ? "gotIt" : "start"}
         onDismiss={dismissHelp}
       />
+      <div ref={boardRef} className="um-play-sudoku-wrap um-play-board um-lit-board" dir="ltr">
       <div
-        ref={boardRef}
-        className="um-play-sudoku um-play-board um-lit-board"
-        dir="ltr"
+        className="um-play-sudoku"
         role="grid"
         aria-label={t("games.sudoku.title")}
       >
@@ -245,7 +244,13 @@ export default function SudokuGame() {
             type="button"
             data-sudoku-cell="true"
             className={`${given[index] ? "given" : ""} ${selected === index ? "sel" : ""} ${errors.includes(index) ? "err" : ""}`}
-            onClick={() => setSelected(index)}
+            onClick={() => {
+              if (selected === index && !given[index] && !noteMode) {
+                place(((value || 0) % 9) + 1, index);
+                return;
+              }
+              setSelected(index);
+            }}
             aria-label={value ? String(value) : t("games.emptyCell")}
           >
             {value ? (
@@ -256,7 +261,7 @@ export default function SudokuGame() {
           </button>
         ))}
       </div>
-      <div className="um-play-pad">
+        <div className="um-play-pad">
         {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => (
           <button key={n} type="button" className="um-play-btn" onClick={() => place(n)}>
             {String(n)}
@@ -265,6 +270,7 @@ export default function SudokuGame() {
         <button type="button" className="um-play-btn" onClick={() => place(0)}>
           {t("games.erase")}
         </button>
+      </div>
       </div>
       <div className="um-play-row">
         <button

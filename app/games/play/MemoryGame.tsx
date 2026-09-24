@@ -20,7 +20,23 @@ import {
   usePlayHelp,
 } from "./PlayChrome";
 
-const FACES = ["🌿", "🕌", "🏔️", "🌊", "🪁", "🎻", "🫖", "🧭"];
+const FACES = ["leaf", "dome", "peak", "wave", "kite", "string", "pot", "compass"];
+
+function MemoryMark({ face }: { face: string }) {
+  const common = { fill: "none", stroke: "#1c2748", strokeWidth: 2.2, strokeLinecap: "round" as const };
+  return (
+    <svg viewBox="0 0 48 48" width="58%" height="58%" aria-hidden="true">
+      {face === "leaf" ? <path {...common} d="M14 32c8-16 20-18 22-18-2 12-8 22-22 18z" /> : null}
+      {face === "dome" ? <path {...common} d="M10 32h28M14 32V22a10 10 0 0 1 20 0v10" /> : null}
+      {face === "peak" ? <path {...common} d="M8 34 L24 12 L40 34z" /> : null}
+      {face === "wave" ? <path {...common} d="M8 22c4 6 8 6 12 0s8-6 12 0 8 6 12 0" /> : null}
+      {face === "kite" ? <path {...common} d="M24 8 L36 24 L24 40 L12 24z" /> : null}
+      {face === "string" ? <path {...common} d="M16 14c8 4 8 16 0 20M32 14c-8 4-8 16 0 20" /> : null}
+      {face === "pot" ? <path {...common} d="M16 18h16l-2 16H18zM20 18v-4h8v4" /> : null}
+      {face === "compass" ? <path {...common} d="M24 10v6M24 32v6M10 24h6M32 24h6M24 24m-8 0a8 8 0 1 0 16 0a8 8 0 1 0-16 0" /> : null}
+    </svg>
+  );
+}
 
 type Card = { id: number; face: string; up: boolean; done: boolean };
 
@@ -198,7 +214,7 @@ export default function MemoryGame() {
               <span className="um-play-mem-inner">
                 <span className="um-play-mem-face um-play-mem-back" data-mem-face="back" />
                 <span className="um-play-mem-face um-play-mem-front" data-mem-face="front">
-                  {card.face}
+                  <MemoryMark face={card.face} />
                 </span>
               </span>
             </button>

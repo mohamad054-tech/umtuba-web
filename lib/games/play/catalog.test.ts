@@ -14,7 +14,7 @@ import {
 const ROOT = join(process.cwd());
 
 describe("playable games catalog", () => {
-  it("lists the twenty-nine playable slugs and 404s unknown ids", () => {
+  it("lists the playable slugs and 404s unknown ids", () => {
     expect([...PLAYABLE_GAME_SLUGS]).toEqual([
       "sudoku",
       "g2048",
@@ -45,6 +45,7 @@ describe("playable games catalog", () => {
       "shapes",
       "typerace",
       "uno",
+      "marble-chain",
     ]);
     expect(isPlayableGameSlug("sudoku")).toBe(true);
     expect(isPlayableGameSlug("quick-q")).toBe(true);
@@ -78,7 +79,7 @@ describe("playable games catalog", () => {
   it("keeps SVG marks for games without owner artwork and maps 13 local WebP tiles", () => {
     const art = readFileSync(join(ROOT, "app/games/play/GameArt.tsx"), "utf8");
     expect(art).not.toMatch(/unsplash|shutterstock|midjourney|dall-e|openai|stable diffusion/i);
-    expect(GAME_ARTWORK_SLUGS).toHaveLength(13);
+    expect(GAME_ARTWORK_SLUGS).toHaveLength(14);
     for (const slug of PLAYABLE_GAME_SLUGS) {
       const src = gameArtworkSrc(slug);
       if (GAME_ARTWORK_SLUGS.includes(slug as (typeof GAME_ARTWORK_SLUGS)[number])) {

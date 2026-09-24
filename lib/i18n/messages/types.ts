@@ -1720,6 +1720,11 @@ export type GamesMessages = {
   "games.typerace.howTo3": string;
   "games.uno.title": string;
   "games.uno.blurb": string;
+  "games.marble-chain.title": string;
+  "games.marble-chain.blurb": string;
+  "games.marble-chain.howTo1": string;
+  "games.marble-chain.howTo2": string;
+  "games.marble-chain.howTo3": string;
   "games.uno.howTo1": string;
   "games.uno.howTo2": string;
   "games.uno.howTo3": string;
