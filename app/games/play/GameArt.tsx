@@ -498,6 +498,15 @@ const ART: Record<PlayableGameSlug, () => JSX.Element> = {
   shapes: ShapesArt,
   typerace: TypeRaceArt,
   uno: UnoArt,
+  "marble-chain": function MarbleChainArt() {
+    return (
+      <Frame>
+        <circle cx="48" cy="80" r="14" fill={C.gold} />
+        <circle cx="80" cy="68" r="14" fill={C.mint} />
+        <circle cx="112" cy="80" r="14" fill={C.clay} />
+      </Frame>
+    );
+  },
 };
 
 export default function GameArt({

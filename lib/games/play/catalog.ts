@@ -30,6 +30,7 @@ export const PLAYABLE_GAME_SLUGS = [
   "shapes",
   "typerace",
   "uno",
+  "marble-chain",
 ] as const;
 
 export type PlayableGameSlug = (typeof PLAYABLE_GAME_SLUGS)[number];
@@ -72,6 +73,7 @@ export const PLAYABLE_GAMES: readonly PlayableGame[] = [
   { slug: "shapes", titleKey: "games.shapes.title", blurbKey: "games.shapes.blurb" },
   { slug: "typerace", titleKey: "games.typerace.title", blurbKey: "games.typerace.blurb", arabicContent: true },
   { slug: "uno", titleKey: "games.uno.title", blurbKey: "games.uno.blurb" },
+  { slug: "marble-chain", titleKey: "games.marble-chain.title", blurbKey: "games.marble-chain.blurb" },
 ] as const;
 
 export function isPlayableGameSlug(value: string): value is PlayableGameSlug {
@@ -101,6 +103,7 @@ export const GAME_ARTWORK_SLUGS = [
   "typerace",
   "hangword",
   "guess-city",
+  "marble-chain",
 ] as const satisfies readonly PlayableGameSlug[];
 
 export type GameArtworkSlug = (typeof GAME_ARTWORK_SLUGS)[number];

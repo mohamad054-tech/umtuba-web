@@ -1260,6 +1260,16 @@ body:has(.um-game-fit) {
   box-shadow: 0 0 10px rgba(240, 169, 59, 0.95);
 }
 
+.um-marble-board {
+  display: block;
+  width: min(100%, 520px);
+  aspect-ratio: 4 / 3;
+  margin: 8px auto 0;
+  border-radius: 16px;
+  touch-action: none;
+  direction: ltr;
+}
+
 .um-place-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
