@@ -535,12 +535,15 @@ export function PriceGame() {
   );
 }
 
+const WHEEL_COLORS = ["#d46a5e", "#f0a93b", "#7ed9b8", "#6ea8ff", "#e7d7a1", "#c46b9a"];
+
 export function WheelGame() {
   const { t, locale } = useI18n();
   const help = usePlayHelp();
   const sfx = useMemo(() => createPlaySfx(), []);
   const angleRef = useRef(0);
   const stageRef = useRef<HTMLDivElement>(null);
+  const dragRef = useRef<{ x: number; y: number; cx: number; cy: number } | null>(null);
   const [angle, setAngle] = useState(0);
   const [total, setTotal] = useState(0);
   const [spins, setSpins] = useState(0);
@@ -550,13 +553,14 @@ export function WheelGame() {
   useBoardScrollLock(stageRef, help.ready);
 
   const begin = () => { if (!help.ready) { setFloor(readBest("wheel") ?? 0); setTotal(0); setSpins(0); setWon(null); } help.dismissHelp(); };
-  const spin = () => {
+  const spin = (flick = 0) => {
     if (busy) return;
     setBusy(true);
     setWon(null);
     const pick = Math.floor(Math.random() * WHEEL_SLICES.length);
     const reduced = prefersReducedMotion();
-    const next = wheelStopAngle(angleRef.current, pick, WHEEL_SLICES.length, reduced ? 0 : 5);
+    const from = angleRef.current + flick;
+    const next = wheelStopAngle(from, pick, WHEEL_SLICES.length, reduced ? 0 : 5);
     angleRef.current = next;
     setAngle(next);
     window.setTimeout(() => {
@@ -579,33 +583,86 @@ export function WheelGame() {
         <div
           className="um-play-wheel"
           data-play-item="true"
+          dir="ltr"
+          role="button"
+          tabIndex={0}
+          aria-label={t("games.spin")}
+          onKeyDown={(event) => {
+            if (event.key === "Enter" || event.key === " ") {
+              event.preventDefault();
+              spin();
+            }
+          }}
           style={{ transform: `rotate(${angle}deg)` }}
           onPointerDown={(event) => {
             if (!event.isPrimary || busy) return;
             event.currentTarget.setPointerCapture(event.pointerId);
+            const box = event.currentTarget.getBoundingClientRect();
+            dragRef.current = {
+              x: event.clientX,
+              y: event.clientY,
+              cx: box.left + box.width / 2,
+              cy: box.top + box.height / 2,
+            };
           }}
           onPointerUp={(event) => {
             if (!event.isPrimary) return;
-            spin();
+            const start = dragRef.current;
+            dragRef.current = null;
+            if (!start) {
+              spin();
+              return;
+            }
+            const moved = Math.hypot(event.clientX - start.x, event.clientY - start.y);
+            if (moved < 12) {
+              spin();
+              return;
+            }
+            const a0 = Math.atan2(start.y - start.cy, start.x - start.cx);
+            const a1 = Math.atan2(event.clientY - start.cy, event.clientX - start.cx);
+            let sweep = ((a1 - a0) * 180) / Math.PI;
+            if (sweep > 180) sweep -= 360;
+            if (sweep < -180) sweep += 360;
+            spin(sweep);
           }}
         >
-          {WHEEL_SLICES.map((value, index) => (
-            <span
-              key={`${value}-${index}`}
-              className="um-play-slice"
-              dir="ltr"
-              style={{ transform: `rotate(${index * step + step / 2}deg) translateY(-78px)` }}
-            >
-              {value}%
-            </span>
-          ))}
+          <svg className="um-play-wheel-face" viewBox="0 0 200 200" aria-hidden="true">
+            {WHEEL_SLICES.map((value, index) => {
+              const start = index * step - 90;
+              const end = start + step;
+              const toXY = (deg: number, radius: number) => {
+                const rad = (deg * Math.PI) / 180;
+                return [100 + radius * Math.cos(rad), 100 + radius * Math.sin(rad)];
+              };
+              const [x0, y0] = toXY(start, 92);
+              const [x1, y1] = toXY(end, 92);
+              const [tx, ty] = toXY(start + step / 2, 62);
+              return (
+                <g key={`${value}-${index}`}>
+                  <path d={`M100 100 L${x0} ${y0} A92 92 0 0 1 ${x1} ${y1} Z`} fill={WHEEL_COLORS[index]} />
+                  <text
+                    x={tx}
+                    y={ty}
+                    textAnchor="middle"
+                    dominantBaseline="middle"
+                    fill="#142018"
+                    fontSize="16"
+                    fontWeight="800"
+                  >
+                    {value}%
+                  </text>
+                </g>
+              );
+            })}
+            <circle cx="100" cy="100" r="16" fill="#ffe7a3" stroke="#b56a12" strokeWidth="3" />
+          </svg>
         </div>
       </div>
       <p className={`um-play-wheel-won${won != null && total > floor ? " um-play-best" : won != null ? " um-play-celebrate" : ""}`} dir="ltr">
         {won == null ? "\u00a0" : t("games.wheel.won", { values: { value: `${formatPlayNumber(locale, won)}%` } })}
       </p>
       <div className="um-play-row" style={{ justifyContent: "center" }}>
-        <button type="button" className="um-play-btn go" data-play-item="true" onClick={spin} disabled={busy}>{t("games.spin")}</button>
+        <button type="button" className="um-play-btn go" data-play-item="true" onClick={() => spin()} disabled={busy}>{t("games.spin")}</button>
       </div>
       <p className="um-play-qnum">{formatPlayNumber(locale, spins)}</p>
     </Shell>
