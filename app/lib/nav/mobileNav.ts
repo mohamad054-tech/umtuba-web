@@ -27,7 +27,8 @@ export const ANALYTICS_CONSENT_BANNER_OFFSET_VAR =
 
 export type MobilePrimaryNavId =
   | "home"
-  | "live"
+  | "sections"
+  | "create"
   | "messages"
   | "profile";
 
@@ -40,9 +41,10 @@ export type MobilePrimaryNavItem = {
 
 export const MOBILE_PRIMARY_NAV_ITEMS: MobilePrimaryNavItem[] = [
   { id: "home", label: "Home", href: APP_ROUTES.home },
-  { id: "live", label: "Live", href: APP_ROUTES.live },
+  { id: "sections", label: "Sections", href: APP_ROUTES.sections },
+  { id: "create", label: "Upload", href: APP_ROUTES.createVideo },
   { id: "messages", label: "Messages", href: APP_ROUTES.messages },
-  { id: "profile", label: "Profile", href: APP_ROUTES.profile },
+  { id: "profile", label: "Me", href: APP_ROUTES.profile },
 ];
 
 const LIVE_ROOM_PATH_RE = /^\/live\/(?!media-lab(?:\/|$))[^/]+/;
@@ -93,8 +95,10 @@ export function isMobilePrimaryNavActive(
         path === APP_ROUTES.discover ||
         path.startsWith(`${APP_ROUTES.discover}/`)
       );
-    case "live":
-      return path === APP_ROUTES.live || path.startsWith(`${APP_ROUTES.live}/`);
+    case "sections":
+      return path === APP_ROUTES.sections || path.startsWith(`${APP_ROUTES.sections}/`);
+    case "create":
+      return path === APP_ROUTES.create || path.startsWith(`${APP_ROUTES.create}/`);
     case "messages":
       return path === APP_ROUTES.messages || path.startsWith(`${APP_ROUTES.messages}/`);
     case "profile":

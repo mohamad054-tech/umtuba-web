@@ -6,6 +6,7 @@ import { teacherEnMessages } from "./teacherCatalogs";
 import { teacherIdPartial } from "./teacherLocaleCatalogs";
 import { uiParityIdMessages } from "./uiParityCatalogs";
 import { learningHubIdMessages } from "./learningHubCatalogs";
+import { homeChromeEnglishFallback } from "./homeChromeFallback";
 import type { FoundationMessages } from "./types";
 
 /** Professional native chrome. UMTUBA stays Latin. Authored content stays source-language. */
@@ -838,4 +839,5 @@ export const idMessages: FoundationMessages = {
   "teacher.public.title": "Pengajar",
   ...teacherIdPartial,
   ...uiParityIdMessages,
+  ...homeChromeEnglishFallback,
 };

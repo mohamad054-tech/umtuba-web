@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useLayoutEffect, useRef, useState, useMemo } from "react";
 import { loadDiscoverFeedPageAction } from "../actions/loadDiscoverFeed";
@@ -9,7 +8,6 @@ import ProductEmptyState from "../components/product/ProductEmptyState";
 import ProductErrorState from "../components/product/ProductErrorState";
 import {
   APP_ROUTES,
-  buildHomeCityFocusHref,
   findIndexByCity,
   findIndexByPostId,
 } from "../lib/nav";
@@ -19,7 +17,6 @@ import {
   shouldStartFeedLoadMore,
 } from "../lib/video/feedPagination";
 import { sanitizeUserFacingMessage } from "../lib/product/userFacingMessage";
-import StoryRail from "../stories/components/StoryRail";
 import { useTranslation } from "../components/i18n";
 import DiscoverFeed from "./components/DiscoverFeed";
 import DiscoverShell from "./components/DiscoverShell";
@@ -296,7 +293,6 @@ export default function DiscoverExperience({
     return (
       <DiscoverShell>
         <div className="flex flex-1 flex-col gap-3">
-          <StoryRail viewerId={viewerId} />
           <div className="flex flex-1 items-center justify-center px-6 py-16">
             <ProductErrorState
               title="Could not load videos"
@@ -315,7 +311,6 @@ export default function DiscoverExperience({
     return (
       <DiscoverShell>
         <div className="flex flex-1 flex-col gap-3">
-          <StoryRail viewerId={viewerId} />
           <div className="flex flex-1 items-center justify-center px-6 py-16">
             <ProductEmptyState
               compact
@@ -333,17 +328,14 @@ export default function DiscoverExperience({
     );
   }
 
-  const exploreHref = buildHomeCityFocusHref(activeVideo.location.city);
   const activePostId = Number(activeVideo.id);
   const commentsReturnPath = `${APP_ROUTES.home}?post=${activeVideo.id}`;
 
   return (
     <DiscoverShell>
-      <div className="flex min-h-0 flex-1 flex-col gap-3">
-        <StoryRail viewerId={viewerId} />
-        <div className="flex min-h-0 flex-1 flex-col gap-3 lg:flex-row lg:items-stretch lg:justify-center">
-        <div className="relative mx-auto flex min-h-0 w-full flex-1 lg:max-w-[510px] lg:flex-none">
-          <div className="video-watch-stage relative z-10 h-full min-h-0 w-full flex-1 overflow-hidden bg-black lg:rounded-[36px] lg:border lg:border-white/10">
+      <div className="flex min-h-0 flex-1 flex-col">
+        <div className="relative mx-auto flex min-h-0 w-full flex-1 sm:max-w-[510px] sm:flex-none sm:py-3">
+          <div className="video-watch-stage relative z-10 h-full min-h-0 w-full flex-1 overflow-hidden bg-black sm:rounded-[36px] sm:border sm:border-[#f0a93b]/25">
             <DiscoverFeed
               videos={videos}
               initialIndex={pinnedInitialIndex}
@@ -357,6 +349,7 @@ export default function DiscoverExperience({
               onNearEnd={handleNearEnd}
               onVideoDeleted={handleVideoDeleted}
               onCaptionChange={handleCaptionChange}
+              onNonVideoActive={() => setCommentsOpen(false)}
               loadMoreEpoch={loadMoreEpoch}
             />
 
@@ -416,16 +409,6 @@ export default function DiscoverExperience({
               />
             ) : null}
           </div>
-        </div>
-        </div>
-
-        <div className="hidden justify-center px-4 pb-4 lg:flex">
-          <Link
-            href={exploreHref}
-            className="watch-focus-ring rounded-full border border-sky-400/30 bg-sky-500/15 px-4 py-2 text-xs font-black uppercase tracking-[0.16em] text-sky-50 transition hover:bg-sky-500/25"
-          >
-            {t("home.exploreCity")}
-          </Link>
         </div>
       </div>
     </DiscoverShell>

@@ -52,14 +52,14 @@ describe("Page Assembly V1 — routes", () => {
     expect(home).not.toMatch(/LandingHero/);
   });
 
-  it("Home shell includes section circles for Learning Store Games Live", () => {
-    const circles = read("app/discover/components/HomeSectionCircles.tsx");
-    expect(circles).toMatch(/APP_ROUTES\.learning/);
-    expect(circles).toMatch(/APP_ROUTES\.store/);
-    expect(circles).toMatch(/APP_ROUTES\.games/);
-    expect(circles).toMatch(/APP_ROUTES\.live/);
+  it("moves section circles off the home shell onto Sections", () => {
     const shell = read("app/discover/components/DiscoverShell.tsx");
-    expect(shell).toMatch(/HomeSectionCircles/);
+    expect(shell).not.toMatch(/HomeSectionCircles/);
     expect(shell).toMatch(/title=\{t\("nav\.home"\)\}/);
+    const sections = read("app/sections/SectionsExperience.tsx");
+    expect(sections).toMatch(/APP_ROUTES\.learning/);
+    expect(sections).toMatch(/APP_ROUTES\.store/);
+    expect(sections).toMatch(/APP_ROUTES\.games/);
+    expect(sections).toMatch(/APP_ROUTES\.live/);
   });
 });

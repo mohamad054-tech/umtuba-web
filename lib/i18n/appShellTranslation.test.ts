@@ -27,8 +27,8 @@ describe("App Shell translation V1", () => {
     expect(translate("ar", "nav.messages")).toBe("الرسائل");
     expect(translate("en", desktopNavLabelKey("/world"))).toBe("World");
     expect(translate("ar", desktopNavLabelKey("/world"))).toBe("العالم");
-    expect(translate("en", mobileNavLabelKey("profile"))).toBe("Profile");
-    expect(translate("ar", mobileNavLabelKey("profile"))).toBe("الملف");
+    expect(translate("en", mobileNavLabelKey("profile"))).toBe("Me");
+    expect(translate("ar", mobileNavLabelKey("profile"))).toBe("أنا");
   });
 
   it("translates settings chrome and language labels", () => {

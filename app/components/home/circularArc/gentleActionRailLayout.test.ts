@@ -17,16 +17,14 @@ describe("Left Action Rail (approved drawing)", () => {
     expect(arc).not.toMatch(/layoutGentleActionRail/);
   });
 
-  it("binds left rail to right rail inside DiscoverVideoCard", () => {
+  it("keeps the action rail on the inline end of the video", () => {
     const card = readFileSync(
       join(process.cwd(), "app/discover/components/DiscoverVideoCard.tsx"),
       "utf8"
     );
-    expect(card).toMatch(/data-home-arc-rail="left-action"/);
     expect(card).toMatch(/data-home-action-rail="right"/);
     expect(card).toMatch(/feed-caption-safe/);
-    expect(card).toMatch(/start-3/);
-    expect(card).toMatch(/extendPx = 8/);
-    expect(card).not.toMatch(/-translate-x-\[calc/);
+    expect(card).toMatch(/end-3/);
+    expect(card).not.toMatch(/data-home-arc-rail="left-action"/);
   });
 });

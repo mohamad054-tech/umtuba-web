@@ -35,6 +35,7 @@ const FOOTER_LINKS: Array<{ href: string; key: TranslationKey }> = [
 ];
 
 function isPublicFooterPath(pathname: string): boolean {
+  if (pathname === "/" || pathname === "/discover") return false;
   return !FOOTER_HIDDEN_PREFIXES.some(
     (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`)
   );

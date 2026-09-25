@@ -27,15 +27,17 @@ describe("shell coherence", () => {
 
   it("AppTopNav is the shared shell chrome", () => {
     const top = read("app/components/AppTopNav.tsx");
-    expect(top).toMatch(/aria-label=\{t\("nav\.primary"\)\}/);
     expect(top).toMatch(/UserMenu/);
     expect(top).toMatch(/WalletBalanceIndicator/);
-    expect(top).toMatch(/NotificationBell/);
+    expect(top).not.toMatch(/NotificationBell/);
     expect(top).toMatch(/APP_ROUTES\.search/);
     expect(top).toMatch(/actions\.search|nav\.search/);
     expect(top).toMatch(/watch-focus-ring/);
-    expect(top).toMatch(/LanguageSelector/);
-    expect(top).toMatch(/variant="compact"/);
+    expect(top).not.toMatch(/LanguageSelector/);
+    const side = read("app/components/chrome/DesktopSideNav.tsx");
+    expect(side).toMatch(/LanguageSelector/);
+    expect(side).toMatch(/variant="compact"/);
+    expect(side).toMatch(/umtuba-language-shell/);
   });
 
   it("StoreShell keeps AppTopNav as shared chrome with a store appearance", () => {
@@ -45,10 +47,9 @@ describe("shell coherence", () => {
     expect(shell).toMatch(/appearance="store"/);
     expect(shell).not.toMatch(/StoreTopNav/);
     expect(top).toMatch(/appearance\?: "default" \| "store"/);
-    expect(top).toMatch(/APP_NAV_ITEMS/);
     expect(top).toMatch(/UserMenu/);
-    expect(top).toMatch(/NotificationBell/);
-    expect(top).toMatch(/LanguageSelector/);
+    expect(top).not.toMatch(/NotificationBell/);
+    expect(top).not.toMatch(/LanguageSelector/);
   });
 
   it("AuthShell exposes compact language control for guests", () => {
@@ -109,15 +110,16 @@ describe("shell coherence", () => {
     expect(watch).not.toMatch(/>Related</);
   });
 
-  it("keeps the compact language control discoverable on Home and Watch", () => {
+  it("keeps language on Sections and the desktop side menu, not the home header", () => {
     const top = read("app/components/AppTopNav.tsx");
     const selector = read("app/components/i18n/LanguageSelector.tsx");
-    const home = read("app/discover/components/DiscoverShell.tsx");
-    expect(top).toMatch(/umtuba-language-shell/);
-    expect(top.indexOf("LanguageSelector")).toBeLessThan(top.indexOf("APP_ROUTES.search"));
+    const side = read("app/components/chrome/DesktopSideNav.tsx");
+    const sections = read("app/sections/SectionsExperience.tsx");
+    expect(top).not.toMatch(/umtuba-language-shell/);
+    expect(side).toMatch(/umtuba-language-shell/);
+    expect(sections).toMatch(/umtuba-language-sections/);
     expect(selector).toMatch(/compactLocaleLabel/);
     expect(selector).toMatch(/data-locale-code=\{locale\}/);
-    expect(home).not.toMatch(/overflow-x-hidden bg-\[#050510\]/);
   });
 
   it("does not reintroduce dead product routes into shell chrome", () => {

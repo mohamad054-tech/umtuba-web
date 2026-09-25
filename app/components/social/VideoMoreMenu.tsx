@@ -16,10 +16,7 @@ import { useTranslation } from "../i18n";
 import { APP_ROUTES } from "../../lib/nav";
 import { useDialogA11y } from "../../lib/product/useDialogA11y";
 import { sanitizeUserFacingMessage } from "../../lib/product/userFacingMessage";
-import {
-  copyPostLink,
-  type SharePostInput,
-} from "../../lib/social/shareAndViews";
+import { type SharePostInput } from "../../lib/social/shareAndViews";
 import { MAX_CAPTION_LENGTH } from "../../../lib/supabase/videoPostsShared";
 import { viewerMaySeeDeleteControl } from "../../../lib/supabase/deleteOwnedPostShared";
 import { clampDeleteMenuBox } from "./clampDeleteMenuBox";
@@ -167,16 +164,6 @@ export default function VideoMoreMenu({
   function showStatus(message: string) {
     setStatusMessage(message);
     window.setTimeout(() => setStatusMessage(null), 2200);
-  }
-
-  async function handleCopyLink() {
-    closeMenu();
-    const outcome = await copyPostLink(postId, surface);
-    if (outcome.method === "clipboard") {
-      showStatus(t("video.more.linkCopied"));
-      return;
-    }
-    showStatus(t("video.more.copyFailed"));
   }
 
   function handleNotInterested() {
@@ -334,10 +321,6 @@ export default function VideoMoreMenu({
                       onClick={handleEditCaption}
                     />
                     <MenuItem
-                      label={t("video.more.copyLink")}
-                      onClick={() => void handleCopyLink()}
-                    />
-                    <MenuItem
                       label={t("video.more.delete")}
                       danger
                       onClick={handleDelete}
@@ -347,10 +330,6 @@ export default function VideoMoreMenu({
                   <>
                     <MenuItem
                       itemRef={firstMenuRef}
-                      label={t("video.more.copyLink")}
-                      onClick={() => void handleCopyLink()}
-                    />
-                    <MenuItem
                       label={t("video.more.notInterested")}
                       onClick={handleNotInterested}
                     />

@@ -12,6 +12,16 @@ export type DiscoverLocation = {
   country: string;
 };
 
+/**
+ * Optional real destination attached to a post.
+ * Present only when the post payload includes a place, course, or product.
+ * Not inferred from the placeholder location written in the video mapper.
+ */
+export type DiscoverFeedLink =
+  | { kind: "place"; city: string }
+  | { kind: "course"; title: string; href: string }
+  | { kind: "product"; title: string; href: string };
+
 export type DiscoverStats = {
   likes: number;
   comments: number;
@@ -38,6 +48,11 @@ export type DiscoverVideo = {
   articleId?: string | null;
   articleTitle?: string | null;
   articleHref?: string | null;
+  /**
+   * Place, course, or product chip. Null until posts carry those fields.
+   * Do not fill this from the placeholder location.
+   */
+  link?: DiscoverFeedLink | null;
   stats: DiscoverStats;
   likedByMe: boolean;
   savedByMe: boolean;

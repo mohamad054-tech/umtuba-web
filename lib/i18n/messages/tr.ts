@@ -6,6 +6,7 @@ import { teacherEnMessages } from "./teacherCatalogs";
 import { teacherTrPartial } from "./teacherLocaleCatalogs";
 import { uiParityTrMessages } from "./uiParityCatalogs";
 import { learningHubTrMessages } from "./learningHubCatalogs";
+import { homeChromeEnglishFallback } from "./homeChromeFallback";
 import type { FoundationMessages } from "./types";
 
 /** Professional native chrome. UMTUBA stays Latin. Authored content stays source-language. */
@@ -838,4 +839,5 @@ export const trMessages: FoundationMessages = {
   "teacher.public.title": "Öğretmen",
   ...teacherTrPartial,
   ...uiParityTrMessages,
+  ...homeChromeEnglishFallback,
 };

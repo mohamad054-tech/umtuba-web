@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "../../components/i18n";
 import type { WatchProgressEvent } from "../../components/video/VideoPlayer";
 import { APP_ROUTES } from "../../lib/nav";
@@ -15,11 +15,10 @@ import {
 import { createConsecutiveWatchTracker } from "../../../lib/video/watchHidePolicy";
 import { rememberQualifiedWatch } from "../../../lib/video/rememberQualifiedWatch";
 import type { DiscoverStats, DiscoverVideo } from "../types";
-import { HomeCircularArc } from "../../components/home/circularArc";
-import { shouldMountHomeCircularArc } from "../../components/home/circularArc/homeCircularArcFlags";
 import DiscoverActionRail from "./DiscoverActionRail";
 import DiscoverCaption from "./DiscoverCaption";
-import DiscoverCreatorInfo from "./DiscoverCreatorInfo";
+import DiscoverCreatorInfo, { DiscoverCreatorAvatar } from "./DiscoverCreatorInfo";
+import DiscoverLinkChip from "./DiscoverLinkChip";
 import DiscoverNativeVideo from "./DiscoverNativeVideo";
 
 type DiscoverVideoCardProps = {
@@ -63,41 +62,9 @@ export default function DiscoverVideoCard({
   const [localViews] = useState(() => new Set<number>());
   const viewsSet = sessionViews ?? localViews;
   const postId = Number(video.id);
-  const showLeftActionRail = shouldMountHomeCircularArc();
   const sessionRef = useRef<WatchSessionSnapshot | null>(null);
   const wasActiveRef = useRef(false);
   const hideTrackerRef = useRef(createConsecutiveWatchTracker({ onQualified: () => {} }));
-  const chromeRef = useRef<HTMLDivElement | null>(null);
-  const rightRailRef = useRef<HTMLDivElement | null>(null);
-  const leftRailRef = useRef<HTMLDivElement | null>(null);
-
-  useLayoutEffect(() => {
-    if (!showLeftActionRail) return;
-    const chrome = chromeRef.current;
-    const right = rightRailRef.current;
-    const left = leftRailRef.current;
-    if (!chrome || !right || !left) return;
-
-    const syncMirrorZone = () => {
-      const chromeRect = chrome.getBoundingClientRect();
-      const rightRect = right.getBoundingClientRect();
-      // Approved drawing: start slightly above first right button,
-      // end slightly below last right button.
-      const extendPx = 8;
-      left.style.top = `${Math.round(rightRect.top - chromeRect.top) - extendPx}px`;
-      left.style.height = `${Math.round(rightRect.height) + extendPx * 2}px`;
-    };
-
-    syncMirrorZone();
-    const ro = new ResizeObserver(syncMirrorZone);
-    ro.observe(right);
-    ro.observe(chrome);
-    window.addEventListener("resize", syncMirrorZone);
-    return () => {
-      ro.disconnect();
-      window.removeEventListener("resize", syncMirrorZone);
-    };
-  }, [showLeftActionRail, active]);
 
   useEffect(() => {
     if (!active || !Number.isInteger(postId) || postId <= 0) {
@@ -220,27 +187,16 @@ export default function DiscoverVideoCard({
       <div className="pointer-events-none absolute inset-0 z-20 flex flex-col justify-end">
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black/80 via-black/35 to-transparent" />
 
-        <div ref={chromeRef} className="feed-caption-safe z-10">
-          {showLeftActionRail ? (
-            <div
-              ref={leftRailRef}
-              data-home-arc-rail="left-action"
-              className="pointer-events-auto absolute start-3 z-30 overflow-visible"
-            >
-              <HomeCircularArc />
-            </div>
-          ) : null}
-
+        <div className="feed-caption-safe z-10">
           <div className="min-w-0 space-y-2">
-            <div className="pointer-events-auto">
-              <DiscoverCreatorInfo
-                creator={video.creator}
-                viewerId={viewerId}
-                postId={video.id}
-                articleId={video.articleId}
-                onFollowChange={onFollowChange}
-              />
-            </div>
+            <DiscoverLinkChip link={video.link} />
+            <DiscoverCreatorInfo
+              creator={video.creator}
+              viewerId={viewerId}
+              postId={video.id}
+              articleId={video.articleId}
+              onFollowChange={onFollowChange}
+            />
             {video.removed ? (
               <p className="pointer-events-none inline-flex rounded-full border border-amber-300/40 bg-amber-500/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.14em] text-amber-100">
                 {t("feed.postRemoved")}
@@ -252,14 +208,21 @@ export default function DiscoverVideoCard({
               hashtags={video.hashtags}
               articleHref={video.articleHref}
               articleTitle={video.articleTitle}
+              views={video.stats.views}
             />
           </div>
 
           <div
-            ref={rightRailRef}
-            className="feed-side-rail pointer-events-auto end-3"
+            className="feed-side-rail pointer-events-auto end-3 flex flex-col items-center gap-4"
             data-home-action-rail="right"
           >
+            <DiscoverCreatorAvatar
+              creator={video.creator}
+              viewerId={viewerId}
+              postId={video.id}
+              articleId={video.articleId}
+              onFollowChange={onFollowChange}
+            />
             <DiscoverActionRail
               postId={postId}
               stats={video.stats}

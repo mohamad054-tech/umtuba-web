@@ -254,11 +254,12 @@ describe("stories application layer contracts", () => {
 });
 
 describe("stories UI + navigation contracts", () => {
-  it("mounts StoryRail on Discover without dead links", () => {
-    const experience = readRepoFile("app/discover/DiscoverExperience.tsx");
-    expect(experience).toMatch(/import StoryRail from "\.\.\/stories\/components\/StoryRail"/);
-    expect(experience).toMatch(/<StoryRail viewerId=\{viewerId\} \/>/);
-    expect(experience).toMatch(/min-h-0/);
+  it("mounts StoryRail on Sections without dead links", () => {
+    const sections = readRepoFile("app/sections/SectionsExperience.tsx");
+    expect(sections).toMatch(/import StoryRail from "\.\.\/stories\/components\/StoryRail"/);
+    expect(sections).toMatch(/<StoryRail viewerId=\{viewerId\} \/>/);
+    const home = readRepoFile("app/discover/DiscoverExperience.tsx");
+    expect(home).not.toMatch(/StoryRail/);
   });
 
   it("StoryRail starts with Add Story and opens a fullscreen viewer", () => {

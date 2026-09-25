@@ -5,7 +5,7 @@ import { useTranslation } from "../i18n";
 
 type VideoViewCountStatProps = {
   views: number;
-  variant?: "rail" | "life";
+  variant?: "rail" | "life" | "caption";
 };
 
 function EyeIcon({ size = 18 }: { size?: number }) {
@@ -39,6 +39,18 @@ export default function VideoViewCountStat({
   const { t } = useTranslation();
   const count = formatInteractionCount(views);
   const label = t("video.views.label", { values: { count } });
+
+  if (variant === "caption") {
+    return (
+      <span
+        className="inline-flex items-center gap-1 text-[11px] font-bold text-white/80"
+        aria-label={label}
+      >
+        <EyeIcon size={13} />
+        <span aria-hidden>{count}</span>
+      </span>
+    );
+  }
 
   if (variant === "life") {
     return (

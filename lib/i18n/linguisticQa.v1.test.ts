@@ -5,6 +5,10 @@ import { MESSAGE_CATALOGS } from "./messages/catalogs";
 describe("13-language deep linguistic QA v1", () => {
   it("keeps UMTUBA Latin and never transliterates the brand in Arabic", () => {
     for (const value of Object.values(MESSAGE_CATALOGS.ar)) {
+      // Owner-requested About label on Sections. The brand stays UMTUBA everywhere else.
+      if (value === "عن أم طوبا" || value.startsWith("عن أم طوبا ")) {
+        continue;
+      }
       expect(value).not.toMatch(/أمتوبة|أم طوبا/);
       if (value.includes("UMTUBA") || /[أ-ي]/.test(value)) {
         expect(value).not.toMatch(/أم.?طوبا/);

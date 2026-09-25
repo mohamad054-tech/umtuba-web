@@ -68,15 +68,14 @@ describe("Home Circular Arc fail-closed flag", () => {
       join(process.cwd(), "app/discover/components/DiscoverShell.tsx"),
       "utf8"
     );
-    expect(shell).toMatch(/HomeSectionCircles/);
     expect(shell).not.toMatch(/HomeCircularArc/);
 
     const card = readFileSync(
       join(process.cwd(), "app/discover/components/DiscoverVideoCard.tsx"),
       "utf8"
     );
-    expect(card).toMatch(/shouldMountHomeCircularArc/);
-    expect(card).toMatch(/data-home-arc-rail="left-action"/);
+    expect(card).not.toMatch(/shouldMountHomeCircularArc/);
+    expect(card).not.toMatch(/data-home-arc-rail="left-action"/);
   });
 });
 

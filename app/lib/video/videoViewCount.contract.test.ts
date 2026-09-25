@@ -61,12 +61,14 @@ describe("video view count — select and map", () => {
 });
 
 describe("video view count — UI", () => {
-  it("shows a non-button view count under share on Home and Watch rails", () => {
-    const home = read("app/discover/components/DiscoverActionRail.tsx");
+  it("shows a small view count under the Home caption and keeps the Watch rail count", () => {
+    const home = read("app/discover/components/DiscoverCaption.tsx");
+    const rail = read("app/discover/components/DiscoverActionRail.tsx");
     const watch = read("app/components/video/VideoActionRail.tsx");
     const stat = read("app/components/video/VideoViewCountStat.tsx");
 
-    expect(home).toMatch(/<VideoViewCountStat views=\{stats\.views\} \/>/);
+    expect(home).toMatch(/<VideoViewCountStat views=\{views\} variant="caption" \/>/);
+    expect(rail).not.toMatch(/VideoViewCountStat/);
     expect(watch).toMatch(/<VideoViewCountStat views=\{displayStats\.views\} \/>/);
     expect(stat).not.toMatch(/<button/);
     expect(stat).toMatch(/video\.views\.label/);

@@ -20,6 +20,8 @@ type FollowButtonProps = {
   idleClassName?: string;
   onFollowChange?: (snapshot: FollowSnapshot) => void;
   size?: "sm" | "md";
+  /** Gold plus badge. Hidden once the viewer already follows. */
+  variant?: "text" | "plus";
 };
 
 /**
@@ -36,6 +38,7 @@ export default function FollowButton({
   idleClassName,
   onFollowChange,
   size = "md",
+  variant = "text",
 }: FollowButtonProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -62,6 +65,9 @@ export default function FollowButton({
   if (!canFollow) {
     return null;
   }
+  if (variant === "plus" && following) {
+    return null;
+  }
 
   const nextPath = returnPath || pathname || APP_ROUTES.discover;
   const loginHref = `${APP_ROUTES.login}?next=${encodeURIComponent(nextPath)}`;
@@ -84,6 +90,7 @@ export default function FollowButton({
         disabled={pending}
         aria-pressed={following}
         aria-busy={pending}
+        aria-label={variant === "plus" ? t("social.follow") : undefined}
         onClick={() => {
           if (!viewerId) {
             router.push(loginHref);
@@ -118,11 +125,19 @@ export default function FollowButton({
             });
           });
         }}
-        className={`watch-focus-ring shrink-0 rounded-full transition disabled:cursor-wait disabled:opacity-60 ${sizeClass} ${
+        className={`watch-focus-ring shrink-0 rounded-full transition disabled:cursor-wait disabled:opacity-60 ${
+          variant === "plus" ? "flex h-5 w-5 items-center justify-center text-sm font-black leading-none" : sizeClass
+        } ${
           following ? followingStyles : idleStyles
         } ${className}`}
       >
-        {pending ? "…" : following ? t("social.following") : t("social.follow")}
+        {variant === "plus"
+          ? pending
+            ? "…"
+            : "+"
+          : pending
+            ? "…"
+            : following ? t("social.following") : t("social.follow")}
       </button>
       {errorMessage ? (
         <p className="max-w-[14rem] text-[11px] font-medium text-red-200/90">

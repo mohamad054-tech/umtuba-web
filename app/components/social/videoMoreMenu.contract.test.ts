@@ -11,8 +11,10 @@ function read(rel: string) {
 describe("video More menu v1", () => {
   it("replaces rail Report/Delete with one More menu on both feeds", () => {
     const menu = read("app/components/social/VideoMoreMenu.tsx");
-    expect(menu).toMatch(/copyPostLink/);
     expect(menu).toMatch(/video\.more\.editCaption/);
+    expect(menu).not.toMatch(/video\.more\.copyLink/);
+    const share = read("app/components/social/ShareMenu.tsx");
+    expect(share).toMatch(/Copy link/);
     expect(menu).toMatch(/video\.more\.notInterested/);
     expect(menu).toMatch(/video\.more\.report/);
     expect(menu).toMatch(/deletePostAction/);

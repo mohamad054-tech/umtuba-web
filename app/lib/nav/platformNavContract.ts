@@ -27,7 +27,8 @@ export const DESKTOP_PRIMARY_NAV_HREFS = [
 /** Mobile primary ids (no Discover tab). */
 export const MOBILE_PRIMARY_NAV_IDS = [
   "home",
-  "live",
+  "sections",
+  "create",
   "messages",
   "profile",
 ] as const;
@@ -35,9 +36,10 @@ export const MOBILE_PRIMARY_NAV_IDS = [
 /** Mobile primary labels in order. */
 export const MOBILE_PRIMARY_NAV_LABELS = [
   "Home",
-  "Live",
+  "Sections",
+  "Upload",
   "Messages",
-  "Profile",
+  "Me",
 ] as const;
 
 /**

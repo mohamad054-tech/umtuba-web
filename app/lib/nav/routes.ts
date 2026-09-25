@@ -2,6 +2,7 @@ import { slugifyCity } from "../journey/handoff";
 
 export const APP_ROUTES = {
   home: "/",
+  sections: "/sections",
   welcome: "/welcome",
   discover: "/discover",
   watch: "/watch",
@@ -40,6 +41,7 @@ export const APP_ROUTES = {
   rewards: "/rewards",
   creatorInsights: "/creator/insights",
   learning: "/learning",
+  quran: "/learning/quran",
   games: "/games",
   store: "/store",
   storeSearch: "/store/search",

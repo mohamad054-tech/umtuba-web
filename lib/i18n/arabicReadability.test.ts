@@ -62,10 +62,9 @@ describe("Arabic readability / accessibility tokens", () => {
     expect(language).toContain("app-ink-secondary");
   });
 
-  it("preserves header design while using high-contrast inactive ink", () => {
-    expect(nav).toContain("app-top-nav-link");
-    expect(nav).toContain("app-top-nav-link--active");
+  it("keeps the redesigned header readable", () => {
     expect(nav).toContain("watch-focus-ring");
+    expect(nav).toContain("app-top-nav-subtitle");
     expect(nav).not.toMatch(/text-white\/45/);
     expect(css).toContain("--app-top-nav-ink-inactive: #e8eaef");
     expect(css).toContain("--app-top-nav-ink-active: #dbeafe");

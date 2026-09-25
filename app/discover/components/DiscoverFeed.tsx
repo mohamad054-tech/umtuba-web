@@ -13,7 +13,11 @@ import { readUserWantsSound } from "../../../lib/video/feedMutePreference";
 import { isFeedPlaybackSuppressed } from "../../../lib/video/feedHiddenPlayback";
 import { isPlayableHttpSrc } from "../../lib/video/playbackFetchPolicy";
 import type { DiscoverStats, DiscoverVideo } from "../types";
+import DiscoverGameBreakCard from "./DiscoverGameBreakCard";
 import DiscoverVideoCard from "./DiscoverVideoCard";
+import { buildHomeFeedItems, feedIndexForVideo } from "../feedWithGameBreaks";
+import { getPlayableGame } from "../../../lib/games/play/catalog";
+import { useTranslation } from "../../components/i18n";
 
 type DiscoverFeedProps = {
   videos: DiscoverVideo[];
@@ -34,6 +38,8 @@ type DiscoverFeedProps = {
   onCaptionChange?: (videoId: string, caption: string) => void;
   /** Bump when a load-more attempt fails so near-end can fire again. */
   loadMoreEpoch?: number;
+  /** Game-break slides are not videos. Close overlays without a watch signal. */
+  onNonVideoActive?: () => void;
 };
 
 const NEIGHBOR_WINDOW = 1;
@@ -69,7 +75,9 @@ export default function DiscoverFeed({
   onVideoDeleted,
   onCaptionChange,
   loadMoreEpoch = 0,
+  onNonVideoActive,
 }: DiscoverFeedProps) {
+  const { t } = useTranslation();
   const scrollerRef = useRef<HTMLDivElement>(null);
   const slideNodesRef = useRef<Map<string, HTMLElement>>(new Map());
   const activeIndexRef = useRef(0);
@@ -77,7 +85,9 @@ export default function DiscoverFeed({
   /** Stable Set mutated for session view dedupe (does not trigger re-render). */
   const [sessionViews] = useState(() => new Set<number>());
   const [activeIndex, setActiveIndex] = useState(() =>
-    Math.min(Math.max(initialIndex, 0), Math.max(videos.length - 1, 0))
+    feedIndexForVideo(
+      Math.min(Math.max(initialIndex, 0), Math.max(videos.length - 1, 0))
+    )
   );
   const [advanceLocked, setAdvanceLocked] = useState(false);
   const videoIdsKey = videos.map((video) => video.id).join(",");
@@ -87,7 +97,9 @@ export default function DiscoverFeed({
   const applyingDeepLinkRef = useRef(false);
   const userMovedRef = useRef(false);
 
-  const activeVideo = videos[activeIndex] ?? videos[0];
+  const items = useMemo(() => buildHomeFeedItems(videos), [videos]);
+  const activeItem = items[activeIndex];
+  const activeVideo = activeItem?.kind === "video" ? activeItem.video : null;
 
   useEffect(() => {
     activeIndexRef.current = activeIndex;
@@ -101,17 +113,20 @@ export default function DiscoverFeed({
     if (videos.length === 0) {
       return;
     }
-    setActiveIndex((current) => Math.min(current, videos.length - 1));
-  }, [videos.length]);
+    setActiveIndex((current) => Math.min(current, Math.max(items.length - 1, 0)));
+  }, [items.length]);
 
   useEffect(() => {
-    if (activeIndex >= videos.length - 3) {
+    if (
+      activeItem?.kind === "video" &&
+      activeItem.videoIndex >= videos.length - 3
+    ) {
       if (!nearEndRequestedRef.current) {
         nearEndRequestedRef.current = true;
         onNearEnd?.();
       }
     }
-  }, [activeIndex, videos.length, onNearEnd]);
+  }, [activeIndex, activeItem, videos.length, onNearEnd]);
 
   useEffect(() => {
     const scroller = scrollerRef.current;
@@ -142,19 +157,19 @@ export default function DiscoverFeed({
       return;
     }
 
-    const safeIndex = Math.min(Math.max(initialIndex, 0), videos.length - 1);
+    const safeVideoIndex = Math.min(Math.max(initialIndex, 0), videos.length - 1);
     const scroller = scrollerRef.current;
-    const video = videos[safeIndex];
+    const video = videos[safeVideoIndex];
     const node = video ? slideNodesRef.current.get(video.id) : null;
     if (!video || !scroller || !node) {
       return;
     }
 
     deepLinkAppliedRef.current = true;
-    if (safeIndex > 0) {
+    if (safeVideoIndex > 0) {
       applyingDeepLinkRef.current = true;
       scrollScrollerToSlide(scroller, node, "auto");
-      setActiveIndex(safeIndex);
+      setActiveIndex(feedIndexForVideo(safeVideoIndex));
       window.requestAnimationFrame(() => {
         applyingDeepLinkRef.current = false;
       });
@@ -169,13 +184,13 @@ export default function DiscoverFeed({
       index <= activeIndex + NEIGHBOR_WINDOW;
       index += 1
     ) {
-      if (index >= 0 && index < videos.length) {
+      if (index >= 0 && index < items.length) {
         indexes.add(index);
       }
     }
 
     return indexes;
-  }, [activeIndex, videos.length]);
+  }, [activeIndex, items.length]);
 
   const setSlideNode = useCallback((id: string, node: HTMLElement | null) => {
     if (node) {
@@ -189,10 +204,10 @@ export default function DiscoverFeed({
   const scrollToIndex = useCallback(
     (nextIndex: number) => {
       const scroller = scrollerRef.current;
-      const clamped = Math.min(Math.max(nextIndex, 0), videos.length - 1);
-      const nextVideo = videos[clamped];
-      const node = nextVideo
-        ? slideNodesRef.current.get(nextVideo.id)
+      const clamped = Math.min(Math.max(nextIndex, 0), items.length - 1);
+      const nextItem = items[clamped];
+      const node = nextItem
+        ? slideNodesRef.current.get(nextItem.key)
         : null;
 
       if (!scroller || !node) {
@@ -210,7 +225,7 @@ export default function DiscoverFeed({
       );
       setActiveIndex(clamped);
     },
-    [videos]
+    [items]
   );
 
   useEffect(() => {
@@ -250,8 +265,8 @@ export default function DiscoverFeed({
           return;
         }
 
-        const videoId = (topEntry.target as HTMLElement).dataset.videoId;
-        const nextIndex = videos.findIndex((video) => video.id === videoId);
+        const feedKey = (topEntry.target as HTMLElement).dataset.feedKey;
+        const nextIndex = items.findIndex((item) => item.key === feedKey);
 
         if (nextIndex >= 0) {
           setActiveIndex(nextIndex);
@@ -270,27 +285,32 @@ export default function DiscoverFeed({
     return () => {
       observer.disconnect();
     };
-  }, [videos, mountedIndexes]);
+  }, [items, mountedIndexes]);
 
   useEffect(() => {
-    if (!activeVideo) {
+    const item = items[activeIndex];
+    if (!item) return;
+    if (item.kind === "video") {
+      onActiveChange?.(item.video, item.videoIndex);
       return;
     }
-
-    onActiveChange?.(activeVideo, activeIndex);
-  }, [activeIndex, activeVideo, onActiveChange]);
+    onNonVideoActive?.();
+  }, [activeIndex, items, onActiveChange, onNonVideoActive]);
 
   useEffect(() => {
-    const unsigned = videos.filter((video, index) => {
+    const unsigned = items.filter((item, index) => {
       return (
+        item.kind === "video" &&
         mountedIndexes.has(index) &&
-        Number.isInteger(Number(video.id)) &&
-        Number(video.id) > 0 &&
-        !isPlayableHttpSrc(video.src)
+        Number.isInteger(Number(item.video.id)) &&
+        Number(item.video.id) > 0 &&
+        !isPlayableHttpSrc(item.video.src)
       );
     });
 
-    for (const video of unsigned) {
+    for (const item of unsigned) {
+      if (item.kind !== "video") continue;
+      const video = item.video;
       const postId = Number(video.id);
       if (!Number.isInteger(postId) || postId <= 0 || signingRef.current.has(postId)) {
         continue;
@@ -307,14 +327,14 @@ export default function DiscoverFeed({
           signingRef.current.delete(postId);
         });
     }
-  }, [mountedIndexes, onSrcChange, videos]);
+  }, [items, mountedIndexes, onSrcChange]);
 
   const stepByDelta = useCallback(
     (delta: number) => {
       const current = activeIndexRef.current;
       const next = current + delta;
 
-      if (next < 0 || next >= videos.length) {
+      if (next < 0 || next >= items.length) {
         // At feed edge — do not trap keys so page/chrome remain usable.
         return false;
       }
@@ -322,8 +342,18 @@ export default function DiscoverFeed({
       scrollToIndex(next);
       return true;
     },
-    [scrollToIndex, videos.length]
+    [scrollToIndex, items.length]
   );
+
+  const stepToNextVideo = useCallback(() => {
+    let next = activeIndexRef.current + 1;
+    while (next < items.length && items[next]?.kind !== "video") {
+      next += 1;
+    }
+    if (next >= items.length) return false;
+    scrollToIndex(next);
+    return true;
+  }, [items, scrollToIndex]);
 
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
@@ -349,7 +379,7 @@ export default function DiscoverFeed({
       const current = activeIndexRef.current;
       const next = current + delta;
 
-      if (next < 0 || next >= videos.length) {
+      if (next < 0 || next >= items.length) {
         // At feed edge — do not trap keys so page/chrome remain usable.
         return;
       }
@@ -363,12 +393,19 @@ export default function DiscoverFeed({
     return () => {
       window.removeEventListener("keydown", onKeyDown);
     };
-  }, [advanceLocked, stepByDelta, videos.length]);
+  }, [advanceLocked, items.length, stepByDelta]);
 
   useEffect(() => {
     const scroller = scrollerRef.current;
     const activeId = activeVideo?.id;
-    if (!scroller || !activeId) return;
+    if (!scroller) return;
+    if (!activeId) {
+      scroller.querySelectorAll("video").forEach((video) => {
+        video.muted = true;
+        video.pause();
+      });
+      return;
+    }
 
     const wantsSound = readUserWantsSound() && !isFeedPlaybackSuppressed();
     scroller.querySelectorAll<HTMLElement>("[data-video-id]").forEach((slide) => {
@@ -438,17 +475,35 @@ export default function DiscoverFeed({
       className="video-snap-scroller h-full w-full snap-y snap-mandatory overflow-y-auto"
       aria-label="Discover vertical video feed"
     >
-      {videos.map((video, index) => {
+      {items.map((item, index) => {
+        if (item.kind === "game") {
+          return (
+            <div
+              key={item.key}
+              ref={(node) => setSlideNode(item.key, node)}
+              data-feed-key={item.key}
+              data-game-break={item.slug}
+              className="h-full w-full shrink-0 snap-start snap-always"
+            >
+              <DiscoverGameBreakCard
+                slug={item.slug}
+                title={t(getPlayableGame(item.slug)?.titleKey ?? "feed.gameBreak.title")}
+              />
+            </div>
+          );
+        }
+
+        const video = item.video;
         const shouldMountPlayer = mountedIndexes.has(index);
+        const hasLaterVideo = items.slice(index + 1).some((entry) => entry.kind === "video");
         const shouldAutoAdvance =
-          index === activeIndex &&
-          index < videos.length - 1 &&
-          !advanceLocked;
+          index === activeIndex && hasLaterVideo && !advanceLocked;
 
         return (
           <div
-            key={video.id}
-            ref={(node) => setSlideNode(video.id, node)}
+            key={item.key}
+            ref={(node) => setSlideNode(item.key, node)}
+            data-feed-key={item.key}
             data-video-id={video.id}
             className="h-full w-full shrink-0 snap-start snap-always"
           >
@@ -469,9 +524,7 @@ export default function DiscoverFeed({
                   onCaptionChange?.(video.id, nextCaption)
                 }
                 onUiLockChange={setAdvanceLocked}
-                onEnded={
-                  shouldAutoAdvance ? () => stepByDelta(1) : undefined
-                }
+                onEnded={shouldAutoAdvance ? () => stepToNextVideo() : undefined}
               />
             ) : (
               <div className="flex h-full w-full items-center justify-center bg-[#050510] text-white/40">

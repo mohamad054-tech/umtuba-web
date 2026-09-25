@@ -74,32 +74,23 @@ describe("Home Circular Arc Preview Foundation V1", () => {
     expect(mod.shouldMountHomeCircularArc()).toBe(false);
   });
 
-  it("keeps DiscoverShell free of Arc; left rail lives in DiscoverVideoCard", () => {
+  it("keeps the circular arc out of the home video card", () => {
     const shell = readFileSync(
       join(process.cwd(), "app/discover/components/DiscoverShell.tsx"),
       "utf8"
     );
-    expect(shell).toMatch(/HomeSectionCircles/);
-    expect(shell).toMatch(/<HomeSectionCircles \/>/);
     expect(shell).not.toMatch(/HomeCircularArc/);
     expect(shell).not.toMatch(/shouldMountHomeCircularArc/);
-
-    const experience = readFileSync(
-      join(process.cwd(), "app/discover/DiscoverExperience.tsx"),
-      "utf8"
-    );
-    expect(experience).not.toMatch(/HomeCircularArc/);
-    expect(experience).not.toMatch(/data-home-arc-rail/);
 
     const card = readFileSync(
       join(process.cwd(), "app/discover/components/DiscoverVideoCard.tsx"),
       "utf8"
     );
-    expect(card).toMatch(/shouldMountHomeCircularArc/);
-    expect(card).toMatch(/data-home-arc-rail="left-action"/);
-    expect(card).toMatch(/HomeCircularArc/);
+    expect(card).not.toMatch(/shouldMountHomeCircularArc/);
+    expect(card).not.toMatch(/data-home-arc-rail/);
+    expect(card).not.toMatch(/HomeCircularArc/);
+    expect(card).toMatch(/data-home-action-rail="right"/);
     expect(card).toMatch(/DiscoverActionRail/);
-    expect(card).toMatch(/watch-rail-btn|HomeCircularArc/);
   });
 });
 

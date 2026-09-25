@@ -27,10 +27,11 @@ describe("WP-QA-01 Explore This City → World", () => {
     expect(discover).toMatch(/Compatible alias/);
   });
 
-  it("Home Explore this city still uses the shared builder", () => {
-    const experience = read("app/discover/DiscoverExperience.tsx");
-    expect(experience).toMatch(/buildHomeCityFocusHref/);
-    expect(experience).toMatch(/home.exploreCity/);
+  it("Home link chip uses the shared city builder when a real place exists", () => {
+    const chip = read("app/discover/components/DiscoverLinkChip.tsx");
+    expect(chip).toMatch(/buildHomeCityFocusHref/);
+    expect(chip).toMatch(/home\.link\.explore/);
+    expect(chip).toMatch(/visibleDiscoverFeedLink/);
   });
 });
 
