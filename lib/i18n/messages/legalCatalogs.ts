@@ -52,7 +52,7 @@ export const legalEnMessages = {
     "UMTUBA exists so ideas can cross borders. That only works if people are safe here.",
   "legal.meta.copyrightTitle": "Copyright and DMCA Policy",
   "legal.meta.copyrightDescription":
-    "UMTUBA Limited respects intellectual property and expects its users to do the same.",
+    "Mohammad Idries Mohammad Abu Teer respects intellectual property and expects its users to do the same.",
   "legal.meta.contactTitle": "Contact",
   "legal.meta.contactDescription":
     "Support and general enquiries: support@umtuba.com. Privacy and data requests: privacy@umtuba.com.",
@@ -214,7 +214,7 @@ export const legalEnMessages = {
   "legal.terms.s4.title": "4. Your content",
   "legal.terms.s4.p1": "You keep ownership of everything you post.",
   "legal.terms.s4.p2":
-    "By posting, you grant UMTUBA Limited a worldwide, non-exclusive, royalty-free licence to host, store, reproduce, adapt for technical formats, distribute and display your content **for the purpose of operating and promoting the service**. This licence ends when you delete the content, except for copies already shared by others and copies in backups pending routine deletion.",
+    "By posting, you grant Mohammad Idries Mohammad Abu Teer a worldwide, non-exclusive, royalty-free licence to host, store, reproduce, adapt for technical formats, distribute and display your content **for the purpose of operating and promoting the service**. This licence ends when you delete the content, except for copies already shared by others and copies in backups pending routine deletion.",
   "legal.terms.s4.p3":
     "You confirm that you own your content or have the rights to post it, and that it does not infringe anyone else's rights.",
   "legal.terms.s5.title": "5. What you may not do",
@@ -258,7 +258,7 @@ export const legalEnMessages = {
   "legal.terms.s11.p1":
     "Nothing in these terms limits liability for death or personal injury caused by negligence, for fraud, or for anything that cannot be limited under Irish law.",
   "legal.terms.s11.p2":
-    "Subject to that, UMTUBA Limited is not liable for indirect or consequential loss, loss of profits, loss of data, or loss of goodwill. Our total liability in any 12-month period is limited to the greater of €100 or the amount you paid us in that period.",
+    "Subject to that, Mohammad Idries Mohammad Abu Teer is not liable for indirect or consequential loss, loss of profits, loss of data, or loss of goodwill. Our total liability in any 12-month period is limited to the greater of €100 or the amount you paid us in that period.",
   "legal.terms.s11.p3":
     "Nothing in these terms affects your statutory rights as a consumer.",
   "legal.terms.s12.title": "12. Termination",
@@ -352,7 +352,7 @@ export const legalEnMessages = {
 
   "legal.copyright.title": "Copyright and DMCA Policy",
   "legal.copyright.intro":
-    "UMTUBA Limited respects intellectual property and expects its users to do the same.",
+    "Mohammad Idries Mohammad Abu Teer respects intellectual property and expects its users to do the same.",
   "legal.copyright.report.title": "Reporting infringement",
   "legal.copyright.report.intro":
     "Send a notice to **dmca@umtuba.com** containing:",
@@ -538,7 +538,7 @@ export const legalArMessages: LegalMessages = {
     "وُجدت UMTUBA لتعبر الأفكار الحدود. وهذا لا ينجح إلا إذا كان الناس بأمان هنا.",
   "legal.meta.copyrightTitle": "سياسة حقوق النشر (DMCA)",
   "legal.meta.copyrightDescription":
-    "تحترم UMTUBA Limited الملكية الفكرية وتتوقع من مستخدميها الالتزام نفسه.",
+    "تحترم محمد إدريس محمد أبو طير الملكية الفكرية وتتوقع من مستخدميها الالتزام نفسه.",
   "legal.meta.contactTitle": "تواصل معنا",
   "legal.meta.contactDescription":
     "الدعم والاستفسارات العامة: support@umtuba.com. الخصوصية وطلبات البيانات: privacy@umtuba.com.",
@@ -698,7 +698,7 @@ export const legalArMessages: LegalMessages = {
   "legal.terms.s4.title": "٤. المحتوى الخاص بك",
   "legal.terms.s4.p1": "تبقى ملكية كل ما تنشره لك.",
   "legal.terms.s4.p2":
-    "بنشرك للمحتوى، تمنح UMTUBA Limited ترخيصاً عالمياً غير حصري وبدون مقابل لاستضافة محتواك وتخزينه ونسخه وتكييفه للصيغ التقنية وتوزيعه وعرضه **لغرض تشغيل الخدمة والترويج لها**. ينتهي هذا الترخيص عند حذفك للمحتوى، باستثناء النسخ التي شاركها آخرون والنسخ الموجودة في النسخ الاحتياطية بانتظار الحذف الدوري.",
+    "بنشرك للمحتوى، تمنح محمد إدريس محمد أبو طير ترخيصاً عالمياً غير حصري وبدون مقابل لاستضافة محتواك وتخزينه ونسخه وتكييفه للصيغ التقنية وتوزيعه وعرضه **لغرض تشغيل الخدمة والترويج لها**. ينتهي هذا الترخيص عند حذفك للمحتوى، باستثناء النسخ التي شاركها آخرون والنسخ الموجودة في النسخ الاحتياطية بانتظار الحذف الدوري.",
   "legal.terms.s4.p3":
     "تؤكد أنك تملك محتواك أو تملك حقوق نشره، وأنه لا ينتهك حقوق أي طرف آخر.",
   "legal.terms.s5.title": "٥. ما لا يجوز",
@@ -741,7 +741,7 @@ export const legalArMessages: LegalMessages = {
   "legal.terms.s11.p1":
     "لا شيء في هذه الشروط يحدّ من المسؤولية عن الوفاة أو الإصابة الشخصية الناتجة عن الإهمال، أو عن الاحتيال، أو عن أي أمر لا يمكن تحديده بموجب القانون الأيرلندي.",
   "legal.terms.s11.p2":
-    "ومع مراعاة ذلك، لا تتحمل UMTUBA Limited المسؤولية عن الخسائر غير المباشرة أو التبعية، أو خسارة الأرباح أو البيانات أو السمعة التجارية. وتقتصر مسؤوليتنا الإجمالية في أي فترة ١٢ شهراً على الأكبر من ١٠٠ يورو أو المبلغ الذي دفعته لنا في تلك الفترة.",
+    "ومع مراعاة ذلك، لا تتحمل محمد إدريس محمد أبو طير المسؤولية عن الخسائر غير المباشرة أو التبعية، أو خسارة الأرباح أو البيانات أو السمعة التجارية. وتقتصر مسؤوليتنا الإجمالية في أي فترة ١٢ شهراً على الأكبر من ١٠٠ يورو أو المبلغ الذي دفعته لنا في تلك الفترة.",
   "legal.terms.s11.p3":
     "لا شيء في هذه الشروط يمس حقوقك القانونية كمستهلك.",
   "legal.terms.s12.title": "١٢. الإنهاء",
@@ -835,7 +835,7 @@ export const legalArMessages: LegalMessages = {
 
   "legal.copyright.title": "سياسة حقوق النشر (DMCA)",
   "legal.copyright.intro":
-    "تحترم UMTUBA Limited الملكية الفكرية وتتوقع من مستخدميها الالتزام نفسه.",
+    "تحترم محمد إدريس محمد أبو طير الملكية الفكرية وتتوقع من مستخدميها الالتزام نفسه.",
   "legal.copyright.report.title": "الإبلاغ عن انتهاك",
   "legal.copyright.report.intro":
     "أرسل إشعاراً إلى **dmca@umtuba.com** يتضمن:",

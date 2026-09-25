@@ -25,10 +25,10 @@ export const TERMS_AGREEMENT_EN = `These terms form a binding agreement between 
 
 export const TERMS_AGREEMENT_AR = `تشكّل هذه الشروط اتفاقية ملزمة بينك وبين محمد إدريس محمد أبو طير (بصفته الشخصية). ${OPERATOR_STATEMENT_AR}`;
 
-export const TERMS_BODY_EN = `${TERMS_AGREEMENT_EN} Registered office: ${OPERATOR_ADDRESS_EN}.`;
+export const TERMS_BODY_EN = `${TERMS_AGREEMENT_EN} Address: ${OPERATOR_ADDRESS_EN}.`;
 
-export const TERMS_BODY_AR = `${TERMS_AGREEMENT_AR} المقر المسجّل: ${OPERATOR_ADDRESS_AR}.`;
+export const TERMS_BODY_AR = `${TERMS_AGREEMENT_AR} العنوان: ${OPERATOR_ADDRESS_AR}.`;
 
-export const REGISTERED_OFFICE_EN = `Registered office: ${OPERATOR_ADDRESS_EN}`;
+export const REGISTERED_OFFICE_EN = `Address: ${OPERATOR_ADDRESS_EN}`;
 
-export const REGISTERED_OFFICE_AR = `المقر المسجّل: ${OPERATOR_ADDRESS_AR}`;
+export const REGISTERED_OFFICE_AR = `العنوان: ${OPERATOR_ADDRESS_AR}`;

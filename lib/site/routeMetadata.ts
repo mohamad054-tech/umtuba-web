@@ -290,7 +290,7 @@ export const communityGuidelinesMetadata = buildPageMetadata({
 export const copyrightMetadata = buildPageMetadata({
   title: "Copyright and DMCA Policy",
   description:
-    "UMTUBA Limited respects intellectual property and expects its users to do the same.",
+    "Mohammad Idries Mohammad Abu Teer respects intellectual property and expects its users to do the same.",
   path: "/copyright",
   index: "index",
 });

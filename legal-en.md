@@ -15,7 +15,7 @@ UMTUBA is currently operated by Mohammad Idries Mohammad Abu Teer (an individual
 UMTUBA Limited (Republic of Ireland) is being registered and will take over as
 operator. We are the data controller for personal data described in this policy.
 
-- Registered office: 6 Al-Baraa Street, Umm Tuba, Jerusalem
+- Address: 6 Al-Baraa Street, Umm Tuba, Jerusalem
 - Privacy contact: privacy@umtuba.com
 
 ## What we collect
@@ -141,7 +141,7 @@ changes we will notify you in the app or by email before they take effect.
 These terms form a binding agreement between you and Mohammad Idries Mohammad Abu
 Teer (an individual). UMTUBA is currently operated by Mohammad Idries Mohammad Abu
 Teer (an individual). UMTUBA Limited (Republic of Ireland) is being registered and
-will take over as operator. Registered office: 6 Al-Baraa Street, Umm Tuba,
+will take over as operator. Address: 6 Al-Baraa Street, Umm Tuba,
 Jerusalem.
 
 By creating an account or using UMTUBA you accept these terms. If you do not accept
@@ -167,7 +167,7 @@ offensive or misleading.
 
 You keep ownership of everything you post.
 
-By posting, you grant UMTUBA Limited a worldwide, non-exclusive, royalty-free licence
+By posting, you grant Mohammad Idries Mohammad Abu Teer a worldwide, non-exclusive, royalty-free licence
 to host, store, reproduce, adapt for technical formats, distribute and display your
 content **for the purpose of operating and promoting the service**. This licence ends
 when you delete the content, except for copies already shared by others and copies in
@@ -232,7 +232,7 @@ will give reasonable notice.
 Nothing in these terms limits liability for death or personal injury caused by
 negligence, for fraud, or for anything that cannot be limited under Irish law.
 
-Subject to that, UMTUBA Limited is not liable for indirect or consequential loss, loss
+Subject to that, Mohammad Idries Mohammad Abu Teer is not liable for indirect or consequential loss, loss
 of profits, loss of data, or loss of goodwill. Our total liability in any 12-month
 period is limited to the greater of €100 or the amount you paid us in that period.
 
@@ -375,7 +375,7 @@ your username and what was removed. A different reviewer will look at it.
 
 **Last updated:** 13 September 2026
 
-UMTUBA Limited respects intellectual property and expects its users to do the same.
+Mohammad Idries Mohammad Abu Teer respects intellectual property and expects its users to do the same.
 
 ## Reporting infringement
 
@@ -434,7 +434,7 @@ you file.
 UMTUBA is currently operated by Mohammad Idries Mohammad Abu Teer (an individual).
 UMTUBA Limited (Republic of Ireland) is being registered and will take over as
 operator.
-Registered office: 6 Al-Baraa Street, Umm Tuba, Jerusalem
+Address: 6 Al-Baraa Street, Umm Tuba, Jerusalem
 
 We aim to respond within 3 working days. Data protection requests are answered within
 one month, as required by the GDPR.
