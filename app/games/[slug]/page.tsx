@@ -48,7 +48,8 @@ export default async function GamePlayPage({ params }: Props) {
   if (!game) notFound();
 
   const pairFit = slug === "larger-country" || slug === "farther-pair";
-  const fit = slug === "solitaire" || slug === "guess-city" || slug === "landmark" || pairFit;
+  const marbleFit = slug === "marble-chain";
+  const fit = slug === "solitaire" || slug === "guess-city" || slug === "landmark" || pairFit || marbleFit;
 
   return (
     <main
@@ -56,7 +57,7 @@ export default async function GamePlayPage({ params }: Props) {
         fit ? "um-game-fit" : "min-h-screen"
       } ${slug === "guess-city" || slug === "landmark" ? "um-game-fit-place" : ""} ${
         pairFit ? "um-game-fit-pair" : ""
-      } ${MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS}`}
+      } ${marbleFit ? "um-game-fit-marble" : ""} ${MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS}`}
     >
       <AppTopNav
         title={t(game.titleKey)}
