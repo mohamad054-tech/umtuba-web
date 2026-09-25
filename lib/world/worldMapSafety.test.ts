@@ -24,7 +24,7 @@ describe("world map safety", () => {
     expect(translate("en", "world.map.title")).toBe("Map");
     expect(translate("ar", "world.map.title")).toBe("الخريطة");
     expect(translate("ar", "world.map.unavailable")).toBe("تعذّر تحميل الخريطة.");
-    expect(translate("fr", "world.map.title")).toBe("Map");
+    expect(translate("fr", "world.map.title")).toBe("Carte");
   });
 
   it("loads the map client-only and keeps the page usable if it fails", () => {

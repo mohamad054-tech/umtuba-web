@@ -22,7 +22,7 @@ describe("App Shell translation V1", () => {
     expect(translate("ar", "analytics.consent.accept")).toBe("قبول");
     expect(translate("en", "analytics.consent.body")).toMatch(/PostHog/);
     expect(translate("ar", "analytics.consent.body")).toMatch(/تحليلات/);
-    expect(translate("fr", "analytics.consent.accept")).toBe("Accept");
+    expect(translate("fr", "analytics.consent.accept")).toBe("Accepter");
     expect(translate("en", "nav.messages")).toBe("Messages");
     expect(translate("ar", "nav.messages")).toBe("الرسائل");
     expect(translate("en", desktopNavLabelKey("/world"))).toBe("World");

@@ -1,106 +1,57 @@
-﻿# Cursor Report — feat/quran-hifz-path-v1 (guided path UX)
+﻿# Cursor Report — feat/translations-11-locales
 
 ## Summary
 
-Redesigned `/learning/quran/shams` from nine top mode buttons into one calm guided memorization path. Main screen stays quiet: current step, verse/audio for that step, one «التالي», plus a small row for «مراجعات اليوم» / «خريطة الحفظ» / «أدوات أخرى». Spaced self-ratings are stored on-device only. Branch created from live Quran+games commit `e63f2377ab7696d5603d45934fa222d2b43516a4`. No deploy. No merge. `release/v1` untouched.
+Translated leftover English UI strings in the 11 locales that are not English or Arabic (`fr`, `es`, `de`, `pt`, `id`, `hi`, `ru`, `tr`, `zh-CN`, `ja`, `ko`). Branch was created from `bd1ab74a1ca95317acab0a1560607a52a0a345c1`. No deploy. No merge. No pull request.
 
 ```
-BRANCH = feat/quran-hifz-path-v1
-BASE = e63f2377ab7696d5603d45934fa222d2b43516a4
-DEPLOY = FORBIDDEN
-MERGE = FORBIDDEN
+BRANCH = feat/translations-11-locales
+BASE = bd1ab74a1ca95317acab0a1560607a52a0a345c1
+DEPLOY = NO
+MERGE = NO
+PUSH = origin feat/translations-11-locales
 ```
 
-### Guided path (Arabic on-screen)
+Arabic UI was not rewritten. Legal catalogs and legal markdown were not edited. Quran text, tafsir, and translation-of-meanings were not edited. `quranUiCopy.ts` stays bilingual Arabic/English by its existing contract. None of the 11 locales is RTL; `dir` / locale direction logic was not changed.
 
-استمع → كرّر → الآية كاملة → بعض الكلمات مخفية → الحروف الأولى → مخفية بالكامل → من الذاكرة → كيف كان حفظك؟  
-After «حفظتها»: وصل — هذه الآية → وصل — الآية التالية → وصل — الآيتان معاً  
-After last ayah: السورة من الصور (text hidden; «أظهر الآية» per verse; night sky if no image)
-
-### أدوات أخرى
-
-رتّب الآيات · وصل التلاوة · السورة كاملة · البسملة · الوصل · الاستماع بلا نظر
-
-### Review ladder (localStorage only)
-
-- أعدها = later today (+4 hours)
-- متردد = tomorrow (+1 day)
-- حفظتها = 3 → 7 → 14 → 30 → 60 days (streak grows; caps at 60)
-
-### Images
-
-Ayat **1–6** have `public/hifz/shams/shams-{n}.webp`. Ayat **7–15** have no image (night sky only).
+A local modification to this file from `fix/legal-operator-details-v1` is in `stash@{0}` (`legal CURSOR_REPORT before translations branch`) and was not committed here.
 
 ## Exact files changed
 
-- `app/learning/quran/shams/HifzShamsExperience.tsx` — guided-path UX rewrite
-- `app/learning/quran/shams/useHusaryPlayer.ts` — `startQueue` for chain-link audio
-- `lib/hifz/reviewSchedule.ts` — spaced schedule + map status helpers
-- `lib/hifz/reviewSchedule.test.ts` — unit tests for ratings / due / map
-- `lib/hifz/pathSteps.ts` — pure path state machine
-- `lib/hifz/pathSteps.test.ts` — path advancement / chain / surah memory
-- `lib/hifz/progress.ts` — progress v2, `rateAyah`, v1 migrate, `listDueToday`
-- `lib/hifz/types.ts` — HifzLocalProgress v2 + tool types
-- `docs/ai/CURSOR_REPORT.md` — this report
+- `lib/i18n/messages/uiEnglishClosures.ts` — translations for UI keys that still matched English
+- `lib/i18n/messages/catalogs.ts` — spread those closures last, after the game overlays
+- `lib/i18n/appShellTranslation.test.ts` — expect the existing French consent label `Accepter`
+- `lib/world/worldMapSafety.test.ts` — expect French map title `Carte`
 
 ## Migrations created
 
-none
+None.
 
 ## Security review
 
-- Progress and reviews stay device-only (`localStorage` via `rateAyah` / `readProgress`).
-- No secrets, no env values printed, no remote DB, no service-role use.
-- Quran ayah / tafsir / meanings strings were not invented or edited.
-- Husary audio still streamed from Quran.com CDN (not copied into repo).
-- Page stays noindex. Old `/hifz/shams` permanent redirect unchanged.
-- Games / video / watch not modified.
+No auth, payment, or data-access changes. Placeholders such as `{start}`, `{end}`, and `{radius}` were not rewritten. Brand strings `UMTUBA`, `UM Life`, and `Hello City` stay as-is. Map attribution keeps `OpenFreeMap`, `OpenMapTiles`, and `OpenStreetMap`.
 
 ## Tests
 
-```
-npx vitest run lib/hifz/reviewSchedule.test.ts lib/hifz/pathSteps.test.ts lib/hifz/ashShamsData.test.ts lib/hifz/audio.test.ts
-```
-
-**PASS** — 4 files, 39 tests.
+- `npx vitest run lib/i18n lib/world/worldMapSafety.test.ts` — 19 files, 107 tests, PASS
+- `npm test` — 446 files passed, 23 failed, 26 failed tests, 11 skipped. The i18n tests pass. Failures checked against this branch with the translation files stashed are pre-existing, including Translation Studio seed hash / row-count tests (`expected 88, got 145`) and the App Shell inventory count (`expected 146, got 145`). Other failures are outside i18n (wallet formatting, learning route snapshots, nav contract scans, local Supabase gate). Not fixed.
 
 ## TypeScript
 
-```
-npx tsc --noEmit
-```
-
-**PASS** (exit 0)
+`npx tsc --noEmit` — PASS
 
 ## Build
 
-```
-npm run build
-```
-
-**PASS** (exit 0). Routes include `/learning/quran` and `/learning/quran/shams`. Unrelated Turbopack filesystem-tracing warnings in translation-studio remain.
+`npm run build` — PASS (existing Turbopack filesystem-tracing warnings in translation studio, not from this change)
 
 ## git diff --check
 
-**PASS** (no whitespace errors; CRLF conversion warnings only)
+PASS (no whitespace errors)
 
 ## git status --short
 
-(relevant to commit)
-
-- `M app/learning/quran/shams/HifzShamsExperience.tsx`
-- `M app/learning/quran/shams/useHusaryPlayer.ts`
-- `M lib/hifz/progress.ts`
-- `M lib/hifz/types.ts`
-- `A lib/hifz/pathSteps.ts`
-- `A lib/hifz/pathSteps.test.ts`
-- `A lib/hifz/reviewSchedule.ts`
-- `A lib/hifz/reviewSchedule.test.ts`
-- `M docs/ai/CURSOR_REPORT.md`
-
-Unrelated dirt not committed: `.local/`, `tmp/`, `docs/ai/IOS_STATUS_AR.md`, `worktrees/`, `AGENTS.md` (stash).
+Committed: the four files above. Left untracked and uncommitted: `.local/`, `tmp/`, `worktrees/`.
 
 ## Open issues
 
-- cursor-ide-browser MCP could not open a usable tab (tabs list empty / navigate failed). Local production server was started on port 3461 for manual check; automated phone/wide viewport browser pass was **not** verified.
-- Auto-play may start on listen / repeat / link steps; pause/stop remain available.
+Some short labels stay identical to English because they are the normal word in that language, or because the surrounding copy already uses that loanword (`Store`, `Stories`, `Creator`, `Likes` in German; `Notifications`, `Question`, `Social` in French; `Ideas`, `Global`, `Instructor` in Spanish). Product names left unchanged: `UMTUBA`, `UM Life`, `Hello City`, `UMTUBA Learning`, `CPU`, `2048`, `Sudoku` where that spelling is the name, and `DEMO` where the Latin badge is the usual form. `learning.oneToOne.range` stays `{start} – {end}`.
