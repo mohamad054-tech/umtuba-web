@@ -2210,3 +2210,129 @@ body:has(.um-game-fit) {
     display: none;
   }
 }
+
+.um-wood,
+.um-ropes {
+  width: min(100%, 420px);
+  margin-inline: auto;
+  direction: ltr;
+}
+
+.um-wood-board {
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  gap: 3px;
+  padding: 8px;
+  aspect-ratio: 1;
+}
+
+.um-wood-cell,
+.um-wood-bit {
+  border-radius: 4px;
+  background: rgba(8, 12, 32, 0.45);
+  box-shadow: inset 0 0 0 1px rgba(255, 231, 163, 0.12);
+}
+
+.um-wood-cell.on,
+.um-wood-bit.on {
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.35), inset 0 -3px 0 rgba(80, 42, 16, 0.35);
+}
+
+.um-wood-tray {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.um-wood-piece {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 2px;
+  min-height: 92px;
+  padding: 8px;
+  border: 0;
+  border-radius: 14px;
+  background: rgba(10, 16, 40, 0.55);
+  touch-action: none;
+  cursor: grab;
+}
+
+.um-wood-piece:disabled {
+  opacity: 0.35;
+}
+
+.um-ropes-field {
+  position: relative;
+  width: min(100%, 420px);
+  aspect-ratio: 1;
+  touch-action: none;
+}
+
+.um-ropes-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.um-ropes-svg line {
+  stroke-width: 1.4;
+  stroke-linecap: round;
+}
+
+.um-ropes-svg line.cross {
+  stroke: #e07a6a;
+}
+
+.um-ropes-svg line.clear {
+  stroke: rgba(240, 169, 59, 0.85);
+}
+
+.um-ropes-dot {
+  position: absolute;
+  width: 44px;
+  height: 44px;
+  margin: -22px 0 0 -22px;
+  border: 0;
+  border-radius: 999px;
+  background: radial-gradient(circle at 35% 35%, #fff6df, #f0a93b 42%, #9a6e22);
+  box-shadow: 0 0 12px rgba(240, 169, 59, 0.55);
+  touch-action: none;
+  cursor: grab;
+}
+
+.um-fall {
+  display: grid;
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+  gap: 2px;
+  width: min(100%, 280px);
+  margin-inline: auto;
+  padding: 8px;
+  aspect-ratio: 10 / 18;
+  touch-action: none;
+  direction: ltr;
+}
+
+.um-fall-cell {
+  border-radius: 3px;
+  background: rgba(8, 12, 32, 0.35);
+}
+
+.um-fall-cell.on {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45);
+}
+
+.um-ropes-win {
+  position: absolute;
+  inset: 12%;
+  z-index: 2;
+  display: grid;
+  place-content: center;
+  gap: 10px;
+  text-align: center;
+  border-radius: 16px;
+  background: rgba(10, 16, 40, 0.88);
+  color: #fff6df;
+  font-weight: 800;
+}

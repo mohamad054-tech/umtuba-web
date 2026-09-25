@@ -38,6 +38,9 @@ import SnakeGame from "./SnakeGame";
 import SudokuGame from "./SudokuGame";
 import XoGame from "./XoGame";
 import MarbleChainGame from "./MarbleChainGame";
+import UntangleRopesGame from "./UntangleRopesGame";
+import FallingBlocksGame from "./FallingBlocksGame";
+import WoodBlocksGame from "./WoodBlocksGame";
 
 const PLAY: Record<PlayableGameSlug, () => JSX.Element> = {
   sudoku: SudokuGame,
@@ -70,6 +73,9 @@ const PLAY: Record<PlayableGameSlug, () => JSX.Element> = {
   typerace: TypeRaceGame,
   uno: UnoGame,
   "marble-chain": MarbleChainGame,
+  "wood-blocks": WoodBlocksGame,
+  "untangle-ropes": UntangleRopesGame,
+  "falling-blocks": FallingBlocksGame,
 };
 
 export default function GamePlayClient({ slug }: { slug: PlayableGameSlug }) {
