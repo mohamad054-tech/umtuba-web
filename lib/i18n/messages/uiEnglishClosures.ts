@@ -570,7 +570,11 @@ const ko = lessonAndMap({
 });
 
 export const uiEnglishClosures: Record<Exclude<AppLocale, "ar" | "en">, UiEnglishClosure> = {
-  fr,
+  fr: {
+    ...fr,
+    "stories.railAria": "Histoires",
+    "search.tab.stories": "Histoires",
+  },
   es: {
     ...es,
     "landing.world.videos.title": "Vídeos",
@@ -578,8 +582,34 @@ export const uiEnglishClosures: Record<Exclude<AppLocale, "ar" | "en">, UiEnglis
   de: {
     ...de,
     "landing.world.challenges.title": "Missionen",
+    "store.shell.title": "Shop",
+    "store.chrome.navAria": "Shop",
+    "store.hero.eyebrow": "UMTUBA Shop",
+    "store.welcome.hookEyebrow": "Shop",
+    "store.search.navSubtitle": "Shop",
+    "store.wishlist.navSubtitle": "Shop",
+    "store.cart.navSubtitle": "Shop",
+    "store.orders.navSubtitle": "Shop",
+    "store.checkout.navSubtitle": "Shop",
+    "store.product.store": "Shop",
+    "menu.store": "Shop",
+    "store.home.sellersEyebrow": "Ersteller",
+    "home.creator": "Ersteller",
+    "stories.railAria": "Storys",
+    "search.tab.stories": "Storys",
+    "social.likes": "Gefällt mir",
+    "world.radiusKm": "Umkreis: {radius} km",
+    "admin.hub.title": "Verwaltung",
+    "menu.admin": "Verwaltung",
+    "store.profile.tabLive": "Livestream",
+    "nav.live": "Livestream",
+    "learning.hub.section.live": "Livestream",
   },
-  pt,
+  pt: {
+    ...pt,
+    "stories.railAria": "Histórias",
+    "search.tab.stories": "Histórias",
+  },
   id: {
     ...id,
     "admin.hub.title": "Pengelola",
@@ -598,7 +628,10 @@ export const uiEnglishClosures: Record<Exclude<AppLocale, "ar" | "en">, UiEnglis
     "games.sudoku.title": "Судоку",
     "store.demo.badge": "ДЕМО",
   },
-  tr,
+  tr: {
+    ...tr,
+    "teacher.course.quiz": "Kısa sınav",
+  },
   "zh-CN": {
     ...zhCN,
     "games.sudoku.title": "数独",
