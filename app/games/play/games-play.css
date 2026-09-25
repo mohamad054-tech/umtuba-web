@@ -1260,14 +1260,59 @@ body:has(.um-game-fit) {
   box-shadow: 0 0 10px rgba(240, 169, 59, 0.95);
 }
 
+.um-game-fit-marble .um-game-fit-body > h2,
+.um-game-fit-marble .um-game-fit-body > [data-games-subtitle] {
+  display: none;
+}
+
+.um-marble-stage {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+}
+
 .um-marble-board {
   display: block;
-  width: min(100%, 520px);
-  aspect-ratio: 4 / 3;
-  margin: 8px auto 0;
+  width: 100%;
+  height: 100%;
   border-radius: 16px;
   touch-action: none;
   direction: ltr;
+}
+
+.um-marble-help {
+  display: grid;
+  grid-template-columns: 64px 1fr;
+  gap: 8px;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.um-marble-help svg {
+  width: 64px;
+  height: 28px;
+}
+
+.um-marble-howto {
+  position: absolute;
+  z-index: 3;
+  inset: 8px;
+  overflow: auto;
+}
+
+.um-marble-banner {
+  position: absolute;
+  inset: 18%;
+  z-index: 2;
+  display: grid;
+  place-content: center;
+  gap: 10px;
+  text-align: center;
+  border-radius: 16px;
+  background: rgba(10, 16, 40, 0.9);
+  color: #fff6df;
+  font-weight: 800;
 }
 
 .um-place-row {
