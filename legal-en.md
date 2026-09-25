@@ -1,7 +1,6 @@
 # UMTUBA — Legal Pages (English source)
 
 > DRAFT — pending review by an Irish-qualified solicitor. Not yet binding.
-> Company details marked `[[...]]` must be filled once registration completes.
 
 ---
 
@@ -12,12 +11,11 @@
 
 ## Who we are
 
-UMTUBA Limited (in registration, Republic of Ireland) operates umtuba.com and the
-UMTUBA mobile applications. We are the data controller for personal data described
-in this policy.
+UMTUBA is currently operated by Mohammad Idries Mohammad Abu Teer (an individual).
+UMTUBA Limited (Republic of Ireland) is being registered and will take over as
+operator. We are the data controller for personal data described in this policy.
 
-- Registered office: `[[REGISTERED ADDRESS]]`
-- Company registration number: `[[CRN]]`
+- Registered office: 6 Al-Baraa Street, Umm Tuba, Jerusalem
 - Privacy contact: privacy@umtuba.com
 
 ## What we collect
@@ -140,9 +138,11 @@ changes we will notify you in the app or by email before they take effect.
 
 ## 1. Agreement
 
-These terms form a binding agreement between you and UMTUBA Limited (in registration,
-Republic of Ireland), registered office `[[REGISTERED ADDRESS]]`, company number
-`[[CRN]]`.
+These terms form a binding agreement between you and Mohammad Idries Mohammad Abu
+Teer (an individual). UMTUBA is currently operated by Mohammad Idries Mohammad Abu
+Teer (an individual). UMTUBA Limited (Republic of Ireland) is being registered and
+will take over as operator. Registered office: 6 Al-Baraa Street, Umm Tuba,
+Jerusalem.
 
 By creating an account or using UMTUBA you accept these terms. If you do not accept
 them, do not use the service.
@@ -431,9 +431,10 @@ you file.
 **Legal and moderation appeals:** legal@umtuba.com
 **Copyright:** dmca@umtuba.com
 
-**UMTUBA Limited** (in registration, Republic of Ireland)
-Registered office: `[[REGISTERED ADDRESS]]`
-Company number: `[[CRN]]`
+UMTUBA is currently operated by Mohammad Idries Mohammad Abu Teer (an individual).
+UMTUBA Limited (Republic of Ireland) is being registered and will take over as
+operator.
+Registered office: 6 Al-Baraa Street, Umm Tuba, Jerusalem
 
 We aim to respond within 3 working days. Data protection requests are answered within
 one month, as required by the GDPR.
@@ -447,8 +448,9 @@ UMTUBA is a platform for sharing ideas across borders.
 It brings together short video, live streaming, messaging, personal pages, place
 discovery, courses, and a marketplace — in 13 languages.
 
-The platform is built and operated by UMTUBA Limited, a company in registration in
-the Republic of Ireland.
+UMTUBA is currently operated by Mohammad Idries Mohammad Abu Teer (an individual).
+UMTUBA Limited (Republic of Ireland) is being registered and will take over as
+operator.
 
 **Our principle:** every idea deserves a chance to reach the world.
 

@@ -3,7 +3,12 @@ import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { APP_ROUTES } from "../../app/lib/nav/routes";
 import { isProtectedPath, PROTECTED_PREFIXES } from "../env/supabaseAuthGate";
-import { COMPANY_NUMBER_PLACEHOLDER, REGISTERED_ADDRESS_PLACEHOLDER } from "../legal/company";
+import {
+  OPERATOR_ADDRESS_AR,
+  OPERATOR_ADDRESS_EN,
+  OPERATOR_NAME_AR,
+  OPERATOR_NAME_EN,
+} from "../legal/company";
 import { LEGAL_DRAFT_BANNER_ENABLED } from "../legal/draftBanner";
 import {
   ABOUT_PAGE,
@@ -16,7 +21,7 @@ import {
   PRIVACY_PAGE,
   TERMS_PAGE,
 } from "../legal/pageSpecs";
-import { legalEnMessages } from "../i18n/messages/legalCatalogs";
+import { legalArMessages, legalEnMessages } from "../i18n/messages/legalCatalogs";
 import { SITEMAP_STATIC_ROUTES } from "./indexing";
 import {
   aboutMetadata,
@@ -119,11 +124,31 @@ describe("Legal pages source contract", () => {
     expect(signup).toMatch(/auth\.signup\.privacyPolicy/);
   });
 
-  it("keeps company placeholders and does not invent address or CRN", () => {
-    expect(REGISTERED_ADDRESS_PLACEHOLDER).toBe("[[REGISTERED ADDRESS]]");
-    expect(COMPANY_NUMBER_PLACEHOLDER).toBe("[[CRN]]");
+  it("names the individual operator and does not show a company number", () => {
+    expect(OPERATOR_NAME_EN).toBe("Mohammad Idries Mohammad Abu Teer");
+    expect(OPERATOR_NAME_AR).toBe("محمد إدريس محمد أبو طير");
+    expect(OPERATOR_ADDRESS_EN).toBe("6 Al-Baraa Street, Umm Tuba, Jerusalem");
+    expect(OPERATOR_ADDRESS_AR).toBe("القدس، أم طوبا، شارع البراء 6");
     const company = readRepo("lib/legal/company.ts");
-    expect(company).not.toMatch(/\d{5,}/);
+    expect(company).not.toMatch(/\[\[/);
+    expect(company).not.toMatch(/\bCRN\b/);
+    const english = JSON.stringify(legalEnMessages);
+    const arabic = JSON.stringify(legalArMessages);
+    expect(english).not.toMatch(/\[\[|\{crn\}|\{address\}/);
+    expect(arabic).not.toMatch(/\[\[|\{crn\}|\{address\}/);
+    expect(legalEnMessages["legal.privacy.who.p1"]).toContain(OPERATOR_NAME_EN);
+    expect(legalEnMessages["legal.privacy.who.p1"]).toMatch(/data controller/);
+    expect(legalEnMessages["legal.privacy.who.office"]).toContain(
+      OPERATOR_ADDRESS_EN
+    );
+    expect(legalArMessages["legal.privacy.who.p1"]).toContain(OPERATOR_NAME_AR);
+    expect(legalArMessages["legal.privacy.who.office"]).toContain(
+      OPERATOR_ADDRESS_AR
+    );
+    expect(legalEnMessages["legal.footer.operator"]).toContain(OPERATOR_NAME_EN);
+    expect(legalArMessages["legal.footer.operator"]).toContain(OPERATOR_NAME_AR);
+    expect("legal.privacy.who.crn" in legalEnMessages).toBe(false);
+    expect("legal.contact.crn" in legalEnMessages).toBe(false);
     expect(LEGAL_DRAFT_BANNER_ENABLED).toBe(true);
   });
 

@@ -3,6 +3,19 @@
  * Arabic is the supplied translation. Other catalogs reuse English until supplied.
  */
 
+import {
+  OPERATOR_STATEMENT_AR,
+  OPERATOR_STATEMENT_EN,
+  PRIVACY_CONTROLLER_AR,
+  PRIVACY_CONTROLLER_EN,
+  REGISTERED_OFFICE_AR,
+  REGISTERED_OFFICE_EN,
+  TERMS_AGREEMENT_AR,
+  TERMS_AGREEMENT_EN,
+  TERMS_BODY_AR,
+  TERMS_BODY_EN,
+} from "../../legal/company";
+
 export const legalEnMessages = {
   "legal.draftBanner":
     "DRAFT — pending legal review. Not yet binding.",
@@ -25,13 +38,12 @@ export const legalEnMessages = {
   "legal.footer.about": "About",
   "legal.footer.delete": "Delete account",
   "legal.footer.export": "Export data",
+  "legal.footer.operator": OPERATOR_STATEMENT_EN,
 
   "legal.meta.privacyTitle": "Privacy Policy",
-  "legal.meta.privacyDescription":
-    "UMTUBA Limited (in registration, Republic of Ireland) operates umtuba.com and the UMTUBA mobile applications. We are the data controller for personal data described in this policy.",
+  "legal.meta.privacyDescription": PRIVACY_CONTROLLER_EN,
   "legal.meta.termsTitle": "Terms of Service",
-  "legal.meta.termsDescription":
-    "These terms form a binding agreement between you and UMTUBA Limited (in registration, Republic of Ireland).",
+  "legal.meta.termsDescription": TERMS_AGREEMENT_EN,
   "legal.meta.cookiesTitle": "Cookie Policy",
   "legal.meta.cookiesDescription":
     "Cookies are small files stored on your device. We also use similar technologies such as local storage and device identifiers.",
@@ -56,10 +68,8 @@ export const legalEnMessages = {
 
   "legal.privacy.title": "Privacy Policy",
   "legal.privacy.who.title": "Who we are",
-  "legal.privacy.who.p1":
-    "UMTUBA Limited (in registration, Republic of Ireland) operates umtuba.com and the UMTUBA mobile applications. We are the data controller for personal data described in this policy.",
-  "legal.privacy.who.office": "Registered office: {address}",
-  "legal.privacy.who.crn": "Company registration number: {crn}",
+  "legal.privacy.who.p1": PRIVACY_CONTROLLER_EN,
+  "legal.privacy.who.office": REGISTERED_OFFICE_EN,
   "legal.privacy.who.email": "Privacy contact: privacy@umtuba.com",
   "legal.privacy.collect.title": "What we collect",
   "legal.privacy.collect.direct": "You give us directly:",
@@ -188,8 +198,7 @@ export const legalEnMessages = {
 
   "legal.terms.title": "Terms of Service",
   "legal.terms.s1.title": "1. Agreement",
-  "legal.terms.s1.p1":
-    "These terms form a binding agreement between you and UMTUBA Limited (in registration, Republic of Ireland), registered office {address}, company number {crn}.",
+  "legal.terms.s1.p1": TERMS_BODY_EN,
   "legal.terms.s1.p2":
     "By creating an account or using UMTUBA you accept these terms. If you do not accept them, do not use the service.",
   "legal.terms.s2.title": "2. Eligibility",
@@ -390,10 +399,8 @@ export const legalEnMessages = {
   "legal.contact.legal":
     "**Legal and moderation appeals:** legal@umtuba.com",
   "legal.contact.copyright": "**Copyright:** dmca@umtuba.com",
-  "legal.contact.company":
-    "**UMTUBA Limited** (in registration, Republic of Ireland)",
-  "legal.contact.office": "Registered office: {address}",
-  "legal.contact.crn": "Company number: {crn}",
+  "legal.contact.company": OPERATOR_STATEMENT_EN,
+  "legal.contact.office": REGISTERED_OFFICE_EN,
   "legal.contact.p1":
     "We aim to respond within 3 working days. Data protection requests are answered within one month, as required by the GDPR.",
 
@@ -401,8 +408,7 @@ export const legalEnMessages = {
   "legal.about.p1": "UMTUBA is a platform for sharing ideas across borders.",
   "legal.about.p2":
     "It brings together short video, live streaming, messaging, personal pages, place discovery, courses, and a marketplace — in 13 languages.",
-  "legal.about.p3":
-    "The platform is built and operated by UMTUBA Limited, a company in registration in the Republic of Ireland.",
+  "legal.about.p3": OPERATOR_STATEMENT_EN,
   "legal.about.principle":
     "**Our principle:** every idea deserves a chance to reach the world.",
   "legal.about.contact": "Contact: support@umtuba.com",
@@ -518,13 +524,12 @@ export const legalArMessages: LegalMessages = {
   "legal.footer.about": "عن UMTUBA",
   "legal.footer.delete": "حذف الحساب",
   "legal.footer.export": "تصدير البيانات",
+  "legal.footer.operator": OPERATOR_STATEMENT_AR,
 
   "legal.meta.privacyTitle": "سياسة الخصوصية",
-  "legal.meta.privacyDescription":
-    "شركة UMTUBA Limited (قيد التسجيل في جمهورية أيرلندا) تُشغّل موقع umtuba.com وتطبيقات UMTUBA. نحن المتحكّم بالبيانات الشخصية الموضّحة في هذه السياسة.",
+  "legal.meta.privacyDescription": PRIVACY_CONTROLLER_AR,
   "legal.meta.termsTitle": "شروط الاستخدام",
-  "legal.meta.termsDescription":
-    "تشكّل هذه الشروط اتفاقية ملزمة بينك وبين UMTUBA Limited (قيد التسجيل في جمهورية أيرلندا).",
+  "legal.meta.termsDescription": TERMS_AGREEMENT_AR,
   "legal.meta.cookiesTitle": "سياسة ملفات تعريف الارتباط",
   "legal.meta.cookiesDescription":
     "ملفات صغيرة تُخزّن على جهازك. نستخدم أيضاً تقنيات مشابهة مثل التخزين المحلي ومعرّفات الأجهزة.",
@@ -548,10 +553,8 @@ export const legalArMessages: LegalMessages = {
 
   "legal.privacy.title": "سياسة الخصوصية",
   "legal.privacy.who.title": "من نحن",
-  "legal.privacy.who.p1":
-    "شركة **UMTUBA Limited** (قيد التسجيل في جمهورية أيرلندا) تُشغّل موقع umtuba.com وتطبيقات UMTUBA. نحن المتحكّم بالبيانات الشخصية الموضّحة في هذه السياسة.",
-  "legal.privacy.who.office": "المقر المسجّل: {address}",
-  "legal.privacy.who.crn": "رقم تسجيل الشركة: {crn}",
+  "legal.privacy.who.p1": PRIVACY_CONTROLLER_AR,
+  "legal.privacy.who.office": REGISTERED_OFFICE_AR,
   "legal.privacy.who.email": "جهة الاتصال للخصوصية: privacy@umtuba.com",
   "legal.privacy.collect.title": "ما الذي نجمعه",
   "legal.privacy.collect.direct": "ما تعطينا إياه مباشرة:",
@@ -679,8 +682,7 @@ export const legalArMessages: LegalMessages = {
 
   "legal.terms.title": "شروط الاستخدام",
   "legal.terms.s1.title": "١. الاتفاقية",
-  "legal.terms.s1.p1":
-    "تشكّل هذه الشروط اتفاقية ملزمة بينك وبين **UMTUBA Limited** (قيد التسجيل في جمهورية أيرلندا)، المقر المسجّل {address}، رقم الشركة {crn}.",
+  "legal.terms.s1.p1": TERMS_BODY_AR,
   "legal.terms.s1.p2":
     "بإنشاء حساب أو استخدام UMTUBA فإنك تقبل هذه الشروط. إن لم تقبلها، لا تستخدم الخدمة.",
   "legal.terms.s2.title": "٢. الأهلية",
@@ -879,10 +881,8 @@ export const legalArMessages: LegalMessages = {
   "legal.contact.legal":
     "**القانوني وتظلّمات الإشراف:** legal@umtuba.com",
   "legal.contact.copyright": "**حقوق النشر:** dmca@umtuba.com",
-  "legal.contact.company":
-    "**UMTUBA Limited** (قيد التسجيل في جمهورية أيرلندا)",
-  "legal.contact.office": "المقر المسجّل: {address}",
-  "legal.contact.crn": "رقم الشركة: {crn}",
+  "legal.contact.company": OPERATOR_STATEMENT_AR,
+  "legal.contact.office": REGISTERED_OFFICE_AR,
   "legal.contact.p1":
     "نسعى للرد خلال ٣ أيام عمل. وتُجاب طلبات حماية البيانات خلال شهر واحد، حسب ما تفرضه اللائحة الأوروبية.",
 
@@ -890,8 +890,7 @@ export const legalArMessages: LegalMessages = {
   "legal.about.p1": "UMTUBA منصة لمشاركة الأفكار عبر الحدود.",
   "legal.about.p2":
     "تجمع الفيديو القصير والبث المباشر والمراسلة والصفحات الشخصية واكتشاف الأماكن والدورات التعليمية والمتجر — بـ ١٣ لغة.",
-  "legal.about.p3":
-    "تبني المنصة وتشغّلها **UMTUBA Limited**، شركة قيد التسجيل في جمهورية أيرلندا.",
+  "legal.about.p3": OPERATOR_STATEMENT_AR,
   "legal.about.principle":
     "**مبدؤنا:** كل فكرة تستحق فرصة للوصول إلى العالم.",
   "legal.about.contact": "للتواصل: support@umtuba.com",

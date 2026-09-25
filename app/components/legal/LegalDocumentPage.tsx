@@ -2,7 +2,6 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { createTranslator } from "../../../lib/i18n/translate";
 import { resolveRequestLocale } from "../../../lib/i18n/server";
-import { COMPANY_PLACEHOLDER_VALUES } from "../../../lib/legal/company";
 import type { LegalPageSpec } from "../../../lib/legal/pageSpecs";
 import { APP_ROUTES, MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS } from "../../lib/nav";
 import UmtubaStackedLogo from "../brand/UmtubaStackedLogo";
@@ -20,7 +19,6 @@ export default async function LegalDocumentPage({
 }: LegalDocumentPageProps) {
   const { locale } = await resolveRequestLocale();
   const t = createTranslator(locale);
-  const values = COMPANY_PLACEHOLDER_VALUES;
 
   return (
     <main
@@ -101,7 +99,7 @@ export default async function LegalDocumentPage({
                       : "text-[15px] leading-7 text-white/70"
                   }
                 >
-                  <LegalRichText text={t(block.key, { values })} />
+                  <LegalRichText text={t(block.key)} />
                 </p>
               );
             }
@@ -113,7 +111,7 @@ export default async function LegalDocumentPage({
                 >
                   {block.keys.map((key) => (
                     <li key={key}>
-                      <LegalRichText text={t(key, { values })} />
+                      <LegalRichText text={t(key)} />
                     </li>
                   ))}
                 </ul>
@@ -139,10 +137,10 @@ export default async function LegalDocumentPage({
                         className="border-b border-white/10"
                       >
                         <td className="px-3 py-2 align-top">
-                          <LegalRichText text={t(row[0], { values })} />
+                          <LegalRichText text={t(row[0])} />
                         </td>
                         <td className="px-3 py-2 align-top">
-                          <LegalRichText text={t(row[1], { values })} />
+                          <LegalRichText text={t(row[1])} />
                         </td>
                       </tr>
                     ))}

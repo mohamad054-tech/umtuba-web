@@ -4,7 +4,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useI18n } from "../i18n";
 import { APP_ROUTES } from "../../lib/nav";
-import { COMPANY_LEGAL_NAME } from "../../../lib/legal/company";
 import type { TranslationKey } from "../../../lib/i18n/messages/types";
 
 const FOOTER_HIDDEN_PREFIXES = [
@@ -65,7 +64,7 @@ export default function SiteFooter() {
         ))}
       </nav>
       <p className="mx-auto mt-4 max-w-5xl text-center text-xs text-white/35">
-        {COMPANY_LEGAL_NAME}
+        {t("legal.footer.operator")}
       </p>
     </footer>
   );

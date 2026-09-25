@@ -4,11 +4,15 @@ import { MESSAGE_CATALOGS } from "./messages/catalogs";
 
 describe("13-language deep linguistic QA v1", () => {
   it("keeps UMTUBA Latin and never transliterates the brand in Arabic", () => {
-    for (const value of Object.values(MESSAGE_CATALOGS.ar)) {
-      expect(value).not.toMatch(/أمتوبة|أم طوبا/);
-      if (value.includes("UMTUBA") || /[أ-ي]/.test(value)) {
-        expect(value).not.toMatch(/أم.?طوبا/);
-      }
+    const legalPlaceAddressKeys = new Set([
+      "legal.privacy.who.office",
+      "legal.contact.office",
+      "legal.terms.s1.p1",
+    ]);
+    for (const [key, value] of Object.entries(MESSAGE_CATALOGS.ar)) {
+      expect(value).not.toMatch(/أمتوبة/);
+      if (legalPlaceAddressKeys.has(key)) continue;
+      expect(value).not.toMatch(/أم طوبا|أم.?طوبا/);
     }
     expect(translate("ar", "landing.joinCta")).toContain("UMTUBA");
   });

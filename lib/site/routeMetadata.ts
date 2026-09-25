@@ -1,4 +1,8 @@
 import type { Metadata } from "next";
+import {
+  PRIVACY_CONTROLLER_EN,
+  TERMS_AGREEMENT_EN,
+} from "../legal/company";
 import { buildPageMetadata } from "./metadata";
 import { BRAND, DEFAULT_DESCRIPTION, DEFAULT_TITLE } from "./brand";
 
@@ -255,14 +259,14 @@ export const updatePasswordMetadata = buildPageMetadata({
 
 export const termsMetadata = buildPageMetadata({
   title: "Terms of Service",
-  description: `These terms form a binding agreement between you and ${BRAND.name} Limited (in registration, Republic of Ireland).`,
+  description: TERMS_AGREEMENT_EN,
   path: "/terms",
   index: "index",
 });
 
 export const privacyMetadata = buildPageMetadata({
   title: "Privacy Policy",
-  description: `${BRAND.name} Limited (in registration, Republic of Ireland) operates umtuba.com and the UMTUBA mobile applications. We are the data controller for personal data described in this policy.`,
+  description: PRIVACY_CONTROLLER_EN,
   path: "/privacy",
   index: "index",
 });

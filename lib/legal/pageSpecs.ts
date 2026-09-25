@@ -32,11 +32,7 @@ export const PRIVACY_PAGE: LegalPageSpec = {
     { type: "p", key: "legal.privacy.who.p1" },
     {
       type: "list",
-      keys: [
-        "legal.privacy.who.office",
-        "legal.privacy.who.crn",
-        "legal.privacy.who.email",
-      ],
+      keys: ["legal.privacy.who.office", "legal.privacy.who.email"],
     },
     { type: "h2", id: "what-we-collect", key: "legal.privacy.collect.title" },
     { type: "lead", key: "legal.privacy.collect.direct" },
@@ -357,7 +353,6 @@ export const CONTACT_PAGE: LegalPageSpec = {
     { type: "p", key: "legal.contact.copyright" },
     { type: "p", key: "legal.contact.company" },
     { type: "p", key: "legal.contact.office" },
-    { type: "p", key: "legal.contact.crn" },
     { type: "p", key: "legal.contact.p1" },
   ],
 };
