@@ -31,6 +31,8 @@ export const PLAYABLE_GAME_SLUGS = [
   "typerace",
   "uno",
   "marble-chain",
+  "wood-blocks",
+  "untangle-ropes",
 ] as const;
 
 export type PlayableGameSlug = (typeof PLAYABLE_GAME_SLUGS)[number];
@@ -74,6 +76,8 @@ export const PLAYABLE_GAMES: readonly PlayableGame[] = [
   { slug: "typerace", titleKey: "games.typerace.title", blurbKey: "games.typerace.blurb", arabicContent: true },
   { slug: "uno", titleKey: "games.uno.title", blurbKey: "games.uno.blurb" },
   { slug: "marble-chain", titleKey: "games.marble-chain.title", blurbKey: "games.marble-chain.blurb" },
+  { slug: "wood-blocks", titleKey: "games.wood-blocks.title", blurbKey: "games.wood-blocks.blurb" },
+  { slug: "untangle-ropes", titleKey: "games.untangle-ropes.title", blurbKey: "games.untangle-ropes.blurb" },
 ] as const;
 
 export function isPlayableGameSlug(value: string): value is PlayableGameSlug {

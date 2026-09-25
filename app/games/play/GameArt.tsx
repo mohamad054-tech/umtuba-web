@@ -507,6 +507,27 @@ const ART: Record<PlayableGameSlug, () => JSX.Element> = {
       </Frame>
     );
   },
+  "wood-blocks": function WoodBlocksArt() {
+    return (
+      <Frame>
+        <rect x="36" y="46" width="34" height="22" rx="4" fill="#e7c48a" />
+        <rect x="74" y="46" width="22" height="48" rx="4" fill="#c9844a" />
+        <rect x="40" y="92" width="52" height="22" rx="4" fill="#8d5a32" />
+      </Frame>
+    );
+  },
+  "untangle-ropes": function UntangleRopesArt() {
+    return (
+      <Frame>
+        <path d="M40 48 C70 48 90 112 120 112" fill="none" stroke={C.gold} strokeWidth="6" strokeLinecap="round" />
+        <path d="M40 112 C70 112 90 48 120 48" fill="none" stroke={C.clay} strokeWidth="6" strokeLinecap="round" />
+        <circle cx="40" cy="48" r="8" fill={C.ink} />
+        <circle cx="120" cy="112" r="8" fill={C.ink} />
+        <circle cx="40" cy="112" r="8" fill={C.ink} />
+        <circle cx="120" cy="48" r="8" fill={C.ink} />
+      </Frame>
+    );
+  },
 };
 
 export default function GameArt({

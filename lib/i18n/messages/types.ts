@@ -1725,6 +1725,16 @@ export type GamesMessages = {
   "games.marble-chain.howTo1": string;
   "games.marble-chain.howTo2": string;
   "games.marble-chain.howTo3": string;
+  "games.wood-blocks.title": string;
+  "games.wood-blocks.blurb": string;
+  "games.wood-blocks.howTo1": string;
+  "games.wood-blocks.howTo2": string;
+  "games.wood-blocks.howTo3": string;
+  "games.untangle-ropes.title": string;
+  "games.untangle-ropes.blurb": string;
+  "games.untangle-ropes.howTo1": string;
+  "games.untangle-ropes.howTo2": string;
+  "games.untangle-ropes.howTo3": string;
   "games.uno.howTo1": string;
   "games.uno.howTo2": string;
   "games.uno.howTo3": string;
