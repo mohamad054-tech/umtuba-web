@@ -2302,6 +2302,27 @@ body:has(.um-game-fit) {
   cursor: grab;
 }
 
+.um-fall {
+  display: grid;
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+  gap: 2px;
+  width: min(100%, 280px);
+  margin-inline: auto;
+  padding: 8px;
+  aspect-ratio: 10 / 18;
+  touch-action: none;
+  direction: ltr;
+}
+
+.um-fall-cell {
+  border-radius: 3px;
+  background: rgba(8, 12, 32, 0.35);
+}
+
+.um-fall-cell.on {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45);
+}
+
 .um-ropes-win {
   position: absolute;
   inset: 12%;

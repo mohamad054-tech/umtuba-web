@@ -1735,6 +1735,11 @@ export type GamesMessages = {
   "games.untangle-ropes.howTo1": string;
   "games.untangle-ropes.howTo2": string;
   "games.untangle-ropes.howTo3": string;
+  "games.falling-blocks.title": string;
+  "games.falling-blocks.blurb": string;
+  "games.falling-blocks.howTo1": string;
+  "games.falling-blocks.howTo2": string;
+  "games.falling-blocks.howTo3": string;
   "games.uno.howTo1": string;
   "games.uno.howTo2": string;
   "games.uno.howTo3": string;

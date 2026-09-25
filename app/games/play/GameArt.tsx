@@ -516,6 +516,16 @@ const ART: Record<PlayableGameSlug, () => JSX.Element> = {
       </Frame>
     );
   },
+  "falling-blocks": function FallingBlocksArt() {
+    return (
+      <Frame>
+        <rect x="58" y="28" width="18" height="54" rx="3" fill={C.gold} />
+        <rect x="76" y="46" width="36" height="18" rx="3" fill={C.mint} />
+        <rect x="40" y="82" width="54" height="18" rx="3" fill={C.clay} />
+        <rect x="94" y="100" width="18" height="28" rx="3" fill="#6ea8ff" />
+      </Frame>
+    );
+  },
   "untangle-ropes": function UntangleRopesArt() {
     return (
       <Frame>

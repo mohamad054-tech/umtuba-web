@@ -48,6 +48,7 @@ describe("playable games catalog", () => {
       "marble-chain",
       "wood-blocks",
       "untangle-ropes",
+      "falling-blocks",
     ]);
     expect(isPlayableGameSlug("sudoku")).toBe(true);
     expect(isPlayableGameSlug("quick-q")).toBe(true);
