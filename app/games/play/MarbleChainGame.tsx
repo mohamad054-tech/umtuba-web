@@ -9,9 +9,12 @@ import {
   verdictFromScore,
 } from "../../../lib/games/play/engine";
 import { readBest, writeBestIfHigher } from "../../../lib/games/play/scores";
-import { PlayPanel, PlayResult, PlayStat, usePlayHelp } from "./PlayChrome";
+import Link from "next/link";
+import { APP_ROUTES } from "../../lib/nav";
+import { PlayResult, usePlayHelp } from "./PlayChrome";
 
-const COLORS = ["#f0a93b", "#7ed9b8", "#6ea8ff", "#e07a6a"];
+const COLORS = ["#f0a93b", "#3ee0b0", "#5aa6ff", "#ff6d6d"];
+const MARKS = ["●", "▲", "■", "+"];
 const SPACING = 26;
 const ROUNDS = [
   { balls: 16, speed: 26, turns: 1.15, angle: -0.9 },
@@ -50,8 +53,8 @@ function buildPath(w: number, h: number, round: number): Path {
   const spec = ROUNDS[round] ?? ROUNDS[0];
   const cx = w * 0.5;
   const cy = h * 0.5;
-  const maxR = Math.min(w, h) * 0.4;
-  const minR = Math.min(w, h) * 0.18;
+  const maxR = Math.min(w, h) * 0.44;
+  const minR = Math.min(w, h) * 0.2;
   const points: { x: number; y: number }[] = [];
   const steps = 280;
   for (let i = 0; i <= steps; i += 1) {
@@ -144,6 +147,41 @@ function deviceIsSlow() {
   return prefersReducedMotion() || (typeof memory === "number" && memory <= 4) || cores <= 4;
 }
 
+type Bit = { x: number; y: number; vx: number; vy: number; life: number; color: string };
+type Floater = { x: number; y: number; text: string; life: number };
+
+function paintBall(ctx: CanvasRenderingContext2D, x: number, y: number, radius: number, color: number, spin: number, lite: boolean) {
+  ctx.beginPath();
+  ctx.fillStyle = "rgba(0,0,0,0.28)";
+  ctx.ellipse(x, y + radius * 0.85, radius * 0.72, radius * 0.28, 0, 0, Math.PI * 2);
+  ctx.fill();
+  const fill = COLORS[color] ?? COLORS[0]!;
+  const glow = ctx.createRadialGradient(x - radius * 0.35, y - radius * 0.4, radius * 0.1, x, y, radius);
+  glow.addColorStop(0, "#fff8e8");
+  glow.addColorStop(0.28, fill);
+  glow.addColorStop(1, "#1a1028");
+  ctx.beginPath();
+  ctx.fillStyle = glow;
+  ctx.arc(x, y, radius, 0, Math.PI * 2);
+  ctx.fill();
+  if (!lite) {
+    ctx.beginPath();
+    ctx.strokeStyle = "rgba(255,255,255,0.35)";
+    ctx.lineWidth = 1.5;
+    ctx.arc(x, y, radius - 1.5, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(spin);
+  ctx.fillStyle = "rgba(12,8,20,0.8)";
+  ctx.font = `${Math.max(9, radius)}px sans-serif`;
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText(MARKS[color] ?? "●", 0, 1);
+  ctx.restore();
+}
+
 export default function MarbleChainGame() {
   const { t, locale } = useI18n();
   const help = usePlayHelp();
@@ -163,11 +201,22 @@ export default function MarbleChainGame() {
   const layoutRef = useRef(true);
   const pauseRef = useRef(true);
   const bannerRef = useRef(false);
+  const pausedRef = useRef(false);
+  const mutedRef = useRef(true);
+  const aimAngle = useRef(-Math.PI / 2);
+  const shownAngle = useRef(-Math.PI / 2);
+  const recoilRef = useRef(0);
+  const flashRef = useRef(0);
+  const bitsRef = useRef<Bit[]>([]);
+  const floatRef = useRef<Floater[]>([]);
+  const starsRef = useRef<{ x: number; y: number; r: number }[] | null>(null);
   const [score, setScore] = useState(0);
   const [round, setRound] = useState(0);
   const [over, setOver] = useState<"win" | "lose" | null>(null);
   const [banner, setBanner] = useState(false);
   const [isBest, setIsBest] = useState(false);
+  const [paused, setPaused] = useState(false);
+  const [muted, setMuted] = useState(true);
 
   const keepAmmo = () => {
     const colors = colorsLeft(ballsRef.current);
@@ -202,8 +251,10 @@ export default function MarbleChainGame() {
     writeBestIfHigher("marble-chain", scoreRef.current);
     setScore(scoreRef.current);
     setOver(result);
-    if (result === "win") sfx.win();
-    else sfx.no();
+    if (!mutedRef.current) {
+      if (result === "win") sfx.win();
+      else sfx.no();
+    }
   };
 
   const restart = () => {
@@ -220,12 +271,19 @@ export default function MarbleChainGame() {
       return;
     }
     beginRound(next, true);
-    sfx.flip();
+    if (!mutedRef.current) sfx.flip();
   };
 
   useEffect(() => {
-    pauseRef.current = !help.ready || help.helpOpen || Boolean(over) || banner;
-  }, [help.ready, help.helpOpen, over, banner]);
+    pauseRef.current = !help.ready || help.helpOpen || Boolean(over) || banner || paused;
+    pausedRef.current = paused;
+    mutedRef.current = muted;
+  }, [help.ready, help.helpOpen, over, banner, paused, muted]);
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-marble-play", "1");
+    return () => document.documentElement.removeAttribute("data-marble-play");
+  }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -249,7 +307,27 @@ export default function MarbleChainGame() {
         canvas.height = ph;
       }
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      ctx.clearRect(0, 0, w, h);
+      const sky = ctx.createLinearGradient(0, 0, 0, h);
+      sky.addColorStop(0, "#07061a");
+      sky.addColorStop(0.55, "#1a1460");
+      sky.addColorStop(1, "#5a2494");
+      ctx.fillStyle = sky;
+      ctx.fillRect(0, 0, w, h);
+      if (!starsRef.current || starsRef.current.length === 0) {
+        starsRef.current = Array.from({ length: lite ? 18 : 36 }, () => ({
+          x: Math.random() * w,
+          y: Math.random() * h,
+          r: Math.random() * 1.4 + 0.4,
+        }));
+      }
+      ctx.fillStyle = "rgba(255,255,255,0.75)";
+      for (const star of starsRef.current) {
+        ctx.globalAlpha = 0.35 + (Math.sin(now / 700 + star.x) + 1) * 0.2;
+        ctx.beginPath();
+        ctx.arc(star.x, star.y, star.r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
 
       let path = pathRef.current;
       if (!path || path.round !== roundRef.current || Math.abs(path.w - w) > 8 || Math.abs(path.h - h) > 8) {
@@ -276,18 +354,36 @@ export default function MarbleChainGame() {
       }
       const hole = pointAt(path, path.total);
       ctx.lineTo(hole.x, hole.y);
-      ctx.strokeStyle = "rgba(240, 169, 59, 0.45)";
-      ctx.lineWidth = 16;
       ctx.lineCap = "round";
       ctx.lineJoin = "round";
+      ctx.strokeStyle = "rgba(8, 6, 18, 0.9)";
+      ctx.lineWidth = 26;
       ctx.stroke();
+      ctx.strokeStyle = "rgba(240, 169, 59, 0.85)";
+      ctx.lineWidth = 18;
+      ctx.stroke();
+      ctx.strokeStyle = "#140c22";
+      ctx.lineWidth = 12;
+      ctx.stroke();
+      const close = ballsRef.current[0] ? path.total - ballsRef.current[0].s < 140 : false;
+      const swirl = now / 420;
+      ctx.save();
+      ctx.translate(hole.x, hole.y);
+      ctx.rotate(swirl);
       ctx.beginPath();
-      ctx.fillStyle = "#140b22";
-      ctx.arc(hole.x, hole.y, 16, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.strokeStyle = "#f0a93b";
+      ctx.strokeStyle = close ? "rgba(255,90,90,0.95)" : "rgba(255,214,120,0.95)";
       ctx.lineWidth = 3;
+      ctx.arc(0, 0, 16 + Math.sin(now / 280) * 2, 0.2, Math.PI * 1.5);
       ctx.stroke();
+      ctx.rotate(1.4);
+      ctx.beginPath();
+      ctx.arc(0, 0, 10, 0, Math.PI * 1.2);
+      ctx.stroke();
+      ctx.restore();
+      ctx.beginPath();
+      ctx.fillStyle = close ? "#4a1020" : "#120818";
+      ctx.arc(hole.x, hole.y, 8, 0, Math.PI * 2);
+      ctx.fill();
 
       const spec = ROUNDS[roundRef.current] ?? ROUNDS[0];
       if (!pauseRef.current && !overRef.current && !bannerRef.current) {
@@ -324,20 +420,52 @@ export default function MarbleChainGame() {
             balls.push({ color: shot.color, s: hit.s + (towardHole ? SPACING * 0.45 : -SPACING * 0.45) });
             pushApart(balls);
             shotRef.current = null;
-            sfx.flip();
+            recoilRef.current = 1;
+            if (!mutedRef.current) sfx.flip();
           } else if (shot.x < -30 || shot.y < -30 || shot.x > w + 30 || shot.y > h + 30) {
             shotRef.current = null;
           }
         }
+        const before = balls.slice();
         const removed = clearTouching(balls);
         if (removed) {
           const stamp = now;
           if (stamp > comboUntil.current) comboRef.current = 0;
           comboRef.current += 1;
           comboUntil.current = stamp + 800;
-          scoreRef.current += removed * 50 * comboRef.current;
+          const gained = removed * 50 * comboRef.current;
+          scoreRef.current += gained;
           setScore(scoreRef.current);
-          sfx.ok();
+          if (!mutedRef.current) {
+            if (comboRef.current > 1) sfx.win();
+            else sfx.ok();
+          }
+          const cap = lite ? 16 : 28;
+          flashRef.current = 0.55;
+          let floated = false;
+          for (const ball of before) {
+            if (balls.includes(ball) || ball.s < 0) continue;
+            const spot = pointAt(path, ball.s);
+            if (!floated) {
+              floatRef.current.push({ x: spot.x, y: spot.y - 8, text: `+${gained}`, life: 1 });
+              if (comboRef.current > 1) {
+                floatRef.current.push({ x: spot.x, y: spot.y - 30, text: `×${comboRef.current}`, life: 1.15 });
+              }
+              floated = true;
+            }
+            if (!lite) {
+              for (let n = 0; n < 4 && bitsRef.current.length < cap; n += 1) {
+                bitsRef.current.push({
+                  x: spot.x,
+                  y: spot.y,
+                  vx: (Math.random() - 0.5) * 80,
+                  vy: (Math.random() - 0.7) * 80,
+                  life: 1,
+                  color: COLORS[ball.color] ?? COLORS[0]!,
+                });
+              }
+            }
+          }
           keepAmmo();
         }
         if (!balls.length) {
@@ -345,60 +473,95 @@ export default function MarbleChainGame() {
           else {
             bannerRef.current = true;
             setBanner(true);
-            sfx.win();
+            if (!mutedRef.current) sfx.win();
           }
         } else if (balls[0] && balls[0].s >= path.total - 8) {
           finish("lose");
         }
       }
 
+      const ballR = Math.min(16, Math.max(13, w * 0.04));
       for (const ball of ballsRef.current) {
         if (ball.s < -4 || ball.s > path.total + 4) continue;
         const p = pointAt(path, ball.s);
-        ctx.beginPath();
-        ctx.fillStyle = COLORS[ball.color] ?? COLORS[0]!;
-        ctx.arc(p.x, p.y, 12, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.beginPath();
-        ctx.fillStyle = "rgba(255,255,255,0.45)";
-        ctx.arc(p.x - 3, p.y - 3, 3, 0, Math.PI * 2);
-        ctx.fill();
+        paintBall(ctx, p.x, p.y, ballR, ball.color, ball.s * 0.08, lite);
       }
 
       const flying = shotRef.current;
-      if (flying) {
+      if (flying) paintBall(ctx, flying.x, flying.y, ballR * 0.9, flying.color, now * 0.004, lite);
+
+      bitsRef.current = bitsRef.current.filter((bit) => bit.life > 0);
+      for (const bit of bitsRef.current) {
+        bit.x += bit.vx * dt;
+        bit.y += bit.vy * dt;
+        bit.life -= dt * 1.6;
+        ctx.globalAlpha = Math.max(0, bit.life);
+        ctx.fillStyle = bit.color;
         ctx.beginPath();
-        ctx.fillStyle = COLORS[flying.color] ?? COLORS[0]!;
-        ctx.arc(flying.x, flying.y, 11, 0, Math.PI * 2);
+        ctx.arc(bit.x, bit.y, 3, 0, Math.PI * 2);
         ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+      floatRef.current = floatRef.current.filter((item) => item.life > 0);
+      ctx.font = "700 16px sans-serif";
+      ctx.textAlign = "center";
+      for (const item of floatRef.current) {
+        item.y -= 18 * dt;
+        item.life -= dt * 0.8;
+        ctx.globalAlpha = Math.max(0, item.life);
+        ctx.fillStyle = "#ffe7a3";
+        ctx.fillText(item.text, item.x, item.y);
+      }
+      ctx.globalAlpha = 1;
+      if (flashRef.current > 0) {
+        ctx.fillStyle = `rgba(255, 236, 190, ${flashRef.current * 0.28})`;
+        ctx.fillRect(0, 0, w, h);
+        flashRef.current = Math.max(0, flashRef.current - dt * 1.8);
       }
 
       const sx = w / 2;
       const sy = h / 2;
       const aim = aimRef.current;
+      if (aim) aimAngle.current = Math.atan2(aim.y - sy, aim.x - sx);
+      let spin = aimAngle.current - shownAngle.current;
+      while (spin > Math.PI) spin -= Math.PI * 2;
+      while (spin < -Math.PI) spin += Math.PI * 2;
+      shownAngle.current += spin * Math.min(1, dt * 14);
+      const ang = shownAngle.current;
+      recoilRef.current = Math.max(0, recoilRef.current - dt * 4);
+      const kick = recoilRef.current * 10;
+      const lx = sx - Math.cos(ang) * kick;
+      const ly = sy - Math.sin(ang) * kick;
       if (aim) {
-        const dx = aim.x - sx;
-        const dy = aim.y - sy;
-        const len = Math.hypot(dx, dy) || 1;
         ctx.beginPath();
-        ctx.strokeStyle = "rgba(255, 231, 163, 0.45)";
+        ctx.strokeStyle = "rgba(255, 231, 163, 0.4)";
         ctx.lineWidth = 2;
-        ctx.moveTo(sx, sy);
-        ctx.lineTo(sx + (dx / len) * 120, sy + (dy / len) * 120);
+        ctx.moveTo(lx, ly);
+        ctx.lineTo(lx + Math.cos(ang) * 130, ly + Math.sin(ang) * 130);
         ctx.stroke();
       }
+      ctx.save();
+      ctx.translate(lx, ly);
+      ctx.rotate(ang);
+      ctx.beginPath();
+      ctx.fillStyle = "#8a5a16";
+      ctx.arc(0, 0, 30, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.strokeStyle = "#ffe7a3";
+      ctx.lineWidth = 3;
+      ctx.arc(0, 0, 28, 0, Math.PI * 2);
+      ctx.stroke();
       ctx.beginPath();
       ctx.fillStyle = "#f0a93b";
-      ctx.arc(sx, sy, 22, 0, Math.PI * 2);
+      ctx.moveTo(18, -7);
+      ctx.lineTo(36, 0);
+      ctx.lineTo(18, 7);
+      ctx.closePath();
       ctx.fill();
-      ctx.beginPath();
-      ctx.fillStyle = COLORS[readyRef.current] ?? COLORS[0]!;
-      ctx.arc(sx, sy, 13, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.beginPath();
-      ctx.fillStyle = COLORS[queuedRef.current] ?? COLORS[0]!;
-      ctx.arc(sx + 28, sy + 16, 8, 0, Math.PI * 2);
-      ctx.fill();
+      ctx.restore();
+      paintBall(ctx, lx, ly, 16, readyRef.current, 0, lite);
+      paintBall(ctx, lx + 34, ly + 20, 9, queuedRef.current, 0, lite);
 
       frame = window.requestAnimationFrame(draw);
     };
@@ -407,7 +570,7 @@ export default function MarbleChainGame() {
   }, [sfx]);
 
   const onPointerDown = (event: React.PointerEvent<HTMLCanvasElement>) => {
-    if (overRef.current || bannerRef.current) return;
+    if (overRef.current || bannerRef.current || pausedRef.current) return;
     const rect = event.currentTarget.getBoundingClientRect();
     aimRef.current = { x: event.clientX - rect.left, y: event.clientY - rect.top };
     event.currentTarget.setPointerCapture(event.pointerId);
@@ -422,7 +585,7 @@ export default function MarbleChainGame() {
   const onPointerUp = (event: React.PointerEvent<HTMLCanvasElement>) => {
     const aim = aimRef.current;
     aimRef.current = null;
-    if (!aim || overRef.current || bannerRef.current || shotRef.current) return;
+    if (!aim || overRef.current || bannerRef.current || pausedRef.current || shotRef.current) return;
     const rect = event.currentTarget.getBoundingClientRect();
     const sx = rect.width / 2;
     const sy = rect.height / 2;
@@ -448,35 +611,43 @@ export default function MarbleChainGame() {
     queuedRef.current = pickColor(ballsRef.current);
   };
 
-  const stats = (
-    <>
-      <PlayStat label={t("games.score")} value={formatPlayNumber(locale, score)} />
-      <PlayStat label={t("games.round")} value={formatPlayNumber(locale, round + 1)} />
-      <button type="button" className="um-play-btn" onClick={restart}>
-        {t("games.playAgain")}
+  const bar = (
+    <div className="um-marble-bar">
+      <Link href={APP_ROUTES.games} className="um-marble-icon" aria-label={t("games.backToCatalog")}>
+        ←
+      </Link>
+      <span className="um-marble-readout">
+        <small>{t("games.score")}</small>
+        {formatPlayNumber(locale, score)}
+      </span>
+      <span className="um-marble-readout">
+        <small>{t("games.round")}</small>
+        {formatPlayNumber(locale, round + 1)}
+      </span>
+      <button type="button" className="um-marble-icon" onClick={() => setPaused((value) => !value)} aria-label={t("games.paused")}>
+        {paused ? "▶" : "Ⅱ"}
       </button>
-    </>
+      <button type="button" className="um-marble-icon" onClick={help.toggleHelp} aria-label={t("games.howTo")}>
+        ?
+      </button>
+      <button
+        type="button"
+        className="um-marble-icon"
+        onClick={() => setMuted((value) => !value)}
+        aria-label={muted ? t("games.unmute") : t("games.mute")}
+      >
+        {muted ? "🔇" : "🔊"}
+      </button>
+    </div>
   );
 
-  if (over) {
-    return (
-      <PlayPanel stats={stats} fill>
-        <PlayResult
-          score={score}
-          verdictKey={over === "win" ? "games.youWin" : verdictFromScore("high", score)}
-          detail={isBest ? t("games.localBest", { values: { score: formatPlayNumber(locale, score) } }) : t("games.marble-chain.title")}
-          onAgain={restart}
-        />
-      </PlayPanel>
-    );
-  }
-
   return (
-    <PlayPanel stats={stats} helpOpen={help.helpOpen} onToggleHelp={help.toggleHelp} fill>
+    <div className="um-marble-shell">
+      {bar}
       <div className="um-marble-stage">
         <canvas
           ref={canvasRef}
-          className="um-marble-board um-lit-board"
+          className="um-marble-board"
           dir="ltr"
           onPointerDown={onPointerDown}
           onPointerMove={onPointerMove}
@@ -530,7 +701,17 @@ export default function MarbleChainGame() {
             </button>
           </div>
         ) : null}
+        {over ? (
+          <div className="um-marble-banner um-marble-over">
+            <PlayResult
+              score={score}
+              verdictKey={over === "win" ? "games.youWin" : verdictFromScore("high", score)}
+              detail={isBest ? t("games.localBest", { values: { score: formatPlayNumber(locale, score) } }) : t("games.marble-chain.title")}
+              onAgain={restart}
+            />
+          </div>
+        ) : null}
       </div>
-    </PlayPanel>
+    </div>
   );
 }

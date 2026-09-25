@@ -57,9 +57,9 @@ export default async function GamePlayPage({ params }: Props) {
         fit ? "um-game-fit" : "min-h-screen"
       } ${slug === "guess-city" || slug === "landmark" ? "um-game-fit-place" : ""} ${
         pairFit ? "um-game-fit-pair" : ""
-      } ${marbleFit ? "um-game-fit-marble" : ""} ${MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS}`}
+      } ${marbleFit ? "um-game-fit-marble" : ""} ${marbleFit ? "" : MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS}`}
     >
-      <AppTopNav
+      {marbleFit ? null : <AppTopNav
         title={t(game.titleKey)}
         sticky
         actions={
@@ -70,10 +70,12 @@ export default async function GamePlayPage({ params }: Props) {
             {t("games.backToCatalog")}
           </Link>
         }
-      />
+      />}
       <div
         className={
-          fit
+          marbleFit
+            ? "um-marble-page"
+            : fit
             ? "um-game-fit-body mx-auto w-full max-w-5xl min-w-0 px-3 sm:px-5"
             : "mx-auto max-w-5xl min-w-0 px-4 py-8 sm:px-5 md:px-8"
         }
