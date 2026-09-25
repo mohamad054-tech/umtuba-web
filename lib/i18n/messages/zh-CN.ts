@@ -6,6 +6,7 @@ import { teacherEnMessages } from "./teacherCatalogs";
 import { teacherZhCNPartial } from "./teacherLocaleCatalogs";
 import { uiParityZhCNMessages } from "./uiParityCatalogs";
 import { learningHubZhCNMessages } from "./learningHubCatalogs";
+import { homeChromeEnglishFallback } from "./homeChromeFallback";
 import type { FoundationMessages } from "./types";
 
 /** Professional native chrome. UMTUBA stays Latin. Authored content stays source-language. */
@@ -832,4 +833,5 @@ export const zhCNMessages: FoundationMessages = {
   "teacher.public.title": "讲师",
   ...teacherZhCNPartial,
   ...uiParityZhCNMessages,
+  ...homeChromeEnglishFallback,
 };

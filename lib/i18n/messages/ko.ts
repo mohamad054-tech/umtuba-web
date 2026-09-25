@@ -6,6 +6,7 @@ import { teacherEnMessages } from "./teacherCatalogs";
 import { teacherKoPartial } from "./teacherLocaleCatalogs";
 import { uiParityKoMessages } from "./uiParityCatalogs";
 import { learningHubKoMessages } from "./learningHubCatalogs";
+import { homeChromeEnglishFallback } from "./homeChromeFallback";
 import type { FoundationMessages } from "./types";
 
 /** Professional native chrome. UMTUBA stays Latin. Authored content stays source-language. */
@@ -837,4 +838,5 @@ export const koMessages: FoundationMessages = {
   "teacher.public.title": "강사",
   ...teacherKoPartial,
   ...uiParityKoMessages,
+  ...homeChromeEnglishFallback,
 };

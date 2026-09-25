@@ -1,74 +1,31 @@
 "use client";
 
 import type { ReactNode } from "react";
-import Link from "next/link";
 import AppTopNav from "../../components/AppTopNav";
 import { useTranslation } from "../../components/i18n";
-import { APP_ROUTES } from "../../lib/nav";
-import HomeSectionCircles from "./HomeSectionCircles";
 
 type DiscoverShellProps = {
   children: ReactNode;
 };
 
 /**
- * Video-First Home chrome. Still used by DiscoverExperience (Home feed).
- * `/discover` redirects here; title stays Home.
- *
- * Circular Arc mounts on the video stage edge (DiscoverExperience), not here —
- * so it stays aligned to the video card rather than a page-left rail.
+ * Video-first home. Section circles, stories, and the welcome/saved chips
+ * live on other surfaces so the video can fill the screen.
  */
 export default function DiscoverShell({ children }: DiscoverShellProps) {
   const { t } = useTranslation();
 
   return (
-    <main
-      className="relative flex h-dvh min-h-dvh flex-col overflow-hidden overflow-x-hidden bg-[#050510] text-white"
-    >
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute left-[-12%] top-[-8%] h-[28rem] w-[28rem] rounded-full bg-blue-600/25 blur-3xl" />
-        <div className="absolute right-[-10%] top-[12%] h-[26rem] w-[26rem] rounded-full bg-sky-500/12 blur-3xl" />
-        <div className="absolute bottom-[-15%] left-[28%] h-[22rem] w-[22rem] rounded-full bg-indigo-600/20 blur-3xl" />
-        <div className="absolute right-[18%] bottom-[8%] h-[18rem] w-[18rem] rounded-full bg-cyan-500/10 blur-3xl" />
+    <main className="um-home-sky relative flex h-dvh min-h-dvh flex-col overflow-hidden overflow-x-hidden text-white">
+      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
+        <div className="absolute left-[-12%] top-[-8%] h-[28rem] w-[28rem] rounded-full bg-blue-600/20 blur-3xl" />
+        <div className="absolute right-[-10%] top-[12%] h-[26rem] w-[26rem] rounded-full bg-sky-500/10 blur-3xl" />
+        <div className="absolute bottom-[-15%] left-[28%] h-[22rem] w-[22rem] rounded-full bg-indigo-600/15 blur-3xl" />
       </div>
-
       <div className="sticky top-0 z-40">
-        <AppTopNav
-          title={t("nav.home")}
-          sticky={false}
-          subtitle={t("home.subtitle")}
-          subtitleHelp={t("home.subtitleHelp")}
-          actions={
-            <div className="flex items-center gap-2">
-              <Link
-                href={APP_ROUTES.welcome}
-                className="watch-focus-ring hidden rounded-full border border-white/15 bg-white/5 px-3 py-1.5 text-xs font-bold text-white/80 transition hover:bg-white/10 sm:inline-flex"
-              >
-                {t("home.welcome")}
-              </Link>
-              <Link
-                href={APP_ROUTES.saved}
-                className="watch-focus-ring hidden rounded-full border border-white/15 bg-white/5 px-3 py-1.5 text-xs font-bold text-white/80 transition hover:bg-white/10 sm:inline-flex"
-              >
-                {t("home.saved")}
-              </Link>
-              <Link
-                href={APP_ROUTES.createVideo}
-                className="watch-focus-ring rounded-full border border-white/15 bg-white px-3 py-1.5 text-xs font-black text-black transition hover:bg-white/90"
-              >
-                {t("home.upload")}
-              </Link>
-            </div>
-          }
-        />
-        <div className="border-b border-white/5 bg-[#050510]/80 backdrop-blur-md">
-          <div className="mx-auto w-full max-w-[1400px]">
-            <HomeSectionCircles />
-          </div>
-        </div>
+        <AppTopNav title={t("nav.home")} sticky={false} />
       </div>
-
-      <div className="relative z-10 mx-auto flex min-h-0 w-full max-w-[1400px] flex-1 flex-col overflow-hidden px-0 lg:px-6 lg:py-5">
+      <div className="relative z-10 flex min-h-0 w-full flex-1 flex-col overflow-hidden">
         {children}
       </div>
     </main>

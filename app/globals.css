@@ -10,7 +10,7 @@
   /* Set while the analytics consent banner is visible */
   --analytics-consent-banner-offset: 0px;
   /* Phone: sit clearly above the bottom bar, not on the screen edge. */
-  --feed-chrome-bottom: calc(env(safe-area-inset-bottom, 0px) + 6.5rem);
+  --feed-chrome-bottom: calc(env(safe-area-inset-bottom, 0px) + 6.5rem + var(--analytics-consent-banner-offset, 0px));
   /* App top nav ink — readable on premium dark without redesign */
   --app-top-nav-ink: #f7f8fb;
   --app-top-nav-ink-inactive: #e8eaef;
@@ -33,14 +33,29 @@
 @media (min-width: 640px) {
   :root {
     --app-mobile-bottom-nav-offset: 0px;
-    --feed-chrome-bottom: calc(env(safe-area-inset-bottom, 0px) + 4.75rem);
+    --feed-chrome-bottom: calc(env(safe-area-inset-bottom, 0px) + 1.75rem + var(--analytics-consent-banner-offset, 0px));
   }
 }
 
 @media (min-width: 1024px) {
   :root {
-    --feed-chrome-bottom: 1.75rem;
+    --feed-chrome-bottom: calc(1.75rem + var(--analytics-consent-banner-offset, 0px));
   }
+}
+
+.um-home-sky {
+  --um-night-black: #060512;
+  --um-night-navy: #0c1842;
+  --um-night-blue: #2a45b8;
+  --um-night-purple: #5a2494;
+  background-color: var(--um-night-black);
+  background-image:
+    radial-gradient(130% 100% at 4% -12%, color-mix(in srgb, var(--um-night-purple) 88%, white 8%) 0%, transparent 58%),
+    radial-gradient(100% 85% at 108% -4%, color-mix(in srgb, var(--um-night-blue) 86%, white 6%) 0%, transparent 56%),
+    radial-gradient(90% 60% at 48% 112%, color-mix(in srgb, var(--um-night-purple) 62%, transparent) 0%, transparent 58%),
+    linear-gradient(168deg, var(--um-night-navy) 0%, color-mix(in srgb, var(--um-night-blue) 38%, var(--um-night-black)) 44%, var(--um-night-purple) 100%);
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 
 @theme inline {

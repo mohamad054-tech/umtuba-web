@@ -28,10 +28,11 @@ describe("Mobile World Affordance Decision V1", () => {
     ).toBe(true);
   });
 
-  it("keeps Mobile primary as Home Live Messages Profile without World", () => {
+  it("keeps Mobile primary as Home, Sections, Upload, Messages, and Me without World", () => {
     expect(MOBILE_PRIMARY_NAV_IDS).toEqual([
       "home",
-      "live",
+      "sections",
+      "create",
       "messages",
       "profile",
     ]);
@@ -40,9 +41,10 @@ describe("Mobile World Affordance Decision V1", () => {
     ]);
     expect(MOBILE_PRIMARY_NAV_ITEMS.map((item) => item.label)).toEqual([
       "Home",
-      "Live",
+      "Sections",
+      "Upload",
       "Messages",
-      "Profile",
+      "Me",
     ]);
     expect(MOBILE_PRIMARY_NAV_ITEMS.some((item) => item.label === "World")).toBe(
       false

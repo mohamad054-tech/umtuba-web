@@ -527,6 +527,9 @@ export function mapVideoPostToDiscover(post: PublicPostDTO): DiscoverVideo | nul
     articleId,
     articleTitle,
     articleHref: articleId ? `/articles/${articleId}` : null,
+    // posts / PublicPostDTO have no city, place_id, course_id, or product_id.
+    // location below is a hardcoded placeholder and must not drive the link chip.
+    link: null,
     overlays: post.overlays ?? [],
     stats: {
       likes: post.likes,

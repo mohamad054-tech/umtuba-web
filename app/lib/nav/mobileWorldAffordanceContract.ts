@@ -27,12 +27,13 @@ import {
 export const MOBILE_WORLD_DESKTOP_LABEL = "World" as const;
 export const MOBILE_WORLD_DESKTOP_HREF = APP_ROUTES.worldDiscovery;
 
-/** Mobile primary stays four items — World intentionally absent. */
+/** Mobile primary — World stays off the bottom bar (sections and the side menu carry it). */
 export const MOBILE_PRIMARY_WITHOUT_WORLD_LABELS = [
   "Home",
-  "Live",
+  "Sections",
+  "Upload",
   "Messages",
-  "Profile",
+  "Me",
 ] as const;
 
 /** Paths that must not be mobile primary tabs under this decision. */

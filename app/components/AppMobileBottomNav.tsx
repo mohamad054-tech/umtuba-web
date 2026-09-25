@@ -39,11 +39,19 @@ function NavIcon({ id, active }: { id: MobilePrimaryNavId; active: boolean }) {
           <path d="M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-5v-6H10v6H5a1 1 0 0 1-1-1v-9.5Z" />
         </svg>
       );
-    case "live":
+    case "sections":
       return (
         <svg {...common}>
-          <rect x="3" y="6" width="14" height="12" rx="2" />
-          <path d="m17 10 4-2v8l-4-2v-4Z" />
+          <rect x="3" y="3" width="7" height="7" rx="1.5" />
+          <rect x="14" y="3" width="7" height="7" rx="1.5" />
+          <rect x="3" y="14" width="7" height="7" rx="1.5" />
+          <rect x="14" y="14" width="7" height="7" rx="1.5" />
+        </svg>
+      );
+    case "create":
+      return (
+        <svg {...common} strokeWidth={2.4}>
+          <path d="M12 5v14M5 12h14" />
         </svg>
       );
     case "messages":
@@ -139,7 +147,7 @@ export default function AppMobileBottomNav() {
     <nav
       aria-label={t("nav.primaryMobile")}
       style={{ bottom: "var(--analytics-consent-banner-offset, 0px)" }}
-      className={`fixed inset-x-0 z-[70] border-t border-white/10 bg-[#050510]/95 backdrop-blur-xl ${MOBILE_BOTTOM_NAV_MAX_CLASS}`}
+      className={`fixed inset-x-0 z-[70] border-t border-[#f0a93b]/20 bg-[#050510]/95 backdrop-blur-xl ${MOBILE_BOTTOM_NAV_MAX_CLASS}`}
     >
       <ul className="mx-auto flex max-w-lg items-stretch justify-between gap-0.5 px-1 pt-1 pb-[max(0.35rem,env(safe-area-inset-bottom))]">
         {MOBILE_PRIMARY_NAV_ITEMS.map((item) => {
@@ -149,6 +157,7 @@ export default function AppMobileBottomNav() {
               : item.href;
           const active = isMobilePrimaryNavActive(pathname, item.id);
           const label = t(mobileNavLabelKey(item.id));
+          const create = item.id === "create";
 
           return (
             <li key={item.id} className="min-w-0 flex-1">
@@ -157,19 +166,23 @@ export default function AppMobileBottomNav() {
                 aria-current={active ? "page" : undefined}
                 aria-label={label}
                 className={`watch-focus-ring flex min-h-12 flex-col items-center justify-center gap-0.5 rounded-xl px-1 py-1 text-[10px] font-bold transition ${
-                  active
-                    ? "text-blue-100"
-                    : "text-white/45 hover:text-white/80"
+                  create
+                    ? "text-[#f0a93b]"
+                    : active
+                      ? "text-[#f0a93b]"
+                      : "text-white/55 hover:text-white/80"
                 }`}
               >
                 <span
-                  className={`flex h-7 w-7 items-center justify-center rounded-full ${
-                    active ? "bg-blue-500/20 text-blue-100" : "text-white/55"
+                  className={`flex items-center justify-center rounded-full ${
+                    create
+                      ? "h-10 w-10 bg-[#f0a93b] text-[#0c1842]"
+                      : `h-7 w-7 ${active ? "text-[#f0a93b]" : "text-white/60"}`
                   }`}
                 >
                   <NavIcon id={item.id} active={active} />
                 </span>
-                <span className="truncate">{label}</span>
+                {create ? null : <span className="truncate">{label}</span>}
               </Link>
             </li>
           );

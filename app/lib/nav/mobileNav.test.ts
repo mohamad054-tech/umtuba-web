@@ -12,32 +12,33 @@ import {
 import { APP_NAV_ITEMS, APP_ROUTES } from "./routes";
 
 describe("MOBILE_PRIMARY_NAV_ITEMS", () => {
-  it("renders the four primary destinations in order", () => {
+  it("renders the five primary destinations in order", () => {
     expect(MOBILE_PRIMARY_NAV_ITEMS.map((item) => item.id)).toEqual([
       "home",
-      "live",
+      "sections",
+      "create",
       "messages",
       "profile",
     ]);
     expect(MOBILE_PRIMARY_NAV_ITEMS.map((item) => item.label)).toEqual([
       "Home",
-      "Live",
+      "Sections",
+      "Upload",
       "Messages",
-      "Profile",
+      "Me",
     ]);
     expect(MOBILE_PRIMARY_NAV_ITEMS[0]?.href).toBe(APP_ROUTES.home);
-    expect(MOBILE_PRIMARY_NAV_ITEMS[1]?.href).toBe(APP_ROUTES.live);
-    expect(MOBILE_PRIMARY_NAV_ITEMS[2]?.href).toBe(APP_ROUTES.messages);
-    expect(MOBILE_PRIMARY_NAV_ITEMS[3]?.href).toBe(APP_ROUTES.profile);
+    expect(MOBILE_PRIMARY_NAV_ITEMS[1]?.href).toBe(APP_ROUTES.sections);
+    expect(MOBILE_PRIMARY_NAV_ITEMS[2]?.href).toBe(APP_ROUTES.createVideo);
+    expect(MOBILE_PRIMARY_NAV_ITEMS[3]?.href).toBe(APP_ROUTES.messages);
+    expect(MOBILE_PRIMARY_NAV_ITEMS[4]?.href).toBe(APP_ROUTES.profile);
   });
 });
 
 describe("isMobilePrimaryNavActive", () => {
-  it("handles nested live and profile routes", () => {
-    expect(isMobilePrimaryNavActive("/live", "live")).toBe(true);
-    expect(
-      isMobilePrimaryNavActive("/live/db60a16b-ae73-4923-a00f-da075a41821a", "live")
-    ).toBe(true);
+  it("handles nested profile routes and the new sections tab", () => {
+    expect(isMobilePrimaryNavActive("/sections", "sections")).toBe(true);
+    expect(isMobilePrimaryNavActive("/create/video", "create")).toBe(true);
     expect(isMobilePrimaryNavActive("/profile/creator_one", "profile")).toBe(
       true
     );

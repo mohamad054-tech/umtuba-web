@@ -56,7 +56,7 @@ describe("Platform Navigation Contract Sync V1", () => {
   });
 
   describe("mobile primary navigation", () => {
-    it("freezes Home Live Messages Profile without Discover", () => {
+    it("freezes Home Sections Upload Messages Me without Discover", () => {
       expect(MOBILE_PRIMARY_NAV_ITEMS.map((item) => item.id)).toEqual([
         ...MOBILE_PRIMARY_NAV_IDS,
       ]);

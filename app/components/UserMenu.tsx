@@ -20,6 +20,7 @@ import {
   userMenuGroupLabelKey,
   userMenuItemLabelKey,
 } from "../../lib/i18n";
+import ActivityTierIndicator from "./activity-tiers/ActivityTierIndicator";
 import { useTranslation } from "./i18n";
 
 /**
@@ -276,13 +277,16 @@ export default function UserMenu() {
           id={`${menuId}-menu`}
           role="menu"
           aria-labelledby={`${menuId}-trigger`}
-          className="absolute right-0 top-[calc(100%+0.5rem)] z-[80] w-56 overflow-hidden rounded-2xl border border-white/10 bg-[#0a0a18] shadow-[0_16px_48px_rgba(0,0,0,0.55)]"
+          className="absolute end-0 top-[calc(100%+0.5rem)] z-[80] w-56 overflow-hidden rounded-2xl border border-white/10 bg-[#0a0a18] shadow-[0_16px_48px_rgba(0,0,0,0.55)]"
         >
           <div className="border-b border-white/10 px-3.5 py-3">
             <p className="truncate text-sm font-black text-white">
               {profile.display_name || profile.username}
             </p>
             <p className="truncate text-xs text-white/45">@{profile.username}</p>
+            <div className="mt-2">
+              <ActivityTierIndicator compact />
+            </div>
           </div>
 
           {menuGroups.map((group) => {

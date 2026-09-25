@@ -67,7 +67,7 @@ describe("Home Readiness Guardrails V1", () => {
     expect(loader).toMatch(/getDiscoverVideosServer/);
 
     const shell = read("app/discover/components/DiscoverShell.tsx");
-    expect(shell).toMatch(/HomeSectionCircles/);
+    expect(shell).not.toMatch(/HomeSectionCircles/);
     expect(shell).toMatch(/title=\{t\("nav\.home"\)\}/);
 
     const experience = read("app/discover/DiscoverExperience.tsx");

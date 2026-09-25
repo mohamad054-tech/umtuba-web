@@ -6,10 +6,12 @@ import { teacherEnMessages } from "./teacherCatalogs";
 import { teacherHiPartial } from "./teacherLocaleCatalogs";
 import { uiParityHiMessages } from "./uiParityCatalogs";
 import { learningHubHiMessages } from "./learningHubCatalogs";
+import { homeChromeEnglishFallback } from "./homeChromeFallback";
 import type { FoundationMessages } from "./types";
 
 /** Professional native chrome. UMTUBA stays Latin. Authored content stays source-language. */
 export const hiMessages: FoundationMessages = {
+  ...homeChromeEnglishFallback,
   ...storeHiMessages,
   ...teacherEnMessages,
   ...legalEnMessages,
@@ -838,4 +840,5 @@ export const hiMessages: FoundationMessages = {
   "teacher.public.title": "शिक्षक",
   ...teacherHiPartial,
   ...uiParityHiMessages,
+  ...homeChromeEnglishFallback,
 };

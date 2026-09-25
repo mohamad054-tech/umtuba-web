@@ -12,10 +12,12 @@ const DESKTOP_NAV_KEYS: Record<string, TranslationKey> = {
 
 const MOBILE_NAV_KEYS: Record<string, TranslationKey> = {
   home: "nav.home",
+  sections: "nav.sections",
+  create: "home.upload",
   discover: "nav.discover",
   live: "nav.live",
   messages: "nav.messages",
-  profile: "nav.profile",
+  profile: "nav.me",
 };
 
 const USER_MENU_ITEM_KEYS: Record<string, TranslationKey> = {
