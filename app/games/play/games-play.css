@@ -2932,3 +2932,256 @@ html[data-marble-play] footer {
     padding: 4px 8px;
   }
 }
+
+.um-game-fit-shop {
+  background:
+    radial-gradient(circle at 18% 0%, rgba(88, 120, 255, 0.28), transparent 32%),
+    radial-gradient(circle at 80% 8%, rgba(240, 169, 59, 0.22), transparent 26%),
+    #070b18;
+}
+
+.um-game-fit-shop .um-play-panel {
+  background:
+    radial-gradient(circle at 50% 0%, rgba(240, 169, 59, 0.14), transparent 42%),
+    linear-gradient(180deg, #141c3d, #070b18);
+  border-color: rgba(240, 169, 59, 0.38);
+}
+
+@media (max-width: 639px) {
+  .um-game-fit-shop .um-game-fit-body > h2,
+  .um-game-fit-shop .um-game-fit-body > [data-games-subtitle] {
+    display: none;
+  }
+}
+
+.um-game-fit-shop .um-play-panel.fit .um-play-bar {
+  padding: 2px 8px;
+}
+
+.um-game-fit-shop .um-play-panel.fit .um-play-body {
+  gap: 6px;
+}
+
+.um-shop-board,
+.um-shop-offer,
+.um-shop-pair,
+.um-shop-sort,
+.um-shop-shelf {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+}
+
+.um-shop-board,
+.um-shop-offer {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+  overflow: hidden;
+}
+
+.um-shop-hero {
+  flex: 1 1 auto;
+  width: 100%;
+  min-height: 0;
+  max-height: 46dvh;
+  display: grid;
+  place-items: center;
+  padding: 8px;
+  border: 3px solid #f0a93b;
+  border-radius: 12px;
+  background:
+    radial-gradient(circle at 50% 30%, rgba(240, 169, 59, 0.16), transparent 46%),
+    #0b1224;
+  box-shadow: 0 0 18px rgba(240, 169, 59, 0.35);
+  touch-action: manipulation;
+}
+
+.um-game-fit-shop .um-place-quiz .um-shop-hero {
+  max-height: 32dvh;
+}
+
+.um-shop-hero .um-product-mark {
+  width: min(100%, 100%);
+  height: 100%;
+  max-height: 100%;
+}
+
+.um-shop-name {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  line-height: 1.15;
+  font-weight: 800;
+}
+
+.um-shop-name .en {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: rgba(247, 244, 234, 0.72);
+}
+
+.um-shop-tag {
+  align-self: center;
+  border: 2px solid #f0a93b;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #ffe7a3, #f0a93b);
+  color: #1a1204;
+  font-weight: 900;
+  padding: 3px 12px;
+  box-shadow: 0 4px 0 #6a4a12;
+}
+
+.um-shop-tag.old {
+  background: transparent;
+  color: rgba(247, 244, 234, 0.7);
+  box-shadow: none;
+}
+
+.um-shop-tags {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin: 0;
+}
+
+.um-shop-board.ok .um-shop-tag {
+  animation: um-globe-ok 460ms ease;
+  border-color: #7ef6c2;
+  background: #7ef6c2;
+}
+
+.um-shop-board.no .um-shop-tag {
+  animation: um-globe-no 420ms ease;
+  border-color: #e85d4c;
+  background: #e85d4c;
+  color: #fff;
+}
+
+.um-game-fit-shop .um-play-slider {
+  width: 100%;
+  height: 44px;
+  margin: 0;
+  accent-color: #f0a93b;
+  touch-action: pan-x;
+}
+
+.um-shop-pair {
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+  gap: 8px;
+}
+
+.um-shop-shelf {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-rows: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.um-shop-sort {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.um-shop-card,
+.um-shop-row {
+  min-width: 0;
+  min-height: 0;
+  border: 2px solid rgba(240, 169, 59, 0.78);
+  border-radius: 14px;
+  background:
+    linear-gradient(165deg, rgba(255, 231, 163, 0.14), transparent 42%),
+    linear-gradient(180deg, #1b274c, #0c1228);
+  box-shadow: 0 4px 0 #6a4a12;
+  color: inherit;
+  touch-action: manipulation;
+}
+
+.um-shop-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 4px;
+}
+
+.um-shop-card .um-product-mark,
+.um-shop-row .um-product-mark {
+  width: min(100%, 72px);
+  height: auto;
+}
+
+.um-shop-pair .um-product-mark {
+  width: min(34vw, 140px);
+  height: auto;
+  flex: 1;
+  min-height: 0;
+}
+
+.um-shop-card .um-shop-name,
+.um-shop-row .um-shop-name {
+  font-size: 0.68rem;
+  align-items: center;
+}
+
+.um-shop-card .um-shop-name span,
+.um-shop-row .um-shop-name span {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.um-shop-card .um-shop-tag {
+  font-size: 0.72rem;
+  padding: 1px 8px;
+}
+
+.um-shop-card.sel,
+.um-shop-row.sel {
+  border-color: #7ef6c2;
+  box-shadow: 0 0 14px rgba(126, 246, 194, 0.65);
+}
+
+.um-shop-row {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+  padding: 4px 8px;
+  text-align: start;
+}
+
+.um-shop-row .um-shop-name {
+  align-items: flex-start;
+  text-align: start;
+}
+
+.um-game-fit-shop .um-play-choice {
+  min-height: 42px;
+  border: 2px solid rgba(240, 169, 59, 0.78);
+  border-radius: 16px;
+  background:
+    linear-gradient(165deg, rgba(255, 231, 163, 0.16), transparent 42%),
+    linear-gradient(180deg, #1b274c, #0c1228);
+  box-shadow: 0 4px 0 #6a4a12;
+}
+
+.um-shop-zoom-art {
+  width: min(86vw, 420px);
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+}
+
+.um-shop-zoom-art .um-product-mark {
+  width: 100%;
+  height: 100%;
+}

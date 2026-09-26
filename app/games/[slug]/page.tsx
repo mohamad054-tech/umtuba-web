@@ -52,7 +52,9 @@ export default async function GamePlayPage({ params }: Props) {
   const arcadeFit =
     slug === "snake" || slug === "shapes" || slug === "hangword" || slug === "typerace" || slug === "solitaire";
   const globeFit = slug === "guess-city" || slug === "flag-guess";
-  const fit = arcadeFit || globeFit || slug === "landmark" || pairFit || marbleFit;
+  const shopFit =
+    slug === "price" || slug === "basket" || slug === "cheaper" || slug === "sort-price" || slug === "guess-discount";
+  const fit = arcadeFit || globeFit || shopFit || slug === "landmark" || pairFit || marbleFit;
 
   return (
     <main
@@ -62,7 +64,7 @@ export default async function GamePlayPage({ params }: Props) {
         globeFit ? "um-game-fit-globe" : ""
       } ${
         pairFit ? "um-game-fit-pair" : ""
-      } ${arcadeFit ? "um-game-fit-arcade" : ""} ${marbleFit ? "um-game-fit-marble" : ""} ${marbleFit ? "" : MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS}`}
+      } ${arcadeFit ? "um-game-fit-arcade" : ""} ${shopFit ? "um-game-fit-shop" : ""} ${marbleFit ? "um-game-fit-marble" : ""} ${marbleFit ? "" : MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS}`}
     >
       {marbleFit ? null : <AppTopNav
         title={t(game.titleKey)}

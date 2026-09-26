@@ -37,7 +37,7 @@ import { readBest, writeBestIfHigher } from "../../../lib/games/play/scores";
 import { useBoardScrollLock } from "./boardPointer";
 import type { PlayableGameSlug } from "../../../lib/games/play/catalog";
 import { ColorCard } from "./ColorCards";
-import ProductMark from "./ProductMark";
+import ProductMark, { ShopPicture } from "./ProductMark";
 import { CountryFlag } from "./PlaceCard";
 import LightWorldMap from "./LightWorldMap";
 import {
@@ -78,7 +78,11 @@ function Shell({
         slug === "farther-pair" ||
         slug === "shapes" ||
         slug === "hangword" ||
-        slug === "typerace"
+        slug === "typerace" ||
+        slug === "price" ||
+        slug === "basket" ||
+        slug === "cheaper" ||
+        slug === "sort-price"
       }
     >
       <PlayHowTo
@@ -257,7 +261,7 @@ export function CheaperGame() {
 
   if (done) {
     return (
-      <PlayPanel stats={<PlayStat label={t("games.score")} value={formatPlayNumber(locale, score)} />}>
+      <PlayPanel fill stats={<PlayStat label={t("games.score")} value={formatPlayNumber(locale, score)} />}>
         <PlayResult score={score} verdictKey={verdictFromScore("high", score)} detail={t("games.cheaper.title")} onAgain={() => { setDone(false); setScore(0); setRound(0); deal(); help.keepReadyOnReplay(); }} />
       </PlayPanel>
     );
@@ -266,10 +270,14 @@ export function CheaperGame() {
   return (
     <Shell slug="cheaper" howTo={["games.cheaper.howTo1", "games.cheaper.howTo2", "games.cheaper.howTo3"]} stats={<PlayStat label={t("games.score")} value={formatPlayNumber(locale, score)} />} ready={help.ready} helpOpen={help.helpOpen} onToggleHelp={help.toggleHelp} begin={begin}>
       {pair ? (
-        <div className="um-play-pairgrid" dir="ltr">
+        <div className="um-shop-pair" dir="ltr">
           {pair.map((item, index) => (
-            <button key={item.id} type="button" className="um-play-pair" data-play-item="true" onClick={() => pick(index as 0 | 1)}>
-              {item.name}
+            <button key={item.id} type="button" className="um-shop-card" data-play-item="true" onClick={() => pick(index as 0 | 1)}>
+              <ProductMark kind={item.kind} />
+              <span className="um-shop-name">
+                <span>{item.name}</span>
+                <span className="en">{item.nameEn}</span>
+              </span>
             </button>
           ))}
         </div>
@@ -369,7 +377,7 @@ export function SortPriceGame() {
 
   if (done) {
     return (
-      <PlayPanel stats={<PlayStat label={t("games.score")} value={formatPlayNumber(locale, score)} />}>
+      <PlayPanel fill stats={<PlayStat label={t("games.score")} value={formatPlayNumber(locale, score)} />}>
         <PlayResult score={score} verdictKey={verdictFromScore("high", score)} detail={t("games.sort-price.title")} onAgain={() => { setDone(false); setRound(0); setScore(0); deal(); help.keepReadyOnReplay(); }} />
       </PlayPanel>
     );
@@ -377,10 +385,15 @@ export function SortPriceGame() {
 
   return (
     <Shell slug="sort-price" howTo={["games.sort-price.howTo1", "games.sort-price.howTo2", "games.sort-price.howTo3"]} stats={<PlayStat label={t("games.score")} value={formatPlayNumber(locale, score)} />} ready={help.ready} helpOpen={help.helpOpen} onToggleHelp={help.toggleHelp} begin={begin}>
-      <div className="um-play-sort">
+      <div className="um-shop-sort">
         {items.map((item, idx) => (
-          <button key={item.id} type="button" className={`um-play-step${sel === idx ? " sel" : ""}`} data-play-item="true" onClick={() => tap(idx)}>
-            {item.name} · {item.price}
+          <button key={item.id} type="button" className={`um-shop-row${sel === idx ? " sel" : ""}`} data-play-item="true" onClick={() => tap(idx)}>
+            <ProductMark kind={item.kind} />
+            <span className="um-shop-name">
+              <span>{item.name}</span>
+              <span className="en">{item.nameEn}</span>
+            </span>
+            <span className="um-shop-tag" dir="ltr">{formatPlayNumber(locale, item.price)}</span>
           </button>
         ))}
       </div>
@@ -512,7 +525,7 @@ export function PriceGame() {
 
   if (done) {
     return (
-      <PlayPanel stats={<PlayStat label={t("games.score")} value={formatPlayNumber(locale, score)} />}>
+      <PlayPanel fill stats={<PlayStat label={t("games.score")} value={formatPlayNumber(locale, score)} />}>
         <PlayResult score={score} verdictKey={verdictFromScore("high", score)} detail={t("games.price.title")} onAgain={() => { const next = shuffled(PRICE_CATALOG).slice(0, 5); setDeck(next); setI(0); setScore(0); setLocked(false); setDone(false); const first = next[0]; setGuess(first ? Math.round((Math.max(20, Math.round((first.p * 0.2) / 10) * 10) + Math.round((first.p * 2.2) / 10) * 10) / 2) : 200); help.keepReadyOnReplay(); }} />
       </PlayPanel>
     );
@@ -521,13 +534,15 @@ export function PriceGame() {
   return (
     <Shell slug="price" howTo={["games.price.howTo1", "games.price.howTo2", "games.price.howTo3"]} stats={<PlayStat label={t("games.score")} value={formatPlayNumber(locale, score)} />} ready={help.ready} helpOpen={help.helpOpen} onToggleHelp={help.toggleHelp} begin={begin}>
       {item ? (
-        <div className="um-play-quiz" dir="ltr">
-          <p className="um-play-note">{t("games.madeUpPrices")}</p>
-          <ProductMark kind={item.k} />
-          <p className="um-play-qtext">{item.n}</p>
-          <p className="um-play-priceline" dir="ltr">
+        <div className={`um-shop-board${locked ? (Math.abs(guess - item.p) / item.p <= 0.15 ? " ok" : " no") : ""}`} dir="ltr">
+          <ShopPicture kind={item.k} hero />
+          <p className="um-shop-name">
+            <span>{item.n}</span>
+            <span className="en">{item.e}</span>
+          </p>
+          <p className="um-shop-tag" dir="ltr">
             {formatPlayNumber(locale, guess)}
-            {locked ? ` / ${formatPlayNumber(locale, item.p)}` : ""}
+            {locked ? <span className="real"> / {formatPlayNumber(locale, item.p)}</span> : null}
           </p>
           <input className="um-play-slider" type="range" min={min} max={max} step={5} value={guess} data-play-item="true" disabled={locked} onChange={(e) => setGuess(Number(e.target.value))} />
           <div className="um-play-row">
@@ -708,7 +723,7 @@ export function BasketGame() {
 
   if (done) {
     return (
-      <PlayPanel stats={<PlayStat label={t("games.score")} value={formatPlayNumber(locale, score)} />}>
+      <PlayPanel fill stats={<PlayStat label={t("games.score")} value={formatPlayNumber(locale, score)} />}>
         <PlayResult score={score} verdictKey={verdictFromScore("high", score)} detail={t("games.basket.title")} onAgain={() => { setDone(false); setPicked([]); setScore(0); help.keepReadyOnReplay(); }} />
       </PlayPanel>
     );
@@ -716,15 +731,15 @@ export function BasketGame() {
 
   return (
     <Shell slug="basket" howTo={["games.basket.howTo1", "games.basket.howTo2", "games.basket.howTo3"]} stats={<PlayStat label={t("games.score")} value={`${formatPlayNumber(locale, sum)} / ${formatPlayNumber(locale, cap)}`} />} ready={help.ready} helpOpen={help.helpOpen} onToggleHelp={help.toggleHelp} begin={begin}>
-      <p className="um-play-note">{t("games.madeUpPrices")}</p>
-      <div className="um-play-shelf">
+      <div className="um-shop-shelf">
         {BASKET_ITEMS.map((item, idx) => (
-          <button key={`${item.n}-${idx}`} type="button" className={`um-product-card${picked.includes(idx) ? " sel" : ""}`} data-play-item="true" onClick={() => toggle(idx)}>
+          <button key={`${item.n}-${idx}`} type="button" className={`um-shop-card${picked.includes(idx) ? " sel" : ""}`} data-play-item="true" onClick={() => toggle(idx)}>
             <ProductMark kind={item.k} />
-            <span className="um-product-copy">
-              <span className="um-place-name">{item.n}</span>
-              <span className="um-place-country" dir="ltr">{formatPlayNumber(locale, item.p)}</span>
+            <span className="um-shop-name">
+              <span>{item.n}</span>
+              <span className="en">{item.e}</span>
             </span>
+            <span className="um-shop-tag" dir="ltr">{formatPlayNumber(locale, item.p)}</span>
           </button>
         ))}
       </div>
