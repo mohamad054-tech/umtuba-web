@@ -14,12 +14,11 @@ import { APP_ROUTES } from "../../lib/nav";
 import { PlayResult, usePlayHelp } from "./PlayChrome";
 
 const COLORS = ["#f0a93b", "#3ee0b0", "#5aa6ff", "#ff6d6d"];
-const MARKS = ["●", "▲", "■", "+"];
 const SPACING = 26;
 const ROUNDS = [
-  { balls: 16, speed: 26, turns: 1.15, angle: -0.9 },
-  { balls: 22, speed: 32, turns: 1.6, angle: 0.7 },
-  { balls: 28, speed: 40, turns: 2.05, angle: 2.1 },
+  { balls: 12, speed: 16, turns: 1.05, angle: -0.9 },
+  { balls: 18, speed: 24, turns: 1.45, angle: 0.7 },
+  { balls: 24, speed: 32, turns: 1.85, angle: 2.1 },
 ] as const;
 
 type Ball = { color: number; s: number };
@@ -41,9 +40,9 @@ function pickColor(balls: Ball[]) {
 
 function makeChain(count: number, lead: number): Ball[] {
   const balls: Ball[] = [];
-  const colors = [0, 0, 1, 1, 0, 0];
+  const colors = [0, 0, 0, 1, 1, 1, 2, 2];
   for (let i = 0; i < count; i += 1) {
-    const color = i < colors.length ? colors[i]! : Math.floor(i / 2) % COLORS.length;
+    const color = i < colors.length ? colors[i]! : Math.floor(i / 3) % COLORS.length;
     balls.push({ color, s: lead - i * SPACING });
   }
   return balls;
@@ -150,6 +149,62 @@ function deviceIsSlow() {
 type Bit = { x: number; y: number; vx: number; vy: number; life: number; color: string };
 type Floater = { x: number; y: number; text: string; life: number };
 
+function launcherHub(w: number, h: number) {
+  return Math.min(48, Math.max(34, Math.min(w, h) * 0.1));
+}
+
+function traceTrack(ctx: CanvasRenderingContext2D, path: Path) {
+  ctx.beginPath();
+  for (let i = 0; i < path.points.length; i += 2) {
+    const p = path.points[i]!;
+    if (i === 0) ctx.moveTo(p.x, p.y);
+    else ctx.lineTo(p.x, p.y);
+  }
+}
+
+function paintMark(ctx: CanvasRenderingContext2D, color: number, radius: number) {
+  const s = radius * 0.46;
+  ctx.fillStyle = "rgba(18, 10, 16, 0.88)";
+  ctx.strokeStyle = "rgba(18, 10, 16, 0.88)";
+  ctx.lineWidth = Math.max(1.4, radius * 0.1);
+  ctx.lineCap = "round";
+  if (color === 0) {
+    ctx.beginPath();
+    ctx.arc(0, 0, s * 0.38, 0, Math.PI * 2);
+    ctx.fill();
+    for (let i = 0; i < 8; i += 1) {
+      const a = (i / 8) * Math.PI * 2;
+      ctx.beginPath();
+      ctx.moveTo(Math.cos(a) * s * 0.55, Math.sin(a) * s * 0.55);
+      ctx.lineTo(Math.cos(a) * s, Math.sin(a) * s);
+      ctx.stroke();
+    }
+    return;
+  }
+  ctx.beginPath();
+  if (color === 1) {
+    ctx.moveTo(0, -s);
+    ctx.lineTo(s * 0.9, s * 0.62);
+    ctx.lineTo(-s * 0.9, s * 0.62);
+  } else if (color === 2) {
+    ctx.moveTo(0, -s);
+    ctx.lineTo(s * 0.72, 0);
+    ctx.lineTo(0, s);
+    ctx.lineTo(-s * 0.72, 0);
+  } else {
+    for (let i = 0; i < 8; i += 1) {
+      const a = (i / 8) * Math.PI * 2 - Math.PI / 2;
+      const r = i % 2 === 0 ? s : s * 0.38;
+      const x = Math.cos(a) * r;
+      const y = Math.sin(a) * r;
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+  }
+  ctx.closePath();
+  ctx.fill();
+}
+
 function paintBall(ctx: CanvasRenderingContext2D, x: number, y: number, radius: number, color: number, spin: number, lite: boolean) {
   ctx.beginPath();
   ctx.fillStyle = "rgba(0,0,0,0.28)";
@@ -174,11 +229,7 @@ function paintBall(ctx: CanvasRenderingContext2D, x: number, y: number, radius: 
   ctx.save();
   ctx.translate(x, y);
   ctx.rotate(spin);
-  ctx.fillStyle = "rgba(12,8,20,0.8)";
-  ctx.font = `${Math.max(9, radius)}px sans-serif`;
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-  ctx.fillText(MARKS[color] ?? "●", 0, 1);
+  paintMark(ctx, color, radius);
   ctx.restore();
 }
 
@@ -340,50 +391,60 @@ export default function MarbleChainGame() {
         pathRef.current = path;
       }
       if (layoutRef.current) {
-        ballsRef.current = makeChain(ROUNDS[roundRef.current]!.balls, Math.min(path.total * 0.42, path.total - 40));
+        const start = roundRef.current === 0 ? 0.2 : roundRef.current === 1 ? 0.32 : 0.4;
+        ballsRef.current = makeChain(ROUNDS[roundRef.current]!.balls, Math.min(path.total * start, path.total - 80));
         readyRef.current = 0;
         queuedRef.current = 1;
         layoutRef.current = false;
       }
 
-      ctx.beginPath();
-      for (let i = 0; i < path.points.length; i += 6) {
-        const p = path.points[i]!;
-        if (i === 0) ctx.moveTo(p.x, p.y);
-        else ctx.lineTo(p.x, p.y);
-      }
       const hole = pointAt(path, path.total);
-      ctx.lineTo(hole.x, hole.y);
+      traceTrack(ctx, path);
       ctx.lineCap = "round";
       ctx.lineJoin = "round";
-      ctx.strokeStyle = "rgba(8, 6, 18, 0.9)";
-      ctx.lineWidth = 26;
+      ctx.shadowColor = "rgba(240, 169, 59, 0.7)";
+      ctx.shadowBlur = lite ? 0 : 18;
+      ctx.strokeStyle = "rgba(240, 169, 59, 0.55)";
+      ctx.lineWidth = 30;
       ctx.stroke();
-      ctx.strokeStyle = "rgba(240, 169, 59, 0.85)";
-      ctx.lineWidth = 18;
+      ctx.shadowBlur = 0;
+      ctx.strokeStyle = "#6a4a22";
+      ctx.lineWidth = 24;
       ctx.stroke();
-      ctx.strokeStyle = "#140c22";
-      ctx.lineWidth = 12;
+      const stone = ctx.createLinearGradient(0, 0, path.w, path.h);
+      stone.addColorStop(0, "#3c3428");
+      stone.addColorStop(0.5, "#1c160f");
+      stone.addColorStop(1, "#2a2418");
+      ctx.strokeStyle = stone;
+      ctx.lineWidth = 14;
+      ctx.stroke();
+      ctx.strokeStyle = "rgba(255, 231, 163, 0.28)";
+      ctx.lineWidth = 16;
       ctx.stroke();
       const close = ballsRef.current[0] ? path.total - ballsRef.current[0].s < 140 : false;
-      const swirl = now / 420;
+      const pulse = 1 + Math.sin(now / 280) * 0.05;
       ctx.save();
       ctx.translate(hole.x, hole.y);
-      ctx.rotate(swirl);
+      ctx.scale(pulse, pulse);
+      const gate = ctx.createRadialGradient(0, 0, 4, 0, 0, 30);
+      gate.addColorStop(0, close ? "rgba(255, 120, 90, 0.95)" : "rgba(255, 228, 160, 0.95)");
+      gate.addColorStop(0.4, close ? "rgba(90, 16, 28, 0.8)" : "rgba(120, 72, 16, 0.55)");
+      gate.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.fillStyle = gate;
       ctx.beginPath();
-      ctx.strokeStyle = close ? "rgba(255,90,90,0.95)" : "rgba(255,214,120,0.95)";
-      ctx.lineWidth = 3;
-      ctx.arc(0, 0, 16 + Math.sin(now / 280) * 2, 0.2, Math.PI * 1.5);
+      ctx.arc(0, 0, 30, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = "#ffe7a3";
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.arc(0, 0, 18, 0, Math.PI * 2);
       ctx.stroke();
-      ctx.rotate(1.4);
+      ctx.strokeStyle = close ? "rgba(255,160,140,0.9)" : "rgba(255,231,163,0.75)";
+      ctx.lineWidth = 2;
       ctx.beginPath();
-      ctx.arc(0, 0, 10, 0, Math.PI * 1.2);
+      ctx.arc(0, 0, 11, now / 380, now / 380 + Math.PI * 1.35);
       ctx.stroke();
       ctx.restore();
-      ctx.beginPath();
-      ctx.fillStyle = close ? "#4a1020" : "#120818";
-      ctx.arc(hole.x, hole.y, 8, 0, Math.PI * 2);
-      ctx.fill();
 
       const spec = ROUNDS[roundRef.current] ?? ROUNDS[0];
       if (!pauseRef.current && !overRef.current && !bannerRef.current) {
@@ -454,14 +515,14 @@ export default function MarbleChainGame() {
               floated = true;
             }
             if (!lite) {
-              for (let n = 0; n < 4 && bitsRef.current.length < cap; n += 1) {
+              for (let n = 0; n < 6 && bitsRef.current.length < cap; n += 1) {
                 bitsRef.current.push({
                   x: spot.x,
                   y: spot.y,
-                  vx: (Math.random() - 0.5) * 80,
-                  vy: (Math.random() - 0.7) * 80,
+                  vx: (Math.random() - 0.5) * 140,
+                  vy: (Math.random() - 0.75) * 140,
                   life: 1,
-                  color: COLORS[ball.color] ?? COLORS[0]!,
+                  color: n % 2 === 0 ? (COLORS[ball.color] ?? COLORS[0]!) : "#ffe7a3",
                 });
               }
             }
@@ -498,12 +559,12 @@ export default function MarbleChainGame() {
         ctx.globalAlpha = Math.max(0, bit.life);
         ctx.fillStyle = bit.color;
         ctx.beginPath();
-        ctx.arc(bit.x, bit.y, 3, 0, Math.PI * 2);
+        ctx.arc(bit.x, bit.y, 4.5, 0, Math.PI * 2);
         ctx.fill();
       }
       ctx.globalAlpha = 1;
       floatRef.current = floatRef.current.filter((item) => item.life > 0);
-      ctx.font = "700 16px sans-serif";
+      ctx.font = "800 22px sans-serif";
       ctx.textAlign = "center";
       for (const item of floatRef.current) {
         item.y -= 18 * dt;
@@ -521,6 +582,7 @@ export default function MarbleChainGame() {
 
       const sx = w / 2;
       const sy = h / 2;
+      const hub = launcherHub(w, h);
       const aim = aimRef.current;
       if (aim) aimAngle.current = Math.atan2(aim.y - sy, aim.x - sx);
       let spin = aimAngle.current - shownAngle.current;
@@ -533,35 +595,53 @@ export default function MarbleChainGame() {
       const lx = sx - Math.cos(ang) * kick;
       const ly = sy - Math.sin(ang) * kick;
       if (aim) {
+        ctx.save();
+        ctx.setLineDash([5, 7]);
         ctx.beginPath();
-        ctx.strokeStyle = "rgba(255, 231, 163, 0.4)";
+        ctx.strokeStyle = "rgba(255, 231, 163, 0.75)";
         ctx.lineWidth = 2;
-        ctx.moveTo(lx, ly);
-        ctx.lineTo(lx + Math.cos(ang) * 130, ly + Math.sin(ang) * 130);
+        ctx.moveTo(lx + Math.cos(ang) * (hub + 8), ly + Math.sin(ang) * (hub + 8));
+        ctx.lineTo(lx + Math.cos(ang) * (hub + 120), ly + Math.sin(ang) * (hub + 120));
         ctx.stroke();
+        ctx.restore();
       }
       ctx.save();
       ctx.translate(lx, ly);
-      ctx.rotate(ang);
+      const metal = ctx.createRadialGradient(-hub * 0.25, -hub * 0.3, hub * 0.15, 0, 0, hub);
+      metal.addColorStop(0, "#fff6d8");
+      metal.addColorStop(0.42, "#e2b04a");
+      metal.addColorStop(1, "#6d3d0e");
       ctx.beginPath();
-      ctx.fillStyle = "#8a5a16";
-      ctx.arc(0, 0, 30, 0, Math.PI * 2);
+      ctx.fillStyle = metal;
+      ctx.arc(0, 0, hub, 0, Math.PI * 2);
       ctx.fill();
-      ctx.beginPath();
-      ctx.strokeStyle = "#ffe7a3";
+      ctx.strokeStyle = "#fff1c4";
       ctx.lineWidth = 3;
-      ctx.arc(0, 0, 28, 0, Math.PI * 2);
       ctx.stroke();
+      ctx.rotate(ang);
+      ctx.fillStyle = "#f3d48a";
       ctx.beginPath();
-      ctx.fillStyle = "#f0a93b";
-      ctx.moveTo(18, -7);
-      ctx.lineTo(36, 0);
-      ctx.lineTo(18, 7);
+      ctx.moveTo(hub * 0.15, -hub * 0.26);
+      ctx.lineTo(hub * 1.2, -hub * 0.14);
+      ctx.lineTo(hub * 1.2, hub * 0.14);
+      ctx.lineTo(hub * 0.15, hub * 0.26);
       ctx.closePath();
       ctx.fill();
+      ctx.strokeStyle = "#8a5a16";
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
       ctx.restore();
-      paintBall(ctx, lx, ly, 16, readyRef.current, 0, lite);
-      paintBall(ctx, lx + 34, ly + 20, 9, queuedRef.current, 0, lite);
+      paintBall(ctx, lx + Math.cos(ang) * hub * 0.08, ly + Math.sin(ang) * hub * 0.08, hub * 0.46, readyRef.current, 0, lite);
+      const nx = lx + hub * 0.95;
+      const ny = ly + hub * 0.95;
+      ctx.beginPath();
+      ctx.fillStyle = "rgba(12, 8, 20, 0.72)";
+      ctx.strokeStyle = "#ffe7a3";
+      ctx.lineWidth = 2;
+      ctx.arc(nx, ny, hub * 0.4, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+      paintBall(ctx, nx, ny, hub * 0.3, queuedRef.current, 0, lite);
 
       frame = window.requestAnimationFrame(draw);
     };
@@ -589,11 +669,14 @@ export default function MarbleChainGame() {
     const rect = event.currentTarget.getBoundingClientRect();
     const sx = rect.width / 2;
     const sy = rect.height / 2;
+    const hub = launcherHub(rect.width, rect.height);
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
     const dx = x - sx;
     const dy = y - sy;
-    if (Math.hypot(dx, dy) < 36 && Math.hypot(x - aim.x, y - aim.y) < 20) {
+    const onHub = Math.hypot(dx, dy) < hub + 8;
+    const onNext = Math.hypot(x - (sx + hub * 0.95), y - (sy + hub * 0.95)) < hub * 0.55;
+    if ((onHub || onNext) && Math.hypot(x - aim.x, y - aim.y) < 18) {
       const ready = readyRef.current;
       readyRef.current = queuedRef.current;
       queuedRef.current = ready;
@@ -660,29 +743,31 @@ export default function MarbleChainGame() {
         <div className="um-play-howto um-marble-howto" data-howto="true">
           <p className="um-play-howto-title">{t("games.howTo")}</p>
           <div className="um-marble-help">
-            <svg viewBox="0 0 64 28" aria-hidden="true">
-              <path d="M4 20 C16 4 28 4 40 16" fill="none" stroke="#f0a93b" strokeWidth="3" />
-              <circle cx="14" cy="12" r="4" fill="#f0a93b" />
-              <circle cx="24" cy="8" r="4" fill="#7ed9b8" />
-              <circle cx="34" cy="12" r="4" fill="#6ea8ff" />
-              <circle cx="52" cy="18" r="6" fill="#140b22" stroke="#f0a93b" strokeWidth="2" />
+            <svg viewBox="0 0 72 40" aria-hidden="true">
+              <path d="M6 28 C18 8 34 8 46 22" fill="none" stroke="#e8c87a" strokeWidth="8" strokeLinecap="round" />
+              <path d="M6 28 C18 8 34 8 46 22" fill="none" stroke="#2a2116" strokeWidth="3" strokeLinecap="round" />
+              <circle cx="16" cy="18" r="6" fill="#f0a93b" />
+              <circle cx="28" cy="12" r="6" fill="#3ee0b0" />
+              <circle cx="40" cy="16" r="6" fill="#5aa6ff" />
+              <circle cx="60" cy="26" r="8" fill="#120818" stroke="#ffe7a3" strokeWidth="2" />
             </svg>
             <p>{t("games.marble-chain.howTo1")}</p>
           </div>
           <div className="um-marble-help">
-            <svg viewBox="0 0 64 28" aria-hidden="true">
-              <circle cx="32" cy="16" r="7" fill="#f0a93b" />
-              <circle cx="32" cy="16" r="3" fill="#7ed9b8" />
-              <line x1="32" y1="16" x2="54" y2="6" stroke="rgba(255,231,163,0.8)" strokeWidth="2" />
+            <svg viewBox="0 0 72 40" aria-hidden="true">
+              <circle cx="28" cy="22" r="11" fill="#e2b04a" stroke="#fff1c4" strokeWidth="2" />
+              <circle cx="28" cy="22" r="5" fill="#3ee0b0" />
+              <path d="M36 18 L52 8" fill="none" stroke="#ffe7a3" strokeWidth="2" strokeDasharray="3 3" />
+              <circle cx="54" cy="30" r="5" fill="#5aa6ff" stroke="#ffe7a3" strokeWidth="1.5" />
             </svg>
             <p>{t("games.marble-chain.howTo2")}</p>
           </div>
           <div className="um-marble-help">
-            <svg viewBox="0 0 64 28" aria-hidden="true">
-              <circle cx="16" cy="14" r="5" fill="#e07a6a" />
-              <circle cx="28" cy="14" r="5" fill="#e07a6a" />
-              <circle cx="40" cy="14" r="5" fill="#e07a6a" />
-              <circle cx="54" cy="18" r="3" fill="#6ea8ff" />
+            <svg viewBox="0 0 72 40" aria-hidden="true">
+              <circle cx="14" cy="20" r="7" fill="#ff6d6d" />
+              <circle cx="30" cy="20" r="7" fill="#ff6d6d" />
+              <circle cx="46" cy="20" r="7" fill="#ff6d6d" />
+              <path d="M54 12 L62 20 L54 28" fill="none" stroke="#ffe7a3" strokeWidth="2" />
             </svg>
             <p>{t("games.marble-chain.howTo3")}</p>
           </div>
