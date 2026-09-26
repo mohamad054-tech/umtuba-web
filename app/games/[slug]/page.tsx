@@ -18,7 +18,7 @@ type Props = {
 };
 
 export function generateStaticParams() {
-  return PLAYABLE_GAME_SLUGS.map((slug) => ({ slug }));
+  return PLAYABLE_GAME_SLUGS.filter((slug) => isPlayableGameSlug(slug)).map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({ params }: Props) {

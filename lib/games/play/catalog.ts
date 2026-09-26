@@ -38,6 +38,20 @@ export const PLAYABLE_GAME_SLUGS = [
 
 export type PlayableGameSlug = (typeof PLAYABLE_GAME_SLUGS)[number];
 
+/**
+ * سلسلة الكرات stays in the repo but is hidden from the catalogue and its page.
+ * Flip this to true to show the tile and open /games/marble-chain again.
+ * Later rebuild, not started: if the balls meeting at a gap are the same color,
+ * the front rolls back and joins. If they differ, the gap stays, the front stops,
+ * and the rear keeps moving until it catches up so the player can shoot into the gap.
+ */
+export const MARBLE_CHAIN_VISIBLE = false;
+
+function isListedGame(slug: string): boolean {
+  if (slug === "marble-chain") return MARBLE_CHAIN_VISIBLE;
+  return true;
+}
+
 export type PlayableGame = {
   slug: PlayableGameSlug;
   titleKey: TranslationKey;
@@ -83,10 +97,11 @@ export const PLAYABLE_GAMES: readonly PlayableGame[] = [
 ] as const;
 
 export function isPlayableGameSlug(value: string): value is PlayableGameSlug {
-  return (PLAYABLE_GAME_SLUGS as readonly string[]).includes(value);
+  return (PLAYABLE_GAME_SLUGS as readonly string[]).includes(value) && isListedGame(value);
 }
 
 export function getPlayableGame(slug: string): PlayableGame | null {
+  if (!isPlayableGameSlug(slug)) return null;
   return PLAYABLE_GAMES.find((game) => game.slug === slug) ?? null;
 }
 
