@@ -132,6 +132,34 @@ export function stepsInOrder(order: readonly string[], truth: readonly string[])
   return order.length === truth.length && truth.length > 0 && order.every((step, idx) => step === truth[idx]);
 }
 
+export type StepLine = { n: number; text: string; wrong: boolean };
+
+export type StepReview = {
+  hit: boolean;
+  yours: StepLine[];
+  correct: StepLine[];
+};
+
+/** What stays on screen after confirm. A wrong try keeps both lists until Next. */
+export function reviewOrder(attempt: readonly string[], truth: readonly string[]): StepReview {
+  return {
+    hit: stepsInOrder(attempt, truth),
+    yours: attempt.map((text, idx) => ({ n: idx + 1, text, wrong: text !== truth[idx] })),
+    correct: truth.map((text, idx) => ({ n: idx + 1, text, wrong: false })),
+  };
+}
+
+export type OrderPhase = "play" | "review";
+
+export function orderPhaseAfterConfirm(phase: OrderPhase): OrderPhase {
+  if (phase === "review") return "review";
+  return "review";
+}
+
+export function orderPhaseAfterNext(phase: OrderPhase): "stay" | "advance" {
+  return phase === "review" ? "advance" : "stay";
+}
+
 export const TERMS = [
   { t: "الخوارزمية", e: "Algorithm", d: "خطوات مرتّبة لحل مسألة" },
   { t: "المتغيّر", e: "Variable", d: "مكان في الذاكرة يحمل قيمة" },
