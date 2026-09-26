@@ -2729,13 +2729,16 @@ html[data-marble-play] footer {
 
 .um-globe-stage {
   display: flex;
+  align-items: center;
   justify-content: center;
-  flex-shrink: 0;
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
 .um-globe {
   position: relative;
-  width: min(42vw, 168px);
+  width: min(58vw, 38vh, 220px);
+  max-height: 100%;
   aspect-ratio: 1;
   border-radius: 50%;
   overflow: hidden;
@@ -2806,9 +2809,30 @@ html[data-marble-play] footer {
   box-shadow: 0 8px 14px rgba(0, 0, 0, 0.45);
 }
 
+.um-globe-quiz .um-play-choices,
+.um-globe-quiz .um-play-why,
+.um-globe-quiz .um-play-row {
+  flex-shrink: 0;
+}
+
+.um-globe-quiz .um-play-why {
+  margin: 2px 0 0;
+  padding: 2px 8px;
+  line-height: 1.25;
+  max-height: 2.6em;
+  overflow: hidden;
+}
+
+.um-globe-quiz .um-play-row {
+  margin: 4px 0 0;
+}
+
+.um-game-fit-globe .um-globe-quiz {
+  padding-bottom: 8px;
+}
+
 .um-globe-quiz .um-play-choices {
   gap: 6px;
-  flex-shrink: 0;
 }
 
 .um-globe-quiz .um-play-choice {
@@ -2875,14 +2899,20 @@ html[data-marble-play] footer {
   70% { transform: translateX(7px); }
 }
 
-@media (max-width: 420px), (max-height: 800px) {
+@media (max-height: 740px) {
   .um-game-fit-globe .um-globe {
-    width: min(34vw, 128px);
+    width: min(46vw, 30vh, 150px);
   }
 
   .um-game-fit-globe .um-globe-quiz .um-play-qnum,
   .um-game-fit-globe .um-globe-quiz .um-play-why {
     margin: 0;
     font-size: 0.82rem;
+  }
+}
+
+@media (min-height: 800px) {
+  .um-globe-quiz .um-play-choice {
+    min-height: 56px;
   }
 }
