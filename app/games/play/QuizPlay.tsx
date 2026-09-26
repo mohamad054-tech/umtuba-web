@@ -41,11 +41,8 @@ function GoldGlobe({
 }) {
   return (
     <div className={`um-globe-stage${mark ? ` ${mark}` : ""}`}>
-      <div className="um-globe" aria-hidden="true">
-        <span className="um-globe-grid" />
-        <span className="um-globe-face">{children}</span>
-        <span className="um-globe-shine" />
-      </div>
+      <span className="um-sight-orb" aria-hidden="true" />
+      <div className="um-sight-frame">{children}</div>
     </div>
   );
 }

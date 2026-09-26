@@ -1,5 +1,8 @@
 "use client";
 
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import { createPortal } from "react-dom";
+import { useI18n } from "../../components/i18n";
 import { shuffled } from "../../../lib/games/play/engine";
 import {
   BLANKS,
@@ -27,6 +30,109 @@ function PlacePhoto({ src }: { src: string }) {
     <div className="um-place-photo-wrap" dir="ltr">
       <img className="um-place-photo" src={src} alt="" draggable={false} />
     </div>
+  );
+}
+
+function PhotoZoom({
+  src,
+  contain,
+  label,
+  onClose,
+}: {
+  src: string;
+  contain?: boolean;
+  label: string;
+  onClose: () => void;
+}) {
+  const [scale, setScale] = useState(1);
+  const scaleRef = useRef(1);
+  const pointers = useRef(new Map<number, { x: number; y: number }>());
+  const pinchRef = useRef<{ dist: number; scale: number } | null>(null);
+  const moved = useRef(false);
+
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose();
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
+  const zoomTo = (next: number) => {
+    const clamped = Math.min(4, Math.max(1, next));
+    scaleRef.current = clamped;
+    setScale(clamped);
+  };
+
+  return (
+    <div
+      className="um-sight-zoom"
+      role="dialog"
+      aria-label={label}
+      onPointerDown={(event) => {
+        event.currentTarget.setPointerCapture(event.pointerId);
+        pointers.current.set(event.pointerId, { x: event.clientX, y: event.clientY });
+        moved.current = false;
+        if (pointers.current.size === 2) {
+          const pts = [...pointers.current.values()];
+          pinchRef.current = {
+            dist: Math.hypot(pts[0]!.x - pts[1]!.x, pts[0]!.y - pts[1]!.y) || 1,
+            scale: scaleRef.current,
+          };
+        }
+      }}
+      onPointerMove={(event) => {
+        const prev = pointers.current.get(event.pointerId);
+        if (!prev) return;
+        if (Math.hypot(event.clientX - prev.x, event.clientY - prev.y) > 10) moved.current = true;
+        pointers.current.set(event.pointerId, { x: event.clientX, y: event.clientY });
+        if (pointers.current.size < 2 || !pinchRef.current) return;
+        const pts = [...pointers.current.values()];
+        const dist = Math.hypot(pts[0]!.x - pts[1]!.x, pts[0]!.y - pts[1]!.y) || 1;
+        zoomTo(pinchRef.current.scale * (dist / pinchRef.current.dist));
+      }}
+      onPointerUp={(event) => {
+        pointers.current.delete(event.pointerId);
+        if (pointers.current.size < 2) pinchRef.current = null;
+        if (pointers.current.size === 0 && !moved.current) onClose();
+      }}
+      onPointerCancel={() => {
+        pointers.current.clear();
+        pinchRef.current = null;
+      }}
+      onWheel={(event) => {
+        event.preventDefault();
+        zoomTo(scaleRef.current + (event.deltaY < 0 ? 0.25 : -0.25));
+      }}
+    >
+      <img
+        src={src}
+        alt=""
+        draggable={false}
+        className={contain ? "contain" : undefined}
+        style={{ transform: `scale(${scale})` }}
+      />
+    </div>
+  );
+}
+
+function SightButton({ src, contain, children }: { src: string; contain?: boolean; children: ReactNode }) {
+  const { locale } = useI18n();
+  const [open, setOpen] = useState(false);
+  const openLabel = locale === "ar" ? "افتح الصورة" : "Open the picture";
+  const closeLabel = locale === "ar" ? "أغلق الصورة" : "Close the picture";
+  return (
+    <>
+      <button type="button" className={`um-sight${contain ? " contain" : ""}`} aria-label={openLabel} onClick={() => setOpen(true)}>
+        {children}
+      </button>
+      {open && typeof document !== "undefined"
+        ? createPortal(
+            <PhotoZoom src={src} contain={contain} label={closeLabel} onClose={() => setOpen(false)} />,
+            document.body,
+          )
+        : null}
+    </>
   );
 }
 
@@ -143,9 +249,11 @@ export function FlagGuessGame() {
       load={flagQuiz}
       seconds={18}
       extra={(item) => (
-        <div className="um-play-flagbox" data-play-item="true" dir="ltr">
-          <FlagMark id={item.prompt} />
-        </div>
+        <SightButton src={`/games/flags/${item.prompt}.svg`} contain>
+          <div className="um-play-flagbox" data-play-item="true" dir="ltr">
+            <FlagMark id={item.prompt} />
+          </div>
+        </SightButton>
       )}
       hidePrompt
     />
@@ -161,7 +269,11 @@ export function GuessCityGame() {
       howTo={["games.guess-city.howTo1", "games.guess-city.howTo2", "games.guess-city.howTo3"]}
       load={() => buildPlaceQuiz(GAME_CITIES, CITY_ROUND)}
       seconds={18}
-      extra={(item) => <PlacePhoto src={placeSrc("cities", item.prompt)} />}
+      extra={(item) => (
+        <SightButton src={placeSrc("cities", item.prompt)}>
+          <img className="um-place-photo" src={placeSrc("cities", item.prompt)} alt="" draggable={false} />
+        </SightButton>
+      )}
       hidePrompt
     />
   );
