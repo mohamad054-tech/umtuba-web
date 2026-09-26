@@ -38,12 +38,20 @@ function pickColor(balls: Ball[]) {
   return colors[Math.floor(Math.random() * colors.length)] ?? 0;
 }
 
-function makeChain(count: number, lead: number): Ball[] {
+function makeChain(count: number, lead: number, round: number): Ball[] {
   const balls: Ball[] = [];
-  const colors = [0, 0, 0, 1, 1, 1, 2, 2];
+  const rhythm = round >= 2 ? [2, 1, 2, 1] : [2];
+  let color = round % COLORS.length;
+  let run = rhythm[0] ?? 2;
+  let step = 0;
   for (let i = 0; i < count; i += 1) {
-    const color = i < colors.length ? colors[i]! : Math.floor(i / 3) % COLORS.length;
+    if (run <= 0) {
+      step += 1;
+      color = (color + 1) % COLORS.length;
+      run = rhythm[step % rhythm.length] ?? 2;
+    }
     balls.push({ color, s: lead - i * SPACING });
+    run -= 1;
   }
   return balls;
 }
@@ -392,9 +400,14 @@ export default function MarbleChainGame() {
       }
       if (layoutRef.current) {
         const start = roundRef.current === 0 ? 0.2 : roundRef.current === 1 ? 0.32 : 0.4;
-        ballsRef.current = makeChain(ROUNDS[roundRef.current]!.balls, Math.min(path.total * start, path.total - 80));
-        readyRef.current = 0;
-        queuedRef.current = 1;
+        const chain = makeChain(
+          ROUNDS[roundRef.current]!.balls,
+          Math.min(path.total * start, path.total - 80),
+          roundRef.current,
+        );
+        ballsRef.current = chain;
+        readyRef.current = chain[0]?.color ?? 0;
+        queuedRef.current = chain.find((ball) => ball.color !== readyRef.current)?.color ?? (readyRef.current + 1) % COLORS.length;
         layoutRef.current = false;
       }
 
