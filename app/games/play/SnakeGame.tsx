@@ -272,13 +272,13 @@ export default function SnakeGame() {
       const eating = nextCell.x === sim.food.x && nextCell.y === sim.food.y;
       const progress = sim.dead || reduced ? 0 : Math.min(1, sim.acc / snakeTickMs(sim.score, false));
       const chain = snakeVisualChain(sim.body, sim.dir, progress, eating);
-      const smooth = sampleChain(chain, Math.min(72, Math.max(16, chain.length * 4)));
+      const smooth = sampleChain(chain, Math.max(8, chain.length));
       const toPx = (point: SnakePoint) => ({
         x: (point.x + 0.5) * cell,
         y: (point.y + 0.5) * cell,
       });
       const pixels = smooth.map(toPx);
-      const headR = cell * 0.46;
+      const headR = cell * 0.5;
 
       const pulse = reduced ? 1 : 1 + Math.sin(now / 280) * 0.08;
       const food = toPx(sim.food);
@@ -318,7 +318,7 @@ export default function SnakeGame() {
         for (let index = pixels.length - 1; index >= 0; index -= 1) {
           const point = pixels[index]!;
           const along = pixels.length === 1 ? 0 : index / (pixels.length - 1);
-          const radius = headR * (1 - along * 0.62);
+          const radius = headR * (0.96 - along * 0.16);
           const gloss = ctx.createRadialGradient(
             point.x - radius * 0.28,
             point.y - radius * 0.34,
@@ -608,6 +608,7 @@ export default function SnakeGame() {
   if (dead) {
     return (
       <PlayPanel
+        fill
         stats={<PlayStat label={t("games.score")} value={formatPlayNumber(locale, score)} />}
         helpOpen={help.helpOpen}
         onToggleHelp={help.toggleHelp}
@@ -636,6 +637,7 @@ export default function SnakeGame() {
 
   return (
     <PlayPanel
+      fill
       stats={
         <>
           <PlayStat label={t("games.score")} value={formatPlayNumber(locale, score)} />

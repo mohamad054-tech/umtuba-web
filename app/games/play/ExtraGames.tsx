@@ -21,6 +21,8 @@ import {
 } from "../../../lib/games/play/banks";
 import {
   createPlaySfx,
+  createPlayStopwatch,
+  formatPlayClock,
   formatPlayNumber,
   prefersReducedMotion,
   shuffled,
@@ -71,7 +73,13 @@ function Shell({
       stats={stats}
       helpOpen={helpOpen}
       onToggleHelp={onToggleHelp}
-      fill={slug === "larger-country" || slug === "farther-pair"}
+      fill={
+        slug === "larger-country" ||
+        slug === "farther-pair" ||
+        slug === "shapes" ||
+        slug === "hangword" ||
+        slug === "typerace"
+      }
     >
       <PlayHowTo
         open={helpOpen}
@@ -818,10 +826,33 @@ export function HangwordGame() {
     }
   };
 
+  const guessRef = useRef(guess);
+  guessRef.current = guess;
+  useEffect(() => {
+    if (!help.ready || done) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.metaKey || event.ctrlKey || event.altKey) return;
+      const ch = normArabicLetter(event.key);
+      if (!ARABIC_LETTERS.includes(ch)) return;
+      event.preventDefault();
+      guessRef.current(ch);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [done, help.ready]);
+
+  const lock = (
+    <div className={`um-gold-lock${done && score > 0 ? " open" : ""}`} aria-hidden="true">
+      <span className="um-gold-shackle" />
+      <span className="um-gold-body" />
+    </div>
+  );
+
   if (done) {
     return (
-      <PlayPanel stats={<PlayStat label={t("games.score")} value={formatPlayNumber(locale, score)} />}>
+      <PlayPanel fill stats={<PlayStat label={t("games.score")} value={formatPlayNumber(locale, score)} />}>
         <div className={score > floor ? "um-play-best" : undefined}>
+          {lock}
           <PlayResult score={score} verdictKey={verdictFromScore("high", score)} detail={score > floor ? t("games.localBest", { values: { score: formatPlayNumber(locale, score) } }) : `${formatPlayNumber(locale, solved)} ${t("games.of")} 4`} onAgain={() => { setDeck(shuffled(HANG_WORDS).slice(0, 4)); setI(0); setFound([]); setUsed([]); setLives(6); setScore(0); setSolved(0); setDone(false); help.keepReadyOnReplay(); }} />
         </div>
       </PlayPanel>
@@ -832,13 +863,14 @@ export function HangwordGame() {
     <Shell slug="hangword" howTo={["games.hangword.howTo1", "games.hangword.howTo2", "games.hangword.howTo3"]} stats={<PlayStat label={t("games.lives")} value={formatPlayNumber(locale, lives)} />} ready={help.ready} helpOpen={help.helpOpen} onToggleHelp={help.toggleHelp} begin={begin}>
       {word ? (
         <>
+          {lock}
           <p className="um-play-qnum">{word.h}</p>
           <div className="um-play-word">
             {[...word.w].map((ch, idx) => (
-              <span key={`${ch}-${idx}`} className="um-play-slot">{found.includes(normArabicLetter(ch)) ? ch : ""}</span>
+              <span key={`${ch}-${idx}`} className={`um-play-slot${found.includes(normArabicLetter(ch)) ? " on" : ""}`}>{found.includes(normArabicLetter(ch)) ? ch : ""}</span>
             ))}
           </div>
-          <div ref={boardRef} className="um-play-letters um-lit-board">
+          <div ref={boardRef} className="um-play-letters um-hang-keys">
             {ARABIC_LETTERS.map((ch) => (
               <button key={ch} type="button" className="um-play-ltr" data-play-item="true" disabled={used.includes(ch)} onClick={() => guess(ch)}>
                 {ch}
@@ -859,32 +891,108 @@ export function TypeRaceGame() {
   const [value, setValue] = useState("");
   const [score, setScore] = useState(0);
   const [done, setDone] = useState(false);
+  const [elapsed, setElapsed] = useState(0);
+  const [hits, setHits] = useState(0);
+  const [misses, setMisses] = useState(0);
+  const [lit, setLit] = useState("");
+  const clock = useMemo(() => createPlayStopwatch(setElapsed), []);
   const text = TYPE_PHRASES[i] ?? "";
+  const inputRef = useRef<HTMLInputElement | null>(null);
 
-  const begin = () => { if (!help.ready) { setI(0); setValue(""); setScore(0); setDone(false); } help.dismissHelp(); };
-  const onChange = (next: string) => {
-    setValue(next);
-    if (next === text) {
-      const pts = 80;
-      setScore((n) => n + pts);
-      sfx.ok();
-      if (i + 1 >= TYPE_PHRASES.length) { writeBestIfHigher("typerace", score + pts); setDone(true); }
-      else { setI((n) => n + 1); setValue(""); }
+  const begin = () => {
+    if (!help.ready) {
+      setI(0);
+      setValue("");
+      setScore(0);
+      setDone(false);
+      setHits(0);
+      setMisses(0);
+      setElapsed(0);
+      clock.start();
+    }
+    help.dismissHelp();
+    window.setTimeout(() => inputRef.current?.focus(), 0);
+  };
+
+  const finishLine = (nextScore: number) => {
+    if (i + 1 >= TYPE_PHRASES.length) {
+      clock.stop();
+      writeBestIfHigher("typerace", nextScore);
+      setDone(true);
+    } else {
+      setI((n) => n + 1);
+      setValue("");
     }
   };
 
+  const onChange = (next: string) => {
+    if (text.startsWith(next) && next.length <= text.length) {
+      if (next.length > value.length) {
+        setHits((n) => n + (next.length - value.length));
+        setLit(normArabicLetter(next[next.length - 1] ?? ""));
+      }
+      setValue(next);
+      if (next === text) {
+        const pts = 80;
+        setScore((n) => n + pts);
+        sfx.ok();
+        finishLine(score + pts);
+      }
+      return;
+    }
+    if (next.length > value.length) {
+      setMisses((n) => n + 1);
+      setLit("");
+      sfx.no();
+    }
+  };
+
+  const pressKey = (ch: string) => {
+    const nextCh = text[value.length] ?? "";
+    if (ch === " ") {
+      onChange(nextCh === " " ? value + " " : value + "x");
+      return;
+    }
+    if (nextCh && nextCh !== " " && normArabicLetter(ch) === normArabicLetter(nextCh)) onChange(value + nextCh);
+    else onChange(value + ch);
+  };
+
+  const seconds = Math.max(elapsed, 1);
+  const speed = Math.round((hits / seconds) * 60);
+  const accuracy = hits + misses === 0 ? 100 : Math.round((hits / (hits + misses)) * 100);
+  const summary = `${t("games.speed")} ${formatPlayNumber(locale, speed)} · ${t("games.accuracy")} ${formatPlayNumber(locale, accuracy)}%`;
+
   if (done) {
     return (
-      <PlayPanel stats={<PlayStat label={t("games.score")} value={formatPlayNumber(locale, score)} />}>
-        <PlayResult score={score} verdictKey="games.perfect" detail={t("games.typerace.title")} onAgain={() => { setDone(false); setI(0); setValue(""); setScore(0); help.keepReadyOnReplay(); }} />
+      <PlayPanel fill stats={<PlayStat label={t("games.time")} value={formatPlayClock(elapsed)} />}>
+        <div className="um-race-timer" aria-hidden="true">{formatPlayClock(elapsed)}</div>
+        <PlayResult score={score} verdictKey="games.perfect" detail={summary} onAgain={() => { setDone(false); setI(0); setValue(""); setScore(0); setHits(0); setMisses(0); setElapsed(0); clock.start(); help.keepReadyOnReplay(); }} />
       </PlayPanel>
     );
   }
 
+  const nextCh = text[value.length] ?? "";
+
   return (
-    <Shell slug="typerace" howTo={["games.typerace.howTo1", "games.typerace.howTo2", "games.typerace.howTo3"]} stats={<PlayStat label={t("games.score")} value={formatPlayNumber(locale, score)} />} ready={help.ready} helpOpen={help.helpOpen} onToggleHelp={help.toggleHelp} begin={begin}>
-      <p className="um-play-qtext">{text}</p>
-      <input className="um-play-typein" dir="rtl" value={value} data-play-item="true" onChange={(e) => onChange(e.target.value)} autoComplete="off" />
+    <Shell slug="typerace" howTo={["games.typerace.howTo1", "games.typerace.howTo2", "games.typerace.howTo3"]} stats={<><PlayStat label={t("games.score")} value={formatPlayNumber(locale, score)} /><PlayStat label={t("games.time")} value={formatPlayClock(elapsed)} /></>} ready={help.ready} helpOpen={help.helpOpen} onToggleHelp={help.toggleHelp} begin={begin}>
+      <div className="um-race-timer" aria-hidden="true">{formatPlayClock(elapsed)}</div>
+      <p className="um-play-qtext um-race-prompt">{text}</p>
+      <input ref={inputRef} className="um-play-typein um-race-input" dir="rtl" value={value} data-play-item="true" onChange={(e) => onChange(e.target.value)} autoComplete="off" autoCapitalize="off" spellCheck={false} />
+      <div className="um-race-keys" dir="rtl">
+        {ARABIC_LETTERS.map((ch) => (
+          <button
+            key={ch}
+            type="button"
+            className={`um-race-key${normArabicLetter(nextCh) === ch ? " next" : ""}${lit === ch ? " lit" : ""}`}
+            onClick={() => pressKey(ch)}
+          >
+            {ch}
+          </button>
+        ))}
+        <button type="button" className={`um-race-key space${nextCh === " " ? " next" : ""}`} onClick={() => pressKey(" ")}>
+          ⌴
+        </button>
+      </div>
     </Shell>
   );
 }
@@ -945,9 +1053,35 @@ export function ShapesGame() {
     }
   };
 
+  const dragRef = useRef<{ index: number; x: number; y: number; moved: boolean } | null>(null);
+  const pair = (a: number, b: number) => {
+    if (a === b || open.length === 2) return;
+    const first = cards[a];
+    const second = cards[b];
+    if (!first || !second || first.done || second.done) return;
+    if (first.sh === second.sh && first.col === second.col) {
+      setCards((prev) => prev.map((item, i) => (i === a || i === b ? { ...item, up: true, done: true } : item)));
+      const nextScore = score + 50;
+      setScore(nextScore);
+      sfx.ok();
+      setOpen([]);
+      if (cards.filter((item) => item.done).length + 2 === cards.length) {
+        writeBestIfHigher("shapes", nextScore);
+        setDone(true);
+      }
+    } else {
+      setCards((prev) => prev.map((item, i) => (i === a || i === b ? { ...item, up: true } : item)));
+      sfx.no();
+      window.setTimeout(() => {
+        setCards((prev) => prev.map((item, i) => (i === a || i === b ? { ...item, up: false } : item)));
+        setOpen([]);
+      }, 420);
+    }
+  };
+
   if (done) {
     return (
-      <PlayPanel stats={<PlayStat label={t("games.score")} value={formatPlayNumber(locale, score)} />}>
+      <PlayPanel fill stats={<PlayStat label={t("games.score")} value={formatPlayNumber(locale, score)} />}>
         <div className={score > floor ? "um-play-best" : undefined}>
           <PlayResult score={score} verdictKey={verdictFromScore("high", score)} detail={score > floor ? t("games.localBest", { values: { score: formatPlayNumber(locale, score) } }) : t("games.shapes.title")} onAgain={() => { deal(); help.keepReadyOnReplay(); }} />
         </div>
@@ -957,11 +1091,40 @@ export function ShapesGame() {
 
   return (
     <Shell slug="shapes" howTo={["games.shapes.howTo1", "games.shapes.howTo2", "games.shapes.howTo3"]} stats={<PlayStat label={t("games.score")} value={formatPlayNumber(locale, score)} />} ready={help.ready} helpOpen={help.helpOpen} onToggleHelp={help.toggleHelp} begin={begin}>
-      <div ref={boardRef} className="um-play-shapeg um-lit-board" dir="ltr">
+      <div ref={boardRef} className="um-play-shapeg um-gem-frame" dir="ltr">
         {cards.map((card, index) => {
           const face = card.up || card.done;
           return (
-            <button key={index} type="button" className={`um-play-scard${face ? " up" : ""}`} data-play-item="true" onClick={() => flip(index)}>
+            <button
+              key={index}
+              type="button"
+              className={`um-play-scard${face ? " up" : ""}`}
+              data-play-item="true"
+              data-shape-index={index}
+              onPointerDown={(event) => {
+                event.currentTarget.setPointerCapture(event.pointerId);
+                dragRef.current = { index, x: event.clientX, y: event.clientY, moved: false };
+              }}
+              onPointerMove={(event) => {
+                const drag = dragRef.current;
+                if (!drag || drag.index !== index) return;
+                if (Math.hypot(event.clientX - drag.x, event.clientY - drag.y) > 12) drag.moved = true;
+              }}
+              onPointerUp={(event) => {
+                const drag = dragRef.current;
+                dragRef.current = null;
+                if (!drag || drag.index !== index) return;
+                if (!drag.moved) {
+                  flip(index);
+                  return;
+                }
+                const hit = document.elementFromPoint(event.clientX, event.clientY);
+                const tile = hit instanceof Element ? hit.closest("[data-shape-index]") : null;
+                const target = tile ? Number(tile.getAttribute("data-shape-index")) : Number.NaN;
+                if (Number.isInteger(target)) pair(index, target);
+              }}
+              onClick={(event) => event.preventDefault()}
+            >
               {face ? <span className={`um-play-shape ${card.sh}`} style={{ background: card.col }} /> : <span className="um-play-shape-gem" aria-hidden="true" />}
             </button>
           );

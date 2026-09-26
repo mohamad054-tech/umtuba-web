@@ -291,6 +291,16 @@ export default function SolitaireGame() {
   const selectOrMove = (next: KlondikeSel, dest: KlondikeDest, key: string) => {
     if (suppressClick.current) return;
     const now = Date.now();
+    const pileLen = next.zone === "tableau" ? state.tableau[next.pile]?.length ?? 0 : 0;
+    const isTail = next.zone !== "tableau" || next.index === pileLen - 1;
+    if (isTail) {
+      const auto = klondikeAutoFoundation(state, next);
+      if (auto.ok) {
+        commit(auto.next, true);
+        lastTap.current = { key: "", at: 0 };
+        return;
+      }
+    }
     if (sameSel(sel, next) && now - lastTap.current.at < 340) {
       const auto = klondikeAutoFoundation(state, next);
       commit(auto.next, auto.ok);
@@ -420,6 +430,7 @@ export default function SolitaireGame() {
   if (done) {
     return (
       <PlayPanel
+        fill
         stats={
           <>
             <PlayStat label={t("games.moves")} value={formatPlayNumber(locale, moves)} />
