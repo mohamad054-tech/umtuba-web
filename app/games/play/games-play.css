@@ -2806,6 +2806,17 @@ html[data-marble-play] footer {
   box-shadow: none;
 }
 
+.um-globe-stage:has(.um-sight.contain) {
+  flex: 0 0 auto;
+  max-height: 46dvh;
+}
+
+.um-globe-quiz .um-sight.contain {
+  height: auto;
+  aspect-ratio: 4 / 3;
+  max-height: 46dvh;
+}
+
 .um-globe-quiz .um-sight.contain img {
   object-fit: contain;
 }
