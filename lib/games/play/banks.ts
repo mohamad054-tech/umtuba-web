@@ -286,6 +286,23 @@ export const STORE_PRODUCTS: DemoProduct[] = [
   { id: "plant", name: "نبتة صغيرة", nameEn: "Small plant", cat: "منزل", kind: "plant", price: 55 },
 ];
 
+export const DISCOUNT_PERCENTS = [10, 15, 20, 25, 30, 35, 40, 50] as const;
+
+/** Old and sale prices where (old − sale) is exactly `pct` percent of the old price. */
+export function exactDiscountPrices(anchor: number, pct: number): { old: number; sale: number } {
+  const keep = 100 - pct;
+  for (let delta = 0; delta <= 40; delta += 1) {
+    const candidates = delta === 0 ? [anchor] : [anchor - delta, anchor + delta];
+    for (const old of candidates) {
+      if (old < 20) continue;
+      if ((old * keep) % 100 !== 0) continue;
+      const sale = (old * keep) / 100;
+      if (sale > 0 && sale < old) return { old, sale };
+    }
+  }
+  return { old: 100, sale: 100 - pct };
+}
+
 export const PRICE_CATALOG = [
   { n: "حقيبة جلد يدوية", e: "Leather bag", c: "أزياء", p: 340, k: "bag" },
   { n: "سمّاعات لاسلكية", e: "Wireless headphones", c: "إلكترونيات", p: 520, k: "phone" },
