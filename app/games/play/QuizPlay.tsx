@@ -29,7 +29,26 @@ type Props = {
   extra?: (item: QuizItem, index: number) => ReactNode;
   hidePrompt?: boolean;
   fit?: boolean;
+  globe?: boolean;
 };
+
+function GoldGlobe({
+  mark,
+  children,
+}: {
+  mark: "" | "ok" | "no";
+  children: ReactNode;
+}) {
+  return (
+    <div className={`um-globe-stage${mark ? ` ${mark}` : ""}`}>
+      <div className="um-globe" aria-hidden="true">
+        <span className="um-globe-grid" />
+        <span className="um-globe-face">{children}</span>
+        <span className="um-globe-shine" />
+      </div>
+    </div>
+  );
+}
 
 function ChoiceText({ text }: { text: string }) {
   const [arabic, english] = text.split("\n");
@@ -42,7 +61,7 @@ function ChoiceText({ text }: { text: string }) {
   );
 }
 
-export default function QuizPlay({ slug, howTo, load, seconds, extra, hidePrompt, fit }: Props) {
+export default function QuizPlay({ slug, howTo, load, seconds, extra, hidePrompt, fit, globe }: Props) {
   const { t, locale } = useI18n();
   const sfx = useMemo(() => createPlaySfx(), []);
   const { helpOpen, ready, dismissHelp, toggleHelp, keepReadyOnReplay } = usePlayHelp();
@@ -152,7 +171,7 @@ export default function QuizPlay({ slug, howTo, load, seconds, extra, hidePrompt
   if (done) {
     return (
       <PlayPanel
-        fill={fit}
+        fill={fit || globe}
         stats={<PlayStat label={t("games.score")} value={formatPlayNumber(locale, score)} />}
         helpOpen={helpOpen}
         onToggleHelp={toggleHelp}
@@ -176,7 +195,7 @@ export default function QuizPlay({ slug, howTo, load, seconds, extra, hidePrompt
 
   return (
     <PlayPanel
-      fill={fit}
+      fill={fit || globe}
       stats={
         <>
           <PlayStat label={t("games.score")} value={formatPlayNumber(locale, score)} />
@@ -196,14 +215,22 @@ export default function QuizPlay({ slug, howTo, load, seconds, extra, hidePrompt
       {ready && item ? (
         <div
           ref={boardRef}
-          className={`um-play-quiz um-lit-board${fit ? " um-place-quiz" : ""}${pick === item.correct ? " um-play-celebrate" : ""}`}
+          className={`um-play-quiz um-lit-board${fit || globe ? " um-place-quiz" : ""}${globe ? " um-globe-quiz" : ""}${
+            pick != null && pick === item.correct ? " ok um-play-celebrate" : ""
+          }${pick != null && pick !== item.correct ? " no" : ""}`}
           dir="ltr"
         >
           <p className="um-play-qnum">
             {t("games.question")} {formatPlayNumber(locale, index + 1)} {t("games.of")}{" "}
             {formatPlayNumber(locale, deck.length)}
           </p>
-          {extra ? extra(item, index) : null}
+          {extra ? (
+            globe ? (
+              <GoldGlobe mark={pick == null ? "" : pick === item.correct ? "ok" : "no"}>{extra(item, index)}</GoldGlobe>
+            ) : (
+              extra(item, index)
+            )
+          ) : null}
           {hidePrompt ? null : <p className="um-play-qtext">{item.prompt}</p>}
           <div className="um-play-choices">
             {item.choices.map((text, choice) => (

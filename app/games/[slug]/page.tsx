@@ -51,13 +51,16 @@ export default async function GamePlayPage({ params }: Props) {
   const marbleFit = slug === "marble-chain";
   const arcadeFit =
     slug === "snake" || slug === "shapes" || slug === "hangword" || slug === "typerace" || slug === "solitaire";
-  const fit = arcadeFit || slug === "guess-city" || slug === "landmark" || pairFit || marbleFit;
+  const globeFit = slug === "guess-city" || slug === "flag-guess";
+  const fit = arcadeFit || globeFit || slug === "landmark" || pairFit || marbleFit;
 
   return (
     <main
       className={`um-games-shell relative text-white ${
         fit ? "um-game-fit" : "min-h-screen"
       } ${slug === "guess-city" || slug === "landmark" ? "um-game-fit-place" : ""} ${
+        globeFit ? "um-game-fit-globe" : ""
+      } ${
         pairFit ? "um-game-fit-pair" : ""
       } ${arcadeFit ? "um-game-fit-arcade" : ""} ${marbleFit ? "um-game-fit-marble" : ""} ${marbleFit ? "" : MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS}`}
     >
