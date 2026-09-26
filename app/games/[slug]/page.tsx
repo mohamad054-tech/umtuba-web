@@ -54,7 +54,14 @@ export default async function GamePlayPage({ params }: Props) {
   const globeFit = slug === "guess-city" || slug === "flag-guess";
   const shopFit =
     slug === "price" || slug === "basket" || slug === "cheaper" || slug === "sort-price" || slug === "guess-discount";
-  const fit = arcadeFit || globeFit || shopFit || slug === "landmark" || pairFit || marbleFit;
+  const quizFit =
+    slug === "lesson-quiz" ||
+    slug === "quick-q" ||
+    slug === "vocab" ||
+    slug === "fill-blank" ||
+    slug === "order-steps" ||
+    slug === "match-term";
+  const fit = arcadeFit || globeFit || shopFit || quizFit || slug === "landmark" || pairFit || marbleFit;
 
   return (
     <main
@@ -64,7 +71,7 @@ export default async function GamePlayPage({ params }: Props) {
         globeFit ? "um-game-fit-globe" : ""
       } ${
         pairFit ? "um-game-fit-pair" : ""
-      } ${arcadeFit ? "um-game-fit-arcade" : ""} ${shopFit ? "um-game-fit-shop" : ""} ${marbleFit ? "um-game-fit-marble" : ""} ${marbleFit ? "" : MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS}`}
+      } ${arcadeFit ? "um-game-fit-arcade" : ""} ${shopFit ? "um-game-fit-shop" : ""} ${quizFit ? "um-game-fit-quiz" : ""} ${marbleFit ? "um-game-fit-marble" : ""} ${marbleFit ? "" : MOBILE_BOTTOM_NAV_CONTENT_PAD_CLASS}`}
     >
       {marbleFit ? null : <AppTopNav
         title={t(game.titleKey)}

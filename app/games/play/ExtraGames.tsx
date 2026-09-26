@@ -82,7 +82,9 @@ function Shell({
         slug === "price" ||
         slug === "basket" ||
         slug === "cheaper" ||
-        slug === "sort-price"
+        slug === "sort-price" ||
+        slug === "order-steps" ||
+        slug === "match-term"
       }
     >
       <PlayHowTo
@@ -323,7 +325,7 @@ export function OrderStepsGame() {
 
   if (done) {
     return (
-      <PlayPanel stats={<PlayStat label={t("games.score")} value={formatPlayNumber(locale, score)} />}>
+      <PlayPanel fill stats={<PlayStat label={t("games.score")} value={formatPlayNumber(locale, score)} />}>
         <PlayResult score={score} verdictKey={verdictFromScore("high", score)} detail={t("games.order-steps.title")} onAgain={() => { setDone(false); setI(0); setScore(0); deal(0); help.keepReadyOnReplay(); }} />
       </PlayPanel>
     );
@@ -331,16 +333,22 @@ export function OrderStepsGame() {
 
   return (
     <Shell slug="order-steps" howTo={["games.order-steps.howTo1", "games.order-steps.howTo2", "games.order-steps.howTo3"]} stats={<PlayStat label={t("games.score")} value={formatPlayNumber(locale, score)} />} ready={help.ready} helpOpen={help.helpOpen} onToggleHelp={help.toggleHelp} begin={begin}>
-      <p className="um-play-qtext">{STEPS[i]?.title}</p>
-      <div className="um-play-sort">
+      <div className="um-learn-board" dir={locale === "ar" ? "rtl" : "ltr"}>
+      <p className="um-learn-prompt um-play-qtext">
+        <span>{STEPS[i]?.title}</span>
+        <span className="um-learn-en" dir="ltr">{STEPS[i]?.titleEn}</span>
+      </p>
+      <div className="um-play-sort um-learn-steps">
         {items.map((text, idx) => (
           <button key={`${text}-${idx}`} type="button" className={`um-play-step${sel === idx ? " sel" : ""}`} data-play-item="true" onClick={() => tap(idx)}>
-            <span className="n">{idx + 1}</span> {text}
+            <span className="n">{idx + 1}</span>
+            <span>{text}</span>
           </button>
         ))}
       </div>
       <div className="um-play-row">
         <button type="button" className="um-play-btn go" data-play-item="true" onClick={confirm}>{t("games.confirm")}</button>
+      </div>
       </div>
     </Shell>
   );
@@ -445,7 +453,7 @@ export function MatchTermGame() {
 
   if (done) {
     return (
-      <PlayPanel stats={<PlayStat label={t("games.score")} value={formatPlayNumber(locale, score)} />}>
+      <PlayPanel fill stats={<PlayStat label={t("games.score")} value={formatPlayNumber(locale, score)} />}>
         <PlayResult score={score} verdictKey={verdictFromScore("high", score)} detail={t("games.match-term.title")} onAgain={() => { deal(); help.keepReadyOnReplay(); }} />
       </PlayPanel>
     );
@@ -453,17 +461,18 @@ export function MatchTermGame() {
 
   return (
     <Shell slug="match-term" howTo={["games.match-term.howTo1", "games.match-term.howTo2", "games.match-term.howTo3"]} stats={<PlayStat label={t("games.score")} value={formatPlayNumber(locale, score)} />} ready={help.ready} helpOpen={help.helpOpen} onToggleHelp={help.toggleHelp} begin={begin}>
-      <div className="um-play-match" dir="ltr">
+      <div className="um-play-match um-learn-board" dir={locale === "ar" ? "rtl" : "ltr"}>
         <div className="um-play-choices">
           {pairs.map((pair) => (
-            <button key={pair.t} type="button" className={`um-play-choice${left === pair.t ? " sel" : ""}`} data-play-item="true" disabled={matched.includes(pair.t)} onClick={() => setLeft(pair.t)}>
-              {pair.t}
+            <button key={pair.t} type="button" className={`um-play-choice${left === pair.t ? " sel" : ""}${matched.includes(pair.t) ? " done" : ""}`} data-play-item="true" disabled={matched.includes(pair.t)} onClick={() => setLeft(pair.t)}>
+              <span>{pair.t}</span>
+              <span className="um-learn-en" dir="ltr">{pair.e}</span>
             </button>
           ))}
         </div>
         <div className="um-play-choices">
           {defs.map((pair) => (
-            <button key={pair.d} type="button" className="um-play-choice" data-play-item="true" disabled={matched.includes(pair.t)} onClick={() => pickDef(pair.t)}>
+            <button key={pair.d} type="button" className={`um-play-choice def${matched.includes(pair.t) ? " done" : ""}`} data-play-item="true" disabled={matched.includes(pair.t)} onClick={() => pickDef(pair.t)}>
               {pair.d}
             </button>
           ))}
