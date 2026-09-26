@@ -1,20 +1,34 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { useI18n } from "../../components/i18n";
+import { formatPlayNumber, prefersReducedMotion, verdictFromScore } from "../../../lib/games/play/engine";
 import {
-  createPlaySfx,
-  formatPlayNumber,
-  prefersReducedMotion,
-  verdictFromScore,
-} from "../../../lib/games/play/engine";
+  MARBLE_SPACING,
+  clearTouching,
+  createMarbleSfx,
+  pushApart,
+  segmentsOf,
+  stepChain,
+} from "../../../lib/games/play/marbleChain";
 import { readBest, writeBestIfHigher } from "../../../lib/games/play/scores";
+import { readGameMuted, writeGameMuted } from "../../../lib/games/play/theme";
 import Link from "next/link";
 import { APP_ROUTES } from "../../lib/nav";
 import { PlayResult, usePlayHelp } from "./PlayChrome";
 
 const COLORS = ["#f0a93b", "#3ee0b0", "#5aa6ff", "#ff6d6d"];
-const SPACING = 26;
+const SPACING = MARBLE_SPACING;
+
+function subscribeGameMuted(onChange: () => void): () => void {
+  if (typeof window === "undefined") return () => {};
+  window.addEventListener("umtuba-games-mute", onChange);
+  window.addEventListener("storage", onChange);
+  return () => {
+    window.removeEventListener("umtuba-games-mute", onChange);
+    window.removeEventListener("storage", onChange);
+  };
+}
 const ROUNDS = [
   { balls: 12, speed: 16, turns: 1.05, angle: -0.9 },
   { balls: 18, speed: 24, turns: 1.45, angle: 0.7 },
@@ -98,53 +112,6 @@ function pointAt(path: Path, distance: number) {
   const a = path.points[index - 1] ?? path.points[0]!;
   const b = path.points[index] ?? a;
   return { x: a.x + (b.x - a.x) * u, y: a.y + (b.y - a.y) * u };
-}
-
-function sortChain(balls: Ball[]) {
-  balls.sort((a, b) => b.s - a.s);
-}
-
-function pushApart(balls: Ball[]) {
-  sortChain(balls);
-  for (let i = 1; i < balls.length; i += 1) {
-    const limit = balls[i - 1]!.s - SPACING;
-    if (balls[i]!.s > limit) balls[i]!.s = limit;
-  }
-}
-
-function pullClosed(balls: Ball[], dt: number) {
-  sortChain(balls);
-  if (!balls.length) return;
-  for (let i = 1; i < balls.length; i += 1) {
-    const desired = balls[i - 1]!.s - SPACING;
-    const ball = balls[i]!;
-    if (ball.s > desired) ball.s = desired;
-    else ball.s += Math.min(desired - ball.s, 220 * dt);
-  }
-}
-
-function clearTouching(balls: Ball[]) {
-  sortChain(balls);
-  const drop = new Set<Ball>();
-  let index = 0;
-  while (index < balls.length) {
-    let end = index + 1;
-    while (
-      end < balls.length &&
-      balls[end]!.color === balls[index]!.color &&
-      balls[end - 1]!.s - balls[end]!.s <= SPACING * 1.35
-    ) {
-      end += 1;
-    }
-    if (end - index >= 3) {
-      for (let k = index; k < end; k += 1) drop.add(balls[k]!);
-    }
-    index = end;
-  }
-  if (!drop.size) return 0;
-  const next = balls.filter((ball) => !drop.has(ball));
-  balls.splice(0, balls.length, ...next);
-  return drop.size;
 }
 
 function deviceIsSlow() {
@@ -244,7 +211,7 @@ function paintBall(ctx: CanvasRenderingContext2D, x: number, y: number, radius: 
 export default function MarbleChainGame() {
   const { t, locale } = useI18n();
   const help = usePlayHelp();
-  const sfx = useMemo(() => createPlaySfx(), []);
+  const sfx = useMemo(() => createMarbleSfx(), []);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const ballsRef = useRef<Ball[]>([]);
   const pathRef = useRef<Path | null>(null);
@@ -261,7 +228,7 @@ export default function MarbleChainGame() {
   const pauseRef = useRef(true);
   const bannerRef = useRef(false);
   const pausedRef = useRef(false);
-  const mutedRef = useRef(true);
+  const mutedRef = useRef(false);
   const aimAngle = useRef(-Math.PI / 2);
   const shownAngle = useRef(-Math.PI / 2);
   const recoilRef = useRef(0);
@@ -275,7 +242,7 @@ export default function MarbleChainGame() {
   const [banner, setBanner] = useState(false);
   const [isBest, setIsBest] = useState(false);
   const [paused, setPaused] = useState(false);
-  const [muted, setMuted] = useState(true);
+  const muted = useSyncExternalStore(subscribeGameMuted, readGameMuted, () => false);
 
   const keepAmmo = () => {
     const colors = colorsLeft(ballsRef.current);
@@ -312,7 +279,7 @@ export default function MarbleChainGame() {
     setOver(result);
     if (!mutedRef.current) {
       if (result === "win") sfx.win();
-      else sfx.no();
+      else sfx.lose();
     }
   };
 
@@ -330,7 +297,6 @@ export default function MarbleChainGame() {
       return;
     }
     beginRound(next, true);
-    if (!mutedRef.current) sfx.flip();
   };
 
   useEffect(() => {
@@ -462,9 +428,9 @@ export default function MarbleChainGame() {
       const spec = ROUNDS[roundRef.current] ?? ROUNDS[0];
       if (!pauseRef.current && !overRef.current && !bannerRef.current) {
         const balls = ballsRef.current;
-        sortChain(balls);
-        if (balls[0]) balls[0].s += spec.speed * dt;
-        pullClosed(balls, dt);
+        const pulling = stepChain(balls, dt, spec.speed);
+        if (pulling && comboRef.current > 0) comboUntil.current = Math.max(comboUntil.current, now + 700);
+        if (!mutedRef.current && balls[0] && path.total - balls[0].s < 140) sfx.danger(now);
         const shot = shotRef.current;
         if (shot) {
           shot.x += shot.vx * dt;
@@ -495,7 +461,7 @@ export default function MarbleChainGame() {
             pushApart(balls);
             shotRef.current = null;
             recoilRef.current = 1;
-            if (!mutedRef.current) sfx.flip();
+            if (!mutedRef.current) sfx.insert();
           } else if (shot.x < -30 || shot.y < -30 || shot.x > w + 30 || shot.y > h + 30) {
             shotRef.current = null;
           }
@@ -506,13 +472,13 @@ export default function MarbleChainGame() {
           const stamp = now;
           if (stamp > comboUntil.current) comboRef.current = 0;
           comboRef.current += 1;
-          comboUntil.current = stamp + 800;
+          comboUntil.current = stamp + 2800;
           const gained = removed * 50 * comboRef.current;
           scoreRef.current += gained;
           setScore(scoreRef.current);
           if (!mutedRef.current) {
-            if (comboRef.current > 1) sfx.win();
-            else sfx.ok();
+            sfx.pop(comboRef.current);
+            if (segmentsOf(balls).length > 1) sfx.whoosh();
           }
           const cap = lite ? 16 : 28;
           flashRef.current = 0.55;
@@ -663,6 +629,7 @@ export default function MarbleChainGame() {
   }, [sfx]);
 
   const onPointerDown = (event: React.PointerEvent<HTMLCanvasElement>) => {
+    sfx.unlock();
     if (overRef.current || bannerRef.current || pausedRef.current) return;
     const rect = event.currentTarget.getBoundingClientRect();
     aimRef.current = { x: event.clientX - rect.left, y: event.clientY - rect.top };
@@ -696,6 +663,7 @@ export default function MarbleChainGame() {
       return;
     }
     const len = Math.hypot(dx, dy) || 1;
+    if (!mutedRef.current) sfx.shoot();
     shotRef.current = {
       x: sx,
       y: sy,
@@ -729,7 +697,10 @@ export default function MarbleChainGame() {
       <button
         type="button"
         className="um-marble-icon"
-        onClick={() => setMuted((value) => !value)}
+        onClick={() => {
+          sfx.unlock();
+          writeGameMuted(!readGameMuted());
+        }}
         aria-label={muted ? t("games.unmute") : t("games.mute")}
       >
         {muted ? "🔇" : "🔊"}
@@ -785,7 +756,15 @@ export default function MarbleChainGame() {
             <p>{t("games.marble-chain.howTo3")}</p>
           </div>
           <div className="um-play-row" style={{ marginTop: 10 }}>
-            <button type="button" className="um-play-btn go" data-howto-dismiss="true" onClick={help.dismissHelp}>
+            <button
+              type="button"
+              className="um-play-btn go"
+              data-howto-dismiss="true"
+              onClick={() => {
+                sfx.unlock();
+                help.dismissHelp();
+              }}
+            >
               {help.ready ? t("games.gotIt") : t("games.start")}
             </button>
           </div>
