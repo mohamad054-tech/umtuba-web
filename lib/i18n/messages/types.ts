@@ -1517,6 +1517,8 @@ export type GamesMessages = {
   "games.newGame": string;
   "games.moves": string;
   "games.time": string;
+  "games.speed": string;
+  "games.accuracy": string;
   "games.score": string;
   "games.pairs": string;
   "games.youWin": string;
