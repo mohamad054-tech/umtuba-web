@@ -1,3 +1,9 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+import { useI18n } from "../../components/i18n";
+
 export type ProductKind = "bag" | "phone" | "cup" | "book" | "shoe" | "lamp" | "watch" | "plant";
 
 export default function ProductMark({ kind }: { kind: string }) {
@@ -56,5 +62,100 @@ export default function ProductMark({ kind }: { kind: string }) {
         </>
       ) : null}
     </svg>
+  );
+}
+
+export function ShopPicture({ kind, hero }: { kind: string; hero?: boolean }) {
+  const { locale } = useI18n();
+  const [open, setOpen] = useState(false);
+  const openLabel = locale === "ar" ? "افتح الصورة" : "Open the picture";
+  const closeLabel = locale === "ar" ? "أغلق الصورة" : "Close the picture";
+  return (
+    <>
+      <button
+        type="button"
+        className={hero ? "um-shop-hero" : "um-shop-mark"}
+        aria-label={openLabel}
+        onClick={(event) => {
+          event.stopPropagation();
+          setOpen(true);
+        }}
+      >
+        <ProductMark kind={kind} />
+      </button>
+      {open && typeof document !== "undefined"
+        ? createPortal(
+            <PictureZoom kind={kind} label={closeLabel} onClose={() => setOpen(false)} />,
+            document.body,
+          )
+        : null}
+    </>
+  );
+}
+
+function PictureZoom({ kind, label, onClose }: { kind: string; label: string; onClose: () => void }) {
+  const [scale, setScale] = useState(1);
+  const scaleRef = useRef(1);
+  const pointers = useRef(new Map<number, { x: number; y: number }>());
+  const pinchRef = useRef<{ dist: number; scale: number } | null>(null);
+  const moved = useRef(false);
+  const born = useRef(Date.now());
+
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose();
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
+  const zoomTo = (next: number) => {
+    const clamped = Math.min(4, Math.max(1, next));
+    scaleRef.current = clamped;
+    setScale(clamped);
+  };
+
+  return (
+    <div
+      className="um-sight-zoom"
+      role="dialog"
+      aria-label={label}
+      onPointerDown={(event) => {
+        event.currentTarget.setPointerCapture(event.pointerId);
+        pointers.current.set(event.pointerId, { x: event.clientX, y: event.clientY });
+        moved.current = false;
+        if (pointers.current.size === 2) {
+          const pts = [...pointers.current.values()];
+          pinchRef.current = {
+            dist: Math.hypot(pts[0]!.x - pts[1]!.x, pts[0]!.y - pts[1]!.y) || 1,
+            scale: scaleRef.current,
+          };
+        }
+      }}
+      onPointerMove={(event) => {
+        const prev = pointers.current.get(event.pointerId);
+        if (!prev) return;
+        if (Math.hypot(event.clientX - prev.x, event.clientY - prev.y) > 10) moved.current = true;
+        pointers.current.set(event.pointerId, { x: event.clientX, y: event.clientY });
+        if (pointers.current.size < 2 || !pinchRef.current) return;
+        const pts = [...pointers.current.values()];
+        const dist = Math.hypot(pts[0]!.x - pts[1]!.x, pts[0]!.y - pts[1]!.y) || 1;
+        zoomTo(pinchRef.current.scale * (dist / pinchRef.current.dist));
+      }}
+      onPointerUp={(event) => {
+        pointers.current.delete(event.pointerId);
+        if (pointers.current.size < 2) pinchRef.current = null;
+        if (Date.now() - born.current < 350) return;
+        if (pointers.current.size === 0 && !moved.current) onClose();
+      }}
+      onPointerCancel={() => {
+        pointers.current.clear();
+        pinchRef.current = null;
+      }}
+    >
+      <span className="um-shop-zoom-art" style={{ transform: `scale(${scale})` }}>
+        <ProductMark kind={kind} />
+      </span>
+    </div>
   );
 }

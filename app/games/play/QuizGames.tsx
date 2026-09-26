@@ -23,6 +23,7 @@ import {
   placeSrc,
 } from "../../../lib/games/play/places";
 import FlagMark from "./FlagMark";
+import { ShopPicture } from "./ProductMark";
 import QuizPlay from "./QuizPlay";
 
 function PlacePhoto({ src }: { src: string }) {
@@ -297,15 +298,25 @@ export function GuessDiscountGame() {
   return (
     <QuizPlay
       slug="guess-discount"
+      fit
       howTo={["games.guess-discount.howTo1", "games.guess-discount.howTo2", "games.guess-discount.howTo3"]}
       load={discountQuiz}
       seconds={14}
       extra={(item) => {
         const [name, oldP, sale] = item.prompt.split("|");
+        const product = STORE_PRODUCTS.find((row) => row.name === name);
         return (
-          <p className="um-play-priceline">
-            <s>{oldP}</s> <strong>{sale}</strong> — {name}
-          </p>
+          <div className="um-shop-offer">
+            {product ? <ShopPicture kind={product.kind} hero /> : null}
+            <p className="um-shop-name">
+              <span>{name}</span>
+              {product ? <span className="en">{product.nameEn}</span> : null}
+            </p>
+            <p className="um-shop-tags" dir="ltr">
+              <s className="um-shop-tag old">{oldP}</s>
+              <strong className="um-shop-tag">{sale}</strong>
+            </p>
+          </div>
         );
       }}
       hidePrompt

@@ -269,46 +269,47 @@ export const COUNTRIES = [
 export type DemoProduct = {
   id: string;
   name: string;
+  nameEn: string;
   cat: string;
   kind: string;
   price: number;
 };
 
 export const STORE_PRODUCTS: DemoProduct[] = [
-  { id: "bag", name: "حقيبة يومية", cat: "إكسسوار", kind: "bag", price: 189 },
-  { id: "phone", name: "غطاء هاتف", cat: "إلكترونيات", kind: "phone", price: 45 },
-  { id: "cup", name: "كوب حراري", cat: "منزل", kind: "cup", price: 72 },
-  { id: "book", name: "دفتر ملاحظات", cat: "قرطاسية", kind: "book", price: 28 },
-  { id: "shoe", name: "حذاء رياضي", cat: "ملابس", kind: "shoe", price: 310 },
-  { id: "lamp", name: "مصباح مكتب", cat: "منزل", kind: "lamp", price: 145 },
-  { id: "watch", name: "ساعة يد", cat: "إكسسوار", kind: "watch", price: 420 },
-  { id: "plant", name: "نبتة صغيرة", cat: "منزل", kind: "plant", price: 55 },
+  { id: "bag", name: "حقيبة يومية", nameEn: "Everyday bag", cat: "إكسسوار", kind: "bag", price: 189 },
+  { id: "phone", name: "غطاء هاتف", nameEn: "Phone case", cat: "إلكترونيات", kind: "phone", price: 45 },
+  { id: "cup", name: "كوب حراري", nameEn: "Travel cup", cat: "منزل", kind: "cup", price: 72 },
+  { id: "book", name: "دفتر ملاحظات", nameEn: "Notebook", cat: "قرطاسية", kind: "book", price: 28 },
+  { id: "shoe", name: "حذاء رياضي", nameEn: "Sports shoe", cat: "ملابس", kind: "shoe", price: 310 },
+  { id: "lamp", name: "مصباح مكتب", nameEn: "Desk lamp", cat: "منزل", kind: "lamp", price: 145 },
+  { id: "watch", name: "ساعة يد", nameEn: "Wrist watch", cat: "إكسسوار", kind: "watch", price: 420 },
+  { id: "plant", name: "نبتة صغيرة", nameEn: "Small plant", cat: "منزل", kind: "plant", price: 55 },
 ];
 
 export const PRICE_CATALOG = [
-  { n: "حقيبة جلد يدوية", c: "أزياء", p: 340, k: "bag" },
-  { n: "سمّاعات لاسلكية", c: "إلكترونيات", p: 520, k: "phone" },
-  { n: "طقم فناجين فخّار", c: "البيت", p: 130, k: "cup" },
-  { n: "كورس تصوير كامل", c: "تعليم", p: 260, k: "book" },
-  { n: "حذاء رياضي", c: "رياضة", p: 410, k: "shoe" },
-  { n: "مصباح طاولة خشب", c: "البيت", p: 185, k: "lamp" },
-  { n: "ساعة كلاسيكية", c: "أزياء", p: 760, k: "watch" },
-  { n: "نبتة داخلية كبيرة", c: "البيت", p: 95, k: "plant" },
+  { n: "حقيبة جلد يدوية", e: "Leather bag", c: "أزياء", p: 340, k: "bag" },
+  { n: "سمّاعات لاسلكية", e: "Wireless headphones", c: "إلكترونيات", p: 520, k: "phone" },
+  { n: "طقم فناجين فخّار", e: "Clay cups", c: "البيت", p: 130, k: "cup" },
+  { n: "كورس تصوير كامل", e: "Photo course", c: "تعليم", p: 260, k: "book" },
+  { n: "حذاء رياضي", e: "Sports shoe", c: "رياضة", p: 410, k: "shoe" },
+  { n: "مصباح طاولة خشب", e: "Wood lamp", c: "البيت", p: 185, k: "lamp" },
+  { n: "ساعة كلاسيكية", e: "Classic watch", c: "أزياء", p: 760, k: "watch" },
+  { n: "نبتة داخلية كبيرة", e: "Indoor plant", c: "البيت", p: 95, k: "plant" },
 ];
 
 export const BASKET_ITEMS = [
-  { n: "حقيبة جلد", p: 340, k: "bag" },
-  { n: "سمّاعات", p: 520, k: "phone" },
-  { n: "طقم فناجين", p: 130, k: "cup" },
-  { n: "كورس تصوير", p: 260, k: "book" },
-  { n: "حذاء رياضي", p: 410, k: "shoe" },
-  { n: "مصباح خشب", p: 185, k: "lamp" },
-  { n: "ساعة كلاسيك", p: 760, k: "watch" },
-  { n: "نبتة كبيرة", p: 95, k: "plant" },
-  { n: "وشاح صوف", p: 120, k: "bag" },
-  { n: "دفتر جلد", p: 75, k: "book" },
-  { n: "كوب معزول", p: 145, k: "cup" },
-  { n: "حزام جلد", p: 210, k: "shoe" },
+  { n: "حقيبة جلد", e: "Leather bag", p: 340, k: "bag" },
+  { n: "سمّاعات", e: "Headphones", p: 520, k: "phone" },
+  { n: "طقم فناجين", e: "Cup set", p: 130, k: "cup" },
+  { n: "كورس تصوير", e: "Photo course", p: 260, k: "book" },
+  { n: "حذاء رياضي", e: "Sports shoe", p: 410, k: "shoe" },
+  { n: "مصباح خشب", e: "Wood lamp", p: 185, k: "lamp" },
+  { n: "ساعة كلاسيك", e: "Classic watch", p: 760, k: "watch" },
+  { n: "نبتة كبيرة", e: "Large plant", p: 95, k: "plant" },
+  { n: "وشاح صوف", e: "Wool scarf", p: 120, k: "bag" },
+  { n: "دفتر جلد", e: "Leather notebook", p: 75, k: "book" },
+  { n: "كوب معزول", e: "Insulated cup", p: 145, k: "cup" },
+  { n: "حزام جلد", e: "Leather belt", p: 210, k: "shoe" },
 ];
 
 export const WHEEL_SLICES = [5, 10, 15, 20, 25, 30];
