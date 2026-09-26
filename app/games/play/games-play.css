@@ -1260,9 +1260,104 @@ body:has(.um-game-fit) {
   box-shadow: 0 0 10px rgba(240, 169, 59, 0.95);
 }
 
-.um-game-fit-marble .um-game-fit-body > h2,
-.um-game-fit-marble .um-game-fit-body > [data-games-subtitle] {
+html:has(.um-game-fit-marble),
+html:has(.um-game-fit-marble) body,
+html[data-marble-play],
+html[data-marble-play] body {
+  overflow: hidden;
+  max-width: 100%;
+  width: 100%;
+}
+
+html:has(.um-game-fit-marble) nav.fixed,
+html:has(.um-game-fit-marble) footer,
+html[data-marble-play] nav.fixed,
+html[data-marble-play] footer {
+  display: none !important;
+}
+
+.um-game-fit-marble {
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.um-marble-page {
+  flex: 1;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.um-game-fit-marble .um-marble-page > h2,
+.um-game-fit-marble .um-marble-page > [data-games-subtitle] {
   display: none;
+}
+
+.um-marble-shell {
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.um-marble-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  padding-top: max(8px, env(safe-area-inset-top));
+  padding-bottom: 6px;
+  padding-left: max(8px, env(safe-area-inset-left));
+  padding-right: max(8px, env(safe-area-inset-right));
+  overflow: hidden;
+}
+
+.um-marble-readout {
+  min-width: 0;
+  flex: 1;
+  color: #ffe7a3;
+  font-weight: 800;
+  font-size: 16px;
+  line-height: 1.1;
+}
+
+.um-marble-readout small {
+  display: block;
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.um-marble-icon {
+  flex: 0 0 auto;
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  border: 1px solid rgba(240, 169, 59, 0.55);
+  background: rgba(10, 16, 40, 0.72);
+  color: #ffe7a3;
+  font-size: 16px;
+  line-height: 1;
+  font-weight: 800;
+  display: grid;
+  place-items: center;
+  text-decoration: none;
+  overflow: hidden;
+}
+
+.um-marble-over {
+  inset: 8%;
 }
 
 .um-marble-stage {
@@ -1276,9 +1371,14 @@ body:has(.um-game-fit) {
   display: block;
   width: 100%;
   height: 100%;
-  border-radius: 16px;
+  min-width: 0;
+  border-radius: 0;
   touch-action: none;
   direction: ltr;
+}
+
+.um-marble-help p {
+  min-width: 0;
 }
 
 .um-marble-help {
