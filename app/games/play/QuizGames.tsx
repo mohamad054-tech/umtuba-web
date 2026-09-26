@@ -9,8 +9,10 @@ import {
   FLAGS,
   LESSON_QUIZ,
   QUICK_Q,
+  DISCOUNT_PERCENTS,
   STORE_PRODUCTS,
   VOCAB,
+  exactDiscountPrices,
   pickQuiz,
   type QuizItem,
 } from "../../../lib/games/play/banks";
@@ -177,20 +179,21 @@ function blankQuiz(): QuizItem[] {
 }
 
 function discountQuiz(): QuizItem[] {
+  const distractors = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 60];
   return Array.from({ length: 8 }, () => {
     const product = shuffled(STORE_PRODUCTS)[0] ?? STORE_PRODUCTS[0]!;
-    const pct = [10, 15, 20, 25, 30, 35, 40, 50][Math.floor(Math.random() * 8)] ?? 20;
-    const sale = Math.round((product.price * (100 - pct)) / 100);
-    const opts = new Set([pct]);
+    const pct = DISCOUNT_PERCENTS[Math.floor(Math.random() * DISCOUNT_PERCENTS.length)] ?? 20;
+    const { old, sale } = exactDiscountPrices(product.price, pct);
+    const opts = new Set<number>([pct]);
     while (opts.size < 4) {
-      opts.add([5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 60][Math.floor(Math.random() * 11)] ?? 10);
+      opts.add(distractors[Math.floor(Math.random() * distractors.length)] ?? 10);
     }
-    const choices = shuffled([...opts].map(String));
+    const choices = shuffled([...opts].map((n) => `${n}%`));
     return {
-      prompt: `${product.name}|${product.price}|${sale}`,
+      prompt: `${product.name}|${old}|${sale}`,
       choices,
-      correct: choices.indexOf(String(pct)),
-      why: `${product.price} ← ${sale} = ${pct}%`,
+      correct: choices.indexOf(`${pct}%`),
+      why: `${old} − ${sale} = ${old - sale} → ${pct}%`,
     };
   });
 }
