@@ -6,7 +6,7 @@ import {
   getMeaningsForLocale,
   getMuyassarTafsir,
 } from "../../../../lib/hifz/sourcedTexts";
-import { line, quranUi } from "../../../../lib/hifz/quranUiCopy";
+import { quranNotesCopy } from "../../../../lib/hifz/quranUiCopy";
 import { getLocaleDirection } from "../../../../lib/i18n/locales";
 
 /**
@@ -15,7 +15,8 @@ import { getLocaleDirection } from "../../../../lib/i18n/locales";
  */
 export function VerseSourcedNotes({ ayahNumber }: { ayahNumber: number }) {
   const { locale } = useTranslation();
-  const ui = quranUi(locale);
+  const pageLocale = locale === "en" ? "ar" : locale;
+  const ui = quranNotesCopy(pageLocale);
   const [openTafsir, setOpenTafsir] = useState(false);
   const [openMeanings, setOpenMeanings] = useState(false);
 
@@ -42,9 +43,7 @@ export function VerseSourcedNotes({ ayahNumber }: { ayahNumber: number }) {
             className="min-h-11 rounded-full border border-[#e8c87a]/30 bg-[#e8c87a]/10 px-4 py-2 text-sm text-[#f5e6b8]"
             aria-expanded={openTafsir}
           >
-            {openTafsir
-              ? line(locale, ui.hideAr, ui.hideEn)
-              : line(locale, ui.tafsirButtonAr, ui.tafsirButtonEn)}
+            {openTafsir ? ui.hide : ui.tafsir}
           </button>
         ) : null}
         {meanings ? (
@@ -54,9 +53,7 @@ export function VerseSourcedNotes({ ayahNumber }: { ayahNumber: number }) {
             className="min-h-11 rounded-full border border-white/20 bg-white/5 px-4 py-2 text-sm text-white/75"
             aria-expanded={openMeanings}
           >
-            {openMeanings
-              ? line(locale, ui.hideAr, ui.hideEn)
-              : line(locale, ui.meaningsButtonAr, ui.meaningsButtonEn)}
+            {openMeanings ? ui.hide : ui.meanings}
           </button>
         ) : null}
       </div>
@@ -89,7 +86,7 @@ export function VerseSourcedNotes({ ayahNumber }: { ayahNumber: number }) {
           lang={meanings.resolvedLocale}
         >
           <p className="text-[11px] text-white/45">
-            {line(locale, ui.meaningsLabelAr, ui.meaningsLabelEn)}
+            {ui.meanings}
           </p>
           <p className="mt-1 text-[11px] text-[#e8c87a]/65">
             {locale === "ar"

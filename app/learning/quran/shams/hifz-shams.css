@@ -1,3 +1,24 @@
+/* The surah screen used to lock to the window and clip the player.
+   The shell scrolls when a verse, an open note, or a short window is taller
+   than the screen. The picture shrinks first so the player still fits. */
+.hifz-shell {
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.hifz-ayah-frame {
+  width: min(100%, 22.5rem);
+  aspect-ratio: 1;
+  flex: 0 1 auto;
+}
+
+@media (max-height: 1020px) {
+  .hifz-ayah-frame {
+    width: min(100%, 18rem, max(7rem, calc(100dvh - 34rem)));
+  }
+}
+
 @keyframes hifz-shake {
   0%,
   100% {

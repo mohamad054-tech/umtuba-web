@@ -1,6 +1,6 @@
 /**
- * Bilingual (AR + EN) UI chrome for Quran Learning surfaces.
- * Other site locales fall back to English. Never machine-translates Quran/tafsir.
+ * UI chrome for Quran Learning surfaces.
+ * Surah notes follow the visitor language. Quran and tafsir text are never machine-translated.
  */
 
 import type { AppLocale } from "../i18n/locales";
@@ -61,9 +61,9 @@ const COPY: Copy = {
   memorizeCtaEn: "Start memorizing",
   tafsirButtonAr: "التفسير",
   tafsirButtonEn: "Tafsir",
-  meaningsButtonAr: "ترجمة معاني القرآن",
+  meaningsButtonAr: "ترجمة المعاني",
   meaningsButtonEn: "Translation of the meanings",
-  meaningsLabelAr: "ترجمة معاني القرآن",
+  meaningsLabelAr: "ترجمة المعاني",
   meaningsLabelEn: "Translation of the meanings",
   hideAr: "إخفاء",
   hideEn: "Hide",
@@ -80,4 +80,55 @@ export function quranUi(locale: AppLocale): Copy & { primary: "ar" | "en" } {
 
 export function line(locale: AppLocale, ar: string, en: string): string {
   return locale === "ar" ? ar : en;
+}
+
+type NotesCopy = {
+  tafsir: string;
+  meanings: string;
+  hide: string;
+};
+
+/** Button labels under each ayah. One text per site language. */
+const NOTES: Record<AppLocale, NotesCopy> = {
+  ar: { tafsir: "التفسير", meanings: "ترجمة المعاني", hide: "إخفاء" },
+  en: {
+    tafsir: "Tafsir",
+    meanings: "Translation of the meanings",
+    hide: "Hide",
+  },
+  fr: {
+    tafsir: "Tafsir",
+    meanings: "Traduction des sens",
+    hide: "Masquer",
+  },
+  es: {
+    tafsir: "Tafsir",
+    meanings: "Traducción de los significados",
+    hide: "Ocultar",
+  },
+  de: {
+    tafsir: "Tafsir",
+    meanings: "Übersetzung der Bedeutungen",
+    hide: "Ausblenden",
+  },
+  pt: {
+    tafsir: "Tafsir",
+    meanings: "Tradução dos significados",
+    hide: "Ocultar",
+  },
+  id: {
+    tafsir: "Tafsir",
+    meanings: "Terjemahan makna",
+    hide: "Sembunyikan",
+  },
+  hi: { tafsir: "तफ़सीर", meanings: "अर्थों का अनुवाद", hide: "छिपाएँ" },
+  ru: { tafsir: "Тафсир", meanings: "Перевод смыслов", hide: "Скрыть" },
+  tr: { tafsir: "Tefsir", meanings: "Anlamların çevirisi", hide: "Gizle" },
+  "zh-CN": { tafsir: "经注", meanings: "经义翻译", hide: "隐藏" },
+  ja: { tafsir: "タフスィール", meanings: "意味の訳", hide: "隠す" },
+  ko: { tafsir: "타프시르", meanings: "의미 번역", hide: "숨기기" },
+};
+
+export function quranNotesCopy(locale: AppLocale): NotesCopy {
+  return NOTES[locale];
 }

@@ -474,7 +474,7 @@ export default function HifzShamsExperience() {
 
   return (
     <div
-      className={`${amiriQuran.variable} fixed inset-0 z-[200] flex flex-col overflow-hidden text-white`}
+      className={`${amiriQuran.variable} hifz-shell fixed inset-0 z-[200] flex flex-col text-white`}
       dir="rtl"
       lang="ar"
       style={{
@@ -583,7 +583,7 @@ export default function HifzShamsExperience() {
           )}
         </div>
       </div>
-      <main className="relative z-10 flex min-h-0 flex-1 flex-col px-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
+      <main className="relative z-10 flex flex-1 flex-col px-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
         {surface === "path" && showPathAyahPane && (
           <div
             className={`mx-auto flex w-full max-w-3xl flex-1 flex-col transition-opacity duration-300 ${
@@ -597,9 +597,9 @@ export default function HifzShamsExperience() {
               </span>
             </p>
 
-            <div className="flex flex-1 flex-col items-center justify-center gap-5">
+            <div className="flex flex-col items-center gap-4">
               <div
-                className="relative aspect-square w-full max-w-[min(100%,320px)] overflow-hidden rounded-[28px] border border-white/10 bg-[#080816]/70 transition-opacity duration-700 sm:max-w-[min(100%,360px)]"
+                className="hifz-ayah-frame relative overflow-hidden rounded-[28px] border border-white/10 bg-[#080816]/70 transition-opacity duration-700"
                 style={{ opacity: imageOpacity }}
               >
                 {imageSrc && !showBasmala ? (
@@ -763,7 +763,7 @@ export default function HifzShamsExperience() {
         )}
 
         {surface === "map" && (
-          <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-4 overflow-y-auto">
+          <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-4">
             <div className="rounded-2xl border border-[#e8c87a]/20 bg-[#080816]/80 px-4 py-4 text-center">
               <p className="text-2xl font-medium text-[#f5e6b8]">{mapPercent}%</p>
               <p className="mt-1 text-sm text-white/60">نسبة الآيات المحفوظة</p>
@@ -803,7 +803,7 @@ export default function HifzShamsExperience() {
         )}
 
         {surface === "reviews" && (
-          <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col items-center gap-4 overflow-y-auto pt-4">
+          <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col items-center gap-4 pt-4">
             <p className="text-sm text-white/55">مراجعات مستحقة اليوم</p>
             {dueToday.length === 0 ? (
               <p className="text-center text-[#e8c87a]/85">لا مراجعات اليوم — أحسنت.</p>
@@ -893,8 +893,8 @@ export default function HifzShamsExperience() {
         {surface === "tilawa" && (
           <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col">
             <p className="mb-2 text-center text-sm text-[#e8c87a]/85">وصل التلاوة</p>
-            <div className="flex flex-1 flex-col items-center justify-center gap-5">
-              <div className="relative aspect-square w-full max-w-[min(100%,320px)] overflow-hidden rounded-[28px] border border-white/10 bg-[#080816]/70 sm:max-w-[min(100%,360px)]">
+            <div className="flex flex-col items-center gap-4">
+              <div className="hifz-ayah-frame relative overflow-hidden rounded-[28px] border border-white/10 bg-[#080816]/70">
                 {ayahImageSrc(path.ayah) && !showBasmala ? (
                   <Image
                     src={ayahImageSrc(path.ayah)!}
@@ -1034,7 +1034,7 @@ export default function HifzShamsExperience() {
         )}
 
         {surface === "order" && (
-          <div className="relative mx-auto flex h-full w-full max-w-3xl flex-1 flex-col">
+          <div className="relative mx-auto flex min-h-[70dvh] w-full max-w-3xl flex-1 flex-col">
             {!orderStarted && (
               <div className="relative z-10 mb-3 shrink-0 rounded-2xl border border-[#e8c87a]/20 bg-[#080816]/80 px-4 py-3">
                 <p className="text-center text-base leading-relaxed text-[#f3e6c0]">
