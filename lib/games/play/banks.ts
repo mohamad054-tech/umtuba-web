@@ -121,7 +121,16 @@ export const STEPS = [
   { title: "صنع الشاي", titleEn: "Make tea", steps: ["سخّن الماء", "ضع الشاي في الإبريق", "اسكب الماء", "انتظر دقيقتين", "قدّم الكأس"] },
   { title: "نشر فيديو", titleEn: "Post a video", steps: ["صوّر المقطع", "راجع الجودة", "أضف العنوان", "ارفع الملف", "انشر"] },
   { title: "غسل اليدين", titleEn: "Wash your hands", steps: ["بلّل اليدين", "ضع الصابون", "افرك ٢٠ ثانية", "اشطف", "نشّف"] },
+  { title: "إرسال رسالة", titleEn: "Send a message", steps: ["افتح المحادثة", "اكتب الرسالة", "راجع النص", "اضغط إرسال", "تأكد أنها وصلت"] },
+  { title: "زراعة بذرة", titleEn: "Plant a seed", steps: ["أحضر الأصيص", "ضع التربة", "ازرع البذرة", "اسقِ التربة", "ضعها في الضوء"] },
+  { title: "شحن الهاتف", titleEn: "Charge a phone", steps: ["أوصل الشاحن بالمقبس", "أوصل السلك بالهاتف", "انتظر اكتمال الشحن", "افصل السلك عن الهاتف", "اسحب الشاحن من المقبس"] },
+  { title: "غسل الأطباق", titleEn: "Wash the dishes", steps: ["اجمع الأطباق", "أضف ماءً وصابوناً", "افرك الأطباق", "اشطف الصابون", "ضعها لتجف"] },
+  { title: "عبور الشارع", titleEn: "Cross the street", steps: ["قف على الرصيف", "انظر يميناً ويساراً", "انتظر خلو الطريق", "امشِ على الممر", "اكمل إلى الرصيف الآخر"] },
 ];
+
+export function stepsInOrder(order: readonly string[], truth: readonly string[]): boolean {
+  return order.length === truth.length && truth.length > 0 && order.every((step, idx) => step === truth[idx]);
+}
 
 export const TERMS = [
   { t: "الخوارزمية", e: "Algorithm", d: "خطوات مرتّبة لحل مسألة" },

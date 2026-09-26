@@ -12,6 +12,7 @@ import {
   PRICE_CATALOG,
   STEPS,
   STORE_PRODUCTS,
+  stepsInOrder,
   TERMS,
   TYPE_PHRASES,
   WHEEL_SLICES,
@@ -297,14 +298,17 @@ export function OrderStepsGame() {
   const [sel, setSel] = useState<number | null>(null);
   const [score, setScore] = useState(0);
   const [done, setDone] = useState(false);
+  const [mark, setMark] = useState<"" | "ok" | "no">("");
 
   const deal = (index = 0) => {
     const pack = shuffled(STEPS[index]?.steps ?? []);
     setItems(pack);
     setSel(null);
+    setMark("");
   };
   const begin = () => { if (!help.ready) { setI(0); setScore(0); setDone(false); deal(0); } help.dismissHelp(); };
   const tap = (idx: number) => {
+    if (mark) return;
     if (sel == null) { setSel(idx); return; }
     if (sel === idx) { setSel(null); return; }
     const next = [...items];
@@ -313,14 +317,30 @@ export function OrderStepsGame() {
     next[idx] = a;
     setItems(next);
     setSel(null);
-    sfx.ok();
+    sfx.flip();
+  };
+  const advance = () => {
+    if (i + 1 >= STEPS.length) setDone(true);
+    else {
+      const next = i + 1;
+      setI(next);
+      deal(next);
+    }
   };
   const confirm = () => {
+    if (mark) {
+      advance();
+      return;
+    }
     const truth = STEPS[i]?.steps ?? [];
-    const hit = items.every((step, idx) => step === truth[idx]);
-    if (hit) { setScore((n) => n + 130); sfx.ok(); } else sfx.no();
-    if (i + 1 >= STEPS.length) { writeBestIfHigher("order-steps", score + (hit ? 130 : 0)); setDone(true); }
-    else { const next = i + 1; setI(next); deal(next); }
+    const hit = stepsInOrder(items, truth);
+    const total = score + (hit ? 130 : 0);
+    setScore(total);
+    setMark(hit ? "ok" : "no");
+    setSel(null);
+    if (hit) sfx.ok();
+    else sfx.no();
+    if (i + 1 >= STEPS.length) writeBestIfHigher("order-steps", total);
   };
 
   if (done) {
@@ -334,20 +354,28 @@ export function OrderStepsGame() {
   return (
     <Shell slug="order-steps" howTo={["games.order-steps.howTo1", "games.order-steps.howTo2", "games.order-steps.howTo3"]} stats={<PlayStat label={t("games.score")} value={formatPlayNumber(locale, score)} />} ready={help.ready} helpOpen={help.helpOpen} onToggleHelp={help.toggleHelp} begin={begin}>
       <div className="um-learn-board" dir={locale === "ar" ? "rtl" : "ltr"}>
-      <p className="um-learn-prompt um-play-qtext">
+      <p className={`um-learn-prompt um-play-qtext${mark ? ` ${mark}` : ""}`}>
         <span>{STEPS[i]?.title}</span>
-        <span className="um-learn-en" dir="ltr">{STEPS[i]?.titleEn}</span>
+        {mark === "ok" ? (
+          <span className="um-learn-en">{t("games.correct")}</span>
+        ) : mark === "no" ? (
+          <span className="um-learn-en">{locale === "ar" ? "الترتيب الصحيح" : "Correct order"}</span>
+        ) : (
+          <span className="um-learn-en" dir="ltr">{STEPS[i]?.titleEn}</span>
+        )}
       </p>
       <div className="um-play-sort um-learn-steps">
-        {items.map((text, idx) => (
-          <button key={`${text}-${idx}`} type="button" className={`um-play-step${sel === idx ? " sel" : ""}`} data-play-item="true" onClick={() => tap(idx)}>
+        {(mark ? STEPS[i]?.steps ?? [] : items).map((text, idx) => (
+          <button key={`${text}-${idx}`} type="button" className={`um-play-step${mark ? " answer" : ""}${sel === idx ? " sel" : ""}`} data-play-item="true" disabled={mark !== ""} onClick={() => tap(idx)}>
             <span className="n">{idx + 1}</span>
             <span>{text}</span>
           </button>
         ))}
       </div>
       <div className="um-play-row">
-        <button type="button" className="um-play-btn go" data-play-item="true" onClick={confirm}>{t("games.confirm")}</button>
+        <button type="button" className="um-play-btn go" data-play-item="true" onClick={confirm}>
+          {mark ? (i + 1 >= STEPS.length ? t("games.results") : t("games.next")) : t("games.confirm")}
+        </button>
       </div>
       </div>
     </Shell>
