@@ -202,6 +202,7 @@ export function LessonQuizGame() {
   return (
     <QuizPlay
       slug="lesson-quiz"
+      learn
       howTo={["games.lesson-quiz.howTo1", "games.lesson-quiz.howTo2", "games.lesson-quiz.howTo3"]}
       load={() => pickQuiz(LESSON_QUIZ, 6)}
       seconds={20}
@@ -213,6 +214,7 @@ export function QuickQGame() {
   return (
     <QuizPlay
       slug="quick-q"
+      learn
       howTo={["games.quick-q.howTo1", "games.quick-q.howTo2", "games.quick-q.howTo3"]}
       load={() => pickQuiz(QUICK_Q, 10)}
       seconds={12}
@@ -224,10 +226,15 @@ export function VocabGame() {
   return (
     <QuizPlay
       slug="vocab"
+      learn
       howTo={["games.vocab.howTo1", "games.vocab.howTo2", "games.vocab.howTo3"]}
       load={vocabQuiz}
       seconds={12}
-      extra={(item) => <p className="um-play-enword">{item.prompt}</p>}
+      extra={(item) => (
+        <p className="um-play-enword" dir="ltr">
+          {item.prompt}
+        </p>
+      )}
       hidePrompt
     />
   );
@@ -237,6 +244,7 @@ export function FillBlankGame() {
   return (
     <QuizPlay
       slug="fill-blank"
+      learn
       howTo={["games.fill-blank.howTo1", "games.fill-blank.howTo2", "games.fill-blank.howTo3"]}
       load={blankQuiz}
       seconds={14}

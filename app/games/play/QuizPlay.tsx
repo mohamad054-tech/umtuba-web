@@ -30,6 +30,7 @@ type Props = {
   hidePrompt?: boolean;
   fit?: boolean;
   globe?: boolean;
+  learn?: boolean;
 };
 
 function GoldGlobe({
@@ -47,6 +48,18 @@ function GoldGlobe({
   );
 }
 
+function PromptLine({ text }: { text: string }) {
+  if (!text.includes("___")) return <p className="um-play-qtext">{text}</p>;
+  const [before, after] = text.split("___");
+  return (
+    <p className="um-play-qtext">
+      {before}
+      <span className="um-learn-blank">___</span>
+      {after}
+    </p>
+  );
+}
+
 function ChoiceText({ text }: { text: string }) {
   const [arabic, english] = text.split("\n");
   if (!english) return <span>{text}</span>;
@@ -58,7 +71,7 @@ function ChoiceText({ text }: { text: string }) {
   );
 }
 
-export default function QuizPlay({ slug, howTo, load, seconds, extra, hidePrompt, fit, globe }: Props) {
+export default function QuizPlay({ slug, howTo, load, seconds, extra, hidePrompt, fit, globe, learn }: Props) {
   const { t, locale } = useI18n();
   const sfx = useMemo(() => createPlaySfx(), []);
   const { helpOpen, ready, dismissHelp, toggleHelp, keepReadyOnReplay } = usePlayHelp();
@@ -168,7 +181,7 @@ export default function QuizPlay({ slug, howTo, load, seconds, extra, hidePrompt
   if (done) {
     return (
       <PlayPanel
-        fill={fit || globe}
+        fill={fit || globe || learn}
         stats={<PlayStat label={t("games.score")} value={formatPlayNumber(locale, score)} />}
         helpOpen={helpOpen}
         onToggleHelp={toggleHelp}
@@ -192,7 +205,7 @@ export default function QuizPlay({ slug, howTo, load, seconds, extra, hidePrompt
 
   return (
     <PlayPanel
-      fill={fit || globe}
+      fill={fit || globe || learn}
       stats={
         <>
           <PlayStat label={t("games.score")} value={formatPlayNumber(locale, score)} />
@@ -212,23 +225,28 @@ export default function QuizPlay({ slug, howTo, load, seconds, extra, hidePrompt
       {ready && item ? (
         <div
           ref={boardRef}
-          className={`um-play-quiz um-lit-board${fit || globe ? " um-place-quiz" : ""}${globe ? " um-globe-quiz" : ""}${
+          className={`um-play-quiz um-lit-board${fit || globe ? " um-place-quiz" : ""}${learn ? " um-learn-quiz" : ""}${globe ? " um-globe-quiz" : ""}${
             pick != null && pick === item.correct ? " ok um-play-celebrate" : ""
           }${pick != null && pick !== item.correct ? " no" : ""}`}
-          dir="ltr"
+          dir={learn && locale === "ar" ? "rtl" : "ltr"}
         >
           <p className="um-play-qnum">
             {t("games.question")} {formatPlayNumber(locale, index + 1)} {t("games.of")}{" "}
             {formatPlayNumber(locale, deck.length)}
           </p>
-          {extra ? (
+          {learn ? (
+            <div className={`um-learn-prompt${pick == null ? "" : pick === item.correct ? " ok" : " no"}`}>
+              {extra ? extra(item, index) : null}
+              {hidePrompt ? null : <PromptLine text={item.prompt} />}
+            </div>
+          ) : extra ? (
             globe ? (
               <GoldGlobe mark={pick == null ? "" : pick === item.correct ? "ok" : "no"}>{extra(item, index)}</GoldGlobe>
             ) : (
               extra(item, index)
             )
           ) : null}
-          {hidePrompt ? null : <p className="um-play-qtext">{item.prompt}</p>}
+          {learn || hidePrompt ? null : <p className="um-play-qtext">{item.prompt}</p>}
           <div className="um-play-choices">
             {item.choices.map((text, choice) => (
               <button
