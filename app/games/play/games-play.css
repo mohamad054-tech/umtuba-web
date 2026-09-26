@@ -3362,6 +3362,16 @@ html[data-marble-play] footer {
   box-shadow: 0 0 10px rgba(240, 169, 59, 0.45);
 }
 
+.um-game-fit-quiz .um-play-step.answer {
+  border-color: #7ef6c2;
+  box-shadow: 0 0 14px rgba(126, 246, 194, 0.55);
+}
+
+.um-game-fit-quiz .um-play-step:disabled {
+  opacity: 1;
+  color: #f7f4ea;
+}
+
 .um-game-fit-quiz .um-play-step.sel,
 .um-game-fit-quiz .um-play-choice.sel {
   border-color: #7ef6c2;
