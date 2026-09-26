@@ -12,7 +12,10 @@ import {
   PRICE_CATALOG,
   STEPS,
   STORE_PRODUCTS,
-  stepsInOrder,
+  orderPhaseAfterConfirm,
+  orderPhaseAfterNext,
+  reviewOrder,
+  type OrderPhase,
   TERMS,
   TYPE_PHRASES,
   WHEEL_SLICES,
@@ -298,17 +301,20 @@ export function OrderStepsGame() {
   const [sel, setSel] = useState<number | null>(null);
   const [score, setScore] = useState(0);
   const [done, setDone] = useState(false);
-  const [mark, setMark] = useState<"" | "ok" | "no">("");
+  const [phase, setPhase] = useState<OrderPhase>("play");
+  const phaseRef = useRef<OrderPhase>("play");
+  const revealedAt = useRef(0);
 
   const deal = (index = 0) => {
     const pack = shuffled(STEPS[index]?.steps ?? []);
     setItems(pack);
     setSel(null);
-    setMark("");
+    phaseRef.current = "play";
+    setPhase("play");
   };
   const begin = () => { if (!help.ready) { setI(0); setScore(0); setDone(false); deal(0); } help.dismissHelp(); };
   const tap = (idx: number) => {
-    if (mark) return;
+    if (phaseRef.current !== "play") return;
     if (sel == null) { setSel(idx); return; }
     if (sel === idx) { setSel(null); return; }
     const next = [...items];
@@ -320,6 +326,8 @@ export function OrderStepsGame() {
     sfx.flip();
   };
   const advance = () => {
+    if (orderPhaseAfterNext(phaseRef.current) !== "advance") return;
+    if (Date.now() - revealedAt.current < 500) return;
     if (i + 1 >= STEPS.length) setDone(true);
     else {
       const next = i + 1;
@@ -328,20 +336,21 @@ export function OrderStepsGame() {
     }
   };
   const confirm = () => {
-    if (mark) {
-      advance();
-      return;
-    }
+    if (orderPhaseAfterConfirm(phaseRef.current) === "review" && phaseRef.current === "review") return;
     const truth = STEPS[i]?.steps ?? [];
-    const hit = stepsInOrder(items, truth);
-    const total = score + (hit ? 130 : 0);
+    const review = reviewOrder(items, truth);
+    const total = score + (review.hit ? 130 : 0);
     setScore(total);
-    setMark(hit ? "ok" : "no");
+    phaseRef.current = "review";
+    revealedAt.current = Date.now();
+    setPhase("review");
     setSel(null);
-    if (hit) sfx.ok();
+    if (review.hit) sfx.ok();
     else sfx.no();
     if (i + 1 >= STEPS.length) writeBestIfHigher("order-steps", total);
   };
+  const truth = STEPS[i]?.steps ?? [];
+  const review = reviewOrder(items, truth);
 
   if (done) {
     return (
@@ -354,28 +363,50 @@ export function OrderStepsGame() {
   return (
     <Shell slug="order-steps" howTo={["games.order-steps.howTo1", "games.order-steps.howTo2", "games.order-steps.howTo3"]} stats={<PlayStat label={t("games.score")} value={formatPlayNumber(locale, score)} />} ready={help.ready} helpOpen={help.helpOpen} onToggleHelp={help.toggleHelp} begin={begin}>
       <div className="um-learn-board" dir={locale === "ar" ? "rtl" : "ltr"}>
-      <p className={`um-learn-prompt um-play-qtext${mark ? ` ${mark}` : ""}`}>
+      <p className={`um-learn-prompt um-play-qtext${phase === "review" ? (review.hit ? " ok" : " no") : ""}`}>
         <span>{STEPS[i]?.title}</span>
-        {mark === "ok" ? (
-          <span className="um-learn-en">{t("games.correct")}</span>
-        ) : mark === "no" ? (
-          <span className="um-learn-en">{locale === "ar" ? "الترتيب الصحيح" : "Correct order"}</span>
-        ) : (
-          <span className="um-learn-en" dir="ltr">{STEPS[i]?.titleEn}</span>
-        )}
+        {phase === "review" && review.hit ? <span className="um-learn-en">{t("games.correct")}</span> : null}
+        {phase === "play" ? <span className="um-learn-en" dir="ltr">{STEPS[i]?.titleEn}</span> : null}
       </p>
-      <div className="um-play-sort um-learn-steps">
-        {(mark ? STEPS[i]?.steps ?? [] : items).map((text, idx) => (
-          <button key={`${text}-${idx}`} type="button" className={`um-play-step${mark ? " answer" : ""}${sel === idx ? " sel" : ""}`} data-play-item="true" disabled={mark !== ""} onClick={() => tap(idx)}>
-            <span className="n">{idx + 1}</span>
-            <span>{text}</span>
-          </button>
-        ))}
-      </div>
+      {phase === "review" && !review.hit ? (
+        <div className="um-step-reveal">
+          <p className="um-step-label bad">{locale === "ar" ? "ترتيبك" : "Your order"}</p>
+          <div className="um-step-col yours">
+            {review.yours.map((line) => (
+              <div key={`y-${line.n}`} className={`um-play-step${line.wrong ? " bad" : " good"}`}>
+                <span className="n">{line.n}</span>
+                <span>{line.text}</span>
+              </div>
+            ))}
+          </div>
+          <p className="um-step-label good">{locale === "ar" ? "الترتيب الصحيح" : "Correct order"}</p>
+          <div className="um-step-col truth" data-correct-order="true">
+            {review.correct.map((line) => (
+              <div key={`c-${line.n}`} className="um-play-step good">
+                <span className="n">{line.n}</span>
+                <span>{line.text}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : (
+        <div className="um-play-sort um-learn-steps">
+          {(phase === "review" ? review.correct : review.yours).map((line) => (
+            <button key={`${line.text}-${line.n}`} type="button" className={`um-play-step${phase === "review" ? " good" : ""}${sel === line.n - 1 ? " sel" : ""}`} data-play-item="true" disabled={phase !== "play"} onClick={() => tap(line.n - 1)}>
+              <span className="n">{line.n}</span>
+              <span>{line.text}</span>
+            </button>
+          ))}
+        </div>
+      )}
       <div className="um-play-row">
-        <button type="button" className="um-play-btn go" data-play-item="true" onClick={confirm}>
-          {mark ? (i + 1 >= STEPS.length ? t("games.results") : t("games.next")) : t("games.confirm")}
-        </button>
+        {phase === "play" ? (
+          <button type="button" className="um-play-btn go" data-play-item="true" onClick={confirm}>{t("games.confirm")}</button>
+        ) : (
+          <button type="button" className="um-play-btn go" data-play-item="true" onClick={advance}>
+            {i + 1 >= STEPS.length ? t("games.results") : t("games.next")}
+          </button>
+        )}
       </div>
       </div>
     </Shell>

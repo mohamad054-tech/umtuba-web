@@ -3362,6 +3362,72 @@ html[data-marble-play] footer {
   box-shadow: 0 0 10px rgba(240, 169, 59, 0.45);
 }
 
+.um-step-reveal {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.um-step-label {
+  margin: 0;
+  flex-shrink: 0;
+  font-size: 1rem;
+  font-weight: 900;
+  line-height: 1.2;
+}
+
+.um-step-label.bad {
+  color: #ffb4a8;
+}
+
+.um-step-label.good {
+  color: #ffe7a3;
+}
+
+.um-step-col {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.um-step-col.yours {
+  flex: 0.9 1 0;
+}
+
+.um-step-col.truth {
+  flex: 1.25 1 0;
+}
+
+.um-game-fit-quiz .um-play-step.bad {
+  border-color: #e85d4c;
+  background: linear-gradient(180deg, #4a1c24, #1a0c12);
+  box-shadow: 0 3px 0 #8a2e24;
+  color: #ffd0c8;
+  font-size: 0.78rem;
+  padding: 2px 8px;
+}
+
+.um-game-fit-quiz .um-play-step.good {
+  border-color: #f0a93b;
+  background:
+    linear-gradient(165deg, rgba(255, 231, 163, 0.28), transparent 46%),
+    linear-gradient(180deg, #24325f, #10182f);
+  box-shadow: 0 3px 0 #6a4a12, 0 0 14px rgba(240, 169, 59, 0.45);
+  color: #fff8e4;
+  font-size: 1.05rem;
+  font-weight: 800;
+  padding: 4px 8px;
+}
+
+.um-game-fit-quiz .um-play-step.good .n {
+  width: 34px;
+  height: 34px;
+  font-size: 1.05rem;
+}
+
 .um-game-fit-quiz .um-play-step.answer {
   border-color: #7ef6c2;
   box-shadow: 0 0 14px rgba(126, 246, 194, 0.55);
