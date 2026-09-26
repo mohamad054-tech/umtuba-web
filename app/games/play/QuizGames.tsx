@@ -138,6 +138,7 @@ export function FlagGuessGame() {
   return (
     <QuizPlay
       slug="flag-guess"
+      globe
       howTo={["games.flag-guess.howTo1", "games.flag-guess.howTo2", "games.flag-guess.howTo3"]}
       load={flagQuiz}
       seconds={18}
@@ -156,6 +157,7 @@ export function GuessCityGame() {
     <QuizPlay
       slug="guess-city"
       fit
+      globe
       howTo={["games.guess-city.howTo1", "games.guess-city.howTo2", "games.guess-city.howTo3"]}
       load={() => buildPlaceQuiz(GAME_CITIES, CITY_ROUND)}
       seconds={18}
