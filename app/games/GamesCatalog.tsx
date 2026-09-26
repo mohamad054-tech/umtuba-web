@@ -7,6 +7,7 @@ import {
   PLAYABLE_GAMES,
   gameArtworkSrc,
   gamesPlayPath,
+  isPlayableGameSlug,
 } from "../../lib/games/play/catalog";
 import { formatPlayNumber } from "../../lib/games/play/engine";
 import {
@@ -41,7 +42,7 @@ export default function GamesCatalog() {
       <h1 className="mt-2 text-3xl font-black tracking-tight">{t("games.title")}</h1>
       <p className="mt-3 mb-6 text-sm leading-7 text-white/55">{t("games.subtitle")}</p>
       <ul className="um-play-catalog" data-catalog-grid="true">
-        {PLAYABLE_GAMES.map((game, index) => {
+        {PLAYABLE_GAMES.filter((game) => isPlayableGameSlug(game.slug)).map((game, index) => {
           const best = bests[game.slug];
           const photo = Boolean(gameArtworkSrc(game.slug));
           return (

@@ -52,6 +52,9 @@ describe("playable games catalog", () => {
     ]);
     expect(isPlayableGameSlug("sudoku")).toBe(true);
     expect(isPlayableGameSlug("quick-q")).toBe(true);
+    expect(isPlayableGameSlug("wood-blocks")).toBe(true);
+    expect(isPlayableGameSlug("marble-chain")).toBe(false);
+    expect(getPlayableGame("marble-chain")).toBeNull();
     expect(getPlayableGame("missing")).toBeNull();
     expect(getPlayableGame("quick-q")?.arabicContent).toBe(true);
     expect(getPlayableGame("price")?.demoData).toBe(true);
